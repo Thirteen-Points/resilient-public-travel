@@ -1,0 +1,28 @@
+# --- Node / frontend ---
+node_modules/
+dist/
+.vite/
+*.local
+
+# --- Python / backend ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# --- Env & secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Editors & OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Build artifacts & caches ---
+*.log
+.cache/
+out/
