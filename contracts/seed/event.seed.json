@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "version": "seed-v0",
+    "built_at": "2026-09-21",
+    "purpose": "三态事件卡：低置信(单条社媒) / 中置信(多源合并) / 已发布(官方+审核)。用于 A 做时间线与卡片三态、B 做审核台空转测试。",
+    "provenance": "simulated"
+  },
+  "events": [
+    {
+      "event_id": "evt_seed_001",
+      "version": 1,
+      "status": "pending_review",
+      "created_at": "2026-09-22T08:03:20+08:00",
+      "updated_at": "2026-09-22T08:03:20+08:00",
+      "published_at": null,
+      "expires_at": null,
+      "event_type": "signal_failure",
+      "title": "东铁线过海段疑似信号故障（待核实）",
+      "summary": "社交平台用户称大围站广播东铁过海段信号故障、金钟方向停开。仅单一来源，尚未核实。",
+      "mode": "MTR",
+      "line": "ERL",
+      "direction": "both",
+      "affected_segments": [
+        {"from_node": "HUH", "to_node": "EXC", "impact": "closed", "capacity_factor": 0.0}
+      ],
+      "window": {"start": "2026-09-22T08:00:00+08:00", "end": null, "end_confidence": "unknown"},
+      "severity": 3,
+      "confidence": 0.20,
+      "confidence_factors": [
+        {"factor": "source_authority", "weight": 0.35, "score": 0.15, "note": "单一社媒用户，无账号历史"},
+        {"factor": "multi_source_agreement", "weight": 0.25, "score": 0.0, "note": "暂无第二来源"},
+        {"factor": "physical_consistency", "weight": 0.20, "score": 0.6, "note": "与站序一致，但无天气佐证"},
+        {"factor": "admin_confirmation", "weight": 0.20, "score": 0.0, "note": "未审核"}
+      ],
+      "signals": ["sig_seed_001"],
+      "reviewed_by": null,
+      "audit_log": [
+        {"at": "2026-09-22T08:03:20+08:00", "actor": "system", "action": "created", "confidence_after": 0.20}
+      ],
+      "provenance": "simulated",
+      "ui_state": "置信度条显示 20%，卡片右上角标「待核实」，地图**不变色**（未发布不生效）"
+    },
+    {
+      "event_id": "evt_seed_002",
+      "version": 2,
+      "status": "pending_review",
+      "created_at": "2026-09-22T08:03:20+08:00",
+      "updated_at": "2026-09-22T08:05:02+08:00",
+      "published_at": null,
+      "expires_at": null,
+      "event_type": "signal_failure",
+      "title": "东铁线红磡—会展过海段信号故障（3 源一致）",
+      "summary": "3 条独立社媒与 1 条用户上报一致指向红磡至会展站之间信号故障，东铁过海段服务暂停。等待人工确认。",
+      "mode": "MTR",
+      "line": "ERL",
+      "direction": "both",
+      "affected_segments": [
+        {"from_node": "HUH", "to_node": "EXC", "impact": "closed", "capacity_factor": 0.0},
+        {"from_node": "EXC", "to_node": "ADM", "impact": "closed", "capacity_factor": 0.0}
+      ],
+      "window": {"start": "2026-09-22T08:00:00+08:00", "end": null, "end_confidence": "unknown"},
+      "severity": 4,
+      "confidence": 0.55,
+      "confidence_factors": [
+        {"factor": "source_authority", "weight": 0.35, "score": 0.2, "note": "均为社媒与乘客上报"},
+        {"factor": "multi_source_agreement", "weight": 0.25, "score": 0.8, "note": "3 条独立来源一致，含 1 条站内实拍描述"},
+        {"factor": "physical_consistency", "weight": 0.20, "score": 0.9, "note": "与站序、方向均一致"},
+        {"factor": "admin_confirmation", "weight": 0.20, "score": 0.0, "note": "未审核"}
+      ],
+      "signals": ["sig_seed_001", "sig_seed_002", "sig_seed_003", "sig_seed_004"],
+      "reviewed_by": null,
+      "audit_log": [
+        {"at": "2026-09-22T08:03:20+08:00", "actor": "system", "action": "created", "confidence_after": 0.20},
+        {"at": "2026-09-22T08:04:11+08:00", "actor": "system", "action": "merged_signal", "confidence_after": 0.35},
+        {"at": "2026-09-22T08:05:02+08:00", "actor": "system", "action": "merged_signal", "confidence_after": 0.55}
+      ],
+      "provenance": "simulated",
+      "ui_state": "置信度条 55%，卡片显示「3 源一致」，仍**不影响路线**，审核台高亮为「建议确认」"
+    },
+    {
+      "event_id": "evt_seed_003",
+      "version": 3,
+      "status": "published",
+      "created_at": "2026-09-22T08:03:20+08:00",
+      "updated_at": "2026-09-22T08:12:40+08:00",
+      "published_at": "2026-09-22T08:12:40+08:00",
+      "expires_at": "2026-09-22T14:12:40+08:00",
+      "event_type": "signal_failure",
+      "title": "东铁线红磡—会展过海段信号故障，过海服务暂停",
+      "summary": "港铁公布红磡至会展站之间信号故障，东铁线过海段暂停服务，预计影响至中午。替代路线已生成。",
+      "mode": "MTR",
+      "line": "ERL",
+      "direction": "both",
+      "affected_segments": [
+        {"from_node": "HUH", "to_node": "EXC", "impact": "closed", "capacity_factor": 0.0},
+        {"from_node": "EXC", "to_node": "ADM", "impact": "closed", "capacity_factor": 0.0},
+        {"from_node": "TAW", "to_node": "KOT", "impact": "crowded", "capacity_factor": 0.9}
+      ],
+      "window": {"start": "2026-09-22T08:00:00+08:00", "end": "2026-09-22T12:00:00+08:00", "end_confidence": "estimated"},
+      "severity": 4,
+      "confidence": 0.90,
+      "confidence_factors": [
+        {"factor": "source_authority", "weight": 0.35, "score": 1.0, "note": "港铁官方公布"},
+        {"factor": "multi_source_agreement", "weight": 0.25, "score": 0.8, "note": "官方 + 3 条社媒 + 1 条用户上报一致"},
+        {"factor": "physical_consistency", "weight": 0.20, "score": 1.0, "note": "与站序一致"},
+        {"factor": "admin_confirmation", "weight": 0.20, "score": 1.0, "note": "审核员 admin_demo 已确认"}
+      ],
+      "signals": ["sig_seed_001", "sig_seed_002", "sig_seed_003", "sig_seed_004", "sig_seed_005"],
+      "reviewed_by": "admin_demo",
+      "audit_log": [
+        {"at": "2026-09-22T08:03:20+08:00", "actor": "system", "action": "created", "confidence_after": 0.20},
+        {"at": "2026-09-22T08:05:02+08:00", "actor": "system", "action": "merged_signal", "confidence_after": 0.55},
+        {"at": "2026-09-22T08:10:30+08:00", "actor": "system", "action": "merged_official", "confidence_after": 0.85},
+        {"at": "2026-09-22T08:12:40+08:00", "actor": "admin_demo", "action": "published", "confidence_after": 0.90}
+      ],
+      "provenance": "simulated",
+      "ui_state": "发布后：地图红磡—会展段变红脉冲、东铁过海段变灰；路线卡片在 ≤5 秒内全部重算并显示「已避开受影响区段」"
+    }
+  ],
+  "signals": [
+    {"signal_id": "sig_seed_001", "received_at": "2026-09-22T08:03:11+08:00", "source_type": "social", "source_name": "demo-social-stream", "raw_text": "大围站广播话东铁过海段信号故障，全部人落车，金钟方向停开", "lang": "zh-HK", "provenance": "simulated"},
+    {"signal_id": "sig_seed_002", "received_at": "2026-09-22T08:04:02+08:00", "source_type": "social", "source_name": "demo-social-stream", "raw_text": "红磡去会展嗰段好似又死咗？成个站都系人", "lang": "zh-HK", "provenance": "simulated"},
+    {"signal_id": "sig_seed_004", "received_at": "2026-09-22T08:04:58+08:00", "source_type": "user_report", "source_name": "in-app report", "raw_text": "我在红磡站，广播说东铁过海暂停，往金钟要转其他线路", "lang": "zh-HK", "provenance": "simulated"},
+    {"signal_id": "sig_seed_005", "received_at": "2026-09-22T08:10:12+08:00", "source_type": "official", "source_name": "MTR announcement (demo)", "raw_text": "东铁线红磡至会展站之间发生信号故障，服务受阻，预计需时修复。", "lang": "zh-HK", "provenance": "simulated"}
+  ]
+}
