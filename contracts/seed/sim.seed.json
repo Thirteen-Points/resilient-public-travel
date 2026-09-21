@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "version": "seed-v0",
+    "built_at": "2026-09-21",
+    "status": "PLACEHOLDER — 数字仅供 A 先把看板做出来，必须由 C 的 backend/app/sim/ 真实跑出结果后覆盖",
+    "placeholder": true,
+    "scenario_id": "scn_huh_exc_closed_am_peak",
+    "event_ref": "evt_seed_003",
+    "policy_definition": {
+      "selfish": "每个 agent 独立选择个人效用最高的路线（无引导）",
+      "bucket": "按容量水桶比例分配，受公平约束保护（有引导）"
+    }
+  },
+  "assumptions": [
+    "需求 10,000 人 / 60 分钟，仅工作日早高峰（08:00–09:00）",
+    "OD 权重按走廊六站 800 米圈推导 —— 模拟值",
+    "画像比例：上班族 55% / 学生 20% / 游客 10% / 长者 10% / 轮椅 5% —— 模拟值",
+    "替代线路的剩余运力取保守估计（轨道替代线路仅约 25% 余量 + 过海巴士约 900 人/小时）",
+    "东铁过海段运力（约 53,200 人/小时）在该场景中完全不可用",
+    "单车载客量为车型查表估算值（双层巴士 137 / 小巴 19）"
+  ],
+  "population": 10000,
+  "time_range": ["08:00", "09:00"],
+  "time_step_min": 1,
+  "baseline": {
+    "policy": "selfish",
+    "total_delay_person_min": 184300,
+    "avg_delay_min": 18.4,
+    "p95_wait_min": 37,
+    "overloaded_routes": 2,
+    "served_rate": 0.83,
+    "wheelchair_served_rate": 0.71,
+    "route_load": [
+      {"route_id": "r_seed_001", "users": 6120, "capacity_per_hour": 4200, "load_factor": 1.46, "overloaded": true},
+      {"route_id": "r_seed_002", "users": 2140, "capacity_per_hour": 3600, "load_factor": 0.59, "overloaded": false},
+      {"route_id": "r_seed_005", "users": 900, "capacity_per_hour": 466, "load_factor": 1.93, "overloaded": true},
+      {"route_id": "r_seed_006", "users": 540, "capacity_per_hour": 233, "load_factor": 2.32, "overloaded": true},
+      {"route_id": "r_seed_007", "users": 300, "capacity_per_hour": 900, "load_factor": 0.33, "overloaded": false}
+    ]
+  },
+  "guided": {
+    "policy": "bucket",
+    "total_delay_person_min": 112500,
+    "avg_delay_min": 11.3,
+    "p95_wait_min": 14,
+    "overloaded_routes": 0,
+    "served_rate": 0.91,
+    "wheelchair_served_rate": 0.94,
+    "unstoppable_demand": 3100,
+    "shares": [
+      {"route_id": "r_seed_001", "share": 0.34, "users": 3400, "load_factor": 0.81},
+      {"route_id": "r_seed_002", "share": 0.22, "users": 2200, "load_factor": 0.61},
+      {"route_id": "r_seed_003", "share": 0.14, "users": 1400, "load_factor": 0.39},
+      {"route_id": "r_seed_004", "share": 0.12, "users": 1200, "load_factor": 0.42},
+      {"route_id": "r_seed_005", "share": 0.09, "users": 900, "load_factor": 0.85},
+      {"route_id": "r_seed_006", "share": 0.05, "users": 500, "load_factor": 0.85},
+      {"route_id": "r_seed_007", "share": 0.04, "users": 400, "load_factor": 0.44}
+    ],
+    "advice": [
+      "运力缺口 3,100 人/小时：建议提前 20 分钟出发或改用轨道替代",
+      "过海巴士已满，预计需等 2–3 班",
+      "轮椅使用者请优先选择 r_seed_003（全程电梯，不使用小巴）"
+    ]
+  },
+  "delta": {
+    "delay_reduction_pct": 38.9,
+    "p95_wait_reduction_pct": 62.2,
+    "served_rate_gain_pp": 8.0,
+    "overloaded_routes_delta": -2
+  },
+  "fairness": {
+    "max_extra_delay_min": 15,
+    "protected_users": 412,
+    "note": "轮椅与长者的个人最优路线被保留，不因总量最优而被牺牲"
+  },
+  "hero_message": {
+    "zh": "无引导：所有人挤同一条路线 → 2 条线路过载、P95 等待 37 分钟。有引导：分流到 7 条路线 → 过载清零、P95 等待 14 分钟，但仍有 3,100 人/小时的运力缺口 —— 我们不假装能解决全部问题。",
+    "en": "Unguided: everyone crowds one route, 2 lines overload, P95 wait 37 min. Guided: spread across 7 routes, zero overload, P95 wait 14 min — but a 3,100 pax/hour capacity gap remains. We don't pretend to solve it all."
+  },
+  "provenance": "simulated"
+}
