@@ -81,7 +81,14 @@ contracts/seed/sim.seed.json       → 1 万人有/无引导对比（占位数�
 ```
 
 前端可以**先把这些 JSON 当作静态 fixture 导入**，接口就绪后改成 fetch。这样 A 从今天起就能做完整 UI。
-校验：`python -c "import json,glob;[json.load(open(f,encoding='utf-8')) for f in glob.glob('contracts/seed/*.json')];print('ok')"`
+从仓库根目录校验：
+
+```powershell
+python scripts/generate_contract_schemas.py
+python scripts/validate_contract_seeds.py
+```
+
+第二条命令会确认四个种子文件都能读取，并使用 JSON Schema 与 Pydantic 双重验证 B 负责的 Event / Signal。Network、Route、Simulation 仍须等待 C 提供对应 Schema，不能把“JSON 可读取”误当成通过契约校验。
 
 ## 7. 三条不可违反的约定
 

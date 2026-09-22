@@ -12,7 +12,11 @@ from pydantic import ValidationError
 from backend.app.services.event_models import Event
 from backend.app.services.signal_models import Signal
 from scripts.generate_contract_schemas import schema_documents, write_schemas
-from scripts.validate_contract_seeds import validate_seed_payload
+from scripts.validate_contract_seeds import (
+    SEED_FILENAMES,
+    load_seed_documents,
+    validate_seed_payload,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,6 +42,20 @@ class ContractSeedTestCase(unittest.TestCase):
             Event.model_validate(event)
         for signal in self.seed["signals"]:
             Signal.model_validate(signal)
+
+    def test_all_four_shared_seed_files_are_readable_json_objects(self) -> None:
+        documents = load_seed_documents()
+        self.assertEqual(set(documents), set(SEED_FILENAMES))
+        expected_top_level = {
+            "network.seed.json": {"meta", "nodes", "lines", "walk_links"},
+            "event.seed.json": {"meta", "events", "signals"},
+            "routes.seed.json": {"meta", "routes"},
+            "sim.seed.json": {"meta", "baseline", "guided"},
+        }
+        for filename, document in documents.items():
+            with self.subTest(filename=filename):
+                self.assertIsInstance(document, dict)
+                self.assertTrue(expected_top_level[filename].issubset(document))
 
     def test_seed_passes_committed_json_schemas(self) -> None:
         for event in self.seed["events"]:

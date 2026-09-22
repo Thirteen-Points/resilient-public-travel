@@ -19,8 +19,25 @@ from backend.app.services.event_models import Event  # noqa: E402
 from backend.app.services.signal_models import Signal  # noqa: E402
 
 
-SEED_PATH = REPOSITORY_ROOT / "contracts" / "seed" / "event.seed.json"
+SEED_DIRECTORY = REPOSITORY_ROOT / "contracts" / "seed"
+SEED_FILENAMES = (
+    "network.seed.json",
+    "event.seed.json",
+    "routes.seed.json",
+    "sim.seed.json",
+)
+SEED_PATH = SEED_DIRECTORY / "event.seed.json"
 SCHEMA_DIRECTORY = REPOSITORY_ROOT / "contracts" / "schemas"
+
+
+def load_seed_documents(directory: Path = SEED_DIRECTORY) -> dict[str, Any]:
+    """Load all four shared seed files and fail clearly on a missing/bad file."""
+
+    documents: dict[str, Any] = {}
+    for filename in SEED_FILENAMES:
+        path = directory / filename
+        documents[filename] = json.loads(path.read_text(encoding="utf-8"))
+    return documents
 
 
 def _schema_errors(
@@ -116,7 +133,8 @@ def validate_seed_payload(
 
 def main() -> int:
     try:
-        payload = json.loads(SEED_PATH.read_text(encoding="utf-8"))
+        seed_documents = load_seed_documents()
+        payload = seed_documents[SEED_PATH.name]
         event_schema = json.loads(
             (SCHEMA_DIRECTORY / "event.schema.json").read_text(encoding="utf-8")
         )
@@ -134,7 +152,10 @@ def main() -> int:
             print(f"- {SEED_PATH.relative_to(REPOSITORY_ROOT)}: {error}", file=sys.stderr)
         return 1
 
-    print("contract seed validation passed: 3 Events and 5 Signals")
+    print(
+        "contract seed validation passed: 4 seed JSON files readable; "
+        "3 Events and 5 Signals satisfy the B-owned contracts"
+    )
     return 0
 
 
