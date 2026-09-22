@@ -1,7 +1,7 @@
 # Agent 3 — C-Route
 
 Base branch: ZYC
-Working branch: agent/c-route
+Working location: ZYC (direct commits; no Agent branch)
 Model: gpt-6-astra, reasoning high
 
 ## Scope
