@@ -1,0 +1,52 @@
+import { describe, expect, it } from 'vitest'
+import { activePublishedEvents, seedDataSource, snapshotAt } from './seedDataSource'
+import { CORRIDOR_IDS, distanceMetres, legCoordinates, nearestAccessPoint } from '../data'
+
+describe('M0 seed boundary', () => {
+  it('loads all four versioned seeds through the adapter and reports a fixed snapshot', async () => {
+    const [network, { events, signals }, meta] = await Promise.all([
+      seedDataSource.getNetwork(), seedDataSource.getEvents(), seedDataSource.getMeta(),
+    ])
+    expect(network.nodes.length).toBeGreaterThanOrEqual(6)
+    expect(network.lines.length).toBeGreaterThan(1)
+    expect(events).toHaveLength(3)
+    expect(signals.length).toBeGreaterThan(0)
+    expect(meta.simulationSeedAvailable).toBe(true)
+    expect(meta.snapshotAt).toBe(snapshotAt)
+    expect(CORRIDOR_IDS.every(id => network.nodes.some(node => node.id === id))).toBe(true)
+  })
+
+  it('keeps unreviewed and expired reports off the map', async () => {
+    const { events } = await seedDataSource.getEvents()
+    const active = await seedDataSource.getPublishedEvents(snapshotAt)
+    expect(active.map(event => event.event_id)).toEqual(['evt_seed_003'])
+    expect(activePublishedEvents(events, '2026-09-22T15:00:00+08:00')).toEqual([])
+    expect(activePublishedEvents(events, '2026-09-22T08:04:00+08:00')).toEqual([])
+  })
+
+  it('does not fabricate other OD routes; presets reorder only modelled candidates', async () => {
+    const base = { origin: 'TAW', destination: 'ADM', departAt: snapshotAt } as const
+    const fastest = await seedDataSource.getRoutes({ ...base, preset: 'fastest' })
+    const stable = await seedDataSource.getRoutes({ ...base, preset: 'most_stable' })
+    const lessWalking = await seedDataSource.getRoutes({ ...base, preset: 'least_walking' })
+    expect(fastest[0].route_id).toBe('r_seed_001')
+    expect(stable[0].total.reliability).toBeGreaterThanOrEqual(stable[1].total.reliability)
+    expect(lessWalking[0].total.walk_m).toBeLessThanOrEqual(lessWalking[1].total.walk_m)
+    expect(lessWalking[0].total.reliability).toBeGreaterThanOrEqual(0.7)
+    expect(fastest.some(route => route.route_id === 'r_seed_008')).toBe(false)
+    expect(fastest.every(route => route.legs.every(leg =>
+      !(leg.line === 'ERL' && (leg.from === 'HUH' && leg.to === 'EXC' || leg.from === 'EXC' && leg.to === 'ADM')),
+    ))).toBe(true)
+    expect(await seedDataSource.getRoutes({ ...base, destination: 'HUH', preset: 'fastest' })).toEqual([])
+  })
+
+  it('uses seed catchment radius and does not invent geometry for missing stops', async () => {
+    const network = await seedDataSource.getNetwork()
+    const taiWai = network.nodes.find(node => node.id === 'TAW')!
+    expect(nearestAccessPoint(network, taiWai)?.node.id).toBe('TAW')
+    expect(nearestAccessPoint(network, { lat: 0, lng: 0 })).toBeNull()
+    expect(distanceMetres(taiWai, taiWai)).toBe(0)
+    expect(network.meta.catchment_m).toBe(800)
+    expect(legCoordinates({ mode: 'MINIBUS', from: 'BS_TAW', to: 'BS_TW', travel_s: 600, walk_m: 0, accessible: false, provenance: 'real-derived' }, network)).toEqual([])
+  })
+})
