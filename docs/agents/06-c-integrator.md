@@ -1,7 +1,7 @@
 # Agent 6 — C-Integrator
 
 Base branch: ZYC
-Working branch: agent/c-integrator
+Working location: ZYC (direct commits; no Agent branch)
 Model: gpt-6-astra, reasoning high
 
 ## Scope
