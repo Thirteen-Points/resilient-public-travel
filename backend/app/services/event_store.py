@@ -190,8 +190,9 @@ class EventStore:
     ) -> Event:
         """Apply a validated partial update and append one audit record.
 
-        Review transition rules are deliberately not implemented here; those
-        belong to T2.10.  This storage layer only enforces contract validity.
+        Review transition rules are deliberately kept out of this storage
+        method.  Callers that perform review actions use ``EventReviewService``;
+        this layer continues to enforce contract validity and optimistic writes.
         """
 
         self._require_non_empty(actor, "actor")
