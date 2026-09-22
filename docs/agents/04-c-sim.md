@@ -1,7 +1,7 @@
 # Agent 4 — C-Sim
 
 Base branch: ZYC
-Working branch: agent/c-sim
+Working location: ZYC (direct commits; no Agent branch)
 Model: gpt-5.6-sol, reasoning high
 
 ## Scope
