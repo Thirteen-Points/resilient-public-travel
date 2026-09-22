@@ -1,7 +1,7 @@
 # Agent 5 — C-AI
 
 Base branch: ZYC
-Working branch: agent/c-ai
+Working location: ZYC (direct commits; no Agent branch)
 Model: gpt-5.6-terra, reasoning medium
 
 ## Scope
