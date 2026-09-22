@@ -50,3 +50,9 @@
 - B 的 Event / Signal 种子和 Schema 已通过自动验证；C 仍需确认何时补齐 Network / Route / Simulation JSON Schema 及 `/api/health`。
 - 四个种子文件均存在且可读取，但仓库中尚无 A 前端渲染证据；需 A 确认地图、三张事件卡、路线卡片以及不依赖 `ui_state`。
 - `origin/main` 目前没有前后端可运行成果；需全员确定检查、合并与正式冻结安排后，T1.2 才能关闭。
+
+## T1.3 看板阻塞项（2026-09-22）
+
+- 77 张 GitHub Issue 任务卡和字段标签已经建立；优先级分为 64 张必做、10 张应做、3 张可选。
+- 当前凭据缺少 `read:org`、`read:project`、`project` 权限，无法创建或修改组织 Project；需仓库管理员补充权限后，把 77 张 Issue 全部加入 `ResilientRoute Delivery Board`。
+- A / B / C 需检查当前任务状态与优先级，特别是同时含核心范围和可裁剪子功能的 T3.1、T3.5、T4.2。
