@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "version": "1.0",
+    "built_at": "2026-09-22",
+    "description": "Walking connections between nodes. All walk times and distances are estimated using straight-line distance x 1.3 detour factor / 1.2 m/s walking speed. Wheelchair accessibility of interchanges is CRITICAL and mostly UNVERIFIED.",
+    "provenance_note": "Walk link ETS->TST is the most critical unverified item (T7.2 item #3). If elevator is unavailable, wheelchair routing through this path fails."
+  },
+  "walk_links": [
+    {
+      "from": "ETS",
+      "to": "TST",
+      "walk_s": 300,
+      "walk_m": 420,
+      "accessible": true,
+      "provenance": "real-derived",
+      "source": "Estimated from station layout maps",
+      "retrieved_at": "2026-09-21",
+      "confidence": "low",
+      "data_status": "unverified",
+      "note": "Station internal walkway. Duration and elevator availability UNVERIFIED. Critical for wheelchair routing - if elevator unavailable, this path fails."
+    },
+    {
+      "from": "BS_TAW",
+      "to": "TAW",
+      "walk_s": 180,
+      "walk_m": 150,
+      "accessible": true,
+      "provenance": "real-derived",
+      "source": "Estimated from coordinate proximity",
+      "retrieved_at": "2026-09-21",
+      "confidence": "medium",
+      "data_status": "unverified"
+    },
+    {
+      "from": "BS_TIN_SUM",
+      "to": "TAW",
+      "walk_s": 600,
+      "walk_m": 500,
+      "accessible": true,
+      "provenance": "real-derived",
+      "source": "Estimated from coordinate distance",
+      "retrieved_at": "2026-09-21",
+      "confidence": "low",
+      "data_status": "unverified"
+    },
+    {
+      "from": "BS_HUH_TUNNEL",
+      "to": "HUH",
+      "walk_s": 300,
+      "walk_m": 250,
+      "accessible": true,
+      "provenance": "real-derived",
+      "source": "Estimated from coordinate proximity",
+      "retrieved_at": "2026-09-21",
+      "confidence": "low",
+      "data_status": "unverified"
+    },
+    {
+      "from": "BS_ADM_E",
+      "to": "ADM",
+      "walk_s": 240,
+      "walk_m": 200,
+      "accessible": true,
+      "provenance": "real-derived",
+      "source": "Estimated from coordinate proximity",
+      "retrieved_at": "2026-09-21",
+      "confidence": "medium",
+      "data_status": "unverified"
+    },
+    {
+      "from": "PIER_TST",
+      "to": "TST",
+      "walk_s": 420,
+      "walk_m": 350,
+      "accessible": "partial",
+      "provenance": "real-derived",
+      "source": "Estimated from coordinate distance",
+      "retrieved_at": "2026-09-21",
+      "confidence": "medium",
+      "data_status": "unverified",
+      "note": "Partial accessibility - ferry pier ramp may not be fully wheelchair accessible"
+    },
+    {
+      "from": "PIER_CEN",
+      "to": "CEN",
+      "walk_s": 360,
+      "walk_m": 300,
+      "accessible": "partial",
+      "provenance": "real-derived",
+      "source": "Estimated from coordinate distance",
+      "retrieved_at": "2026-09-21",
+      "confidence": "medium",
+      "data_status": "unverified"
+    }
+  ],
+  "unmodelled_walk_links": [
+    {"from": "WAC", "to": "EXC", "estimated_walk_m": 700, "note": "Wan Chai (ISL) to Exhibition Centre - UNVERIFIED walk time. Important for EXC station island alternative. T7.2 item #8."},
+    {"from": "BS_TW", "to": "TSW", "note": "Tsuen Wan bus/minibus interchange - BS_TW node not yet in network"}
+  ]
+}
