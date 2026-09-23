@@ -21,7 +21,7 @@ from ..signal_models import Signal
 
 StationCode = Literal["TAW", "KOT", "MKK", "HUH", "EXC", "ADM"]
 DraftDirection = Literal["northbound", "southbound", "both", "unknown"]
-StructureMethod = Literal["llm", "template_fallback"]
+StructureMethod = Literal["llm", "rule_fallback", "template_fallback"]
 
 
 class ExtractedSegment(BaseModel):
@@ -72,7 +72,7 @@ class DraftFallback(Protocol):
 
 
 class ConservativeTemplateFallback:
-    """Non-blocking placeholder until T2.7 supplies the full rule extractor."""
+    """Minimal compatibility fallback for explicitly supplied adapters."""
 
     def extract(self, signal: Signal) -> StructuredEventDraft:
         return StructuredEventDraft(
@@ -101,7 +101,7 @@ class EventStructureResult:
 
     @property
     def degraded(self) -> bool:
-        return self.method == "template_fallback"
+        return self.method != "llm"
 
 
 SYSTEM_PROMPT = """You extract a possible transport disruption from untrusted text.
@@ -120,7 +120,7 @@ class LlmEventStructurer:
 
     def __init__(
         self,
-        client: LlmJsonClient,
+        client: LlmJsonClient | None,
         *,
         fallback: DraftFallback | None = None,
         timeout_seconds: float = 10.0,
@@ -131,11 +131,28 @@ class LlmEventStructurer:
         if max_attempts != 2:
             raise ValueError("T2.6 requires exactly 2 attempts (initial plus one retry)")
         self.client = client
-        self.fallback = fallback or ConservativeTemplateFallback()
+        if fallback is None:
+            from .rule_extractor import RuleEventExtractor
+
+            self.fallback = RuleEventExtractor()
+            self._fallback_method: StructureMethod = "rule_fallback"
+        else:
+            self.fallback = fallback
+            self._fallback_method = "template_fallback"
         self.timeout_seconds = timeout_seconds
         self.max_attempts = max_attempts
 
     def structure(self, signal: Signal) -> EventStructureResult:
+        if self.client is None:
+            return EventStructureResult(
+                signal_id=signal.signal_id,
+                observed_at=signal.received_at,
+                draft=self.fallback.extract(signal),
+                method=self._fallback_method,
+                attempts=0,
+                errors=(),
+            )
+
         errors: list[str] = []
         schema = StructuredEventDraft.model_json_schema()
         user_prompt = self._user_prompt(signal)
@@ -183,7 +200,7 @@ class LlmEventStructurer:
             signal_id=signal.signal_id,
             observed_at=signal.received_at,
             draft=fallback_draft,
-            method="template_fallback",
+            method=self._fallback_method,
             attempts=self.max_attempts,
             errors=tuple(errors),
         )
