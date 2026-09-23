@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "version": "fixture-v0",
+    "built_at": "2026-09-22",
+    "od": { "origin": "FX_OK", "destination": "FX_BAD_COORD", "depart_at": "2026-09-22T08:20:00+08:00" },
+    "purpose": "Deliberately imperfect fixture for normalizer tests."
+  },
+  "routes": [
+    {
+      "route_id": "r_fx_ok",
+      "label": "Fixture route without score_breakdown",
+      "legs": [
+        { "mode": "WALK", "from": "FX_OK", "to": "FX_BAD_COORD", "travel_s": 300, "walk_m": 420, "accessible": true, "provenance": "real-derived" }
+      ],
+      "total": { "time_s": 300, "time_range_s": [280, 340], "transfers": 0, "walk_m": 420, "fare_hkd": 0, "reliability": 0.9, "freshness_s": 60 },
+      "score": 0.7,
+      "warnings": [],
+      "notes": [],
+      "explain": "score_breakdown is optional and intentionally omitted here.",
+      "provenance": "real-derived"
+    },
+    {
+      "route_id": "r_fx_inverted",
+      "label": "Inverted range and out-of-range score",
+      "legs": [
+        { "mode": "MTR", "line": "FXL", "from": "FX_OK", "to": "FX_BAD_COORD", "travel_s": 240, "walk_m": 0, "accessible": true, "provenance": "real-derived" }
+      ],
+      "total": { "time_s": 240, "time_range_s": [340, 280], "transfers": 0, "walk_m": 0, "fare_hkd": 5, "reliability": 0.8, "freshness_s": 30 },
+      "score": 1.4,
+      "warnings": "none",
+      "notes": [],
+      "explain": "time_range bounds inverted, score above 1, warnings not an array.",
+      "provenance": "real-derived"
+    }
+  ]
+}
