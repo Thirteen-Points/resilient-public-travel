@@ -18,6 +18,7 @@ export interface NetworkLine {
   id: string
   name_en: string
   mode: string
+  operator?: string | string[]
   stops: string[]
   provenance: Provenance
 }

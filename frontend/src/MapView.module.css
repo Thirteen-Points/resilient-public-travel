@@ -3,4 +3,17 @@
 .picking .map { cursor: crosshair; }
 .caption { position: absolute; bottom: 6px; left: 13px; margin: 0; padding: 3px 7px; border-radius: 5px; background: rgba(255,255,255,.85); color: #426273; font-size: 10px; z-index: 450; }
 .pickHint { position: absolute; top: 16px; right: 16px; z-index: 450; margin: 0; padding: 10px 14px; border-radius: 12px; color: #173b50; background: #fff; box-shadow: 0 4px 24px #1748592b; font-size: 13px; }
+.tools { position: absolute; top: 24px; right: 24px; z-index: 450; display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 30px; background: #fffffff0; border: 1px solid #e0e6d8; box-shadow: 0 4px 20px #264b2520; font-size: 10px; color: #5a7157; }
+.tools button { padding: 7px 12px; border: 0; border-radius: 30px; background: #eef3e5; color: #355534; font-size: 11px; font-weight: 600; }
+.tools span { padding-right: 8px; }
+.legend { position: absolute; right: 64px; bottom: 30px; z-index: 450; width: 265px; background: #fffffff5; border: 1px solid #e0e6d8; border-radius: 16px; box-shadow: 0 8px 22px #25451d20; color: #3a5337; font-size: 11px; }
+.legend summary { padding: 13px 16px; cursor: pointer; font-weight: 600; }
+.legend summary span { float: right; }
+.legend > div { padding: 0 16px 10px; max-height: 340px; overflow-y: auto; }
+.legend p { display: flex; align-items: center; gap: 8px; line-height: 1.5; margin: 8px 0; }
+.legend i { width: 23px; height: 7px; flex: none; border-radius: 4px; }
+.legend hr { border: 0; border-top: 1px solid #e0e6d8; margin: 12px 0; }
+.stationLabel { padding: 3px 6px; border: 1px solid #dce5d2; border-radius: 6px; background: #fffffff0; box-shadow: none; color: #355038; font-size: 10px; }
+.picking .tools { top: 64px; }
+@media (max-width: 800px) { .wrap { position: relative; height: 340px; border-radius: 0; } .tools { top: 12px; right: 12px; } .legend { bottom: 28px; right: 55px; width: 210px; } .legend > div { max-height: 200px; } }
 @media (max-width: 700px) { .caption { max-width: 70%; } .pickHint { top: 8px; right: 8px; max-width: 52%; } }
