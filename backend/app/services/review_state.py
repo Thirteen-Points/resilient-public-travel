@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from datetime import datetime, timezone
 from typing import Any, Literal
 
-from .event_models import Event
+from .event_models import ConfidenceFactor, Event
 from .event_store import EventStore
 
 
@@ -19,6 +19,10 @@ class InvalidReviewTransitionError(ValueError):
 
 class InvalidReviewUpdateError(ValueError):
     """Raised when an edit attempts to change review-managed fields."""
+
+
+class InsufficientConfidenceError(InvalidReviewTransitionError):
+    """The reviewed card still misses the contract's publication threshold."""
 
 
 class EventReviewService:
@@ -34,6 +38,10 @@ class EventReviewService:
         "status",
         "published_at",
         "reviewed_by",
+        "confidence",
+        "confidence_factors",
+        "signals",
+        "provenance",
     }
 
     def __init__(self, store: EventStore) -> None:
@@ -46,12 +54,29 @@ class EventReviewService:
         timestamp = self._review_time(at)
         self._require_actor(actor)
         self._require_status("approve", current, {"pending_review", "updated"})
+        already_confirmed = any(
+            factor.factor == "admin_confirmation" and factor.score == 1.0
+            for factor in current.confidence_factors
+        )
+        confidence = round(min(1.0, current.confidence + (0 if already_confirmed else 0.05)), 2)
+        if confidence < 0.60:
+            raise InsufficientConfidenceError("confidence below publish minimum 0.60")
+        factors = [
+            factor for factor in current.confidence_factors
+            if factor.factor != "admin_confirmation"
+        ]
+        factors.append(ConfidenceFactor(
+            factor="admin_confirmation", weight=0.05, score=1.0,
+            note="审核员确认",
+        ))
         return self.store.update_event(
             event_id,
             {
                 "status": "published",
                 "published_at": timestamp,
                 "reviewed_by": actor.strip(),
+                "confidence": confidence,
+                "confidence_factors": factors,
             },
             actor=actor.strip(),
             action="review_approved",
@@ -82,6 +107,14 @@ class EventReviewService:
         effective_updates = dict(updates)
         if current.status == "published":
             effective_updates["status"] = "updated"
+            if any(factor.factor == "admin_confirmation" and factor.score == 1.0
+                   for factor in current.confidence_factors):
+                effective_updates["confidence"] = round(max(0.0, current.confidence - 0.05), 2)
+                effective_updates["confidence_factors"] = [
+                    factor.model_copy(update={"score": 0.0, "note": "修改后待重新审核"})
+                    if factor.factor == "admin_confirmation" else factor
+                    for factor in current.confidence_factors
+                ]
         return self.store.update_event(
             event_id,
             effective_updates,

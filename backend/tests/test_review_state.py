@@ -91,6 +91,7 @@ class ReviewStateTestCase(unittest.TestCase):
         self.assertEqual(after.status, "published")
         self.assertEqual(after.published_at, at)
         self.assertEqual(after.reviewed_by, "admin_b")
+        self.assertEqual(after.confidence, 0.60)
         self.assert_one_change(before, after, "review_approved")
 
     def test_approve_updated_republishes(self) -> None:
@@ -133,6 +134,7 @@ class ReviewStateTestCase(unittest.TestCase):
         self.assertEqual(after.status, "updated")
         self.assertEqual(after.published_at, before.published_at)
         self.assertEqual(after.reviewed_by, before.reviewed_by)
+        self.assertEqual(after.confidence, 0.55)
         self.assert_one_change(before, after, "review_edited")
 
     def test_edit_updated_remains_updated(self) -> None:
@@ -166,6 +168,10 @@ class ReviewStateTestCase(unittest.TestCase):
             {"status": "published"},
             {"published_at": BASE_TIME},
             {"reviewed_by": "fake"},
+            {"confidence": 1.0},
+            {"confidence_factors": []},
+            {"signals": ["fake"]},
+            {"provenance": "real"},
         ]
         for updates in protected_updates:
             with self.subTest(updates=updates):
