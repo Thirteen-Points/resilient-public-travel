@@ -1,0 +1,57 @@
+{
+  "provenance": "simulated",
+  "routes": [
+    {
+      "route_id": "sim_route_rail",
+      "legs": [
+        {
+          "mode": "MTR",
+          "accessible": true,
+          "provenance": "simulated"
+        }
+      ],
+      "total": {
+        "time_s": 1800,
+        "transfers": 0,
+        "walk_m": 420,
+        "fare_hkd": 12.5,
+        "reliability": 0.9,
+        "freshness_s": 0
+      },
+      "provenance": "simulated"
+    },
+    {
+      "route_id": "sim_route_bus",
+      "legs": [
+        {
+          "mode": "BUS",
+          "accessible": true,
+          "provenance": "simulated"
+        }
+      ],
+      "total": {
+        "time_s": 2700,
+        "transfers": 0,
+        "walk_m": 80,
+        "fare_hkd": 9.0,
+        "reliability": 0.6,
+        "freshness_s": 0
+      },
+      "provenance": "simulated"
+    }
+  ],
+  "route_parameters": {
+    "sim_route_rail": {
+      "headway_s": 180,
+      "capacity_per_hour": 3400,
+      "service_capacity_per_hour": 4000,
+      "provenance": "simulated"
+    },
+    "sim_route_bus": {
+      "headway_s": 900,
+      "capacity_per_hour": 460,
+      "service_capacity_per_hour": 541.1764705882,
+      "provenance": "simulated"
+    }
+  }
+}

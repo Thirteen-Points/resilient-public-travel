@@ -1,0 +1,8 @@
+{
+  "provenance": "simulated",
+  "note": "TEST ONLY: hypothetical access links to prove adapter substitution. Not verified geography, distances or accessibility. Never loaded by default seed adapter.",
+  "walk_links": [
+    {"from": "MKK", "to": "MOK", "walk_m": 500, "bidirectional": true, "accessible": "unknown", "provenance": "simulated"},
+    {"from": "EXC", "to": "WAC", "walk_m": 500, "bidirectional": true, "accessible": "partial", "provenance": "simulated"}
+  ]
+}

@@ -1,0 +1,1063 @@
+{
+  "status": "applied-new-stable-route-ids",
+  "source_hashes": {
+    "network.seed.json": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+    "event.seed.json": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c"
+  },
+  "old_routes_sha256": "e4c3696daf3e36a6870d882cf49f5637453fffdea17495ea2996390ac57606a1",
+  "proposed_routes_sha256": "7cc18a101878c725f343dccb8c5433bf5b48975bac870ab6982386730769d0d2",
+  "old_id_to_new_path_id": {
+    "r_seed_001": "r_b59174a6ed64d8cf",
+    "r_seed_002": "r_8d0ba92684b1d1e2",
+    "r_seed_003": "r_a3da1ce3aa06f995",
+    "r_seed_004": "r_da67c274e39e0c00",
+    "r_seed_005": "r_8d4bf8596c86646e",
+    "r_seed_006": "r_a3bb2d93a795746f",
+    "r_seed_007": "r_a6162cc3a32c489b",
+    "r_seed_008": "r_007c4e09879d19cc"
+  },
+  "card_count": 10,
+  "route_and_wheelchair_findings": [],
+  "wheelchair_top3_shortfall": 3,
+  "old_cards": [
+    {
+      "route_id": "r_seed_001",
+      "label": "屯馬綫 → 尖東 → 步行 → 尖沙咀 → 荃灣綫 → 金鐘",
+      "legs": [
+        {
+          "mode": "MTR",
+          "line": "TML",
+          "from": "TAW",
+          "to": "ETS",
+          "headway_s": 180,
+          "travel_s": 1380,
+          "walk_m": 0,
+          "fare_hkd": 0,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "ETS",
+          "to": "TST",
+          "travel_s": 300,
+          "walk_m": 420,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "station_names"
+              ],
+              "status": "derived_distance_accessibility_pending"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "line": "TWL",
+          "from": "TST",
+          "to": "ADM",
+          "headway_s": 120,
+          "travel_s": 300,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        }
+      ],
+      "total": {
+        "time_s": 1980,
+        "time_range_s": [
+          1760,
+          2210
+        ],
+        "transfers": 1,
+        "walk_m": 420,
+        "fare_hkd": 12.5,
+        "co2_g": 820,
+        "reliability": 0.86,
+        "freshness_s": 45
+      },
+      "score": 0.81,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 1980,
+          "normalized": 0.72,
+          "weight": 0.45,
+          "contribution": 0.324
+        },
+        {
+          "criterion": "transfers",
+          "raw": 1,
+          "normalized": 0.5,
+          "weight": 0.1,
+          "contribution": 0.05
+        },
+        {
+          "criterion": "walk",
+          "raw": 420,
+          "normalized": 0.48,
+          "weight": 0.1,
+          "contribution": 0.048
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.86,
+          "normalized": 0.86,
+          "weight": 0.35,
+          "contribution": 0.301
+        }
+      ],
+      "warnings": [
+        "含 420 米站内步行通道，轮椅使用者需确认电梯可用性"
+      ],
+      "notes": [],
+      "explain": "全程轨道，不依赖已经九成满的过海巴士；代价是要走一段站内通道。",
+      "provenance": "real-derived",
+      "evidence": [
+        {
+          "source_id": "S1",
+          "fields": [
+            "line",
+            "station_order"
+          ],
+          "status": "real-derived"
+        },
+        {
+          "source_id": "S4",
+          "fields": [
+            "event_ref",
+            "closed_segments"
+          ],
+          "status": "simulated-scenario"
+        }
+      ]
+    },
+    {
+      "route_id": "r_seed_002",
+      "label": "屯馬綫 → 何文田 → 觀塘綫 → 油麻地 → 荃灣綫 → 金鐘",
+      "legs": [
+        {
+          "mode": "MTR",
+          "line": "TML",
+          "from": "TAW",
+          "to": "HOM",
+          "headway_s": 180,
+          "travel_s": 1080,
+          "walk_m": 0,
+          "fare_hkd": 0,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "line": "KTL",
+          "from": "HOM",
+          "to": "YMT",
+          "headway_s": 120,
+          "travel_s": 210,
+          "walk_m": 60,
+          "fare_hkd": 0,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "line": "TWL",
+          "from": "YMT",
+          "to": "ADM",
+          "headway_s": 120,
+          "travel_s": 600,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        }
+      ],
+      "total": {
+        "time_s": 2190,
+        "time_range_s": [
+          1980,
+          2420
+        ],
+        "transfers": 2,
+        "walk_m": 180,
+        "fare_hkd": 12.5,
+        "co2_g": 880,
+        "reliability": 0.88,
+        "freshness_s": 45
+      },
+      "score": 0.74,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 2190,
+          "normalized": 0.63,
+          "weight": 0.45,
+          "contribution": 0.284
+        },
+        {
+          "criterion": "transfers",
+          "raw": 2,
+          "normalized": 0.33,
+          "weight": 0.1,
+          "contribution": 0.033
+        },
+        {
+          "criterion": "walk",
+          "raw": 180,
+          "normalized": 0.78,
+          "weight": 0.1,
+          "contribution": 0.078
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.88,
+          "normalized": 0.88,
+          "weight": 0.35,
+          "contribution": 0.308
+        }
+      ],
+      "warnings": [],
+      "notes": [
+        "换乘 2 次，比最快方案多约 4 分钟，但步行最少"
+      ],
+      "explain": "换乘多一次，但全程室内、步行仅 180 米；对不想在户外走的人更友好。",
+      "provenance": "real-derived",
+      "evidence": [
+        {
+          "source_id": "S1",
+          "fields": [
+            "line",
+            "station_order"
+          ],
+          "status": "real-derived"
+        },
+        {
+          "source_id": "S4",
+          "fields": [
+            "event_ref",
+            "closed_segments"
+          ],
+          "status": "simulated-scenario"
+        }
+      ]
+    },
+    {
+      "route_id": "r_seed_003",
+      "label": "屯馬綫 → 鑽石山 → 觀塘綫 → 油麻地 → 荃灣綫 → 金鐘（全电梯路径）",
+      "legs": [
+        {
+          "mode": "MTR",
+          "line": "TML",
+          "from": "TAW",
+          "to": "DIH",
+          "headway_s": 180,
+          "travel_s": 420,
+          "walk_m": 0,
+          "fare_hkd": 0,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "line": "KTL",
+          "from": "DIH",
+          "to": "YMT",
+          "headway_s": 120,
+          "travel_s": 990,
+          "walk_m": 80,
+          "fare_hkd": 0,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "line": "TWL",
+          "from": "YMT",
+          "to": "ADM",
+          "headway_s": 120,
+          "travel_s": 600,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        }
+      ],
+      "total": {
+        "time_s": 2520,
+        "time_range_s": [
+          2290,
+          2760
+        ],
+        "transfers": 2,
+        "walk_m": 260,
+        "fare_hkd": 12.5,
+        "co2_g": 910,
+        "reliability": 0.9,
+        "freshness_s": 45
+      },
+      "score": 0.79,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 2520,
+          "normalized": 0.52,
+          "weight": 0.25,
+          "contribution": 0.13
+        },
+        {
+          "criterion": "transfers",
+          "raw": 2,
+          "normalized": 0.33,
+          "weight": 0.1,
+          "contribution": 0.033
+        },
+        {
+          "criterion": "walk",
+          "raw": 260,
+          "normalized": 0.35,
+          "weight": 0.15,
+          "contribution": 0.053
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.9,
+          "normalized": 0.9,
+          "weight": 0.25,
+          "contribution": 0.225
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.75,
+          "normalized": 0.75,
+          "weight": 0.1,
+          "contribution": 0.075
+        }
+      ],
+      "warnings": [
+        "行程较长；建议预留 40 分钟以上"
+      ],
+      "notes": [
+        "不含小巴与阶梯换乘（满足轮椅用户的硬约束）"
+      ],
+      "explain": "为轮椅使用者筛出的首选：全程重铁 + 站内电梯换乘，步行 260 米，不使用任何小巴。",
+      "provenance": "real-derived",
+      "evidence": [
+        {
+          "source_id": "S1",
+          "fields": [
+            "line",
+            "station_order"
+          ],
+          "status": "real-derived"
+        },
+        {
+          "source_id": "S4",
+          "fields": [
+            "event_ref",
+            "closed_segments"
+          ],
+          "status": "simulated-scenario"
+        }
+      ]
+    },
+    {
+      "route_id": "r_seed_004",
+      "label": "東鐵綫（擁擠）→ 九龍塘 → 觀塘綫 → 油麻地 → 荃灣綫 → 金鐘",
+      "legs": [
+        {
+          "mode": "MTR",
+          "line": "ERL",
+          "from": "TAW",
+          "to": "KOT",
+          "headway_s": 240,
+          "travel_s": 330,
+          "walk_m": 0,
+          "fare_hkd": 0,
+          "accessible": true,
+          "provenance": "real-derived",
+          "note": "该段运力下降至 90%，车厢拥挤",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            },
+            {
+              "source_id": "S4",
+              "fields": [
+                "capacity_factor"
+              ],
+              "status": "simulated-scenario"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "line": "KTL",
+          "from": "KOT",
+          "to": "YMT",
+          "headway_s": 120,
+          "travel_s": 780,
+          "walk_m": 60,
+          "fare_hkd": 0,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "line": "TWL",
+          "from": "YMT",
+          "to": "ADM",
+          "headway_s": 120,
+          "travel_s": 600,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        }
+      ],
+      "total": {
+        "time_s": 2070,
+        "time_range_s": [
+          1790,
+          2450
+        ],
+        "transfers": 2,
+        "walk_m": 180,
+        "fare_hkd": 12.5,
+        "co2_g": 860,
+        "reliability": 0.74,
+        "freshness_s": 45
+      },
+      "score": 0.66,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 2070,
+          "normalized": 0.68,
+          "weight": 0.45,
+          "contribution": 0.306
+        },
+        {
+          "criterion": "transfers",
+          "raw": 2,
+          "normalized": 0.33,
+          "weight": 0.1,
+          "contribution": 0.033
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.74,
+          "normalized": 0.74,
+          "weight": 0.35,
+          "contribution": 0.259
+        }
+      ],
+      "warnings": [
+        "该方案仍使用东铁线，但只乘搭未受影响的 大围→九龙塘 段（当前较拥挤，可能需要等 1–2 班）"
+      ],
+      "notes": [
+        "时间接近最快方案，但可靠度较低"
+      ],
+      "explain": "只用了东铁线仍在运行的一小段（大围→九龙塘），避开过海段；车厢拥挤，可靠度打折。",
+      "provenance": "real-derived",
+      "evidence": [
+        {
+          "source_id": "S1",
+          "fields": [
+            "line",
+            "station_order"
+          ],
+          "status": "real-derived"
+        },
+        {
+          "source_id": "S4",
+          "fields": [
+            "event_ref",
+            "capacity_factor"
+          ],
+          "status": "simulated-scenario"
+        }
+      ]
+    },
+    {
+      "route_id": "r_seed_005",
+      "label": "過海巴士 182 → 金鐘（東）",
+      "legs": [
+        {
+          "mode": "BUS",
+          "line": "182",
+          "from": "BS_TAW",
+          "to": "BS_ADM_E",
+          "headway_s": 900,
+          "travel_s": 2640,
+          "walk_m": 0,
+          "fare_hkd": 20.8,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S8",
+              "fields": [
+                "route",
+                "stop",
+                "frequency",
+                "fare"
+              ],
+              "status": "unverified-not-imported"
+            }
+          ]
+        }
+      ],
+      "total": {
+        "time_s": 3180,
+        "time_range_s": [
+          2540,
+          4130
+        ],
+        "transfers": 0,
+        "walk_m": 150,
+        "fare_hkd": 20.8,
+        "co2_g": 1650,
+        "reliability": 0.55,
+        "freshness_s": 120
+      },
+      "score": 0.42,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 3180,
+          "normalized": 0.19,
+          "weight": 0.35,
+          "contribution": 0.067
+        },
+        {
+          "criterion": "transfers",
+          "raw": 0,
+          "normalized": 1.0,
+          "weight": 0.15,
+          "contribution": 0.15
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.55,
+          "normalized": 0.55,
+          "weight": 0.25,
+          "contribution": 0.138
+        },
+        {
+          "criterion": "price",
+          "raw": 20.8,
+          "normalized": 0.2,
+          "weight": 0.1,
+          "contribution": 0.02
+        }
+      ],
+      "warnings": [
+        "唯一全日直达金钟的过海巴士，但经两个堵点，行程约 50–70 分钟",
+        "该线平时载客率已高，故障期间可能需等 2–3 班"
+      ],
+      "notes": [
+        "不用换乘，适合不想换乘且时间宽裕的乘客"
+      ],
+      "explain": "零换乘的过海巴士，但路程最长、路况不可控；系统把它作为「不想换乘」偏好的候选。",
+      "provenance": "real-derived",
+      "evidence": [
+        {
+          "source_id": "S8",
+          "fields": [
+            "route",
+            "stop",
+            "frequency",
+            "fare"
+          ],
+          "status": "unverified-not-imported"
+        },
+        {
+          "source_id": "S4",
+          "fields": [
+            "scenario"
+          ],
+          "status": "simulated-scenario"
+        }
+      ]
+    },
+    {
+      "route_id": "r_seed_006",
+      "label": "過海巴士 982X → 金鐘（東）（僅平日高峰，$6 分段）",
+      "legs": [
+        {
+          "mode": "BUS",
+          "line": "982X",
+          "from": "BS_TAW",
+          "to": "BS_ADM_E",
+          "headway_s": null,
+          "travel_s": 2400,
+          "walk_m": 0,
+          "fare_hkd": 6.0,
+          "accessible": true,
+          "provenance": "real-derived",
+          "note": "旧 1800 s 班距已撤销；精确班次字段未冻结",
+          "evidence": [
+            {
+              "source_id": "S8",
+              "fields": [
+                "route",
+                "stop",
+                "frequency",
+                "fare"
+              ],
+              "status": "unverified-not-imported"
+            }
+          ]
+        }
+      ],
+      "total": {
+        "time_s": 2940,
+        "time_range_s": [
+          2400,
+          3760
+        ],
+        "transfers": 0,
+        "walk_m": 150,
+        "fare_hkd": 6.0,
+        "co2_g": 1580,
+        "reliability": 0.48,
+        "freshness_s": 120
+      },
+      "score": 0.45,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 2940,
+          "normalized": 0.28,
+          "weight": 0.2,
+          "contribution": 0.056
+        },
+        {
+          "criterion": "price",
+          "raw": 6.0,
+          "normalized": 0.85,
+          "weight": 0.35,
+          "contribution": 0.298
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.48,
+          "normalized": 0.48,
+          "weight": 0.25,
+          "contribution": 0.12
+        },
+        {
+          "criterion": "transfers",
+          "raw": 0,
+          "normalized": 1.0,
+          "weight": 0.1,
+          "contribution": 0.1
+        }
+      ],
+      "warnings": [
+        "只开平日早晚高峰，且载客率已 >90%，很可能上不了车",
+        "非高峰时段与假日无服务"
+      ],
+      "notes": [
+        "最便宜（大围站分段 $6）"
+      ],
+      "explain": "价格最低的学生友好选项，但运力极其有限——系统如实标出「可能上不了车」。",
+      "provenance": "real-derived",
+      "evidence": [
+        {
+          "source_id": "S8",
+          "fields": [
+            "route",
+            "stop",
+            "frequency",
+            "fare"
+          ],
+          "status": "unverified-not-imported"
+        },
+        {
+          "source_id": "S4",
+          "fields": [
+            "scenario"
+          ],
+          "status": "simulated-scenario"
+        }
+      ]
+    },
+    {
+      "route_id": "r_seed_007",
+      "label": "巴士 81C → 尖沙咀 → 天星小輪 → 中環 → 港島綫 → 金鐘",
+      "legs": [
+        {
+          "mode": "BUS",
+          "line": "81C",
+          "from": "BS_TAW",
+          "to": "TST",
+          "headway_s": 900,
+          "travel_s": 2100,
+          "walk_m": 0,
+          "fare_hkd": 16.0,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S8",
+              "fields": [
+                "route",
+                "stop",
+                "frequency",
+                "fare"
+              ],
+              "status": "unverified-not-imported"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "TST",
+          "to": "PIER_TST",
+          "travel_s": 420,
+          "walk_m": 350,
+          "accessible": "partial",
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "station_names"
+              ],
+              "status": "derived_distance_accessibility_pending"
+            }
+          ]
+        },
+        {
+          "mode": "FERRY",
+          "line": "TST_CEN",
+          "from": "PIER_TST",
+          "to": "PIER_CEN",
+          "headway_s": 420,
+          "travel_s": 480,
+          "walk_m": 0,
+          "fare_hkd": 5.0,
+          "accessible": "partial",
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S15",
+              "fields": [
+                "timetable",
+                "fare",
+                "wheelchair_limit"
+              ],
+              "status": "verified-page-seed-refresh-pending"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "line": "ISL",
+          "from": "CEN",
+          "to": "ADM",
+          "headway_s": 120,
+          "travel_s": 120,
+          "walk_m": 0,
+          "fare_hkd": 5.5,
+          "accessible": true,
+          "provenance": "real-derived",
+          "evidence": [
+            {
+              "source_id": "S1",
+              "fields": [
+                "line",
+                "station_order"
+              ],
+              "status": "real-derived"
+            }
+          ]
+        }
+      ],
+      "total": {
+        "time_s": 3960,
+        "time_range_s": [
+          3300,
+          4980
+        ],
+        "transfers": 3,
+        "walk_m": 900,
+        "fare_hkd": 26.5,
+        "co2_g": 980,
+        "reliability": 0.42,
+        "freshness_s": 180
+      },
+      "score": 0.31,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 3960,
+          "normalized": 0.0,
+          "weight": 0.3,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "transfers",
+          "raw": 3,
+          "normalized": 0.25,
+          "weight": 0.15,
+          "contribution": 0.038
+        },
+        {
+          "criterion": "walk",
+          "raw": 900,
+          "normalized": 0.0,
+          "weight": 0.15,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.42,
+          "normalized": 0.42,
+          "weight": 0.25,
+          "contribution": 0.105
+        }
+      ],
+      "warnings": [
+        "步行 900 米、换乘 3 次；渡轮受大风影响会停航",
+        "轮椅使用者：天星小轮下层每班仅限 4 名轮椅乘客"
+      ],
+      "notes": [
+        "碳排放最低的非轨道选项之一",
+        "不含小巴"
+      ],
+      "explain": "混合模式备选：巴士 + 渡轮 + 地铁。慢且受天气影响，但提供了一条完全绕开隧道的通路。",
+      "provenance": "real-derived",
+      "evidence": [
+        {
+          "source_id": "S8",
+          "fields": [
+            "route",
+            "stop",
+            "frequency",
+            "fare"
+          ],
+          "status": "unverified-not-imported"
+        },
+        {
+          "source_id": "S15",
+          "fields": [
+            "timetable",
+            "fare",
+            "wheelchair_limit"
+          ],
+          "status": "verified-page-seed-refresh-pending"
+        },
+        {
+          "source_id": "S4",
+          "fields": [
+            "scenario"
+          ],
+          "status": "simulated-scenario"
+        }
+      ]
+    },
+    {
+      "route_id": "r_seed_008",
+      "label": "綠色小巴 481B → 荃灣 → （轉乘未建模，仅作极端备援）",
+      "legs": [
+        {
+          "mode": "MINIBUS",
+          "line": "481B",
+          "from": "BS_TAW",
+          "to": "BS_TW",
+          "headway_s": null,
+          "travel_s": null,
+          "walk_m": 0,
+          "fare_hkd": null,
+          "accessible": false,
+          "provenance": "simulated",
+          "demo_only": true,
+          "evidence": [
+            {
+              "source_id": "S2",
+              "fields": [
+                "route",
+                "stop"
+              ],
+              "status": "unverified-missing-BS_TW"
+            }
+          ]
+        }
+      ],
+      "total": {
+        "time_s": 3900,
+        "time_range_s": [
+          3000,
+          5400
+        ],
+        "transfers": 3,
+        "walk_m": 600,
+        "fare_hkd": 12.3,
+        "co2_g": 760,
+        "reliability": 0.3,
+        "freshness_s": 300
+      },
+      "score": 0.12,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 3900,
+          "normalized": 0.02,
+          "weight": 0.3,
+          "contribution": 0.006
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.3,
+          "normalized": 0.3,
+          "weight": 0.3,
+          "contribution": 0.09
+        },
+        {
+          "criterion": "price",
+          "raw": 12.3,
+          "normalized": 0.45,
+          "weight": 0.2,
+          "contribution": 0.09
+        }
+      ],
+      "warnings": [
+        "小巴 19 座、无低地台，轮椅使用者**不可使用**",
+        "绕行路线，仅宜极端备援"
+      ],
+      "notes": [
+        "不符合轮椅与低步行偏好（已硬过滤）"
+      ],
+      "explain": "极端情况下的备援路线；系统对轮椅用户自动排除小巴。",
+      "provenance": "simulated",
+      "demo_only": true,
+      "evidence": [
+        {
+          "source_id": "S2",
+          "fields": [
+            "route",
+            "stop"
+          ],
+          "status": "unverified-missing-BS_TW"
+        }
+      ]
+    }
+  ],
+  "additional_stable_path_ids": [
+    "r_8232b6602c377cc6",
+    "r_5b0329d9b10b809c"
+  ],
+  "top3_policy": "Only synthetic/verified accessible wheelchair pool under3 may locally relax interchange reuse and Jaccard with warning; current source unknown implies0, no safety relaxation."
+}

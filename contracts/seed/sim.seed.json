@@ -1,10 +1,12 @@
 {
+  "scenario_id": "scn_huh_exc_closed_am_peak",
   "meta": {
     "version": "seed-v0",
     "built_at": "2026-09-21",
-    "status": "PLACEHOLDER — 数字仅供 A 先把看板做出来，必须由 C 的 backend/app/sim/ 真实跑出结果后覆盖",
+    "status": "SIMULATED PLACEHOLDER — 仅供 M0 契约与看板接线，不是实测或正式仿真结果证据",
     "placeholder": true,
     "scenario_id": "scn_huh_exc_closed_am_peak",
+    "provenance": "simulated",
     "event_ref": "evt_seed_003",
     "policy_definition": {
       "selfish": "每个 agent 独立选择个人效用最高的路线（无引导）",
@@ -12,12 +14,12 @@
     }
   },
   "assumptions": [
-    "需求 10,000 人 / 60 分钟，仅工作日早高峰（08:00–09:00）",
-    "OD 权重按走廊六站 800 米圈推导 —— 模拟值",
-    "画像比例：上班族 55% / 学生 20% / 游客 10% / 长者 10% / 轮椅 5% —— 模拟值",
-    "替代线路的剩余运力取保守估计（轨道替代线路仅约 25% 余量 + 过海巴士约 900 人/小时）",
-    "东铁过海段运力（约 53,200 人/小时）在该场景中完全不可用",
-    "单车载客量为车型查表估算值（双层巴士 137 / 小巴 19）"
+    "需求 10,000 人 / 60 分钟是 simulated placeholder，仅用于 M0 契约与看板接线",
+    "本 seed 仍是 TAW→ADM 单场景占位，不把 30 OD / 300 候选作为 M0 门槛",
+    "画像比例：上班族 55% / 学生 20% / 游客 10% / 长者 10% / 轮椅 5%，全部为 simulated",
+    "baseline 人数按当前 8 张 simulated 路线卡的 score 四次方归一并确定性取整，不是实测选择率",
+    "guided capacity_per_hour 是合计 6,900 人/小时的 simulated 剩余运力水桶，不是核验班次或车辆容量",
+    "所有延误、等待、可靠度、服务率与改善幅度均为 placeholder，不得作为实测或正式结果证据"
   ],
   "population": 10000,
   "time_range": ["08:00", "09:00"],
@@ -27,15 +29,18 @@
     "total_delay_person_min": 184300,
     "avg_delay_min": 18.4,
     "p95_wait_min": 37,
-    "overloaded_routes": 2,
-    "served_rate": 0.83,
+    "overloaded_routes": 5,
+    "served_rate": 0.6591,
     "wheelchair_served_rate": 0.71,
     "route_load": [
-      {"route_id": "r_seed_001", "users": 6120, "capacity_per_hour": 4200, "load_factor": 1.46, "overloaded": true},
-      {"route_id": "r_seed_002", "users": 2140, "capacity_per_hour": 3600, "load_factor": 0.59, "overloaded": false},
-      {"route_id": "r_seed_005", "users": 900, "capacity_per_hour": 466, "load_factor": 1.93, "overloaded": true},
-      {"route_id": "r_seed_006", "users": 540, "capacity_per_hour": 233, "load_factor": 2.32, "overloaded": true},
-      {"route_id": "r_seed_007", "users": 300, "capacity_per_hour": 900, "load_factor": 0.33, "overloaded": false}
+      {"route_id": "r_da67c274e39e0c00", "users": 3205, "capacity_per_hour": 2200, "load_factor": 1.46, "overloaded": true},
+      {"route_id": "r_8d0ba92684b1d1e2", "users": 2145, "capacity_per_hour": 1600, "load_factor": 1.34, "overloaded": true},
+      {"route_id": "r_a3da1ce3aa06f995", "users": 2058, "capacity_per_hour": 1200, "load_factor": 1.72, "overloaded": true},
+      {"route_id": "r_b59174a6ed64d8cf", "users": 1464, "capacity_per_hour": 800, "load_factor": 1.83, "overloaded": true},
+      {"route_id": "r_a3bb2d93a795746f", "users": 737, "capacity_per_hour": 400, "load_factor": 1.84, "overloaded": true},
+      {"route_id": "r_8d4bf8596c86646e", "users": 207, "capacity_per_hour": 300, "load_factor": 0.69, "overloaded": false},
+      {"route_id": "r_007c4e09879d19cc", "users": 173, "capacity_per_hour": 250, "load_factor": 0.69, "overloaded": false},
+      {"route_id": "r_a6162cc3a32c489b", "users": 11, "capacity_per_hour": 150, "load_factor": 0.07, "overloaded": false}
     ]
   },
   "guided": {
@@ -44,29 +49,30 @@
     "avg_delay_min": 11.3,
     "p95_wait_min": 14,
     "overloaded_routes": 0,
-    "served_rate": 0.91,
+    "served_rate": 0.69,
     "wheelchair_served_rate": 0.94,
     "unstoppable_demand": 3100,
     "shares": [
-      {"route_id": "r_seed_001", "share": 0.34, "users": 3400, "load_factor": 0.81},
-      {"route_id": "r_seed_002", "share": 0.22, "users": 2200, "load_factor": 0.61},
-      {"route_id": "r_seed_003", "share": 0.14, "users": 1400, "load_factor": 0.39},
-      {"route_id": "r_seed_004", "share": 0.12, "users": 1200, "load_factor": 0.42},
-      {"route_id": "r_seed_005", "share": 0.09, "users": 900, "load_factor": 0.85},
-      {"route_id": "r_seed_006", "share": 0.05, "users": 500, "load_factor": 0.85},
-      {"route_id": "r_seed_007", "share": 0.04, "users": 400, "load_factor": 0.44}
+      {"route_id": "r_da67c274e39e0c00", "share": 0.22, "users": 2200, "capacity_per_hour": 2200, "load_factor": 1.00},
+      {"route_id": "r_8d0ba92684b1d1e2", "share": 0.16, "users": 1600, "capacity_per_hour": 1600, "load_factor": 1.00},
+      {"route_id": "r_a3da1ce3aa06f995", "share": 0.12, "users": 1200, "capacity_per_hour": 1200, "load_factor": 1.00},
+      {"route_id": "r_b59174a6ed64d8cf", "share": 0.08, "users": 800, "capacity_per_hour": 800, "load_factor": 1.00},
+      {"route_id": "r_a3bb2d93a795746f", "share": 0.04, "users": 400, "capacity_per_hour": 400, "load_factor": 1.00},
+      {"route_id": "r_8d4bf8596c86646e", "share": 0.03, "users": 300, "capacity_per_hour": 300, "load_factor": 1.00},
+      {"route_id": "r_007c4e09879d19cc", "share": 0.025, "users": 250, "capacity_per_hour": 250, "load_factor": 1.00},
+      {"route_id": "r_a6162cc3a32c489b", "share": 0.015, "users": 150, "capacity_per_hour": 150, "load_factor": 1.00}
     ],
     "advice": [
       "运力缺口 3,100 人/小时：建议提前 20 分钟出发或改用轨道替代",
       "过海巴士已满，预计需等 2–3 班",
-      "轮椅使用者请优先选择 r_seed_003（全程电梯，不使用小巴）"
+      "轮椅使用者仅考虑 accessible=true、累计步行不超过 400 米且不含小巴的候选；不为凑数量放宽硬约束"
     ]
   },
   "delta": {
     "delay_reduction_pct": 38.9,
     "p95_wait_reduction_pct": 62.2,
-    "served_rate_gain_pp": 8.0,
-    "overloaded_routes_delta": -2
+    "served_rate_gain_pp": 3.1,
+    "overloaded_routes_delta": -5
   },
   "fairness": {
     "max_extra_delay_min": 15,
@@ -74,8 +80,8 @@
     "note": "轮椅与长者的个人最优路线被保留，不因总量最优而被牺牲"
   },
   "hero_message": {
-    "zh": "无引导：所有人挤同一条路线 → 2 条线路过载、P95 等待 37 分钟。有引导：分流到 7 条路线 → 过载清零、P95 等待 14 分钟，但仍有 3,100 人/小时的运力缺口 —— 我们不假装能解决全部问题。",
-    "en": "Unguided: everyone crowds one route, 2 lines overload, P95 wait 37 min. Guided: spread across 7 routes, zero overload, P95 wait 14 min — but a 3,100 pax/hour capacity gap remains. We don't pretend to solve it all."
+    "zh": "模拟占位：无引导时 5 条路线过载、P95 等待 37 分钟；有引导时分流到 8 条路线、过载清零、P95 等待 14 分钟，但仍有 3,100 人/小时的运力缺口。数值仅供 M0 接线，不是实测结论。",
+    "en": "Simulated placeholder: unguided demand overloads 5 routes with a 37-minute P95 wait; guided demand uses 8 routes with zero overload and a 14-minute P95 wait, while 3,100 passengers remain unmet. These values are for M0 wiring, not measured findings."
   },
   "provenance": "simulated"
 }

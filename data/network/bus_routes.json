@@ -1,0 +1,324 @@
+{
+  "meta": {
+    "version": "1.0",
+    "built_at": "2026-09-22",
+    "description": "Bus route verification log. Each route is marked as serving Tai Wai/Sha Tin or excluded. Based on KMB open data API and data.gov.hk.",
+    "provenance_note": "Routes verified against KMB open data API (https://data.etabus.gov.hk/v1/transport/kmb/). Excluded routes confirmed via route endpoint data."
+  },
+  "serving_tai_wai": [
+    {
+      "route_id": "182",
+      "operator": "KMB+CTB",
+      "origin_zh": "沙田(愉翠苑)",
+      "destination_zh": "中環(港澳碼頭)",
+      "tunnel": "CHT",
+      "service_hours": "06:00-23:50",
+      "calendar_type": "daily",
+      "headway_peak_min": 15,
+      "headway_offpeak_min": 25,
+      "fare_hkd": [16.0, 20.8],
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/182/outbound/1",
+      "provenance": "real-derived",
+      "note": "Only full-day direct cross-harbour bus from Sha Tin. Headway and fare estimated."
+    },
+    {
+      "route_id": "182P",
+      "operator": "KMB+CTB",
+      "origin_zh": "愉翠苑",
+      "destination_zh": "中環",
+      "tunnel": "CHT",
+      "service_hours": "weekday_peak_only",
+      "calendar_type": "weekday_peak",
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "provenance": "real-derived",
+      "note": "Peak-hour special service, one-way"
+    },
+    {
+      "route_id": "182X",
+      "operator": "KMB+CTB",
+      "origin_zh": "愉翠苑",
+      "destination_zh": "中環",
+      "tunnel": "CHT",
+      "service_hours": "weekday_peak_only",
+      "calendar_type": "weekday_peak",
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "provenance": "real-derived",
+      "note": "Peak-hour express, one-way"
+    },
+    {
+      "route_id": "N182",
+      "operator": "KMB+CTB",
+      "origin_zh": "廣源",
+      "destination_zh": "中環",
+      "tunnel": "CHT",
+      "service_hours": "overnight",
+      "calendar_type": "daily_overnight",
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "provenance": "real-derived",
+      "note": "Overnight only cross-harbour option"
+    },
+    {
+      "route_id": "982X",
+      "operator": "KMB+CTB",
+      "origin_zh": "愉翠苑",
+      "destination_zh": "灣仔(菲林明道)/金鐘(東)",
+      "tunnel": "WHC",
+      "service_hours": "weekday_peak_only",
+      "calendar_type": "weekday_peak",
+      "fare_hkd": [6.0, 16.0],
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/982X/",
+      "provenance": "real-derived",
+      "note": "Weekday peak only, one-way. Load factor already >90%. $6 TAW section fare is cheapest."
+    },
+    {
+      "route_id": "985",
+      "operator": "KMB+CTB",
+      "origin_zh": "美田",
+      "destination_zh": "金鐘(東)/銅鑼灣",
+      "tunnel": "WHC",
+      "service_hours": "weekday_peak_only",
+      "calendar_type": "weekday_peak",
+      "fare_hkd": [19.5, 19.5],
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "provenance": "real-derived"
+    },
+    {
+      "route_id": "985A",
+      "operator": "KMB+CTB",
+      "origin_zh": "美田",
+      "destination_zh": "金鐘(東)",
+      "tunnel": "WHC",
+      "service_hours": "weekday_peak_only",
+      "calendar_type": "weekday_peak",
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "provenance": "real-derived"
+    },
+    {
+      "route_id": "985B",
+      "operator": "KMB+CTB",
+      "origin_zh": "大圍(田心村)",
+      "destination_zh": "金鐘(東)/銅鑼灣",
+      "tunnel": "WHC",
+      "service_hours": "weekday_peak_only",
+      "calendar_type": "weekday_peak",
+      "fare_hkd": [19.5, 19.5],
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/985B/",
+      "provenance": "real-derived",
+      "note": "Via Hin Keng. Third stop ~70% full."
+    },
+    {
+      "route_id": "170",
+      "operator": "KMB+CTB",
+      "origin_zh": "沙田站",
+      "destination_zh": "華富(中)",
+      "tunnel": "CHT",
+      "service_hours": "06:00-23:45",
+      "calendar_type": "daily",
+      "headway_peak_min": 12,
+      "headway_offpeak_min": 30,
+      "fare_hkd": [20.8, 20.8],
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/170/",
+      "provenance": "real-derived",
+      "note": "HK Island end only reaches Causeway Bay / Aberdeen, NOT Admiralty/Central"
+    },
+    {
+      "route_id": "81C",
+      "operator": "KMB",
+      "origin_zh": "耀安",
+      "destination_zh": "尖沙咀東(麼地道)",
+      "tunnel": null,
+      "calendar_type": "daily",
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/81C/",
+      "provenance": "real-derived",
+      "note": "Does not cross harbour. Via Tai Chung Road / Che Kung Temple Road = Tai Wai area"
+    },
+    {
+      "route_id": "87B",
+      "operator": "KMB",
+      "origin_zh": "新田圍",
+      "destination_zh": "維港灣(大角咀)",
+      "tunnel": "Lion Rock Tunnel",
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "provenance": "real-derived",
+      "note": "Kowloon end is Tai Kok Tsui"
+    },
+    {
+      "route_id": "80X",
+      "operator": "KMB",
+      "origin_zh": "沙田各點",
+      "destination_zh": "觀塘碼頭",
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "provenance": "real-derived"
+    },
+    {
+      "route_id": "82X",
+      "operator": "KMB",
+      "origin_zh": "沙田各點",
+      "destination_zh": "黃大仙",
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "provenance": "real-derived"
+    },
+    {
+      "route_id": "83X",
+      "operator": "KMB",
+      "origin_zh": "沙田各點",
+      "destination_zh": "尖沙咀東",
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "provenance": "real-derived"
+    },
+    {
+      "route_id": "280X",
+      "operator": "KMB",
+      "origin_zh": "沙田各點",
+      "destination_zh": "尖沙咀東",
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "KMB open data API",
+      "provenance": "real-derived"
+    },
+    {
+      "route_id": "481B",
+      "operator": "Minibus (smartbus)",
+      "origin_zh": "荃灣街市街",
+      "destination_zh": "大圍(銅鑼灣山路)",
+      "tunnel": "Shing Mun Tunnel",
+      "service_hours": "06:30-23:00",
+      "calendar_type": "daily",
+      "headway_peak_min": 15,
+      "headway_offpeak_min": 30,
+      "fare_hkd": [12.3, 12.3],
+      "capacity": 19,
+      "low_floor": false,
+      "serves_tai_wai": true,
+      "verified": true,
+      "verified_at": "2026-09-21",
+      "source": "Transport Department",
+      "provenance": "real",
+      "note": "19-seat, no low-floor. Wheelchair users CANNOT use. Lateral connection to Tsuen Wan, not cross-harbour."
+    }
+  ],
+  "excluded_routes": [
+    {
+      "route_id": "680",
+      "reason": "Serves Ma On Shan, not Tai Wai",
+      "verified": true,
+      "verified_at": "2026-09-21"
+    },
+    {
+      "route_id": "680X",
+      "reason": "Serves Ma On Shan, not Tai Wai",
+      "verified": true,
+      "verified_at": "2026-09-21"
+    },
+    {
+      "route_id": "681",
+      "reason": "Serves Ma On Shan, not Tai Wai",
+      "verified": true,
+      "verified_at": "2026-09-21"
+    },
+    {
+      "route_id": "682",
+      "reason": "Serves Ma On Shan (Wu Kai Sha), not Tai Wai",
+      "verified": true,
+      "verified_at": "2026-09-21"
+    },
+    {
+      "route_id": "682P",
+      "reason": "Serves Ma On Shan (Wu Kai Sha), not Tai Wai",
+      "verified": true,
+      "verified_at": "2026-09-21"
+    },
+    {
+      "route_id": "307",
+      "reason": "Serves Tai Po, not Tai Wai",
+      "verified": true,
+      "verified_at": "2026-09-21"
+    },
+    {
+      "route_id": "673",
+      "reason": "Serves Sheung Shui, not Tai Wai",
+      "verified": true,
+      "verified_at": "2026-09-21"
+    },
+    {
+      "route_id": "978",
+      "reason": "Serves Fanling, not Tai Wai",
+      "verified": true,
+      "verified_at": "2026-09-21"
+    },
+    {
+      "route_id": "968",
+      "reason": "Serves Yuen Long, not Tai Wai",
+      "verified": true,
+      "verified_at": "2026-09-21"
+    },
+    {
+      "route_id": "948X",
+      "reason": "Serves Tsing Yi, not Tai Wai",
+      "verified": true,
+      "verified_at": "2026-09-21"
+    },
+    {
+      "route_id": "88K",
+      "reason": "Possibly cancelled on 2025-08-04. One search confirmed, one unconfirmed.",
+      "verified": false,
+      "verified_at": "2026-09-21",
+      "note": "T7.2 item #1 - needs B verification. Excluded from network data."
+    },
+    {
+      "route_id": "80M",
+      "reason": "Proposed cancellation in 2025-26 Sha Tin District Bus Route Plan. Replacement: 85/85A/81K.",
+      "verified": false,
+      "verified_at": "2026-09-21",
+      "note": "Excluded from network data pending confirmation."
+    }
+  ]
+}

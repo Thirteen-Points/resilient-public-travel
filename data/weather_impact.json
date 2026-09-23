@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "version": "1.0",
+    "built_at": "2026-09-22",
+    "description": "Weather impact factors for different transport modes. Used in route reliability scoring and walk time estimation.",
+    "provenance_note": "Penalty factors are estimated (simulated). No official source for HK-specific weather-transport impact coefficients."
+  },
+  "weather_conditions": {
+    "normal": {
+      "description": "No weather warning in effect",
+      "mode_penalties": {
+        "MTR": 1.0,
+        "BUS": 1.0,
+        "MINIBUS": 1.0,
+        "WALK": 1.0,
+        "FERRY": 1.0
+      },
+      "walk_speed_factor": 1.0,
+      "provenance": "real"
+    },
+    "amber_rainstorm": {
+      "description": "Amber rainstorm warning (HKO WRAINA)",
+      "mode_penalties": {
+        "MTR": 1.0,
+        "BUS": 1.15,
+        "MINIBUS": 1.15,
+        "WALK": 1.2,
+        "FERRY": 1.0
+      },
+      "walk_speed_factor": 0.9,
+      "provenance": "simulated",
+      "note": "Estimated penalty factors"
+    },
+    "red_rainstorm": {
+      "description": "Red rainstorm warning (HKO WRAINR)",
+      "mode_penalties": {
+        "MTR": 1.0,
+        "BUS": 1.3,
+        "MINIBUS": 1.3,
+        "WALK": 1.5,
+        "FERRY": 1.1
+      },
+      "walk_speed_factor": 0.75,
+      "provenance": "simulated"
+    },
+    "black_rainstorm": {
+      "description": "Black rainstorm warning (HKO WRAINB)",
+      "mode_penalties": {
+        "MTR": 1.1,
+        "BUS": 1.5,
+        "MINIBUS": 1.5,
+        "WALK": 2.0,
+        "FERRY": 1.3
+      },
+      "walk_speed_factor": 0.5,
+      "provenance": "simulated",
+      "note": "Severe weather - walk not recommended"
+    },
+    "t1": {
+      "description": "Tropical Cyclone Signal No. 1 (HKO WTCSGNL 1)",
+      "mode_penalties": {
+        "MTR": 1.0,
+        "BUS": 1.1,
+        "MINIBUS": 1.1,
+        "WALK": 1.1,
+        "FERRY": 1.0
+      },
+      "walk_speed_factor": 0.95,
+      "provenance": "simulated"
+    },
+    "t3": {
+      "description": "Tropical Cyclone Signal No. 3 (HKO WTCSGNL 3)",
+      "mode_penalties": {
+        "MTR": 1.0,
+        "BUS": 1.2,
+        "MINIBUS": 1.2,
+        "WALK": 1.3,
+        "FERRY": 1.2
+      },
+      "walk_speed_factor": 0.8,
+      "provenance": "simulated"
+    },
+    "t8": {
+      "description": "Tropical Cyclone Signal No. 8 or above (HKO WTCSGNL 8/9/10)",
+      "mode_penalties": {
+        "MTR": 1.2,
+        "BUS": 0.0,
+        "MINIBUS": 0.0,
+        "WALK": 0.0,
+        "FERRY": 0.0
+      },
+      "walk_speed_factor": 0.0,
+      "provenance": "simulated",
+      "note": "T8+: Most surface transport suspended. MTR may continue with reduced service. Ferry suspended."
+    }
+  },
+  "reliability_cv": {
+    "description": "Coefficient of variation (sigma/T) for reliability scoring per mode",
+    "values": {
+      "MTR": 0.08,
+      "BUS": 0.35,
+      "MINIBUS": 0.30,
+      "WALK": 0.15,
+      "FERRY": 0.25
+    },
+    "provenance": "simulated",
+    "note": "Based on industry experience. MTR is most reliable; buses most variable."
+  },
+  "ferry_cancellation_threshold": {
+    "wind_speed_knots": 30,
+    "provenance": "simulated",
+    "note": "Unverified threshold for Star Ferry suspension. T7.2 item #6."
+  }
+}

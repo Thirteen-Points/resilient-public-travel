@@ -1,0 +1,27 @@
+{
+  "provenance": "simulated",
+  "note": "Normalized adapter policy fixture, not verified transit data",
+  "baseline_fare": 12.5,
+  "fares": {},
+  "holidays": [],
+  "profiles": {
+    "commuter": {
+      "persona": "commuter",
+      "mobility": "standard",
+      "preset": "fastest",
+      "max_walk_m": 800
+    },
+    "wheelchair": {
+      "persona": "wheelchair",
+      "mobility": "wheelchair",
+      "walking_speed_mps": 0.7,
+      "max_walk_m": 400,
+      "max_transfers": 2,
+      "hard_flags": [
+        "no_stairs",
+        "no_minibus",
+        "no_non_lowfloor_bus"
+      ]
+    }
+  }
+}

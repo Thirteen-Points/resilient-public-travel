@@ -1,0 +1,149 @@
+# Seed data provenance ledger
+
+Status: M0 offline/demo ledger, reviewed 2026-09-23 (Asia/Hong_Kong). This
+ledger is intentionally conservative: a value is never promoted to `real`
+merely because it looks plausible. `real-derived` means derived from a named
+public/official data family or an explicitly documented estimate; it still needs
+field-level operational verification before production use. `simulated` is
+demo/test data and must remain labelled as such.
+
+## Sources and verification scope
+
+| ID | Source / URL | Checked | Scope | Status |
+|---|---|---|---|---|
+| S1 | MTR, [system map](https://www.mtr.com.hk/en/customer/services/system_map.html) | 2026-09-22 | station and line names/topology used by the corridor seed | topology plausibility only; coordinates and service values not certified |
+| S2 | Hong Kong Transport Department, [public transport data](https://www.td.gov.hk/en/transport_in_hong_kong/public_transport/buses/) | 2026-09-22 | bus/minibus route naming context | route stop order, fares, headways and current service require re-check |
+| S3 | Hong Kong Observatory, [warnings](https://www.hko.gov.hk/en/wxinfo/climat/warndb/warndb.htm) | 2026-09-22 | source family for future weather events | no live weather value is included in these seeds |
+| S4 | Project-owned deterministic fixtures | 2026-09-22 | event signals, route scores, demand, simulation outputs | simulated; not an operational observation |
+
+## M0 source access log (2026-09-22, Asia/Hong_Kong)
+
+These are access observations, not blanket approvals to promote seed values to
+`real`. Web access was checked on 2026-09-22; values below were not written into
+the seeds unless the field and scope were clear.
+
+| ID | URL | Result / fields observed | Coverage and limitation |
+|---|---|---|---|
+| S5 | https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities | **verified page**; monthly dataset; CSV resources for MTR routes/stations, fares, and barrier-free access; data dictionary link | Resource downloads were not imported in this M0 pass; no station row or fare value is promoted from page metadata alone |
+| S6 | https://opendata.mtr.com.hk/data/mtr_lines_and_stations.csv | **unverified access**; tool rejected `text/csv` response | Candidate URL was actually tried; no fields were consumed |
+| S7 | https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=EAL&sta=TAW&lang=en | **unverified access**; tool could not access query URL | Intended fields are schedule/arrival data only; not a service-status API and no seed value consumed |
+| S8 | https://data.gov.hk/en-data/dataset/hk-td-tis_11-pt-headway-en | **verified page**; biweekly dataset; 30 GTFS files plus CSV last-update file; route/stop/frequency/fare files listed | Dataset page was read, but files were not imported; no current headway or fare promoted |
+| S9 | https://data.gov.hk/en-data/dataset/hk-td-tis_7-route-fares | **unverified access**; page not accessible to the checker | No route/fare fields consumed |
+| S10 | https://data.gov.hk/tc-data/dataset/hk-td-tis_1-special-traffic-news | **verified page**; Transport Department, real-time frequency; XML resources and data dictionary listed | This is an incident-source candidate, not used for the simulated event seed |
+| S11 | https://data.etabus.gov.hk/v1/transport/kmb/route/170/outbound/1 | **unverified access**; API URL not accessible to the checker | No KMB route/stop/ETA field consumed; never treated as capacity source |
+| S12 | https://rt.data.gov.hk/v2/transport/citybus/route/CTB/182 | **unverified access**; API URL not accessible to the checker | No Citybus route/stop/ETA field consumed; never treated as capacity source |
+| S13 | https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc | **verified JSON response**; `rainfall.data[].place/max/unit`, `startTime/endTime`, `temperature.data[]`, `warningMessage`, `updateTime` | Snapshot observed at `updateTime=2026-09-22T21:02:00+08:00`; weather snapshot is not embedded in the event seed and does not prove a transport incident |
+| S14 | https://www.hko.gov.hk/en/wxinfo/climat/warndb/warndb.htm | **unverified access**; page not accessible to the checker | No warning status consumed |
+| S15 | https://www.starferry.com.hk/en/service | **verified operator page**; Central–Tsim Sha Tsui timetable/frequency, weekday/weekend fares, wheelchair lower-deck limit, weather/marine-traffic caveat | Current fare/frequency differs from the old seed assumptions; capacity is not published, so capacity remains `real-derived`/pending and no capacity number was promoted |
+| S16 | https://www.gov.hk/en/about/abouthk/holiday/2026.htm | **unverified content**; page returned no readable lines | No holiday/service-calendar value consumed |
+
+S1 (MTR system map) was also directly readable: it lists the East Rail Line
+stations including Admiralty, Exhibition Centre, Hung Hom, Mong Kok East,
+Kowloon Tong and Tai Wai. This supports only line/station naming/topology and
+not the seed coordinates, timings, capacities or current service state.
+
+The MTR and Transport Department pages are accepted as official source families
+because their pages identify the operator/department and describe the supplied
+fields. A page being accessible does not certify a particular seed value; the
+seed remains `real-derived` until the exact row, field definition, update time
+and coverage are captured.
+
+## File-level disposition
+
+| File | Contents | Disposition |
+|---|---|---|
+| `contracts/seed/network.seed.json` | nodes, line topology, coordinates, service assumptions | names/topology are `real-derived`; timings, capacities, fares, accessibility and bus/ferry service are derived or pending; `meta.counts.lines=10`; GMB_481B excluded from runnable lines after manual invalid-stop confirmation |
+| `contracts/seed/routes.seed.json` | eight candidate route cards for `TAW` → `ADM` | every route and leg now carries evidence IDs/fields/status; stale 982X/985B 1800-second headways were removed pending exact schedule evidence; `r_seed_008` is simulated/demo-only with unresolved destination |
+| `contracts/seed/event.seed.json` | three-stage event-card progression and signals | entirely `simulated`, including the “official” signal text; it must not be presented as a real MTR alert |
+| `contracts/seed/sim.seed.json` | deterministic baseline/guided comparison | entirely `simulated`; assumptions are not measured demand or capacity |
+
+## Known pending checks
+
+1. Confirm station coordinates and accessibility against the current official
+   station/accessibility source before operational routing.
+2. Confirm every bus/minibus stop sequence, direction, service calendar, fare,
+   headway and vehicle capacity; do not treat `real-derived` as `real`.
+3. Do not restore GMB_481B unless official route, stop sequence, direction and
+   valid boarding/alighting evidence resolves the manually rejected `BS_TW`.
+   Historical simulated references are not operational candidates.
+4. Confirm ferry fare, capacity, accessibility and weather suspension rules.
+5. Replace simulated event wording with a separately sourced, timestamped
+   official notice before any public-facing live claim.
+6. ERL capacity is not certified by the sources accessed here; it remains
+   `real-derived` and must not be presented as an official passenger-capacity
+   measurement.
+7. Star Ferry fare/frequency/accessibility are now source-observable from S15,
+   but the seed's ferry capacity and any stale fare/headway tuple require a
+   deliberate data refresh; do not silently copy the old numbers.
+8. 982X and 985B exact headway fields remain unverified after manual review;
+   consumers must handle `null` and must not infer a new numeric headway.
+9. The 800 m catchment is an access-point search radius, not a complete-route
+   cumulative walking limit. Small buses remain out of wheelchair candidates
+   unless official accessibility evidence is separately confirmed.
+
+## Six-core coverage ledger
+
+The six core points are `TAW`, `KOT`, `MKK`, `HUH`, `EXC`, `ADM`, producing 30
+directed OD pairs. Current evidence supports only the MTR station/topology rows
+and four partial bus access areas: `BS_TAW`, `BS_TIN_SUM`, `BS_HUH_TUNNEL`, and
+`BS_ADM_E`. MTR street maps confirm station-area exits and access features at
+MKK/KOT/EXC, but no machine-readable coordinates, access time, step-free path
+continuity, or link to a seed node was captured; thus no edge was added.
+
+The four bus route cards/line records are limited to 182 (`BS_TAW`–`BS_ADM_E`),
+982X (`BS_TAW`–`BS_ADM_E`), 985B (`BS_TIN_SUM`–`BS_ADM_E`), and 81C
+(`BS_TAW`–`TST`). Their evidence points to the Transport Department headway
+dataset family (S8) but is marked `unverified-not-imported`; it does not certify
+current stop order, direction, service calendar, fare, coordinate, or headway.
+Official TD route/sequence/stop-location records are now inspected (S17–S20
+below), but do not safely map every abstract seed node. No bus edge is asserted
+for MKK or EXC. This is a coverage limitation, not a reason to fabricate the
+missing 30 route sets.
+
+## Field-level reconciliation (2026-09-23, Asia/Hong_Kong)
+
+Official Transport Department files were fetched from the DATA.GOV.HK resource
+URLs. `X`,`Y` are Hong Kong projected grid coordinates, not decimal
+latitude/longitude. No projection, map-matching, or stop-to-seed-node snapping
+was performed. Dataset resource update dates and row `LAST_UPDATE_DATE` values
+are distinct.
+
+| ID | Exact source / fields | Records checked | Disposition |
+|---|---|---|---|
+| S17 | [Bus route XML](https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml); `ROUTE_ID, COMPANY_CODE, ROUTE, SERVICE_MODE, SPECIAL_TYPE, JOURNEY_TIME, FULL_FARE, ORIGIN, DESTINATION, LAST_UPDATE_DATE` | 182 route 1051, KMB+CTB, Yu Chui Court–Central (Macao Ferry), R/special 0, 60 min, HK$20.8, row 2026-01-14. 81C route 1336, KMB, Yiu On–Tsim Sha Tsui East (Mody Road), R, 78 min, HK$10.2, row 2025-08-11. 982X route 8104: Yu Chui Court–Wan Chai (Fleming Road), T/special 1, 53 min, HK$20.8, row 2026-06-12. 985B route 8705: Tin Sam Village–Wan Chai (Hennessy Road), T/special 1, 47 min, HK$20.8, row 2025-04-03. | Master-record full route fare/time does not establish seed node boarding/section fare, headway or capacity. |
+| S18 | [Bus route stop-sequence XML](https://static.data.gov.hk/td/routes-fares-xml/RSTOP_BUS.xml); `ROUTE_ID, ROUTE_SEQ, STOP_SEQ, STOP_ID, STOP_PICK_DROP, STOP_NAME, LAST_UPDATE_DATE` | 182 route 1051 seq 1 includes stop 859 Tai Wai BBI—Sun Chui Estate/Hung Mui Kuk Road, then Kowloon Tong Junction Road 4223 and Kowloon Tong Station 768. 81C route 1336 includes 859/4223/768. 982X route 8104 includes 6041 Tai Wai BBI—Sun Ming House, 6015 Tai Wai BBI—Tin Sam Village and Admiralty/United Centre 8051. 985B route 8705 starts at 6015, includes Western Harbour Tunnel BBI 911 and Admiralty/United Centre 8051. | Direction-specific ordered records. Existing abstract seed bus nodes are not presumed identical to these stop IDs. Resource updated 2026-08-18; row dates are distinct. |
+| S19 | [Bus stop location XML](https://static.data.gov.hk/td/routes-fares-xml/STOP_BUS.xml); `STOP_ID, STOP_TYPE, X, Y, LAST_UPDATE_DATE` | 859 X=836580,Y=825686; 6042 Tai Wai Station/Che Kung Miu Road X=836629,Y=825937; 6015 X=836379,Y=825731; 768 Kowloon Tong Station X=836499,Y=821851; 8051 Admiralty/United Centre X=835065,Y=815497. XML generated 2026-09-11T17:49:16; resource updated 2026-09-12. | Grid coordinates are not WGS84 or the seed decimal coordinates. No coordinate conversion or node linkage claimed. |
+| S20 | [TD public transport headway GTFS](https://data.gov.hk/en-data/dataset/hk-td-tis_11-pt-headway-en); `routes.txt, trips.txt, frequencies.txt, calendar.txt, stop_times.txt` | Routes 1051/1336 have multiple `frequencies.txt` headway bands. 982X route variants 8104/8308 have scheduled trips. | One constant per-day headway cannot accurately summarize variable bands. Exact 982X/985B departures and service exceptions need schedule/calendar joins; service IDs are not interpreted without calendar/exception rows. |
+| S21 | [MTR street map index](https://www.mtr.com.hk/en/customer/services/stmap_index.html); [MKK map](https://www.mtr.com.hk/archive/en/services/maps/mkk.pdf), [KOT map](https://www.mtr.com.hk/archive/ch/services/maps/kot.pdf), [EXC map](https://www.mtr.com.hk/archive/en/services/maps/exc.pdf) | MKK/KOT maps show station exits and bus/minibus access features; KOT identifies its Public Transport Interchange; EXC map identifies exits, bus stops, ferry pier and public transport interchange. | Confirms station-area features only; no machine-readable coordinates, access time, continuous step-free path, or linkage to a seed node. No graph edge added. |
+| S22 | [MTR system map](https://www.mtr.com.hk/en/customer/services/system_map.html) | Station/line names and East Rail topology for TAW, KOT, MKK, HUH, EXC and ADM. | Topology/name evidence only, not coordinates, timetable or capacity. |
+
+### Traceability spot-check count
+
+At least 17 record-level checks were made: route 1051 operator, origin,
+destination, fare and time; 81C route/operator, destination and fare; 982X
+variant, mode and fare; 985B route, origin, destination and fare; stop 859,
+4223, 768, 6015 and 8051 names/sequence; plus five `X`,`Y` pairs. URLs,
+fields, row IDs/dates where captured, and limitations are listed above. Exact
+section fares, headways, capacity, access and calendar remain pending when not
+explicitly supported.
+
+The user manually verified that `BS_TW` is not a valid stop. `GMB_481B` has
+therefore been removed from runnable `network.seed.json`; any historical
+simulated route reference is not an operational candidate.
+
+## Station-access coordinate follow-up (2026-09-23)
+
+| ID | Source / fields | Observation | Disposition |
+|---|---|---|---|
+| S23 | [LandsD iGeoCom CSV resource](https://data.gov.hk/en-data/dataset/hk-landsd-openmap-development-hkms-digital-geocom/resource/d4be4d11-4566-46a4-9a1b-c05b5be443d0); `GEONAMEID, ENGLISHNAME, CLASS, TYPE, SUBCAT, EASTING, NORTHING, E_SITENAME, REV_DATE` | Downloaded CSV (SHA-256 `d9703a9717774ca6b875f076da7d1be95f8640140e5bd902691b8421befef5db`) on 2026-09-23; resource updated 2026-09-04. Exact `TYPE=MTA`/`E_SITENAME` match yielded 8 TAW + 11 KOT + 4 MKK + 14 HUH + 6 EXC + 7 ADM access records. Exact `TYPE=RSN` point records: TAW 542884 (836455,825953; 21/1/2020), KOT 544548 (836155,822006; 21/1/2020), MKK 557494 (835827,820334; 28/12/2023), HUH 544547 (836815,818227; 4/5/2023), EXC 21170932 (836107,815864; 27/7/2022), ADM 538320 (834977,815617; 27/10/2014). | All 50 MTA access rows and six official railway-station reference points are preserved with raw fields and transformed coordinates in `data/access/station_entrances.json`. These are official point records, not proof of step-free access or continuous path connections. Earlier download-failure observation was superseded after retrieving the CSV. |
+| S24 | [TD GTFS specification](https://static.data.gov.hk/td/pt-headway-en/dataspec/ptheadway_dataspec.pdf), `stops.txt`: `stop_id, stop_name, stop_lat, stop_lon, location_type` | Specification defines WGS84 coordinates; location type 0 is stop and type 2 is station entrance. Current `stops.txt` parsed: 9,447 rows, all `location_type=0`; resource updated 2026-09-12. | This feed provides no station-entrance rows for the six MTR nodes; the iGeoCom MTA access features and RSN reference points above supply the station access locations instead. |
+
+The six network station coordinate pairs now match the corresponding S23 RSN
+records, transformed by the official [HK Geodetic Survey API](https://www.geodetic.gov.hk/transform/v2/?inSys=hkgrid&outSys=wgsgeog&e=836366&n=825885)
+(`inSys=hkgrid`, `outSys=wgsgeog`); API documentation:
+[transformation manual](https://www.geodetic.gov.hk/transform/tformAPI_manual.pdf).
+The supplied Tai Wai sample returned `22.372147626,114.177825919` exactly.
+Independent transformation checks were also made for one access record at
+each of the six stations. The old estimate coordinates are replaced by the
+official RSN point coordinates, not claimed geometric centroids. No walk links
+were added, and access/step-free connectivity remains unknown.

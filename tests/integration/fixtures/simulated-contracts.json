@@ -1,0 +1,353 @@
+{
+  "fixture_meta": {
+    "provenance": "simulated",
+    "purpose": "Consumer contract tests only. All transport values are invented; no simulation result is acceptance evidence."
+  },
+  "network": {
+    "meta": {
+      "catchment_m": 800,
+      "provenance": "simulated",
+      "note": "Synthetic graph, not a Hong Kong network"
+    },
+    "nodes": [
+      {
+        "id": "FIX_A",
+        "kind": "mtr_station",
+        "lat": 0,
+        "lng": 0,
+        "accessible": true,
+        "provenance": "simulated"
+      },
+      {
+        "id": "FIX_B",
+        "kind": "mtr_station",
+        "lat": 0,
+        "lng": 0,
+        "accessible": true,
+        "provenance": "simulated"
+      }
+    ],
+    "lines": [
+      {
+        "id": "TML",
+        "mode": "MTR",
+        "stops": [
+          "FIX_A",
+          "FIX_B"
+        ],
+        "seg_time_s": [
+          100
+        ],
+        "headway_s": {
+          "weekday_peak": 120
+        },
+        "capacity_per_vehicle": 20,
+        "provenance": "simulated",
+        "note": "Invented fixture values; line token tests the documented enum only"
+      }
+    ],
+    "walk_links": [
+      {
+        "from": "FIX_A",
+        "to": "FIX_B",
+        "walk_s": 120,
+        "walk_m": 80,
+        "accessible": true,
+        "provenance": "simulated"
+      }
+    ]
+  },
+  "objects": {
+    "Signal": {
+      "signal_id": "fixture_signal",
+      "received_at": "2026-09-22T08:00:00+08:00",
+      "source_type": "user_report",
+      "source_name": "fixture-stream",
+      "author_hint": "synthetic",
+      "raw_text": "Synthetic interruption; not a real transport report.",
+      "raw_url": null,
+      "lang": "en",
+      "provenance": "simulated"
+    },
+    "Event": {
+      "event_id": "fixture_event",
+      "version": 1,
+      "status": "published",
+      "created_at": "2026-09-22T08:00:00+08:00",
+      "updated_at": "2026-09-22T08:00:00+08:00",
+      "published_at": "2026-09-22T08:00:00+08:00",
+      "expires_at": "2026-09-22T14:00:00+08:00",
+      "event_type": "other",
+      "title": "Synthetic closure",
+      "summary": "Contract fixture only",
+      "mode": "MTR",
+      "line": "TML",
+      "direction": "both",
+      "affected_segments": [
+        {
+          "from_node": "FIX_A",
+          "to_node": "FIX_B",
+          "impact": "closed",
+          "capacity_factor": 0
+        }
+      ],
+      "window": {
+        "start": "2026-09-22T08:00:00+08:00",
+        "end": null,
+        "end_confidence": "unknown"
+      },
+      "severity": 1,
+      "confidence": 0.9,
+      "confidence_factors": [
+        {
+          "factor": "fixture",
+          "weight": 1,
+          "score": 0.9,
+          "note": "Synthetic factor"
+        }
+      ],
+      "signals": [
+        "fixture_signal"
+      ],
+      "reviewed_by": "fixture-reviewer",
+      "audit_log": [
+        {
+          "at": "2026-09-22T08:00:00+08:00",
+          "actor": "fixture-reviewer",
+          "action": "published",
+          "confidence_after": 0.9
+        }
+      ],
+      "provenance": "simulated"
+    },
+    "UserProfile": {
+      "user_id": "fixture_profile",
+      "persona": "wheelchair",
+      "mobility": "wheelchair",
+      "walking_speed_mps": 0.7,
+      "max_walk_m": 400,
+      "max_transfers": 2,
+      "price_sensitive": 0.5,
+      "has_discount_card": false,
+      "urgency": "normal",
+      "preset": "most_stable",
+      "weights": {
+        "time": 0.4,
+        "transfers": 0.1,
+        "walk": 0.1,
+        "price": 0.1,
+        "comfort": 0.1,
+        "reliability": 0.1,
+        "carbon": 0.05,
+        "freshness": 0.05
+      },
+      "hard_flags": [
+        "no_stairs",
+        "no_minibus",
+        "no_non_lowfloor_bus"
+      ],
+      "note": "Invented user; no personal data"
+    },
+    "RouteCandidate": {
+      "route_id": "fixture_route",
+      "label": "Synthetic walking alternative",
+      "legs": [
+        {
+          "mode": "WALK",
+          "from": "FIX_A",
+          "to": "FIX_B",
+          "in_vehicle_s": 120,
+          "walk_m": 80,
+          "accessible": true,
+          "provenance": "simulated"
+        }
+      ],
+      "total": {
+        "time_s": 120,
+        "time_range_s": [
+          100,
+          150
+        ],
+        "transfers": 0,
+        "walk_m": 80,
+        "fare_hkd": 0,
+        "co2_g": 0,
+        "reliability": 0.8,
+        "freshness_s": 0
+      },
+      "score": 0.5,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 0,
+          "normalized": 0.5,
+          "weight": 0.4,
+          "contribution": 0.2
+        },
+        {
+          "criterion": "transfers",
+          "raw": 0,
+          "normalized": 0.5,
+          "weight": 0.1,
+          "contribution": 0.05
+        },
+        {
+          "criterion": "walk",
+          "raw": 80,
+          "normalized": 0.5,
+          "weight": 0.1,
+          "contribution": 0.05
+        },
+        {
+          "criterion": "price",
+          "raw": 0,
+          "normalized": 0.5,
+          "weight": 0.1,
+          "contribution": 0.05
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0,
+          "normalized": 0.5,
+          "weight": 0.1,
+          "contribution": 0.05
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0,
+          "normalized": 0.5,
+          "weight": 0.1,
+          "contribution": 0.05
+        },
+        {
+          "criterion": "carbon",
+          "raw": 0,
+          "normalized": 0.5,
+          "weight": 0.05,
+          "contribution": 0.025
+        },
+        {
+          "criterion": "freshness",
+          "raw": 0,
+          "normalized": 0.5,
+          "weight": 0.05,
+          "contribution": 0.025
+        }
+      ],
+      "warnings": [],
+      "notes": [
+        "Invented walking distance"
+      ],
+      "explain": "Synthetic route used only for contract tests.",
+      "evidence": [
+        {
+          "event_id": "fixture_event",
+          "used": true
+        },
+        {
+          "source": "synthetic-network",
+          "freshness_s": 0
+        }
+      ],
+      "provenance": "simulated"
+    },
+    "LoadEstimate": {
+      "route_id": "fixture_route",
+      "users_on_route": 10,
+      "capacity_per_hour": 20,
+      "load_factor": 0.5,
+      "expected_wait_s": 0,
+      "board_refusal_prob": 0,
+      "overloaded": false
+    },
+    "DiversionPlan": {
+      "plan_id": "fixture_plan",
+      "event_id": "fixture_event",
+      "demand": 10,
+      "window_min": 60,
+      "shares": [
+        {
+          "route_id": "fixture_route",
+          "share": 1,
+          "users": 10,
+          "capacity_per_hour": 20,
+          "load_factor": 0.5
+        }
+      ],
+      "unstoppable_demand": 0,
+      "advice": [
+        "Contract fixture; not a computed operational plan"
+      ],
+      "fairness": {
+        "max_extra_delay_min": 0,
+        "protected_users": 1,
+        "note": "Synthetic test aggregate"
+      },
+      "provenance": "simulated"
+    },
+    "SimResult": {
+      "scenario_id": "fixture_scenario",
+      "population": 10000,
+      "time_range": [
+        "08:00",
+        "09:00"
+      ],
+      "baseline": {
+        "policy": "selfish",
+        "total_delay_person_min": 100,
+        "p95_wait_min": 20,
+        "overloaded_routes": 1,
+        "served_rate": 0.8
+      },
+      "guided": {
+        "policy": "bucket",
+        "total_delay_person_min": 80,
+        "p95_wait_min": 10,
+        "overloaded_routes": 0,
+        "served_rate": 0.9,
+        "unstoppable_demand": 1000,
+        "wheelchair_served_rate": 0.9
+      },
+      "delta": {
+        "delay_reduction_pct": 20,
+        "p95_wait_reduction_pct": 50
+      },
+      "assumptions": [
+        "Hand-authored contract fixture, not a computed simulation and never acceptance evidence."
+      ],
+      "provenance": "simulated"
+    },
+    "Meta": {
+      "generated_at": "2026-09-22T08:00:00+08:00",
+      "graph_snapshot": "fixture_snapshot",
+      "sources": [
+        {
+          "name": "synthetic-network",
+          "last_ok": "2026-09-22T08:00:00+08:00",
+          "provenance": "simulated"
+        }
+      ],
+      "disclaimer": "Synthetic test fixture. Not official emergency advice."
+    },
+    "Snapshot": {
+      "snapshot_id": "fixture_snapshot",
+      "affected_edges": []
+    },
+    "Health": {
+      "ok": true,
+      "sources": [
+        {
+          "name": "synthetic-network",
+          "provenance": "simulated"
+        }
+      ]
+    },
+    "Error": {
+      "error": {
+        "code": "fixture_unavailable",
+        "message": "Synthetic failure",
+        "fallback": "Use last successful fixture"
+      }
+    }
+  }
+}
