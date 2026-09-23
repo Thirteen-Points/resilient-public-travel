@@ -1,0 +1,327 @@
+{
+  "$defs": {
+    "AffectedSegment": {
+      "additionalProperties": false,
+      "properties": {
+        "capacity_factor": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Capacity Factor",
+          "type": "number"
+        },
+        "from_node": {
+          "title": "From Node",
+          "type": "string"
+        },
+        "impact": {
+          "enum": [
+            "closed",
+            "reduced_capacity",
+            "slow",
+            "crowded"
+          ],
+          "title": "Impact",
+          "type": "string"
+        },
+        "to_node": {
+          "title": "To Node",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_node",
+        "to_node",
+        "impact",
+        "capacity_factor"
+      ],
+      "title": "AffectedSegment",
+      "type": "object"
+    },
+    "AuditEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "actor": {
+          "title": "Actor",
+          "type": "string"
+        },
+        "at": {
+          "format": "date-time",
+          "title": "At",
+          "type": "string"
+        },
+        "confidence_after": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence After",
+          "type": "number"
+        }
+      },
+      "required": [
+        "at",
+        "actor",
+        "action",
+        "confidence_after"
+      ],
+      "title": "AuditEntry",
+      "type": "object"
+    },
+    "ConfidenceFactor": {
+      "additionalProperties": false,
+      "properties": {
+        "factor": {
+          "title": "Factor",
+          "type": "string"
+        },
+        "note": {
+          "title": "Note",
+          "type": "string"
+        },
+        "score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "weight": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Weight",
+          "type": "number"
+        }
+      },
+      "required": [
+        "factor",
+        "weight",
+        "score",
+        "note"
+      ],
+      "title": "ConfidenceFactor",
+      "type": "object"
+    },
+    "EventWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End"
+        },
+        "end_confidence": {
+          "title": "End Confidence",
+          "type": "string"
+        },
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "end_confidence"
+      ],
+      "title": "EventWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The Event contract shared by B's pipeline, A's UI and C's engine.",
+  "properties": {
+    "affected_segments": {
+      "items": {
+        "$ref": "#/$defs/AffectedSegment"
+      },
+      "title": "Affected Segments",
+      "type": "array"
+    },
+    "audit_log": {
+      "items": {
+        "$ref": "#/$defs/AuditEntry"
+      },
+      "title": "Audit Log",
+      "type": "array"
+    },
+    "confidence": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "confidence_factors": {
+      "items": {
+        "$ref": "#/$defs/ConfidenceFactor"
+      },
+      "title": "Confidence Factors",
+      "type": "array"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "direction": {
+      "title": "Direction",
+      "type": "string"
+    },
+    "event_id": {
+      "title": "Event Id",
+      "type": "string"
+    },
+    "event_type": {
+      "enum": [
+        "signal_failure",
+        "train_failure",
+        "door_fault",
+        "power_failure",
+        "weather",
+        "crowd",
+        "road_incident",
+        "other"
+      ],
+      "title": "Event Type",
+      "type": "string"
+    },
+    "expires_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Expires At"
+    },
+    "line": {
+      "title": "Line",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "MTR",
+        "BUS",
+        "MINIBUS",
+        "WALK",
+        "FERRY"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "provenance": {
+      "enum": [
+        "real",
+        "real-derived",
+        "simulated"
+      ],
+      "title": "Provenance",
+      "type": "string"
+    },
+    "published_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Published At"
+    },
+    "reviewed_by": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reviewed By"
+    },
+    "severity": {
+      "maximum": 5,
+      "minimum": 1,
+      "title": "Severity",
+      "type": "integer"
+    },
+    "signals": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Signals",
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "pending_review",
+        "published",
+        "updated",
+        "expired",
+        "rejected"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "summary": {
+      "title": "Summary",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "version": {
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "window": {
+      "$ref": "#/$defs/EventWindow"
+    }
+  },
+  "required": [
+    "event_id",
+    "version",
+    "status",
+    "created_at",
+    "updated_at",
+    "published_at",
+    "expires_at",
+    "event_type",
+    "title",
+    "summary",
+    "mode",
+    "line",
+    "direction",
+    "affected_segments",
+    "window",
+    "severity",
+    "confidence",
+    "confidence_factors",
+    "signals",
+    "reviewed_by",
+    "provenance"
+  ],
+  "title": "Event",
+  "type": "object"
+}

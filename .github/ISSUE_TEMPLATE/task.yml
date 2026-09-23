@@ -1,0 +1,66 @@
+name: ResilientRoute task
+description: Create a task card that follows the shared workstream format.
+title: "[T?.?] "
+labels:
+  - "status:待办"
+body:
+  - type: input
+    id: task_id
+    attributes:
+      label: Task ID
+      placeholder: T2.7
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      description: Use A, B, C, or the shared ownership written in 04-workstreams.md.
+    validations:
+      required: true
+  - type: input
+    id: backup
+    attributes:
+      label: Backup
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - 必做
+        - 应做
+        - 可选
+    validations:
+      required: true
+  - type: input
+    id: stage
+    attributes:
+      label: Stage
+      placeholder: P1
+    validations:
+      required: true
+  - type: input
+    id: estimate
+    attributes:
+      label: Estimate
+      placeholder: 4 h
+    validations:
+      required: true
+  - type: textarea
+    id: deliverable
+    attributes:
+      label: Deliverable
+    validations:
+      required: true
+  - type: textarea
+    id: dod
+    attributes:
+      label: Definition of Done
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Dependencies, cut scope, or notes

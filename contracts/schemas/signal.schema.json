@@ -1,0 +1,75 @@
+{
+  "additionalProperties": false,
+  "description": "Raw, unstructured signal defined by ``03-contracts.md`` section 3.1.",
+  "properties": {
+    "author_hint": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Author Hint"
+    },
+    "lang": {
+      "title": "Lang",
+      "type": "string"
+    },
+    "provenance": {
+      "enum": [
+        "real",
+        "real-derived",
+        "simulated"
+      ],
+      "title": "Provenance",
+      "type": "string"
+    },
+    "raw_text": {
+      "title": "Raw Text",
+      "type": "string"
+    },
+    "raw_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Raw Url"
+    },
+    "received_at": {
+      "format": "date-time",
+      "title": "Received At",
+      "type": "string"
+    },
+    "signal_id": {
+      "title": "Signal Id",
+      "type": "string"
+    },
+    "source_name": {
+      "title": "Source Name",
+      "type": "string"
+    },
+    "source_type": {
+      "title": "Source Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "signal_id",
+    "received_at",
+    "source_type",
+    "source_name",
+    "author_hint",
+    "raw_text",
+    "raw_url",
+    "lang",
+    "provenance"
+  ],
+  "title": "Signal",
+  "type": "object"
+}
