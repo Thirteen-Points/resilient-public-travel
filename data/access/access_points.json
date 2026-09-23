@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "version": "1.0",
+    "built_at": "2026-09-22",
+    "description": "Access points within 800m catchment of each corridor station. Used for routing origin/destination matching.",
+    "catchment_m": 800,
+    "provenance_note": "Access point coordinates are real-derived (approximated). Entrance-level coordinates require MTR barrier-free facilities CSV (T7.2 item #7)."
+  },
+  "stations": [
+    {
+      "station_id": "TAW",
+      "access_points": [
+        {"id": "ap_taw_mtr_north", "type": "mtr_entrance", "lat": 22.3741, "lng": 114.1785, "accessible": true, "provenance": "real-derived", "note": "Approximated entrance location"},
+        {"id": "ap_taw_mtr_south", "type": "mtr_entrance", "lat": 22.3721, "lng": 114.1793, "accessible": true, "provenance": "real-derived"},
+        {"id": "BS_TAW", "type": "bus_stop", "lat": 22.3726, "lng": 114.1783, "accessible": true, "provenance": "real-derived", "lines": ["182", "982X", "985B", "81C", "481B"]},
+        {"id": "ap_taw_taxi", "type": "taxi_stand", "lat": 22.3735, "lng": 114.1790, "accessible": true, "provenance": "simulated"}
+      ]
+    },
+    {
+      "station_id": "KOT",
+      "access_points": [
+        {"id": "ap_kot_mtr_east", "type": "mtr_entrance", "lat": 22.3373, "lng": 114.1770, "accessible": true, "provenance": "real-derived"},
+        {"id": "ap_kot_mtr_west", "type": "mtr_entrance", "lat": 22.3365, "lng": 114.1756, "accessible": true, "provenance": "real-derived"},
+        {"id": "ap_kot_bus_stop", "type": "bus_stop", "lat": 22.3367, "lng": 114.1768, "accessible": true, "provenance": "real-derived"}
+      ]
+    },
+    {
+      "station_id": "MKK",
+      "access_points": [
+        {"id": "ap_mkk_mtr_north", "type": "mtr_entrance", "lat": 22.3229, "lng": 114.1729, "accessible": true, "provenance": "real-derived"},
+        {"id": "ap_mkk_mtr_south", "type": "mtr_entrance", "lat": 22.3213, "lng": 114.1723, "accessible": true, "provenance": "real-derived"},
+        {"id": "ap_mkk_bus_terminus", "type": "bus_terminus", "lat": 22.3225, "lng": 114.1730, "accessible": true, "provenance": "real-derived"}
+      ]
+    },
+    {
+      "station_id": "HUH",
+      "access_points": [
+        {"id": "ap_huh_mtr_north", "type": "mtr_entrance", "lat": 22.3042, "lng": 114.1820, "accessible": true, "provenance": "real-derived"},
+        {"id": "ap_huh_mtr_south", "type": "mtr_entrance", "lat": 22.3026, "lng": 114.1814, "accessible": true, "provenance": "real-derived"},
+        {"id": "BS_HUH_TUNNEL", "type": "bus_stop", "lat": 22.3016, "lng": 114.1830, "accessible": true, "provenance": "real-derived", "lines": ["182", "170"]},
+        {"id": "ap_huh_bus_terminus", "type": "bus_terminus", "lat": 22.3030, "lng": 114.1825, "accessible": true, "provenance": "real-derived"}
+      ]
+    },
+    {
+      "station_id": "EXC",
+      "access_points": [
+        {"id": "ap_exc_mtr_north", "type": "mtr_entrance", "lat": 22.2824, "lng": 114.1757, "accessible": true, "provenance": "real-derived"},
+        {"id": "ap_exc_mtr_south", "type": "mtr_entrance", "lat": 22.2808, "lng": 114.1751, "accessible": true, "provenance": "real-derived"},
+        {"id": "ap_exc_walk_to_wac", "type": "walk_access", "lat": 22.2796, "lng": 114.1740, "accessible": true, "provenance": "real-derived", "note": "Walk to Wan Chai (ISL) ~700m, UNVERIFIED (T7.2 item #8)"}
+      ]
+    },
+    {
+      "station_id": "ADM",
+      "access_points": [
+        {"id": "ap_adm_mtr_north", "type": "mtr_entrance", "lat": 22.2801, "lng": 114.1660, "accessible": true, "provenance": "real-derived"},
+        {"id": "ap_adm_mtr_south", "type": "mtr_entrance", "lat": 22.2785, "lng": 114.1650, "accessible": true, "provenance": "real-derived"},
+        {"id": "BS_ADM_E", "type": "bus_stop", "lat": 22.2782, "lng": 114.1668, "accessible": true, "provenance": "real-derived", "lines": ["982X", "985A", "985B"]},
+        {"id": "ap_adm_bus_terminus", "type": "bus_terminus", "lat": 22.2790, "lng": 114.1665, "accessible": true, "provenance": "real-derived"}
+      ]
+    }
+  ]
+}

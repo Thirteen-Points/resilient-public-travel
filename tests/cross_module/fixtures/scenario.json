@@ -1,0 +1,17 @@
+{
+  "provenance": "simulated",
+  "note": "Integration wiring only. Network is synthetic; C-Sim currently uses an aggregate route pool, not an OD-valid passenger assignment.",
+  "network_source": "backend/app/engine/fixtures/network.synthetic.json",
+  "origin": "O",
+  "destination": "D",
+  "depart_at": "2026-09-22T08:20:00+08:00",
+  "baseline_fare_hkd": 1,
+  "zero_demand": {
+    "users_on_route": 0,
+    "load_factor": 0,
+    "board_refusal_prob": 0
+  },
+  "population": 10000,
+  "seed": 20260922,
+  "window_min": 60
+}

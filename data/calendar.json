@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "version": "1.0",
+    "built_at": "2026-09-22",
+    "description": "Service calendar for MTR and bus routes. Four schedule types: weekday, Saturday, Sunday/PH. Public holidays use Sunday schedule.",
+    "source": "MTR service index + GovHK holiday list",
+    "source_url": "https://www.gov.hk/en/about/abouthk/holiday/2026.htm",
+    "provenance": "real"
+  },
+  "schedule_types": {
+    "weekday": {
+      "description": "Monday to Friday",
+      "mtr_headway_key": "weekday_peak",
+      "mtr_offpeak_key": "weekday_offpeak",
+      "bus_peak_service": true
+    },
+    "saturday": {
+      "description": "Saturday (non-PH)",
+      "mtr_headway_key": "saturday",
+      "mtr_offpeak_key": "saturday",
+      "bus_peak_service": "reduced"
+    },
+    "sunday_ph": {
+      "description": "Sunday and Public Holidays",
+      "mtr_headway_key": "sunday_ph",
+      "mtr_offpeak_key": "sunday_ph",
+      "bus_peak_service": false,
+      "note": "982X, 985A/B have NO service on Sundays/PHs"
+    }
+  },
+  "public_holidays_2026": [
+    {"date": "2026-09-26", "day": "Saturday", "name_zh": "中秋節翌日", "name_en": "The day following the Mid-Autumn Festival", "schedule_type": "sunday_ph"},
+    {"date": "2026-10-01", "day": "Thursday", "name_zh": "國慶日", "name_en": "National Day", "schedule_type": "sunday_ph"},
+    {"date": "2026-10-19", "day": "Monday", "name_zh": "重陽節翌日", "name_en": "The day following Chung Yeung Festival", "schedule_type": "sunday_ph", "note": "Beyond delivery window (10/18)"}
+  ],
+  "service_exceptions": [
+    {
+      "line_id": "BUS_982X",
+      "exception": "weekday_peak_only",
+      "days_with_service": ["weekday"],
+      "directions": {"am": "outbound_only", "pm": "inbound_only"},
+      "note": "Only operates on weekday AM/PM peaks, one-way each. No Saturday/Sunday/PH service."
+    },
+    {
+      "line_id": "BUS_985A",
+      "exception": "weekday_peak_only",
+      "days_with_service": ["weekday"],
+      "directions": {"am": "outbound_only", "pm": "inbound_only"}
+    },
+    {
+      "line_id": "BUS_985B",
+      "exception": "weekday_peak_only",
+      "days_with_service": ["weekday"],
+      "directions": {"am": "outbound_only", "pm": "inbound_only"}
+    },
+    {
+      "line_id": "BUS_182P",
+      "exception": "weekday_peak_only",
+      "days_with_service": ["weekday"],
+      "directions": {"am": "outbound_only", "pm": "inbound_only"}
+    },
+    {
+      "line_id": "BUS_182X",
+      "exception": "weekday_peak_only",
+      "days_with_service": ["weekday"],
+      "directions": {"am": "outbound_only", "pm": "inbound_only"}
+    }
+  ],
+  "operating_hours": {
+    "ERL": {"first_train": "05:30", "last_train": "00:30", "provenance": "real", "note": "Approximate; verify on MTR website"},
+    "TML": {"first_train": "05:30", "last_train": "00:30", "provenance": "real-derived"},
+    "KTL": {"first_train": "06:00", "last_train": "01:00", "provenance": "real-derived"},
+    "TWL": {"first_train": "06:00", "last_train": "00:50", "provenance": "real-derived"},
+    "ISL": {"first_train": "06:00", "last_train": "00:50", "provenance": "real-derived"},
+    "BUS_182": {"first": "06:00", "last": "23:50", "provenance": "real", "source": "KMB API"},
+    "BUS_170": {"first": "06:00", "last": "23:45", "provenance": "real", "source": "KMB API"},
+    "BUS_81C": {"first": "05:30", "last": "23:30", "provenance": "real-derived"},
+    "GMB_481B": {"first": "06:30", "last": "23:00", "provenance": "real"},
+    "FERRY_TST_CEN": {"first": "06:30", "last": "23:30", "provenance": "real", "source": "Star Ferry website"}
+  }
+}

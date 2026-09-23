@@ -1,0 +1,38 @@
+{
+  "provenance": "simulated",
+  "note": "C-Route test assumptions only; not verified transport data",
+  "baseline_fare_hkd": 12.5,
+  "fallback_fare_hkd": 12.5,
+  "fare_groups_by_mode": {
+    "MTR": "fixture_rail"
+  },
+  "load": {
+    "users_on_route": 0,
+    "load_factor": 0,
+    "board_refusal_prob": 0
+  },
+  "query": {
+    "origin": "TAW",
+    "destination": "ADM",
+    "depart_at": "2026-09-22T08:20:00+08:00"
+  },
+  "profiles": {
+    "commuter": {
+      "persona": "commuter",
+      "mobility": "standard",
+      "preset": "fastest"
+    },
+    "wheelchair": {
+      "persona": "wheelchair",
+      "mobility": "wheelchair",
+      "walking_speed_mps": 0.7,
+      "max_walk_m": 400,
+      "max_transfers": 2,
+      "hard_flags": [
+        "no_stairs",
+        "no_minibus",
+        "no_non_lowfloor_bus"
+      ]
+    }
+  }
+}

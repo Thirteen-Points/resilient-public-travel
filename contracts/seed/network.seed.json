@@ -5,38 +5,38 @@
     "corridor": "TAW→ADM",
     "catchment_m": 800,
     "note": "示意网络：真实线路名与站序，站间时间/坐标为推算值，待 data/PROVENANCE.md 核实后替换。禁止把未核实值标为 real。",
-    "counts": { "nodes": 22, "lines": 12, "walk_links": 7 }
+    "counts": { "nodes": 22, "lines": 10, "walk_links": 7 }
   },
   "nodes": [
-    {"id":"TAW","name_zh":"大圍","name_en":"Tai Wai","kind":"mtr_station","lat":22.3731,"lng":114.1789,"lines":["ERL","TML"],"accessible":true,"provenance":"real","catchment_m":800},
-    {"id":"KOT","name_zh":"九龍塘","name_en":"Kowloon Tong","kind":"mtr_station","lat":22.3369,"lng":114.1763,"lines":["ERL","KTL"],"accessible":true,"provenance":"real","catchment_m":800},
-    {"id":"MKK","name_zh":"旺角東","name_en":"Mong Kok East","kind":"mtr_station","lat":22.3221,"lng":114.1726,"lines":["ERL"],"accessible":true,"provenance":"real","catchment_m":800},
-    {"id":"HUH","name_zh":"紅磡","name_en":"Hung Hom","kind":"mtr_station","lat":22.3034,"lng":114.1817,"lines":["ERL","TML"],"accessible":true,"provenance":"real","catchment_m":800},
-    {"id":"EXC","name_zh":"會展","name_en":"Exhibition Centre","kind":"mtr_station","lat":22.2816,"lng":114.1754,"lines":["ERL"],"accessible":true,"provenance":"real","catchment_m":800,"note":"东铁独有车站，无其他重铁接驳"},
-    {"id":"ADM","name_zh":"金鐘","name_en":"Admiralty","kind":"mtr_station","lat":22.2793,"lng":114.1655,"lines":["ERL","TWL","ISL","SIL"],"accessible":true,"provenance":"real","catchment_m":800},
-    {"id":"DIH","name_zh":"鑽石山","name_en":"Diamond Hill","kind":"mtr_station","lat":22.3400,"lng":114.2017,"lines":["TML","KTL"],"accessible":true,"provenance":"real"},
-    {"id":"HOM","name_zh":"何文田","name_en":"Ho Man Tin","kind":"mtr_station","lat":22.3096,"lng":114.1825,"lines":["TML","KTL"],"accessible":true,"provenance":"real"},
-    {"id":"PRE","name_zh":"太子","name_en":"Prince Edward","kind":"mtr_station","lat":22.3245,"lng":114.1682,"lines":["KTL","TWL"],"accessible":true,"provenance":"real"},
-    {"id":"MOK","name_zh":"旺角","name_en":"Mong Kok","kind":"mtr_station","lat":22.3193,"lng":114.1694,"lines":["KTL","TWL"],"accessible":true,"provenance":"real"},
-    {"id":"YMT","name_zh":"油麻地","name_en":"Yau Ma Tei","kind":"mtr_station","lat":22.3128,"lng":114.1705,"lines":["KTL","TWL"],"accessible":true,"provenance":"real"},
-    {"id":"JOR","name_zh":"佐敦","name_en":"Jordan","kind":"mtr_station","lat":22.3049,"lng":114.1717,"lines":["TWL"],"accessible":true,"provenance":"real"},
-    {"id":"TST","name_zh":"尖沙咀","name_en":"Tsim Sha Tsui","kind":"mtr_station","lat":22.2975,"lng":114.1724,"lines":["TWL"],"accessible":true,"provenance":"real"},
-    {"id":"ETS","name_zh":"尖東","name_en":"East Tsim Sha Tsui","kind":"mtr_station","lat":22.2953,"lng":114.1754,"lines":["TML"],"accessible":true,"provenance":"real"},
-    {"id":"WAC","name_zh":"灣仔","name_en":"Wan Chai","kind":"mtr_station","lat":22.2776,"lng":114.1733,"lines":["ISL"],"accessible":true,"provenance":"real"},
-    {"id":"CEN","name_zh":"中環","name_en":"Central","kind":"mtr_station","lat":22.2819,"lng":114.1582,"lines":["TWL","ISL"],"accessible":true,"provenance":"real"},
-    {"id":"BS_TAW","name_zh":"大圍站巴士站","name_en":"Tai Wai Station Bus Stop","kind":"bus_stop","lat":22.3726,"lng":114.1783,"lines":["182","982X","985B","81C","481B"],"accessible":true,"provenance":"real-derived"},
+    {"id":"TAW","name_zh":"大圍","name_en":"Tai Wai","kind":"mtr_station","lat":22.372761694,"lng":114.178690084,"lines":["ERL","TML"],"accessible":null,"accessibility_status":"unknown","provenance":"real-derived","catchment_m":800,"coordinate_source":"iGeoCom RSN GEONAMEID 542884; HK Grid transformed by official API"},
+    {"id":"KOT","name_zh":"九龍塘","name_en":"Kowloon Tong","kind":"mtr_station","lat":22.337118101,"lng":114.175777453,"lines":["ERL","KTL"],"accessible":null,"accessibility_status":"unknown","provenance":"real-derived","catchment_m":800,"coordinate_source":"iGeoCom RSN GEONAMEID 544548; HK Grid transformed by official API"},
+    {"id":"MKK","name_zh":"旺角東","name_en":"Mong Kok East","kind":"mtr_station","lat":22.322018914,"lng":114.172593949,"lines":["ERL"],"accessible":null,"accessibility_status":"unknown","provenance":"real-derived","catchment_m":800,"coordinate_source":"iGeoCom RSN GEONAMEID 557494; HK Grid transformed by official API"},
+    {"id":"HUH","name_zh":"紅磡","name_en":"Hung Hom","kind":"mtr_station","lat":22.302991402,"lng":114.1821829,"lines":["ERL","TML"],"accessible":null,"accessibility_status":"unknown","provenance":"real-derived","catchment_m":800,"coordinate_source":"iGeoCom RSN GEONAMEID 544547; HK Grid transformed by official API"},
+    {"id":"EXC","name_zh":"會展","name_en":"Exhibition Centre","kind":"mtr_station","lat":22.281652118,"lng":114.175312107,"lines":["ERL"],"accessible":null,"accessibility_status":"unknown","provenance":"real-derived","catchment_m":800,"note":"东铁独有车站，无其他重铁接驳","coordinate_source":"iGeoCom RSN GEONAMEID 21170932; HK Grid transformed by official API"},
+    {"id":"ADM","name_zh":"金鐘","name_en":"Admiralty","kind":"mtr_station","lat":22.279421078,"lng":114.164347507,"lines":["ERL","TWL","ISL","SIL"],"accessible":null,"accessibility_status":"unknown","provenance":"real-derived","catchment_m":800,"coordinate_source":"iGeoCom RSN GEONAMEID 538320; HK Grid transformed by official API"},
+    {"id":"DIH","name_zh":"鑽石山","name_en":"Diamond Hill","kind":"mtr_station","lat":22.3400,"lng":114.2017,"lines":["TML","KTL"],"accessible":true,"provenance":"real-derived"},
+    {"id":"HOM","name_zh":"何文田","name_en":"Ho Man Tin","kind":"mtr_station","lat":22.3096,"lng":114.1825,"lines":["TML","KTL"],"accessible":true,"provenance":"real-derived"},
+    {"id":"PRE","name_zh":"太子","name_en":"Prince Edward","kind":"mtr_station","lat":22.3245,"lng":114.1682,"lines":["KTL","TWL"],"accessible":true,"provenance":"real-derived"},
+    {"id":"MOK","name_zh":"旺角","name_en":"Mong Kok","kind":"mtr_station","lat":22.3193,"lng":114.1694,"lines":["KTL","TWL"],"accessible":true,"provenance":"real-derived"},
+    {"id":"YMT","name_zh":"油麻地","name_en":"Yau Ma Tei","kind":"mtr_station","lat":22.3128,"lng":114.1705,"lines":["KTL","TWL"],"accessible":true,"provenance":"real-derived"},
+    {"id":"JOR","name_zh":"佐敦","name_en":"Jordan","kind":"mtr_station","lat":22.3049,"lng":114.1717,"lines":["TWL"],"accessible":true,"provenance":"real-derived"},
+    {"id":"TST","name_zh":"尖沙咀","name_en":"Tsim Sha Tsui","kind":"mtr_station","lat":22.2975,"lng":114.1724,"lines":["TWL"],"accessible":true,"provenance":"real-derived"},
+    {"id":"ETS","name_zh":"尖東","name_en":"East Tsim Sha Tsui","kind":"mtr_station","lat":22.2953,"lng":114.1754,"lines":["TML"],"accessible":true,"provenance":"real-derived"},
+    {"id":"WAC","name_zh":"灣仔","name_en":"Wan Chai","kind":"mtr_station","lat":22.2776,"lng":114.1733,"lines":["ISL"],"accessible":true,"provenance":"real-derived"},
+    {"id":"CEN","name_zh":"中環","name_en":"Central","kind":"mtr_station","lat":22.2819,"lng":114.1582,"lines":["TWL","ISL"],"accessible":true,"provenance":"real-derived"},
+    {"id":"BS_TAW","name_zh":"大圍站巴士站","name_en":"Tai Wai Station Bus Stop","kind":"bus_stop","lat":22.3726,"lng":114.1783,"lines":["182","982X","985B","81C"],"accessible":true,"provenance":"real-derived"},
     {"id":"BS_TIN_SUM","name_zh":"田心村","name_en":"Tin Sum Village","kind":"bus_stop","lat":22.3694,"lng":114.1752,"lines":["985A","985B"],"accessible":true,"provenance":"real-derived"},
     {"id":"BS_HUH_TUNNEL","name_zh":"紅磡隧道口","name_en":"Hung Hom Tunnel Portal","kind":"bus_stop","lat":22.3016,"lng":114.1830,"lines":["182","170"],"accessible":true,"provenance":"real-derived"},
     {"id":"BS_ADM_E","name_zh":"金鐘（東）","name_en":"Admiralty (East)","kind":"bus_stop","lat":22.2782,"lng":114.1668,"lines":["982X","985A","985B"],"accessible":true,"provenance":"real-derived"},
-    {"id":"PIER_TST","name_zh":"尖沙咀天星碼頭","name_en":"TST Star Ferry Pier","kind":"pier","lat":22.2938,"lng":114.1685,"lines":["TST_CEN"],"accessible":"partial","provenance":"real","note":"下层限 4 名轮椅乘客"},
-    {"id":"PIER_CEN","name_zh":"中環天星碼頭","name_en":"Central Star Ferry Pier","kind":"pier","lat":22.2877,"lng":114.1615,"lines":["TST_CEN"],"accessible":"partial","provenance":"real"}
+    {"id":"PIER_TST","name_zh":"尖沙咀天星碼頭","name_en":"TST Star Ferry Pier","kind":"pier","lat":22.2938,"lng":114.1685,"lines":["TST_CEN"],"accessible":"partial","provenance":"real-derived","note":"下层限 4 名轮椅乘客"},
+    {"id":"PIER_CEN","name_zh":"中環天星碼頭","name_en":"Central Star Ferry Pier","kind":"pier","lat":22.2877,"lng":114.1615,"lines":["TST_CEN"],"accessible":"partial","provenance":"real-derived"}
   ],
   "lines": [
     {"id":"ERL","name_zh":"東鐵綫","name_en":"East Rail Line","mode":"MTR","bidirectional":true,
      "stops":["TAW","KOT","MKK","HUH","EXC","ADM"],"seg_time_s":[270,165,210,300,165],
      "headway_s":{"weekday_peak":180,"weekday_offpeak":360,"saturday":300,"sunday_ph":300},
      "capacity_per_vehicle":2845,"capacity_note":"9 卡 6 人/m²，待核实","accessible":true,
-     "fare_baseline":true,"provenance":"real","scope_note":"仅建模大围—金钟段"},
+     "fare_baseline":true,"provenance":"real-derived","scope_note":"仅建模大围—金钟段"},
 
     {"id":"TML","name_zh":"屯馬綫","name_en":"Tuen Ma Line","mode":"MTR","bidirectional":true,
      "stops":["TAW","DIH","HOM","HUH","ETS"],"seg_time_s":[420,480,180,240],
@@ -68,14 +68,14 @@
 
     {"id":"BUS_982X","name_zh":"過海巴士982X","name_en":"Cross-harbour Bus 982X","mode":"BUS","bidirectional":true,
      "stops":["BS_TAW","BS_ADM_E"],"seg_time_s":[2400],
-     "headway_s":{"weekday_peak":1800,"weekday_offpeak":null,"saturday":null,"sunday_ph":null},
+     "headway_s":{"weekday_peak":null,"weekday_offpeak":null,"saturday":null,"sunday_ph":null},"headway_status":"unverified_exact_departures",
      "capacity_per_vehicle":137,"accessible":true,"tunnel":"WHC",
      "service_calendar":"weekday_peak_only","fare_hkd":[6.0,16.0],
      "provenance":"real-derived","note":"只开平日早晚高峰单向；载客率已 >90%，中断时大概率上不了车"},
 
     {"id":"BUS_985B","name_zh":"過海巴士985B","name_en":"Cross-harbour Bus 985B","mode":"BUS","bidirectional":true,
      "stops":["BS_TIN_SUM","BS_ADM_E"],"seg_time_s":[2400],
-     "headway_s":{"weekday_peak":1800,"weekday_offpeak":null,"saturday":null,"sunday_ph":null},
+     "headway_s":{"weekday_peak":null,"weekday_offpeak":null,"saturday":null,"sunday_ph":null},"headway_status":"unverified_exact_departures",
      "capacity_per_vehicle":137,"accessible":true,"tunnel":"WHC",
      "service_calendar":"weekday_peak_only","fare_hkd":[19.5,19.5],
      "provenance":"real-derived","note":"经显径；第三站已近七成满"},
@@ -86,18 +86,12 @@
      "capacity_per_vehicle":137,"accessible":true,"tunnel":null,
      "provenance":"real-derived","note":"不过海；用于接驳到尖沙咀再换乘"},
 
-    {"id":"GMB_481B","name_zh":"綠色小巴481B","name_en":"GMB 481B","mode":"MINIBUS","bidirectional":true,
-     "stops":["BS_TAW","BS_TW"],"seg_time_s":[1500],
-     "headway_s":{"weekday_peak":900,"weekday_offpeak":1500,"saturday":1500,"sunday_ph":1800},
-     "capacity_per_vehicle":19,"accessible":false,"fare_hkd":[12.3,12.3],
-     "provenance":"real","note":"19 座无低地台，轮椅用户不可用；横向接驳荃湾，非过海线"},
-
     {"id":"FERRY_TST_CEN","name_zh":"天星小輪 尖沙咀↔中環","name_en":"Star Ferry TST-Central","mode":"FERRY","bidirectional":true,
      "stops":["PIER_TST","PIER_CEN"],"seg_time_s":[480],
      "headway_s":{"weekday_peak":360,"weekday_offpeak":420,"saturday":420,"sunday_ph":420},
      "capacity_per_vehicle":300,"capacity_note":"单船载客量待核实","accessible":"partial",
      "service_hours":"06:30-23:30","fare_hkd":[4.0,6.5],"weather_sensitive":true,
-     "provenance":"real","note":"台风迫近停航（确切门槛待核实）；票价待核实是否为当前价"}
+     "provenance":"real-derived","note":"台风迫近停航（确切门槛待核实）；票价待核实是否为当前价"}
   ],
   "walk_links": [
     {"from":"ETS","to":"TST","walk_s":300,"walk_m":420,"accessible":true,"provenance":"real-derived","note":"站内步行通道，时长与电梯可用性待核实（关键：轮椅方案依赖它）"},
@@ -108,5 +102,5 @@
     {"from":"PIER_TST","to":"TST","walk_s":420,"walk_m":350,"accessible":"partial","provenance":"real-derived"},
     {"from":"PIER_CEN","to":"CEN","walk_s":360,"walk_m":300,"accessible":"partial","provenance":"real-derived"}
   ],
-  "missing_nodes_note": "尚未建模：BS_TW（荃湾）、BUS_170 港岛端（铜锣湾/香港仔）。P1 阶段按需补齐。"
+  "missing_nodes_note": "BS_TW 经人工确认并非有效站点；GMB_481B 因终点及官方站序未核实，已从可运行 network.lines 移除，禁止作为运营候选。历史 routes.seed.json 中如仍有 demo-only 引用仅供审计。尚未建模：BUS_170 港岛端（铜锣湾/香港仔）。"
 }

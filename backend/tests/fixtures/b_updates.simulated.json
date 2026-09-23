@@ -1,0 +1,47 @@
+{
+  "provenance": "simulated",
+  "event_updates": [
+    {
+      "event_id": "sim_evt_001",
+      "version": 1,
+      "status": "draft",
+      "confidence": 0.2,
+      "observed_at": "2026-09-22T08:00:00+08:00",
+      "provenance": "simulated"
+    },
+    {
+      "event_id": "sim_evt_001",
+      "version": 2,
+      "status": "published",
+      "confidence": 0.9,
+      "observed_at": "2026-09-22T08:01:00+08:00",
+      "provenance": "simulated"
+    }
+  ],
+  "load_updates": [
+    {
+      "route_id": "sim_route_rail",
+      "load_factor": 0.96,
+      "observed_at": "2026-09-22T08:00:00+08:00",
+      "provenance": "simulated"
+    },
+    {
+      "route_id": "sim_route_rail",
+      "load_factor": 0.97,
+      "observed_at": "2026-09-22T08:05:00+08:00",
+      "provenance": "simulated"
+    }
+  ],
+  "weather_updates": [
+    {
+      "weather_warning_code": "AMBER_RAIN",
+      "observed_at": "2026-09-22T08:00:00+08:00",
+      "provenance": "simulated"
+    },
+    {
+      "weather_warning_code": "BLACK_RAIN",
+      "observed_at": "2026-09-22T08:02:00+08:00",
+      "provenance": "simulated"
+    }
+  ]
+}
