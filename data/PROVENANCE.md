@@ -147,3 +147,92 @@ Independent transformation checks were also made for one access record at
 each of the six stations. The old estimate coordinates are replaced by the
 official RSN point coordinates, not claimed geometric centroids. No walk links
 were added, and access/step-free connectivity remains unknown.
+
+## M1 data verification pass (2026-09-25, Asia/Hong_Kong)
+
+Scope: the M1 demo corridor — six core stations `TAW/KOT/MKK/HUH/EXC/ADM`,
+the default demo interruption segment `HUH–EXC`, alternative-route data, and
+the accessibility/headway/access fields they depend on. This pass corrected
+the `data/` documentation layer only; `contracts/seed/` is frozen and was not
+modified. Where this pass corrects a value the seed still holds, the
+divergence is listed below and must be reconciled in a deliberate
+contract-freeze change.
+
+### Sources checked
+
+| ID | Source / URL | Result / fields observed | Coverage and limitation |
+|---|---|---|---|
+| S25 | MTR open-data CSVs from `https://opendata.mtr.com.hk/data/`: `mtr_lines_and_stations.csv` (SHA-256 `e0e78115...75e0c3`), `barrier_free_facilities.csv` (`f220d56a...8c66daf`), `barrier_free_facility_category.csv` (`84ba2315...5973f963`), `mtr_lines_fares.csv` (`1bb28b99...46e06f075`) | EAL stop order TAW(9)-KOT(10)-MKK(11)-HUH(12)-EXC(13)-ADM(14) both directions; line membership for all 16 modelled stations; per-station AJ facility rows (all six core have paid-area lift AJ8=Y plus step-free exits); adult Octopus/single fares for six-core and alternative OD pairs (e.g. TAW-ADM 17.1/19.0, HUH-EXC 10.6/12.5, EXC-ADM 4.9/5.0) | Monthly snapshot; station-level facilities do not establish per-entrance step-free paths, walk connectivity, or live lift state. The CSV has no coordinates. Fare rows are adult OD fares, not section fares. |
+| S26 | GovHK 2026 holidays, `https://www.gov.hk/en/about/abouthk/holiday/2026.htm` | 2026-09-26 (Sat, day following the Chinese Mid-Autumn Festival), 2026-10-01 (Thu, National Day), 2026-10-19 (Mon, day following Chung Yeung Festival) — all three rows in `data/calendar.json` confirmed | Date list only; MTR service-calendar application (Sunday headways on PH) remains a documented assumption |
+| S27 | Star Ferry operator page, `https://www.starferry.com.hk/en/service` | Central↔TST timetable: Mon-Fri 06:30-23:30 (bands 10/12, 6, 6/8, 10/12 min), Sat/Sun/PH 10/12, 6/8, 10/12; adult fares lower deck $4.0 weekday / $5.6 weekend, upper deck $5.0 / $6.5; wheelchair users board lower deck, max 4 per ferry; sailing times vary with maritime traffic/sea/weather | No vessel capacity published (stays unverified); no explicit typhoon-signal suspension threshold stated on the page; 10/12-min early/late bands not modelled in `headway_s` |
+| S28 | MTR service index, `https://www.mtr.com.hk/en/customer/services/train_service_index.html` | EAL Admiralty–Sheung Shui headway bands: AM peak 2.7–5.5, PM 3.2, off-peak 4–8, Sat 3.8–8, Sun/PH 3.8–8 min | Band evidence only; the single `headway_s` values in the data/seed files are in-band modelling choices, not official point values. Other lines' bands not captured in this pass. |
+| S29 | MTR getSchedule API, `https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=EAL&sta=TAW&lang=en` | Snapshot 2026-09-24T12:25+08:00: UP ttnt 0/5/7/10, DOWN ttnt 3/6/8/12 | Operational snapshot, not a headway measurement; no value written into data files |
+| S30 | iGeoCom CSV re-download (`open.hkmapservice.gov.hk` zip; inner `iGeoCOM_POI.csv` SHA-256 `d9703a97...efef5db` = the S23 file, byte-identical) | RSN rows extracted for all 16 modelled stations — six core match S23 exactly; ten non-core newly captured: DIH 541087, HOM 21070302, PRE 537817, MOK 545293, YMT 538316, JOR 537420, TST 537333, ETS 537798, WAC 545834, CEN 546117. Transformations via the official Geodetic API re-verified for the six core (exact match) and computed for the ten non-core. MTA access counts re-confirmed 8/11/4/14/6/7. | Same assurance as S23: official point records, not surveyed centroids, not walk-connectivity evidence. Non-core RSN coordinates were written to `data/network/stations.json` (documentation layer) but not to `data/access/station_entrances.json` (S23-structured, left untouched). |
+| S31 | TD `ROUTE_BUS.xml` / `RSTOP_BUS.xml` / `ROUTE_GMB.xml` (`https://static.data.gov.hk/td/routes-fares-xml/`, generated 2026-09-11, fetched 2026-09-25) | Master rows + direction-specific stop sequences for every route in `data/network/bus_routes.json`: 182 (1051, $20.8), 182X (8307 中環→愉翠苑), N182 (1434, $31.2), 982X (8104/8308 AM + 8644 PM 金鐘站(東)→愉翠苑, $20.8), 985 (1174 AM + 8697 PM, $20.8), 985A (8704, $20.8), 985B (8705 田心村→灣仔(軒尼詩道), $20.8), 170 (1047/8470, $20.8), 81C (1336, $10.2), 87B (1370, $7.8), 80X (1333 秦石→觀塘碼頭), 82X (1345 濱景花園→黃大仙循環線), 83X (1348/8492 黃泥頭→觀塘碼頭), 280X (8229/8510), 88K (1380 顯徑→駿景園, row 2026-06-15 — NOT cancelled), 481B (GMB row 2003214, $12.3, row 2025-12-25). Exclusion re-check: 680/680X/681/682/682P/307/673/978/968/948X have no Tai Wai-area stops (978's only 田心 hit is the North-District place name 百福田心球場). 80M and 182P have no master rows. | Master row + stop sequence establish route/operator/OD/full-fare/stop-order, not headway, service calendar, section fares, capacity, or wheelchair features. `X,Y` in STOP_BUS remain untransformed HK grid coordinates. |
+
+### Corrections applied to data/ (2026-09-25)
+
+- `network/stations.json`: all 16 station coordinates replaced with official
+  iGeoCom RSN points (S23/S30); the false "coordinates from MTR open data"
+  claim removed; `accessible: true` now backed by per-station MTR barrier-free
+  CSV rows (AJ codes cited in notes); BS_TAW drops 481B; BS_ADM_E drops
+  985A/985B (no Admiralty-terminus master rows) and keeps 982X/985; piers
+  downgraded to `real-derived` coordinates (OSM approximation) with operator
+  service details verified.
+- `network/lines.json`: GMB_481B removed from runnable lines (aligned with the
+  seed's `missing_nodes_note`); BUS_982X/BUS_985B `weekday_peak` headways set
+  to `null` with `headway_status: "unverified_exact_departures"` (aligned with
+  seed); 982X full fare 16.0→20.8 and 985B 19.5→20.8 per S31; 81C fare 10.2
+  added; 982X note corrected (three variants incl. PM 金鐘站(東) return);
+  985B note records the 灣仔(軒尼詩道) terminus and the BS_ADM_E modelling gap;
+  ERL provenance downgraded `real`→`real-derived` with field-level evidence
+  notes (stop order, accessibility, headway band, fares verified; capacity and
+  seg times remain estimates); KTL collapsed-stop note added; ferry
+  timetable/fares/wheelchair marked verified.
+- `network/bus_routes.json`: evidence basis switched from the unverifiable
+  KMB API (S11) to TD XML (S31); per-route master rows, fares, boarding bays
+  and corrections recorded (985B/985A/985 destinations → 灣仔(軒尼詩道); 83X →
+  觀塘碼頭; 182X direction → 中環→愉翠苑; 80X/82X/280X origins specified);
+  182P and 80M marked absent from master data; 88K confirmed NOT cancelled and
+  excluded as a non-corridor local feeder instead; all exclusions re-verified
+  against stop sequences; 481B verified via ROUTE_GMB with the runnable-network
+  exclusion retained.
+- `network/walk_links.json`: evidence note added — station-level lifts are
+  verified but link-level step-free continuity (ETS↔TST walkway above all)
+  remains unverified; no walk time changed.
+- `access/access_points.json`: `ap_*` MTR-entrance `accessible` set to `null`
+  (station-level evidence cannot be mapped to approximated entrances);
+  481B/985A/985B removed from bus-stop line lists per S31; pointer to
+  `station_entrances.json` as the authoritative access-point evidence.
+- `calendar.json`: three holiday rows verified (S26); Mid-Autumn name aligned
+  to the official GovHK string; ERL/BUS_182/BUS_170/GMB_481B operating-hours
+  provenance downgraded to `real-derived` (MTR first/last-train page under
+  maintenance 2026-09-25; KMB API unverifiable); ferry hours verified.
+
+### Divergences from frozen contracts/seed (recorded, not reconciled here)
+
+1. `network.seed.json` BUS_982X `fare_hkd [6.0, 16.0]` vs data/ `[6.0, 20.8]`;
+   BUS_985B `[19.5, 19.5]` vs data/ `[20.8, 20.8]` — S31 master fares.
+2. `network.seed.json` BUS_985B still models alighting at BS_ADM_E; current
+   official 985B AM terminus is 灣仔(軒尼詩道) — modelling gap in both layers,
+   contract stops untouched.
+3. `routes.seed.json`/`sim.seed.json` are unchanged and keep their own
+   simulated/evidence dispositions.
+
+### Gaps remaining after this pass (not fabricable from these sources)
+
+1. 982X/985B exact departures and headways — `null` retained; do not infer.
+2. Bus section fares (182 $16 claim, 982X $6 claim) — need stop-level fare
+   tables (TD fare-stop files), not master full fares.
+3. Star Ferry vessel capacity; typhoon suspension threshold.
+4. Walk continuity: ETS↔TST walkway, WAC↔EXC ~700 m claim, all bus-stop walk
+   links — no walk link promoted to verified.
+5. Per-entrance step-free mapping for the abstract access points; live lift
+   outage state is dynamic and unmodelled.
+6. MTR first/last train times (page under maintenance on 2026-09-25).
+7. Wheelchair suitability of KMB/CTB bus fleets per line (low-floor assumption
+   unverified); 985B/985A/982X carry `accessible: true` at line level only.
+8. ERL `seg_time_s` per-segment values remain estimates; the official ~17 min
+   TAW→ADM end-to-end claim was not re-verified in this pass.
+9. TML/KTL/TWL/ISL headway bands not re-verified against a current official
+   page in this pass (only EAL was captured, S28).

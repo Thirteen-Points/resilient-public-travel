@@ -62,3 +62,40 @@ does not cap cumulative walking across a complete multi-leg route; therefore
 `r_seed_007`'s `total.walk_m=900` is not rejected by this rule. Minibus legs
 remain excluded from wheelchair recommendations unless separate official
 accessibility evidence exists.
+
+## M1 data-layer verification update (2026-09-25)
+
+Scope: the `data/` documentation layer only (six core stations, the default
+demo interruption segment HUH–EXC, and alternative-route data). The frozen
+`contracts/seed/` files were NOT modified; residual divergences are listed in
+`data/PROVENANCE.md` § "M1 data verification pass".
+
+What changed, all evidence-backed:
+
+| Area | Change | Evidence |
+|---|---|---|
+| Station coordinates | All 16 modelled stations now carry official iGeoCom RSN point coordinates (six core re-verified byte-identical; ten non-core newly captured and transformed via the official Geodetic API); the false "coordinates from MTR open data" claim removed | S23/S30 |
+| Station accessibility | `accessible: true` now backed by per-station rows in the MTR barrier-free CSV (every modelled station has paid-area lift AJ8=Y plus step-free exits; AJ codes cited in notes). Per-entrance mapping and live lift outages remain unmodelled; abstract access points set `accessible: null` instead of unsupported `true` | S25 |
+| Line topology | EAL stop order and all 16 stations' line membership verified; KTL/TML collapsed-stop notes added | S25 |
+| ERL headway | Official band verified (AM peak 2.7–5.5 min etc.); single values kept as documented in-band modelling choices; ERL record provenance downgraded to `real-derived` (capacity/seg-times still estimates) | S28 |
+| Runnable lines | GMB_481B removed from `data/network/lines.json` (aligned with seed `missing_nodes_note`); route existence itself verified in TD ROUTE_GMB row 2003214 | S31 |
+| Bus headways | 982X/985B `weekday_peak` set to `null` + `headway_status: unverified_exact_departures` (aligned with seed); 182/81C/170 headways kept as explicitly-estimated values (TD GTFS variable bands) | S20/S31 |
+| Bus fares | 982X full fare 16.0→20.8, 985B 19.5→20.8, 81C 10.2 added; section fares (182 $16, 982X $6) remain flagged unverified | S31 |
+| Bus routes log | Evidence basis switched from the unverifiable KMB API (S11) to TD XML; 985B/985A/985 destinations corrected to 灣仔(軒尼詩道), 83X to 觀塘碼頭, 182X direction to 中環→愉翠苑; 182P/80M absent from master data; 88K confirmed NOT cancelled (excluded as non-corridor feeder); all ten exclusions re-verified against stop sequences | S31 |
+| Ferry | Timetable bands, adult fares ($4.0/$5.6 lower, $5.0/$6.5 upper), wheelchair limit (4/sailing) verified; capacity and typhoon threshold stay unverified | S27 |
+| Calendar | Three in-window holidays verified against GovHK; ERL/bus operating-hours provenance downgraded to `real-derived` (first/last-train page under maintenance; KMB API unverifiable) | S26 |
+
+For the HUH–EXC interruption demo specifically: the segment closure itself is
+contract/event data (`HUH`–`EXC` and `EXC`–`ADM` affected segments, simulated
+and clearly labelled); the supporting alternative data is now verified at
+line/topology/fare/accessibility level (TML divert via DIH/HOM, KTL/TWL
+combos, ERL fares incl. HUH-EXC 10.6 Octopus), while the EXC-island walk
+(WAC↔EXC ~700 m) and all walk-link continuity remain unverified and are
+labelled as such.
+
+Gates unchanged (they validate `contracts/seed/`, not `data/`):
+
+```text
+python scripts/validate_data.py
+python -m pytest -q tests/test_data_integrity.py
+```

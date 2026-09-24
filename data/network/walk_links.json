@@ -3,7 +3,9 @@
     "version": "1.0",
     "built_at": "2026-09-22",
     "description": "Walking connections between nodes. All walk times and distances are estimated using straight-line distance x 1.3 detour factor / 1.2 m/s walking speed. Wheelchair accessibility of interchanges is CRITICAL and mostly UNVERIFIED.",
-    "provenance_note": "Walk link ETS->TST is the most critical unverified item (T7.2 item #3). If elevator is unavailable, wheelchair routing through this path fails."
+    "provenance_note": "Walk link ETS->TST is the most critical unverified item (T7.2 item #3). If elevator is unavailable, wheelchair routing through this path fails.",
+    "updated_at": "2026-09-25",
+    "evidence_note": "Station-level lift/step-free facilities were verified against the MTR barrier-free CSV on 2026-09-25 (TST AJ3/AJ4/AJ8; ETS AJ2/AJ3/AJ4/AJ8; all six core stations AJ8=Y), but station facilities do NOT establish the step-free continuity of an inter-station walkway, a surface crossing, or live lift service state. Link-level accessible flags remain estimates; no walk link was promoted to verified."
   },
   "walk_links": [
     {
@@ -17,7 +19,7 @@
       "retrieved_at": "2026-09-21",
       "confidence": "low",
       "data_status": "unverified",
-      "note": "Station internal walkway. Duration and elevator availability UNVERIFIED. Critical for wheelchair routing - if elevator unavailable, this path fails."
+      "note": "Station internal walkway. Duration UNVERIFIED. Both stations have unpaid-area lifts per the MTR barrier-free CSV (TST AJ3/AJ4, ETS AJ2/AJ3, checked 2026-09-25), but the walkway's own step-free continuity is not established by station-level data - if elevator availability fails, this wheelchair path fails."
     },
     {
       "from": "BS_TAW",

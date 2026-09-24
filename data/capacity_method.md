@@ -3,6 +3,18 @@
 > This document explains how vehicle and line capacities are derived.
 > All capacities are `real-derived` unless explicitly marked `real` (e.g. minibus statutory limit).
 > A reviewer should be able to reproduce any line's hourly capacity from this document.
+>
+> **2026-09-25 (M1) status note**: the ERL headway *band* is now officially
+> verified (MTR service index: Admiralty–Sheung Shui AM peak 2.7–5.5 min, PM
+> 3.2, off-peak 4–8, Sat/Sun/PH 3.8–8) — the 180 s/162 s point values used
+> below are in-band modelling choices, not official point measurements. Star
+> Ferry adult fares were verified the same day (lower $4.0/$5.6, upper
+> $5.0/$6.5); its vessel capacity remains unpublished and unverified. No
+> official capacity source was found for MTR trains, buses or the ferry in
+> this pass, so every `capacity_per_vehicle` stays `real-derived`/unverified.
+> Green minibus 19-seat statutory maximum unchanged (Cap 374D). GMB_481B is
+> excluded from the runnable network (endpoint invalid); its 65 pax/hour
+> worked example is illustrative only.
 
 ---
 
