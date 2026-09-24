@@ -149,8 +149,29 @@ capacity = 10 x 300 x 0.85 = 2,550 pax/hour
 | BUS 982X | ≈559 AM (06:55–08:10 span, to Wan Chai) / ≈873 PM (17:47–18:27 span, to Yu Chui Court) | user-screenshot departures; average observed headway (12.5 / 8 min) via the §1 formula within each span only — not all-day, not officially verified | ≈0.011x / ≈0.016x |
 | GMB 481B | ~65 | **historical example only — NOT in runnable network** | 0.001x |
 
-> One ERL train = ~20 double-decker buses. This is the core argument for the project:
-> diverting MTR passengers to buses is physically impossible when buses are already 90%+ full.
+**Rail-vs-bus capacity gap — derived illustration and stated risk, NOT a
+verified fact (rewritten 2026-09-25).** One ERL train's rated capacity
+(≈2,845 pax at 6 pax/m², LegCo paper — secondary source, unverified) is
+≈ 20–21 double-decker buses at the industry-estimate ≈137 pax/veh
+(unverified), and ≈ 15 at the 4 pax/m² density (≈2,061). The ratio is a
+derivation that inherits both inputs' data grades — a planning
+illustration, not an operational measurement. Beyond the per-trip ratio,
+the modelled cross-harbour bus supply in the §4 table (182 ≈ 466 pax/h on
+an estimated headway; 982X ≈ 559 / ≈ 873 pax/h as span-derived
+illustrations) sits one to two orders of magnitude below the ERL hourly
+figure, and the >90% peak load factor cited for 982X rests on a single web
+search (§5 item 4), not continuous monitoring.
+
+**Retired absolute wording.** The earlier closing claim — "diverting MTR
+passengers to buses is physically impossible when buses are already 90%+
+full" — promoted one unverified observation into a general fact and drew an
+absolute conclusion the evidence cannot carry. The supported demo statement
+is a qualified risk: at the documented (unverified) load-factor claim and
+the §4 capacity grades, the modelled bus lines could absorb only a small
+fraction of a disrupted ERL peak load; in the simulation the remainder
+surfaces as unmet demand (`unstoppable_demand`, see `data/sim/README.md`)
+rather than being absorbed. Scope: TAW–ADM corridor, modelled lines only,
+peak windows; every number above keeps its real-derived/simulated grade.
 
 ## 5. Data Gaps
 
