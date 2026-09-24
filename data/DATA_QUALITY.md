@@ -126,3 +126,55 @@ Gates unchanged (they validate `contracts/seed/`, not `data/`):
 python scripts/validate_data.py
 python -m pytest -q tests/test_data_integrity.py
 ```
+
+## C runtime data mapping (2026-09-25, analysis only — no engine changes)
+
+**Key caveat: data-layer verification does NOT mean runtime loading
+（data/ 已核验 ≠ C 运行时已加载）。** C's runtime currently loads
+`contracts/seed/network.seed.json` (+ optional event seed) via
+`SeedDataAdapter` (`backend/app/graph/adapter.py`), with fares/baseline/
+profiles from the simulated-only fixture
+`backend/app/engine/fixtures/seed_policy.json`. On load, `SeedDataAdapter`
+**forcibly relabels every node/line/walk-link record `simulated`**
+(`mark_simulated`) — so even `real-derived` seed values are treated as demo
+data at runtime. No backend module reads anything under `data/`;
+`data/network/*.json` and `data/access/*.json` are the documentation /
+evidence layer.
+
+| Field / concern | Where it lives in data/ | Where C runtime reads it today | Mapping status |
+|---|---|---|---|
+| Graph nodes (stations / bus stops / piers) | `network/stations.json` (three arrays) | `network.seed.json` `nodes` — one flat array | Shape difference: C must merge the three arrays into `nodes` before any `JsonDataAdapter`-style load; ids/kind/lat/lng/name fields otherwise line up |
+| Node coordinates | `stations.json` — official iGeoCom RSN points, all 16 stations | seed: six core = same RSN points; ten non-core = old rounded estimates | Divergence (data newer, recorded in PROVENANCE S30); seed untouched by design |
+| Station accessibility | `stations.json` `accessible: true` + per-station AJ evidence notes | seed holds `accessible: null` + `accessibility_status: "unknown"`; `find_access_points` surfaces `accessible is True` → the six core currently report **False** at runtime, bus-stop nodes report True | Semantic divergence; C must decide which semantics ships (station-level CSV evidence vs conservative null) |
+| Line topology / seg times / headways / capacity | `network/lines.json` | seed `lines` | Aligned values; `validate_network` accepts the all-null 982X/985B `headway_s` dicts (key present, values None) |
+| Bus fares | `lines.json` `fare_hkd` (982X 20.8, 985B 20.8, 81C 10.2 — TD-verified) | seed flow charges `max(line.fare_hkd)` as simulated: **982X still bills 16, 985B still bills 19.5** (stale); MTR bills policy baseline 12.5 | Divergence with runtime effect; reconcile via policy `fares` overrides (or a freeze-change seed update) |
+| `headway_status` vocabulary | data: `no_single_headway_applicable_unverified_official` (982X) | seed: `unverified_exact_departures`; runtime does not read the field | Informational divergence (PROVENANCE divergence item 4) |
+| 982X per-trip weekday departures | `network/bus_routes.json` 982X `schedule_evidence` (user-provided screenshots, unverified) | runtime has no per-trip field; BUS_982X headway is all-null → no headway-driven service for it today | C decision: implement per-trip schedule support, or agree a documented representative headway |
+| Walk links | `network/walk_links.json` | seed `walk_links` (same 7 links, same times) | Aligned; data adds the evidence_note on station-level vs link-level accessibility |
+| Bus route verification log | `network/bus_routes.json` | not loaded | Documentation only (incl. 982X `schedule_evidence` and 88K/80M/182P findings) |
+| Access points | `access/access_points.json` (approximations) + `access/station_entrances.json` (50 official iGeoCom MTA records) | `find_access_points` scans the 22 seed graph nodes within the 800 m radius only | Neither access file is wired; official entrance records remain an unwired evidence layer |
+| Service calendar / holidays | `calendar.json` | `RoutingData.holidays` is populated only from a policy JSON (`MappingDataAdapter`/`JsonDataAdapter`); `SeedDataAdapter` passes none | Not wired; wire via policy `holidays` if service-day behaviour is wanted |
+| Weather factors | `weather_impact.json` | `engine/eco.py` hardcodes the same per-mode CVs (labelled simulated); mode-penalty tables are not implemented; weather only enters via `event_type == "weather"` events | Partially duplicated semantics; C decides: implement the penalty tables or keep hardcoded CVs and say so |
+| Sim fixtures | `sim/*.json` | `scripts/precompute_sim.py` / `verify_sim_*` + engine tests | Aligned by design (all simulated) |
+
+### C adaptation items (decisions/implementations for C, not done here)
+
+1. Keep `contracts/seed/` as the runtime input until a deliberate
+   contract-freeze change; do not point adapters at `data/` casually.
+2. For a future `JsonDataAdapter` switch: export one normalized network JSON
+   (merge the three `stations.json` arrays into `nodes`; attach
+   `lines.json`/`walk_links.json`) plus a policy JSON with explicit
+   `baseline_fare`, `fares` (MTR lines have no `fare_hkd` in data/ and
+   `fare_table` fails without overrides), `holidays`, `profiles`.
+3. Resolve the accessibility semantics divergence (seed null vs data
+   verified-true) before relying on `find_access_points`' accessible flag.
+4. Decide the 982X service model (per-trip schedule vs representative
+   headway); today its all-null headway means the runtime never schedules it.
+5. Reconcile runtime bus fares (stale 16 / 19.5) with the TD-verified 20.8.
+6. Wire `calendar.json` holidays through policy `holidays` if needed.
+7. Reconcile weather handling (hardcoded eco CVs vs `weather_impact.json`
+   penalty tables) and keep the simulated labelling honest.
+
+Recorded seed-vs-data divergences live in `data/PROVENANCE.md`
+§ "Divergences from frozen contracts/seed"; this mapping adds the runtime
+view on top and changes nothing in `backend/` or `contracts/`.
