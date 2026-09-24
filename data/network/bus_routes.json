@@ -86,10 +86,34 @@
       "serves_tai_wai": true,
       "verified": true,
       "verified_at": "2026-09-25",
-      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (route/order/fare, data.gov.hk); weekday departures from user-provided timetable screenshots",
       "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
       "provenance": "real-derived",
-      "note": "Variants 8104/8308 AM 愉翠苑/水泉澳->灣仔(菲林明道) and 8644 PM 金鐘站(東)->愉翠苑; full fare 20.8 verified (rows 2026-06-12). Boards 大圍轉車站 6041/6015 via 西隧 (911). The HK$6 Tai Wai section fare remains unverified. Headway unverified; load factor >90% claim is from a single web search, not monitoring."
+      "schedule_evidence": {
+        "source": "User-provided timetable screenshots (two direction panels). No capture date and no verifiable official origin are shown on the images; the times have NOT been re-checked against an official source and must not be presented as operator-verified.",
+        "days": "Monday to Friday only, as displayed on the screenshots. No weekend / public-holiday / off-peak evidence exists in any source this pass.",
+        "provenance_note": "Route existence, operator, OD and full fare remain TD-XML-verified (this file, verified_at 2026-09-25). The departure times themselves rest only on the user-provided screenshots; no provenance upgrade was made.",
+        "directions": [
+          {
+            "direction": "往灣仔菲林明道 (to Fleming Road, Wan Chai)",
+            "od_match_note": "OD/direction corresponds to TD variant 8104 (愉翠苑->灣仔(菲林明道)); the screenshots themselves do not display the variant ID.",
+            "departures": ["06:55", "07:15", "07:30", "07:39", "07:51", "08:04", "08:10"],
+            "gaps_min": [20, 15, 9, 12, 13, 6],
+            "window": "06:55-08:10",
+            "boarding_point_note": "The screenshot panel does not state the departure stop. TD stop sequence boards 大圍轉車站 6041/6015 after the 愉翠苑 origin; the times are recorded verbatim as displayed, not re-interpreted as Tai Wai boarding times."
+          },
+          {
+            "direction": "往愉翠苑巴士總站 (to Yu Chui Court B/T)",
+            "od_match_note": "OD/direction corresponds to TD variant 8644 (金鐘站(東)->愉翠苑); the screenshots themselves do not display the variant ID.",
+            "departures": ["17:47", "17:55", "18:03", "18:11", "18:19", "18:27"],
+            "gaps_min": [8, 8, 8, 8, 8],
+            "window": "17:47-18:27",
+            "boarding_stop_code": "ST871 (verbatim from the screenshot; not mapped to any seed/network node)",
+            "terminus_note": "Screenshot legend reads 翡翠苑; recorded as 愉翠苑 (Yu Chui Court), matching the TD-verified destination of variant 8644."
+          }
+        ]
+      },
+      "note": "Full fare 20.8 verified (TD rows 8104/8308/8644, 2026-06-12). The HK$6 Tai Wai section fare remains unverified. Boards 大圍轉車站 6041/6015 via 西隧 (911). Weekday directional departures recorded from user-provided screenshots (see schedule_evidence; unverified against official sources). Load factor >90% claim is from a single web search, not monitoring."
     },
     {
       "route_id": "985",

@@ -169,6 +169,7 @@ contract-freeze change.
 | S29 | MTR getSchedule API, `https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=EAL&sta=TAW&lang=en` | Snapshot 2026-09-24T12:25+08:00: UP ttnt 0/5/7/10, DOWN ttnt 3/6/8/12 | Operational snapshot, not a headway measurement; no value written into data files |
 | S30 | iGeoCom CSV re-download (`open.hkmapservice.gov.hk` zip; inner `iGeoCOM_POI.csv` SHA-256 `d9703a97...efef5db` = the S23 file, byte-identical) | RSN rows extracted for all 16 modelled stations — six core match S23 exactly; ten non-core newly captured: DIH 541087, HOM 21070302, PRE 537817, MOK 545293, YMT 538316, JOR 537420, TST 537333, ETS 537798, WAC 545834, CEN 546117. Transformations via the official Geodetic API re-verified for the six core (exact match) and computed for the ten non-core. MTA access counts re-confirmed 8/11/4/14/6/7. | Same assurance as S23: official point records, not surveyed centroids, not walk-connectivity evidence. Non-core RSN coordinates were written to `data/network/stations.json` (documentation layer) but not to `data/access/station_entrances.json` (S23-structured, left untouched). |
 | S31 | TD `ROUTE_BUS.xml` / `RSTOP_BUS.xml` / `ROUTE_GMB.xml` (`https://static.data.gov.hk/td/routes-fares-xml/`, generated 2026-09-11, fetched 2026-09-25) | Master rows + direction-specific stop sequences for every route in `data/network/bus_routes.json`: 182 (1051, $20.8), 182X (8307 中環→愉翠苑), N182 (1434, $31.2), 982X (8104/8308 AM + 8644 PM 金鐘站(東)→愉翠苑, $20.8), 985 (1174 AM + 8697 PM, $20.8), 985A (8704, $20.8), 985B (8705 田心村→灣仔(軒尼詩道), $20.8), 170 (1047/8470, $20.8), 81C (1336, $10.2), 87B (1370, $7.8), 80X (1333 秦石→觀塘碼頭), 82X (1345 濱景花園→黃大仙循環線), 83X (1348/8492 黃泥頭→觀塘碼頭), 280X (8229/8510), 88K (1380 顯徑→駿景園, row 2026-06-15 — NOT cancelled), 481B (GMB row 2003214, $12.3, row 2025-12-25). Exclusion re-check: 680/680X/681/682/682P/307/673/978/968/948X have no Tai Wai-area stops (978's only 田心 hit is the North-District place name 百福田心球場). 80M and 182P have no master rows. | Master row + stop sequence establish route/operator/OD/full-fare/stop-order, not headway, service calendar, section fares, capacity, or wheelchair features. `X,Y` in STOP_BUS remain untransformed HK grid coordinates. |
+| S32 | **User-provided 982X timetable screenshots** (two direction panels, supplied in the M1 session on 2026-09-25) | Panel 1 往菲林明道 (Mon–Fri): 06:55, 07:15, 07:30, 07:39, 07:51, 08:04, 08:10 (gaps 20/15/9/12/13/6 min). Panel 2 往愉翠苑巴士總站, board code ST871 as displayed (Mon–Fri): 17:47, 17:55, 18:03, 18:11, 18:19, 18:27 (uniform 8-min gaps). Recorded verbatim in `bus_routes.json` 982X `schedule_evidence`. | The images show **no capture date and no verifiable official origin**; the times were **not** re-checked against an official source. They support only the two visible weekday panels — no off-peak, Saturday, Sunday, public-holiday, or opposite-direction claims. No provenance upgrade was made; 982X stays `real-derived` at record level and `headway_s` stays null because no single value can express the direction/time-varied gaps. OD correspondence to TD variants 8104/8644 is inferred from destinations; the screenshots do not display variant IDs. |
 
 ### Corrections applied to data/ (2026-09-25)
 
@@ -218,10 +219,21 @@ contract-freeze change.
    contract stops untouched.
 3. `routes.seed.json`/`sim.seed.json` are unchanged and keep their own
    simulated/evidence dispositions.
+4. `network.seed.json` BUS_982X `headway_status` reads
+   `unverified_exact_departures` while data/ now reads
+   `no_single_headway_applicable_unverified_official` and additionally holds
+   the S32 directional departures in `bus_routes.json` — the seed has no
+   per-trip schedule field, so the divergence is informational only; the
+   seed's null headways remain correct and were not touched.
 
 ### Gaps remaining after this pass (not fabricable from these sources)
 
-1. 982X/985B exact departures and headways — `null` retained; do not infer.
+1. 982X departures: only the two weekday panels of S32 are documented, from
+   user-provided screenshots with no capture date or verifiable official
+   origin — not operator-verified. No off-peak, Saturday, Sunday or
+   public-holiday service evidence exists for 982X, so `headway_s` stays null
+   and nothing beyond the panels may be claimed. 985B exact departures remain
+   entirely unknown — do not infer.
 2. Bus section fares (182 $16 claim, 982X $6 claim) — need stop-level fare
    tables (TD fare-stop files), not master full fares.
 3. Star Ferry vessel capacity; typhoon suspension threshold.

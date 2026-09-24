@@ -85,6 +85,28 @@ What changed, all evidence-backed:
 | Ferry | Timetable bands, adult fares ($4.0/$5.6 lower, $5.0/$6.5 upper), wheelchair limit (4/sailing) verified; capacity and typhoon threshold stay unverified | S27 |
 | Calendar | Three in-window holidays verified against GovHK; ERL/bus operating-hours provenance downgraded to `real-derived` (first/last-train page under maintenance; KMB API unverifiable) | S26 |
 
+### 982X schedule evidence & capacity-doc closure (2026-09-25, second pass)
+
+- `bus_routes.json` 982X now carries `schedule_evidence`: two weekday
+  direction panels from **user-provided timetable screenshots** (to Fleming
+  Road 06:55–08:10, gaps 20/15/9/12/13/6 min; to Yu Chui Court 17:47–18:27,
+  uniform 8 min, board code ST871 as displayed). The images show no capture
+  date and no verifiable official origin, so the times are recorded verbatim
+  and are **not** operator-verified; no provenance upgrade was made.
+- `lines.json` BUS_982X: `headway_s` stays all-null; `headway_status` is now
+  `no_single_headway_applicable_unverified_official` — a single headway value
+  cannot express the direction/time-varied gaps, and consumers should read
+  the per-trip schedule instead. Nothing beyond the two weekday panels is
+  claimed (no off-peak / Sat / Sun / PH evidence exists).
+- `capacity_method.md`: the old fixed-30-min-headway example (2 veh/h → 233
+  pax/hour) is **retired** as an outdated assumption and must not be quoted
+  as an M1 demo conclusion. In-window directional illustrations (~650 pax/h
+  AM to Wan Chai across 75 min; ~1,050 pax/h PM to Yu Chui Court within 40
+  min) are given with explicit basis/direction/window/assumptions and are not
+  extrapolable to all-day capacity. The GMB_481B worked example and summary
+  row are prominently marked **historical / hypothetical — not in the
+  runnable network** and are excluded from current demo capacity conclusions.
+
 For the HUH–EXC interruption demo specifically: the segment closure itself is
 contract/event data (`HUH`–`EXC` and `EXC`–`ADM` affected segments, simulated
 and clearly labelled); the supporting alternative data is now verified at

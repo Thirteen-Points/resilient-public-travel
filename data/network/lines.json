@@ -212,19 +212,20 @@
         "saturday": null,
         "sunday_ph": null
       },
-      "headway_status": "unverified_exact_departures",
+      "headway_status": "no_single_headway_applicable_unverified_official",
       "capacity_per_vehicle": 137,
       "accessible": true,
       "tunnel": "WHC",
       "service_calendar": "weekday_peak_only",
       "fare_hkd": [6.0, 20.8],
       "provenance": "real-derived",
-      "source": "TD ROUTE_BUS/RSTOP_BUS XML (route/order/fare) + estimated values",
+      "source": "TD ROUTE_BUS/RSTOP_BUS XML (route/order/fare) + user-provided timetable screenshots (weekday departures) + estimated values",
       "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
       "retrieved_at": "2026-09-25",
       "confidence": "medium",
       "data_status": "unverified",
-      "note": "Full fare corrected 16.0 -> 20.8 per TD rows 8104/8308/8644 (2026-06-12); the HK$6.0 Tai Wai section fare is an appendix claim, unverified. Variants: 8104/8308 AM 愉翠苑/水泉澳->灣仔(菲林明道) via 西隧 (911), boarding 大圍轉車站 6041/6015; 8644 PM 金鐘站(東)->愉翠苑 via 西隧 (921). Exact departures unverified - headway fields stay null (aligned with contracts/seed)."
+      "headway_note": "A single headway_s value cannot faithfully express the documented service: weekday gaps are direction- and time-dependent (to Fleming Road 06:55-08:10: 20/15/9/12/13/6 min; to Yu Chui Court 17:47-18:27: uniform 8 min). The departures come from user-provided screenshots with no capture date or verifiable official origin shown, so no field is promoted to verified; headway_s stays null and consumers must use the per-trip schedule in data/network/bus_routes.json (982X.schedule_evidence) instead. No off-peak, Saturday, Sunday or public-holiday service evidence exists; nothing beyond the two weekday panels is claimed.",
+      "note": "Full fare corrected 16.0 -> 20.8 per TD rows 8104/8308/8644 (2026-06-12); the HK$6.0 Tai Wai section fare is an appendix claim, unverified. Variants: 8104/8308 AM 愉翠苑/水泉澳->灣仔(菲林明道) via 西隧 (911), boarding 大圍轉車站 6041/6015; 8644 PM 金鐘站(東)->愉翠苑 via 西隧 (921). The screenshots' two panels match variants 8104/8644 by OD only (no variant ID displayed)."
     },
     {
       "id": "BUS_985B",
