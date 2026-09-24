@@ -178,3 +178,37 @@ evidence layer.
 Recorded seed-vs-data divergences live in `data/PROVENANCE.md`
 § "Divergences from frozen contracts/seed"; this mapping adds the runtime
 view on top and changes nothing in `backend/` or `contracts/`.
+
+## data-layer validator coverage (scripts/validate_data_layer.py, 2026-09-25)
+
+Read-only, stdlib-only structural checker for the `data/` layer, separate
+from `scripts/validate_data.py` (which checks the frozen `contracts/seed/`
+files and does NOT cover `data/`). Current coverage:
+
+- every JSON file under `data/` parses;
+- provenance enum (real / real-derived / simulated) on every record;
+- **fare validation**: any `fare_hkd` value must be a finite non-negative
+  number or a non-empty list of them; a two-element pair (the observed
+  schema) must be ascending; strings, booleans, negatives, NaN and infinity
+  are rejected (Python's JSON parser accepts NaN/Infinity literals, so the
+  finite check is explicit); the field stays optional (MTR lines carry none);
+- node/line/bus-route/access-point references resolve; line stops match
+  `seg_time_s` lengths; headway dicts are null-or-positive; coordinates stay
+  within Hong Kong bounds; `481B` cannot reappear on network nodes;
+- 982X `schedule_evidence` internal consistency: departure times strictly
+  increasing, `gaps_min` equals adjacent time differences, `window` equals
+  first-last;
+- **982X schedule evidence-level canaries**: `schedule_evidence` must keep
+  the user-provided / Monday-to-Friday marking, and the BUS_982X line record
+  must not be silently upgraded — `provenance` may not become `real`,
+  `data_status` may not become `verified`, `headway_s` must stay all-null,
+  and `headway_status` must keep an `unverified` marker. These guard the
+  SCHEDULE tier only; the route-level `verified` flag in `bus_routes.json`
+  (TD-verified route existence/OD/fare) is a different tier and is
+  intentionally not conflated or flagged.
+
+What it does NOT do: verify any value against an external source, judge
+authenticity of the screenshots or operator pages, extrapolate the 982X
+panels to other days/windows/directions, or promote unverified items.
+Source authenticity remains a human process recorded in
+`data/PROVENANCE.md`. Tests: `tests/test_data_layer_integrity.py`.

@@ -7,10 +7,19 @@ evidence layer under data/:
 - every JSON file parses;
 - node / line / bus-route / access-point references resolve (no dangling ids);
 - line stop sequences match seg_time_s lengths and headway dicts are sane;
+- every `fare_hkd` value is a finite non-negative number or a list of them;
+  a two-element pair must be ascending (section fares must not be inverted),
+  and strings/booleans/NaN/infinity are rejected;
 - the 982X schedule_evidence panels are internally consistent: departure
   times strictly increasing, gaps_min equals the adjacent time differences,
   window equals first-last, and the user-provided/unverified source marking
-  is still present (canary against silent provenance upgrades).
+  is still present (canary against silent provenance upgrades);
+- the BUS_982X line record keeps its evidence level: provenance may not be
+  upgraded to `real`, data_status may not become `verified`, headway_s stays
+  all-null (no fabricated single headway) and headway_status keeps an
+  `unverified` marker. This guards the SCHEDULE evidence tier only — the
+  route-level `verified` flag in bus_routes.json refers to TD-verified
+  route existence/OD/fare and is intentionally not conflated with it.
 
 It deliberately does NOT verify any value against an external source, does
 not extrapolate the 982X panels to other days/windows/directions, and never
@@ -20,6 +29,7 @@ with the recorded evidence level", nothing more.
 from __future__ import annotations
 
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -61,6 +71,73 @@ def _walk_provenance(value, path, errors):
     elif isinstance(value, list):
         for index, child in enumerate(value):
             _walk_provenance(child, f"{path}[{index}]", errors)
+
+
+def _fare_errors(value, path):
+    """Validate one fare_hkd value against the observed schema: a finite
+    non-negative number, or a non-empty list of them; a two-element pair
+    (the only shape in current data) must be ascending."""
+    errors = []
+    if isinstance(value, list):
+        if not value:
+            errors.append(f"{path}: fare_hkd list must not be empty")
+            return errors
+        for index, amount in enumerate(value):
+            if isinstance(amount, bool) or not isinstance(amount, (int, float)) \
+                    or not math.isfinite(amount) or amount < 0:
+                errors.append(f"{path}[{index}]: fare must be a finite non-negative number, "
+                              f"got {amount!r}")
+        if len(value) == 2 and all(isinstance(a, (int, float)) and not isinstance(a, bool)
+                                   and math.isfinite(a) for a in value) and value[0] > value[1]:
+            errors.append(f"{path}: fare pair must be ascending (section fares inverted)")
+    elif isinstance(value, bool) or not isinstance(value, (int, float)) \
+            or not math.isfinite(value) or value < 0:
+        errors.append(f"{path}: fare_hkd must be a finite non-negative number or a "
+                      f"non-empty list of them, got {value!r}")
+    return errors
+
+
+def _walk_fares(value, path, errors):
+    if isinstance(value, dict):
+        if "fare_hkd" in value:
+            errors.extend(_fare_errors(value["fare_hkd"], f"{path}.fare_hkd"))
+        for key, child in value.items():
+            _walk_fares(child, f"{path}.{key}", errors)
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            _walk_fares(child, f"{path}[{index}]", errors)
+
+
+def _check_982x_evidence_level(lines_doc, errors):
+    """Guard the SCHEDULE evidence tier of BUS_982X in lines.json.
+
+    The bus_routes.json route-level `verified` flag means TD-verified route
+    existence/OD/fare; it says nothing about the user-provided screenshot
+    schedule. These checks keep the schedule tier from being silently
+    upgraded: no `real` provenance, no `verified` data_status, no fabricated
+    headway values, and an `unverified` marker kept in headway_status.
+    """
+    line = next((item for item in lines_doc.get("lines", []) if item.get("id") == "BUS_982X"), None)
+    if line is None:
+        errors.append("lines: BUS_982X is missing (982X schedule evidence tier unguarded)")
+        return
+    if line.get("provenance") == "real":
+        errors.append("lines:BUS_982X.provenance must not be upgraded to 'real'; the "
+                      "schedule rests on user-provided screenshots (route-level TD "
+                      "verification in bus_routes.json does not cover the schedule)")
+    if line.get("data_status") == "verified":
+        errors.append("lines:BUS_982X.data_status must not be upgraded to 'verified'; "
+                      "the schedule tier stays unverified")
+    headways = line.get("headway_s")
+    if isinstance(headways, dict):
+        filled = {key: value for key, value in headways.items() if value is not None}
+        if filled:
+            errors.append(f"lines:BUS_982X.headway_s must stay all-null (no documented "
+                          f"single headway); non-null values found: {sorted(filled)}")
+    status = str(line.get("headway_status", ""))
+    if "unverified" not in status.lower():
+        errors.append("lines:BUS_982X.headway_status must keep an 'unverified' marker "
+                      f"(got {status!r})")
 
 
 def _check_times(departures, errors, where):
@@ -137,6 +214,7 @@ def validate(docs: dict):
 
     for rel, document in docs.items():
         _walk_provenance(document, rel, errors)
+        _walk_fares(document, rel, errors)
 
     stations_doc = docs["network/stations.json"]
     lines_doc = docs["network/lines.json"]
@@ -145,6 +223,8 @@ def validate(docs: dict):
     access_doc = docs["access/access_points.json"]
     calendar_doc = docs["calendar.json"]
     weather_doc = docs["weather_impact.json"]
+
+    _check_982x_evidence_level(lines_doc, errors)
 
     node_ids, station_ids, bus_stop_ids = set(), set(), set()
     for group, kind in (("stations", "station"), ("bus_stops", "bus_stop"), ("piers", "pier")):
