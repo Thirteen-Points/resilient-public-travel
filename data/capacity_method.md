@@ -77,26 +77,33 @@ capacity = 4 x 137 x 0.85 = 466 pax/hour
 > conclusion. 982X gaps are direction- and time-dependent, so no single
 > headway-based hourly capacity exists for this route.
 
-What the recorded weekday departures actually support (illustrative
-in-window arithmetic only — basis, direction, window and assumptions stated;
-nothing here is an all-day or official figure):
+What the recorded weekday departures actually support, as directly observed
+facts: **7 departures in the 06:55–08:10 span** (AM, to Wan Chai) and
+**6 departures in the 17:47–18:27 span** (PM, to Yu Chui Court). Those are
+trip counts, not hourly capacities. Any frequency derived from them must
+follow this document's own formula — `frequency = 3600 / headway_s` — applied
+to the average observed headway. A departures-÷-span rate is NOT used here:
+it miscounts the span boundaries (7 departures span 6 headways; 6 departures
+span 5), which is how the earlier 5.6/9 veh/h figures went wrong.
 
-| Direction (weekday, user screenshots) | Window | Trips | In-window trip rate | Gaps |
-|---|---|---|---|---|
-| 愉翠苑 -> 灣仔(菲林明道) | 06:55–08:10 (75 min) | 7 | 7 / 1.25 h ≈ 5.6 veh/h (average) | 20/15/9/12/13/6 min |
-| 金鐘(東) -> 愉翠苑巴士總站 | 17:47–18:27 (40 min) | 6 | 6 / (2/3) h = 9 veh/h (within window) | uniform 8 min |
+| Direction (weekday, user screenshots) | Span | Departures | Gaps (min) | Average headway | Implied frequency (§1 formula) |
+|---|---|---|---|---|---|
+| 愉翠苑 -> 灣仔(菲林明道) | 06:55–08:10 (75 min) | 7 | 20/15/9/12/13/6 | 75/6 = 12.5 min | 60/12.5 = **4.8 veh/h** |
+| 金鐘(東) -> 愉翠苑巴士總站 | 17:47–18:27 (40 min) | 6 | uniform 8 | 8 min | **7.5 veh/h** |
 
-Assumptions if one insists on an in-window bucket: `capacity_per_vehicle`
-137 (industry estimate, unverified), `eta_max` 0.85, and the trip rate
-treated as constant across the window — which is false for the AM direction
-(6–20 min gaps). Under those assumptions the AM direction averages
-≈ 5.6 × 137 × 0.85 ≈ **650 pax/hour across its 75-min window**, and the PM
-direction ≈ 9 × 137 × 0.85 ≈ **1,050 pax/hour within its 40-min window**.
-These are NOT transferable: the windows are shorter than an hour, the
-screenshots are user-provided and not verified against an official source,
-and there is no evidence for off-peak, Saturday, Sunday, public-holiday or
-opposite-direction service. Demo wording must cite direction, window and
-assumptions, or omit the number entirely.
+Assumptions if one insists on an hourly bucket: the average headway stands in
+for the real gaps — a false smoothness for the AM direction, whose
+instantaneous rate swings from ~3 veh/h at a 20-min gap to ~10 veh/h at a
+6-min gap — plus `capacity_per_vehicle` 137 (industry estimate, unverified)
+and `eta_max` 0.85. Under those assumptions:
+AM ≈ 4.8 × 137 × 0.85 ≈ **559 pax/hour** and PM ≈ 7.5 × 137 × 0.85 ≈
+**873 pax/hour**. These are derived illustrations, NOT official or all-day
+figures: each rests on a single narrow span (75 minutes AM, 40 minutes PM —
+the PM span alone is shorter than an hour) rather than a full service period;
+they are computed from user-provided screenshots that are not verified
+against an official source; and there is no evidence for off-peak, Saturday,
+Sunday, public-holiday or opposite-direction service. Demo wording must cite
+direction, span and assumptions, or omit the number entirely.
 
 ### GMB 481B - Green minibus
 
@@ -128,9 +135,10 @@ capacity = 10 x 300 x 0.85 = 2,550 pax/hour
 
 > **2026-09-25 caveat.** The two bus rows below are NOT comparable
 > all-day capacity claims. The 182 figure rests on an *estimated* headway
-> (TD GTFS shows variable bands), and the 982X row is a directional
-> in-window illustration from user-provided, unverified screenshots — see
-> §3 before quoting either. GMB 481B is a historical/hypothetical example
+> (TD GTFS shows variable bands), and the 982X figures are span-derived
+> illustrations from user-provided, unverified screenshots (average observed
+> headway per the §1 formula, applied within each recorded span) — see §3
+> before quoting either. GMB 481B is a historical/hypothetical example
 > for a route that is NOT in the runnable network.
 
 | Route | Capacity (pax/hour) | Basis | Ratio to ERL |
@@ -138,7 +146,7 @@ capacity = 10 x 300 x 0.85 = 2,550 pax/hour
 | ERL (normal, peak) | ~53,200 | in-band headway model + LegCo secondary capacity | 1.0x |
 | TML (alternative) | ~42,500 | estimated headway + estimated capacity | 0.8x |
 | BUS 182 (full-day) | ~466 | estimated 15-min peak headway x 137 x 0.85 | 0.009x |
-| BUS 982X | ~650 AM (07:00-ish window, to Wan Chai) / ~1,050 PM (17:47–18:27 window, to Yu Chui Court) | user-screenshot departures, in-window average only — not all-day, not officially verified | ≤0.02x |
+| BUS 982X | ≈559 AM (06:55–08:10 span, to Wan Chai) / ≈873 PM (17:47–18:27 span, to Yu Chui Court) | user-screenshot departures; average observed headway (12.5 / 8 min) via the §1 formula within each span only — not all-day, not officially verified | ≈0.011x / ≈0.016x |
 | GMB 481B | ~65 | **historical example only — NOT in runnable network** | 0.001x |
 
 > One ERL train = ~20 double-decker buses. This is the core argument for the project:

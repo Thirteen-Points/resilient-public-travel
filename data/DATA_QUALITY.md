@@ -100,10 +100,15 @@ What changed, all evidence-backed:
   claimed (no off-peak / Sat / Sun / PH evidence exists).
 - `capacity_method.md`: the old fixed-30-min-headway example (2 veh/h → 233
   pax/hour) is **retired** as an outdated assumption and must not be quoted
-  as an M1 demo conclusion. In-window directional illustrations (~650 pax/h
-  AM to Wan Chai across 75 min; ~1,050 pax/h PM to Yu Chui Court within 40
-  min) are given with explicit basis/direction/window/assumptions and are not
-  extrapolable to all-day capacity. The GMB_481B worked example and summary
+  as an M1 demo conclusion. The directly observed facts are the trip counts
+  (7 departures in the 06:55–08:10 AM span to Wan Chai; 6 in the 17:47–18:27
+  PM span to Yu Chui Court). Any frequency follows the document's own
+  `3600 / average-headway` formula — AM 75/6 = 12.5 min → 4.8 veh/h,
+  PM 8 min → 7.5 veh/h — giving derived illustrations of ≈559 and ≈873
+  pax/hour with explicit basis/direction/span/assumptions. These are not
+  all-day capacities: each rests on a single narrow span (the PM span alone
+  is shorter than an hour) computed from user-provided, unverified
+  screenshots. The GMB_481B worked example and summary
   row are prominently marked **historical / hypothetical — not in the
   runnable network** and are excluded from current demo capacity conclusions.
 
