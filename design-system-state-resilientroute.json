@@ -1,0 +1,415 @@
+{
+  "fileKey": "lVMpgmxkP6NQe5QuDRA80C",
+  "pages": {
+    "Foundations": "0:1",
+    "02 · Components": "5:2",
+    "03 · Prototype": "5:3"
+  },
+  "calls": [
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"collections\":[{\"id\":\"VariableCollectionId:3:2\",\"name\":\"RR Primitives\",\"modeIds\":{\"Default\":\"3:0\"}},{\"id\":\"VariableCollectionId:3:3\",\"name\":\"RR Color\",\"modeIds\":{\"Default\":\"3:1\"}},{\"id\":\"VariableCollectionId:3:4\",\"name\":\"RR Dimensions\",\"modeIds\":{\"Default\":\"3:2\"}}]}"
+        }
+      ],
+      "isError": false
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"created\":[{\"id\":\"VariableID:3:5\",\"name\":\"paper\"},{\"id\":\"VariableID:3:6\",\"name\":\"white\"},{\"id\":\"VariableID:3:7\",\"name\":\"ink\"},{\"id\":\"VariableID:3:8\",\"name\":\"muted\"},{\"id\":\"VariableID:3:9\",\"name\":\"line\"},{\"id\":\"VariableID:3:10\",\"name\":\"lime\"},{\"id\":\"VariableID:3:11\",\"name\":\"limeHover\"},{\"id\":\"VariableID:3:12\",\"name\":\"forest\"},{\"id\":\"VariableID:3:13\",\"name\":\"water\"},{\"id\":\"VariableID:3:14\",\"name\":\"park\"}]}"
+        }
+      ],
+      "isError": false
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"created\":[{\"id\":\"VariableID:3:15\",\"name\":\"red\"},{\"id\":\"VariableID:3:16\",\"name\":\"amber\"},{\"id\":\"VariableID:3:17\",\"name\":\"green\"},{\"id\":\"VariableID:3:18\",\"name\":\"blue\"},{\"id\":\"VariableID:3:19\",\"name\":\"purple\"},{\"id\":\"VariableID:3:20\",\"name\":\"teal\"},{\"id\":\"VariableID:3:21\",\"name\":\"sim\"},{\"id\":\"VariableID:3:22\",\"name\":\"redTint\"},{\"id\":\"VariableID:3:23\",\"name\":\"amberTint\"},{\"id\":\"VariableID:3:24\",\"name\":\"blueTint\"}]}"
+        }
+      ],
+      "isError": false
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"created\":[{\"id\":\"VariableID:3:25\",\"name\":\"bg/page\"},{\"id\":\"VariableID:3:26\",\"name\":\"bg/surface\"},{\"id\":\"VariableID:3:27\",\"name\":\"bg/hero\"},{\"id\":\"VariableID:3:28\",\"name\":\"bg/brand\"},{\"id\":\"VariableID:3:29\",\"name\":\"bg/hover\"},{\"id\":\"VariableID:3:30\",\"name\":\"bg/subtle\"},{\"id\":\"VariableID:3:31\",\"name\":\"bg/water\"},{\"id\":\"VariableID:3:32\",\"name\":\"text/primary\"},{\"id\":\"VariableID:3:33\",\"name\":\"text/secondary\"},{\"id\":\"VariableID:3:34\",\"name\":\"text/inverse\"}]}"
+        }
+      ],
+      "isError": false
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"created\":[{\"id\":\"VariableID:3:35\",\"name\":\"text/brand\"},{\"id\":\"VariableID:3:36\",\"name\":\"border/default\"},{\"id\":\"VariableID:3:37\",\"name\":\"status/affected\"},{\"id\":\"VariableID:3:38\",\"name\":\"status/degraded\"},{\"id\":\"VariableID:3:39\",\"name\":\"status/normal\"},{\"id\":\"VariableID:3:40\",\"name\":\"route/A\"},{\"id\":\"VariableID:3:41\",\"name\":\"route/B\"},{\"id\":\"VariableID:3:42\",\"name\":\"route/C\"},{\"id\":\"VariableID:3:43\",\"name\":\"source/simulated\"},{\"id\":\"VariableID:3:44\",\"name\":\"bg/danger\"}]}"
+        }
+      ],
+      "isError": false
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"created\":[{\"id\":\"VariableID:3:45\",\"name\":\"bg/warning\"},{\"id\":\"VariableID:3:46\",\"name\":\"bg/info\"}]}"
+        }
+      ],
+      "isError": false
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"created\":[{\"id\":\"VariableID:3:47\",\"name\":\"space/0\"},{\"id\":\"VariableID:3:48\",\"name\":\"space/4\"},{\"id\":\"VariableID:3:49\",\"name\":\"space/8\"},{\"id\":\"VariableID:3:50\",\"name\":\"space/12\"},{\"id\":\"VariableID:3:51\",\"name\":\"space/16\"},{\"id\":\"VariableID:3:52\",\"name\":\"space/24\"},{\"id\":\"VariableID:3:53\",\"name\":\"space/32\"},{\"id\":\"VariableID:3:54\",\"name\":\"space/48\"},{\"id\":\"VariableID:3:55\",\"name\":\"space/64\"},{\"id\":\"VariableID:3:56\",\"name\":\"space/80\"}]}"
+        }
+      ],
+      "isError": false
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"created\":[{\"id\":\"VariableID:3:57\",\"name\":\"radius/0\"},{\"id\":\"VariableID:3:58\",\"name\":\"radius/8\"},{\"id\":\"VariableID:3:59\",\"name\":\"radius/16\"},{\"id\":\"VariableID:3:60\",\"name\":\"radius/24\"},{\"id\":\"VariableID:3:61\",\"name\":\"radius/32\"},{\"id\":\"VariableID:3:62\",\"name\":\"radius/999\"},{\"id\":\"VariableID:3:63\",\"name\":\"size/control\"},{\"id\":\"VariableID:3:64\",\"name\":\"stroke/default\"},{\"id\":\"VariableID:3:65\",\"name\":\"stroke/focus\"}]}"
+        }
+      ],
+      "isError": false
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "You've reached the Figma MCP tool call limit on the Starter plan. Upgrade your plan for more tool calls: https://www.figma.com/files/team/1547552915107215308/all-projects?upgrade=mcp_rate_limit_paywall"
+        },
+        {
+          "type": "resource_link",
+          "uri": "file://figma/docs/rate-limits-access.md",
+          "name": "rate-limits-access.md",
+          "mimeType": "text/plain",
+          "size": 3928,
+          "_meta": {
+            "size": 3928
+          }
+        }
+      ],
+      "structuredContent": {
+        "error_code": "INVALID_ARGUMENT"
+      },
+      "isError": true
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "You've reached the Figma MCP tool call limit on the Starter plan. Upgrade your plan for more tool calls: https://www.figma.com/files/team/1547552915107215308/all-projects?upgrade=mcp_rate_limit_paywall"
+        },
+        {
+          "type": "resource_link",
+          "uri": "file://figma/docs/rate-limits-access.md",
+          "name": "rate-limits-access.md",
+          "mimeType": "text/plain",
+          "size": 3928,
+          "_meta": {
+            "size": 3928
+          }
+        }
+      ],
+      "structuredContent": {
+        "error_code": "INVALID_ARGUMENT"
+      },
+      "isError": true
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "You've reached the Figma MCP tool call limit on the Starter plan. Upgrade your plan for more tool calls: https://www.figma.com/files/team/1547552915107215308/all-projects?upgrade=mcp_rate_limit_paywall"
+        },
+        {
+          "type": "resource_link",
+          "uri": "file://figma/docs/rate-limits-access.md",
+          "name": "rate-limits-access.md",
+          "mimeType": "text/plain",
+          "size": 3928,
+          "_meta": {
+            "size": 3928
+          }
+        }
+      ],
+      "structuredContent": {
+        "error_code": "INVALID_ARGUMENT"
+      },
+      "isError": true
+    },
+    {
+      "content": [
+        {
+          "type": "text",
+          "text": "You've reached the Figma MCP tool call limit on the Starter plan. Upgrade your plan for more tool calls: https://www.figma.com/files/team/1547552915107215308/all-projects?upgrade=mcp_rate_limit_paywall"
+        },
+        {
+          "type": "resource_link",
+          "uri": "file://figma/docs/rate-limits-access.md",
+          "name": "rate-limits-access.md",
+          "mimeType": "text/plain",
+          "size": 3928,
+          "_meta": {
+            "size": 3928
+          }
+        }
+      ],
+      "structuredContent": {
+        "error_code": "INVALID_ARGUMENT"
+      },
+      "isError": true
+    }
+  ],
+  "components": {},
+  "screens": {},
+  "cover": "5:4",
+  "status": "blocked-figma-starter-mcp-quota",
+  "completed": {
+    "variables": 61,
+    "textStyles": 10,
+    "effectStyles": 2,
+    "cover": "5:4",
+    "foundationsPage": "0:1",
+    "componentsPage": "5:2",
+    "prototypePage": "5:3"
+  },
+  "pending": [
+    "Foundations documentation boards",
+    "Component library",
+    "Complete desktop and mobile screens",
+    "Prototype connections",
+    "Visual and structural QA"
+  ],
+  "palette": {
+    "paper": "F7F8F2",
+    "white": "FFFFFF",
+    "ink": "18221D",
+    "muted": "5E6961",
+    "line": "D9DFD5",
+    "lime": "BEFF52",
+    "limeHover": "ACEB40",
+    "forest": "243F31",
+    "water": "DEE9E4",
+    "park": "E8EFDE",
+    "red": "C62828",
+    "amber": "F9A825",
+    "green": "2E7D32",
+    "blue": "1565C0",
+    "purple": "6A1B9A",
+    "teal": "00838F",
+    "sim": "0288D1",
+    "redTint": "FFF0EC",
+    "amberTint": "FFF5DB",
+    "blueTint": "ECF3FA"
+  },
+  "semantics": {
+    "bg/page": "paper",
+    "bg/surface": "white",
+    "bg/hero": "ink",
+    "bg/brand": "lime",
+    "bg/hover": "limeHover",
+    "bg/subtle": "park",
+    "bg/water": "water",
+    "text/primary": "ink",
+    "text/secondary": "muted",
+    "text/inverse": "white",
+    "text/brand": "forest",
+    "border/default": "line",
+    "status/affected": "red",
+    "status/degraded": "amber",
+    "status/normal": "green",
+    "route/A": "blue",
+    "route/B": "purple",
+    "route/C": "teal",
+    "source/simulated": "sim",
+    "bg/danger": "redTint",
+    "bg/warning": "amberTint",
+    "bg/info": "blueTint"
+  },
+  "dimensions": [
+    [
+      "space/0",
+      0,
+      "GAP"
+    ],
+    [
+      "space/4",
+      4,
+      "GAP"
+    ],
+    [
+      "space/8",
+      8,
+      "GAP"
+    ],
+    [
+      "space/12",
+      12,
+      "GAP"
+    ],
+    [
+      "space/16",
+      16,
+      "GAP"
+    ],
+    [
+      "space/24",
+      24,
+      "GAP"
+    ],
+    [
+      "space/32",
+      32,
+      "GAP"
+    ],
+    [
+      "space/48",
+      48,
+      "GAP"
+    ],
+    [
+      "space/64",
+      64,
+      "GAP"
+    ],
+    [
+      "space/80",
+      80,
+      "GAP"
+    ],
+    [
+      "radius/0",
+      0,
+      "CORNER_RADIUS"
+    ],
+    [
+      "radius/8",
+      8,
+      "CORNER_RADIUS"
+    ],
+    [
+      "radius/16",
+      16,
+      "CORNER_RADIUS"
+    ],
+    [
+      "radius/24",
+      24,
+      "CORNER_RADIUS"
+    ],
+    [
+      "radius/32",
+      32,
+      "CORNER_RADIUS"
+    ],
+    [
+      "radius/999",
+      999,
+      "CORNER_RADIUS"
+    ],
+    [
+      "size/control",
+      48,
+      "WIDTH_HEIGHT"
+    ],
+    [
+      "stroke/default",
+      1,
+      "STROKE_FLOAT"
+    ],
+    [
+      "stroke/focus",
+      2,
+      "STROKE_FLOAT"
+    ]
+  ],
+  "types": [
+    [
+      "Display",
+      "DM Sans",
+      "Medium",
+      72,
+      76,
+      -2
+    ],
+    [
+      "H1",
+      "DM Sans",
+      "Medium",
+      48,
+      54,
+      -1.5
+    ],
+    [
+      "H2",
+      "DM Sans",
+      "Medium",
+      32,
+      40,
+      -0.6
+    ],
+    [
+      "H3",
+      "DM Sans",
+      "Medium",
+      24,
+      32,
+      -0.3
+    ],
+    [
+      "Body",
+      "DM Sans",
+      "Regular",
+      16,
+      24,
+      0
+    ],
+    [
+      "Small",
+      "DM Sans",
+      "Regular",
+      14,
+      20,
+      0
+    ],
+    [
+      "Label",
+      "DM Sans",
+      "Medium",
+      14,
+      20,
+      0
+    ],
+    [
+      "Caption",
+      "DM Sans",
+      "Regular",
+      12,
+      18,
+      0
+    ],
+    [
+      "Accent",
+      "Caveat",
+      "Regular",
+      72,
+      80,
+      -1
+    ],
+    [
+      "Chinese",
+      "Noto Sans TC",
+      "Regular",
+      16,
+      26,
+      0
+    ]
+  ]
+}

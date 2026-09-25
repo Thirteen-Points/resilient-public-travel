@@ -189,3 +189,21 @@
   .routeName small { max-width: 140px; }
   .routeMetrics { flex-wrap: wrap; }
 }
+.connectionStatus {
+  position: absolute;
+  z-index: 600;
+  right: 16px;
+  bottom: 18px;
+  max-width: min(420px, calc(100% - 32px));
+  max-height: 25vh;
+  overflow: auto;
+  padding: 10px 14px;
+  border: 1px solid #d9d9ce;
+  border-radius: 12px;
+  background: #fffdf2;
+  color: #263b31;
+  font-size: 12px;
+  box-shadow: 0 3px 12px #0002;
+}
+.connectionStatus p { margin: 6px 0; }
+.connectionStatus button { margin-top: 4px; text-decoration: underline; }

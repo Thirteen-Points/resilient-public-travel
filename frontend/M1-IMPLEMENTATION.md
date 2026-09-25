@@ -1,5 +1,8 @@
 # M1 frontend handoff
 
+> This records the original seed implementation. The subsequent API integration,
+> current modes and remaining B/C dependencies are documented in [M1-INTEGRATION.md](./M1-INTEGRATION.md).
+
 ## Implemented
 
 - Route cards: ETA range, original score factors, risks, preference notes,

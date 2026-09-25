@@ -8,6 +8,10 @@
 .secondary { border: 1px solid #d1dccd; background: #f7f8f2; color: #385441; }
 .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .error { padding: 12px; color: #93342e; background: #fff0ed; border: 1px solid #efccc4; border-radius: 12px; font-size: 12px; line-height: 1.5; }
+.actions button[aria-busy=true] { animation: busyPulse 1.2s ease-in-out infinite; cursor: progress; }
+.reviewActions .actions button:disabled, .structured .actions button:disabled, .dialog .actions button:disabled, .reviewHeader > button:disabled { opacity: .55; cursor: not-allowed; }
+@keyframes busyPulse { 50% { opacity: .5; } }
+@media (prefers-reduced-motion: reduce) { .actions button[aria-busy=true] { animation: none; } }
 .avatar { flex: none; width: 94px; height: 94px; overflow: visible; }
 .avatarSmall { width: 58px; height: 58px; }
 .agentPanel, .reviewPanel { position: relative; z-index: 500; margin: 28px 32px; padding: 28px; background: #fff; border: 1px solid #e5ebdf; border-radius: 28px; box-shadow: 0 12px 38px #1f5b6d24; }
