@@ -222,6 +222,70 @@ def test_route_level_verified_flag_is_not_conflated_with_schedule_tier():
     assert not any("BUS_982X" in error or "982X schedule" in error for error in errors)
 
 
+def test_headway_nan_rejected():
+    docs = _docs()
+    line = next(line for line in docs["network/lines.json"]["lines"] if line["id"] == "BUS_182")
+    line["headway_s"]["weekday_peak"] = float("nan")
+    errors, _ = validate(docs)
+    assert any("headway_s.weekday_peak" in error and "finite positive" in error for error in errors)
+
+
+def test_headway_plus_infinity_rejected():
+    docs = _docs()
+    line = next(line for line in docs["network/lines.json"]["lines"] if line["id"] == "BUS_182")
+    line["headway_s"]["saturday"] = float("inf")
+    errors, _ = validate(docs)
+    assert any("headway_s.saturday" in error and "finite positive" in error for error in errors)
+
+
+def test_capacity_nan_rejected():
+    docs = _docs()
+    line = next(line for line in docs["network/lines.json"]["lines"] if line["id"] == "BUS_182")
+    line["capacity_per_vehicle"] = float("nan")
+    errors, _ = validate(docs)
+    assert any("capacity_per_vehicle" in error and "finite positive" in error for error in errors)
+
+
+def test_capacity_infinity_rejected():
+    docs = _docs()
+    line = next(line for line in docs["network/lines.json"]["lines"] if line["id"] == "ERL")
+    line["capacity_per_vehicle"] = float("inf")
+    errors, _ = validate(docs)
+    assert any("capacity_per_vehicle" in error and "finite positive" in error for error in errors)
+
+
+def test_weather_penalty_nan_rejected():
+    docs = _docs()
+    condition = docs["weather_impact.json"]["weather_conditions"]["amber_rainstorm"]
+    condition["mode_penalties"]["BUS"] = float("nan")
+    errors, _ = validate(docs)
+    assert any("weather:amber_rainstorm" in error and "BUS" in error and "finite non-negative" in error
+               for error in errors)
+
+
+def test_weather_penalty_infinity_rejected():
+    docs = _docs()
+    condition = docs["weather_impact.json"]["weather_conditions"]["t3"]
+    condition["mode_penalties"]["FERRY"] = float("inf")
+    errors, _ = validate(docs)
+    assert any("weather:t3" in error and "FERRY" in error and "finite non-negative" in error
+               for error in errors)
+
+
+def test_zero_penalty_and_null_headway_and_positive_values_pass():
+    docs = _docs()
+    # preconditions straight from the shipped data
+    t8 = docs["weather_impact.json"]["weather_conditions"]["t8"]["mode_penalties"]
+    assert t8["BUS"] == 0.0 and t8["WALK"] == 0.0
+    bus_982x = next(line for line in docs["network/lines.json"]["lines"] if line["id"] == "BUS_982X")
+    assert all(value is None for value in bus_982x["headway_s"].values())
+    bus_182 = next(line for line in docs["network/lines.json"]["lines"] if line["id"] == "BUS_182")
+    assert bus_182["headway_s"]["weekday_peak"] == 900 and bus_182["capacity_per_vehicle"] == 137
+    errors, _ = validate(docs)
+    assert not any("headway_s" in error or "capacity_per_vehicle" in error
+                   or "penalty for" in error for error in errors)
+
+
 def test_dangling_walk_link_fails():
     docs = _docs()
     docs["network/walk_links.json"]["walk_links"].append(

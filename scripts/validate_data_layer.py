@@ -6,7 +6,11 @@ evidence layer under data/:
 
 - every JSON file parses;
 - node / line / bus-route / access-point references resolve (no dangling ids);
-- line stop sequences match seg_time_s lengths and headway dicts are sane;
+- line stop sequences match seg_time_s lengths; `headway_s` is null or a
+  finite positive number, `capacity_per_vehicle` a finite positive number,
+  and weather `mode_penalties` finite non-negative numbers — NaN and
+  ±Infinity are rejected everywhere (Python's JSON parser accepts them as
+  literals);
 - every `fare_hkd` value is a finite non-negative number or a list of them;
   a two-element pair must be ascending (section fares must not be inverted),
   and strings/booleans/NaN/infinity are rejected;
@@ -267,11 +271,13 @@ def validate(docs: dict):
             errors.append(f"lines:{line_id}: headway_s must be a non-empty object")
         else:
             for key, value in headways.items():
-                if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0):
-                    errors.append(f"lines:{line_id}: headway_s.{key} must be null or a positive number")
+                if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float))
+                                          or not math.isfinite(value) or value <= 0):
+                    errors.append(f"lines:{line_id}: headway_s.{key} must be null or a finite positive number")
         capacity = line.get("capacity_per_vehicle")
-        if isinstance(capacity, bool) or not isinstance(capacity, (int, float)) or capacity <= 0:
-            errors.append(f"lines:{line_id}: capacity_per_vehicle must be a positive number")
+        if isinstance(capacity, bool) or not isinstance(capacity, (int, float)) \
+                or not math.isfinite(capacity) or capacity <= 0:
+            errors.append(f"lines:{line_id}: capacity_per_vehicle must be a finite positive number")
 
     routes = routes_doc.get("serving_tai_wai", []) + routes_doc.get("excluded_routes", [])
     route_ids = set()
@@ -354,8 +360,9 @@ def validate(docs: dict):
 
     for name, condition in weather_doc.get("weather_conditions", {}).items():
         for mode, penalty in condition.get("mode_penalties", {}).items():
-            if isinstance(penalty, bool) or not isinstance(penalty, (int, float)) or penalty < 0:
-                errors.append(f"weather:{name}: penalty for {mode} must be a non-negative number")
+            if isinstance(penalty, bool) or not isinstance(penalty, (int, float)) \
+                    or not math.isfinite(penalty) or penalty < 0:
+                errors.append(f"weather:{name}: penalty for {mode} must be a finite non-negative number")
 
     warnings.append("structural pass only: source authenticity (TD/MTR rows, user "
                     "screenshots, operator pages) still requires the human checks "

@@ -193,7 +193,10 @@ files and does NOT cover `data/`). Current coverage:
   are rejected (Python's JSON parser accepts NaN/Infinity literals, so the
   finite check is explicit); the field stays optional (MTR lines carry none);
 - node/line/bus-route/access-point references resolve; line stops match
-  `seg_time_s` lengths; headway dicts are null-or-positive; coordinates stay
+  `seg_time_s` lengths; `headway_s` is null or a **finite positive** number,
+  `capacity_per_vehicle` a **finite positive** number, weather
+  `mode_penalties` **finite non-negative** numbers (NaN and ±Infinity are
+  rejected — Python's JSON parser accepts them as literals); coordinates stay
   within Hong Kong bounds; `481B` cannot reappear on network nodes;
 - 982X `schedule_evidence` internal consistency: departure times strictly
   increasing, `gaps_min` equals adjacent time differences, `window` equals
