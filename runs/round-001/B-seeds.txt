@@ -1,0 +1,2 @@
+contract seed validation passed: 4 seed JSON files readable; 3 Events and 5 Signals satisfy the B-owned contracts
+Exit code: 0
