@@ -144,6 +144,32 @@ class EventApiFlowTests(unittest.TestCase):
         self.assertEqual(illegal.status_code, 409)
         self.assertEqual(self.app.state.event_store.get_event("evt-api-flow-001").version, 2)
 
+    def test_reviewer_can_discover_unlinked_reports_and_read_original_evidence(self) -> None:
+        first_id = self.report("first")
+        second_id = self.report("second")
+        for path in ("/api/signals", f"/api/signals/{first_id}"):
+            self.assertEqual(self.client.get(path).status_code, 401)
+            self.assertEqual(self.client.get(path, headers={"X-Review-Token": "wrong"}).status_code, 401)
+        inbox = self.client.get("/api/signals?unlinked_only=true", headers=self.headers)
+        self.assertEqual(inbox.status_code, 200)
+        self.assertEqual([item["signal_id"] for item in inbox.json()], [first_id, second_id])
+        draft = self.client.post("/api/events/ingest", json={"signal_id": first_id}, headers=self.headers)
+        self.assertEqual(draft.json()["state"], "needs_review")
+        self.assertEqual(len(self.client.get("/api/signals?unlinked_only=true", headers=self.headers).json()), 2)
+        created = self.client.post("/api/events", json=self.initial_card(first_id), headers=self.headers)
+        self.assertEqual(created.status_code, 201)
+        remaining = self.client.get("/api/signals?unlinked_only=true", headers=self.headers).json()
+        self.assertEqual([item["signal_id"] for item in remaining], [second_id])
+        merged = self.client.post("/api/events/ingest", json={"signal_id": second_id}, headers=self.headers)
+        self.assertEqual(merged.json()["state"], "merged")
+        self.assertEqual(self.client.get("/api/signals?unlinked_only=true", headers=self.headers).json(), [])
+        self.assertEqual(len(self.client.get("/api/signals", headers=self.headers).json()), 2)
+        original = self.client.get(f"/api/signals/{first_id}", headers=self.headers)
+        self.assertEqual(original.json()["raw_text"], TEXT)
+        self.assertEqual(self.client.get("/api/signals/missing", headers=self.headers).status_code, 404)
+        self.app.state.review_token = None
+        self.assertEqual(self.client.get("/api/signals", headers=self.headers).status_code, 503)
+
     def test_edit_whitelist_and_unconfigured_token(self) -> None:
         signal_id = self.report("first")
         self.client.post("/api/events", json=self.initial_card(signal_id), headers=self.headers)
