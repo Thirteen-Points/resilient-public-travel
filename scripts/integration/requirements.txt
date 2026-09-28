@@ -1,0 +1,2 @@
+# Optional: only required with --schema-map, after B supplies the official schemas.
+jsonschema>=4.18,<5

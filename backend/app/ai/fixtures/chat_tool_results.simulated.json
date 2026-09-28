@@ -1,0 +1,19 @@
+{
+  "provenance": "simulated",
+  "note": "AI boundary unit-test fixture only; it is not transit, capacity, headway, route, or timetable data.",
+  "tool_results": [
+    {
+      "ok": true,
+      "data": {
+        "fixture_value": 12,
+        "provenance": "simulated",
+        "freshness_s": 0
+      },
+      "trace": {
+        "tool": "fixture_tool",
+        "freshness_s": 0,
+        "provenance": "simulated"
+      }
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+# Optional HTTP adapter and contract tests; graph/search core uses stdlib only.
+# Versions used for this local acceptance run.
+fastapi==0.141.1
+httpx==0.28.1

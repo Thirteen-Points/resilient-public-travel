@@ -1,0 +1,147 @@
+{
+  "scenario_id": "scn_huh_exc_closed_am_peak",
+  "population": 10000,
+  "time_range": [
+    "08:00",
+    "09:00"
+  ],
+  "time_step_min": 1,
+  "seed": 20260922,
+  "population_summary": {
+    "population": 10000,
+    "persona_counts": {
+      "commuter": 5500,
+      "elderly": 1000,
+      "student": 2000,
+      "tourist": 1000,
+      "wheelchair": 500
+    },
+    "origin_counts": {
+      "EXC": 1000,
+      "HUH": 1800,
+      "KOT": 2000,
+      "MKK": 1400,
+      "TAW": 3800
+    },
+    "provenance": "simulated"
+  },
+  "baseline": {
+    "policy": "selfish",
+    "total_delay_person_min": 367770.0,
+    "avg_delay_min": 36.8,
+    "p95_wait_min": 60.0,
+    "overloaded_routes": 2,
+    "served_rate": 0.4541,
+    "wheelchair_served_rate": 0.354,
+    "route_load": [
+      {
+        "route_id": "sim_route_rail",
+        "users": 8500,
+        "capacity_per_hour": 3400.0,
+        "load_factor": 2.5,
+        "overloaded": true
+      },
+      {
+        "route_id": "sim_route_bus",
+        "users": 1500,
+        "capacity_per_hour": 460.0,
+        "load_factor": 3.26087,
+        "overloaded": true
+      }
+    ]
+  },
+  "guided": {
+    "policy": "bucket",
+    "total_delay_person_min": 400170.0,
+    "avg_delay_min": 40.0,
+    "p95_wait_min": 60.0,
+    "overloaded_routes": 1,
+    "served_rate": 0.3941,
+    "wheelchair_served_rate": 0.354,
+    "route_load": [
+      {
+        "route_id": "sim_route_rail",
+        "users": 3400,
+        "capacity_per_hour": 3400.0,
+        "load_factor": 1.0,
+        "overloaded": false
+      },
+      {
+        "route_id": "sim_route_bus",
+        "users": 541,
+        "capacity_per_hour": 460.0,
+        "load_factor": 1.176087,
+        "overloaded": true
+      }
+    ],
+    "unstoppable_demand": 6059,
+    "shares": [
+      {
+        "route_id": "sim_route_rail",
+        "share": 0.34,
+        "users": 3400,
+        "capacity_per_hour": 3400.0,
+        "load_factor": 1.0
+      },
+      {
+        "route_id": "sim_route_bus",
+        "share": 0.0541,
+        "users": 541,
+        "capacity_per_hour": 460.0,
+        "load_factor": 1.176087
+      }
+    ],
+    "advice": [
+      "运力缺口 6,059 人/60分钟：建议错峰出发或等待官方加开服务",
+      "目标容量已满：sim_route_rail、sim_route_bus"
+    ]
+  },
+  "delta": {
+    "delay_reduction_pct": -8.8,
+    "p95_wait_reduction_pct": 0.0,
+    "served_rate_gain_pp": -6.0,
+    "overloaded_routes_delta": -1
+  },
+  "fairness": {
+    "max_extra_delay_min": 15.0,
+    "protected_users": 959,
+    "note": "轮椅与长者优先获得可达容量；所有分配均受额外延误 15 分钟硬上限保护"
+  },
+  "capacity_calculations": [
+    {
+      "route_id": "sim_route_rail",
+      "headway_s": 180.0,
+      "departures_per_hour": 20.0,
+      "vehicle_capacity": 200.0,
+      "available_capacity_factor": 1.0,
+      "eta_max_factor": 0.85,
+      "raw_capacity_per_hour": 4000.0,
+      "service_capacity_per_hour": 4000.0,
+      "capacity_per_hour": 3400.0,
+      "provenance": "simulated"
+    },
+    {
+      "route_id": "sim_route_bus",
+      "headway_s": 900.0,
+      "departures_per_hour": 4.0,
+      "vehicle_capacity": 135.29411764705884,
+      "available_capacity_factor": 1.0,
+      "eta_max_factor": 0.85,
+      "raw_capacity_per_hour": 541.1764705882354,
+      "service_capacity_per_hour": 541.1764705882,
+      "capacity_per_hour": 460.0,
+      "provenance": "simulated"
+    }
+  ],
+  "assumptions": [
+    "需求为 10,000 人、工作日早高峰 08:00–09:00；需求量与到达分布均为模拟值",
+    "画像比例为上班族 55% / 学生 20% / 游客 10% / 长者 10% / 轮椅 5%，均为模拟值",
+    "OD 起点权重来自走廊五个受影响站的 800 米圈代理权重，为模拟值；终点统一为 ADM",
+    "路线、ETA、步行、票价、可靠度和 freshness_s 读取 C-Sim 自有的 C-Route 标准输出 simulated fixture，不改动公共字段",
+    "M0 只使用一条模拟轨道路线和一条模拟巴士路线验证适配、容量、公平与运力缺口，不代表真实网络覆盖",
+    "全部班距、车型容量与可用比例在 C-Data 核验前均为 simulated fixture，不作为真实或 real-derived 数据发布",
+    "水桶容量为班次 × 单车载客 × 可用比例 × 0.85；排队利用率使用乘 0.85 前的物理服务能力",
+    "未能在一小时窗口内获得公平且可达分配的乘客计入 unstoppable_demand，不回填或隐藏"
+  ],
+  "provenance": "simulated"
+}

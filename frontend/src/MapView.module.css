@@ -1,0 +1,6 @@
+.wrap { position: absolute; inset: 0; z-index: 0; border-radius: 18px 18px 0 0; overflow: hidden; background: #a9e2e6; }
+.map { width: 100%; height: 100%; background: #a9e2e6; }
+.picking .map { cursor: crosshair; }
+.caption { position: absolute; bottom: 6px; left: 13px; margin: 0; padding: 3px 7px; border-radius: 5px; background: rgba(255,255,255,.85); color: #426273; font-size: 10px; z-index: 450; }
+.pickHint { position: absolute; top: 16px; right: 16px; z-index: 450; margin: 0; padding: 10px 14px; border-radius: 12px; color: #173b50; background: #fff; box-shadow: 0 4px 24px #1748592b; font-size: 13px; }
+@media (max-width: 700px) { .caption { max-width: 70%; } .pickHint { top: 8px; right: 8px; max-width: 52%; } }

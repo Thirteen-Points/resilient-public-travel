@@ -1,0 +1,34 @@
+{
+  "check_id": "c-sim-m0-simulated",
+  "command": "python scripts/verify_sim_m0.py",
+  "status": "PASS",
+  "checks": {
+    "route_fields": true,
+    "simulated_only": true,
+    "fixed_seed_reproducible": true,
+    "precomputed_matches_model": true,
+    "capacity_conserved": true,
+    "physical_capacity_respected": true,
+    "diversion_plan_conserved": true,
+    "fairness_enforced": true,
+    "protected_personal_best_preserved": true,
+    "unmet_demand_reported": true,
+    "event_change_replans": true,
+    "cache_read_under_300ms": true
+  },
+  "scenario_id": "scn_huh_exc_closed_am_peak",
+  "seed": 20260922,
+  "population": 10000,
+  "route_ids": [
+    "sim_route_rail",
+    "sim_route_bus"
+  ],
+  "unstoppable_demand": 6059,
+  "fixture_files": [
+    "backend/tests/fixtures/c_route_output.simulated.json",
+    "backend/tests/fixtures/b_updates.simulated.json",
+    "data/sim/scn_huh_exc_closed_am_peak.input.json"
+  ],
+  "provenance": "simulated",
+  "scope": "Algorithm and adapter acceptance only; no verified C-Data is connected."
+}

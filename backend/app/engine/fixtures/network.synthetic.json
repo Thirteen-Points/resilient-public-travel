@@ -1,0 +1,333 @@
+{
+  "meta": {
+    "provenance": "simulated",
+    "built_at": "2026-09-22T08:00:00+08:00",
+    "note": "Independent synthetic topology, not actual HK transit",
+    "catchment_m": 800
+  },
+  "nodes": [
+    {
+      "id": "O",
+      "name_zh": "O",
+      "kind": "mtr_station",
+      "lat": 22.0,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "D",
+      "name_zh": "D",
+      "kind": "mtr_station",
+      "lat": 22.001,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "V00",
+      "name_zh": "V00",
+      "kind": "bus_stop",
+      "lat": 22.002,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "V01",
+      "name_zh": "V01",
+      "kind": "bus_stop",
+      "lat": 22.003,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "V02",
+      "name_zh": "V02",
+      "kind": "bus_stop",
+      "lat": 22.004,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "V03",
+      "name_zh": "V03",
+      "kind": "bus_stop",
+      "lat": 22.005,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "V04",
+      "name_zh": "V04",
+      "kind": "bus_stop",
+      "lat": 22.006,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "V05",
+      "name_zh": "V05",
+      "kind": "bus_stop",
+      "lat": 22.007,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "V06",
+      "name_zh": "V06",
+      "kind": "bus_stop",
+      "lat": 22.008,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "V07",
+      "name_zh": "V07",
+      "kind": "bus_stop",
+      "lat": 22.009,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "V08",
+      "name_zh": "V08",
+      "kind": "bus_stop",
+      "lat": 22.01,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    },
+    {
+      "id": "V09",
+      "name_zh": "V09",
+      "kind": "bus_stop",
+      "lat": 22.011,
+      "lng": 114,
+      "accessible": true,
+      "provenance": "simulated",
+      "catchment_m": 800
+    }
+  ],
+  "lines": [
+    {
+      "id": "SIM_00",
+      "mode": "MTR",
+      "stops": [
+        "O",
+        "V00",
+        "D"
+      ],
+      "seg_time_s": [
+        80,
+        90
+      ],
+      "headway_s": 120,
+      "capacity_per_vehicle": 100,
+      "fare_hkd": 4,
+      "accessible": true,
+      "low_floor": true,
+      "bidirectional": true,
+      "provenance": "simulated"
+    },
+    {
+      "id": "SIM_01",
+      "mode": "BUS",
+      "stops": [
+        "O",
+        "V01",
+        "D"
+      ],
+      "seg_time_s": [
+        90,
+        100
+      ],
+      "headway_s": 135,
+      "capacity_per_vehicle": 120,
+      "fare_hkd": 5,
+      "accessible": true,
+      "low_floor": true,
+      "bidirectional": true,
+      "provenance": "simulated"
+    },
+    {
+      "id": "SIM_02",
+      "mode": "MTR",
+      "stops": [
+        "O",
+        "V02",
+        "D"
+      ],
+      "seg_time_s": [
+        100,
+        110
+      ],
+      "headway_s": 150,
+      "capacity_per_vehicle": 140,
+      "fare_hkd": 6,
+      "accessible": true,
+      "low_floor": true,
+      "bidirectional": true,
+      "provenance": "simulated"
+    },
+    {
+      "id": "SIM_03",
+      "mode": "BUS",
+      "stops": [
+        "O",
+        "V03",
+        "D"
+      ],
+      "seg_time_s": [
+        110,
+        120
+      ],
+      "headway_s": 165,
+      "capacity_per_vehicle": 160,
+      "fare_hkd": 7,
+      "accessible": true,
+      "low_floor": true,
+      "bidirectional": true,
+      "provenance": "simulated"
+    },
+    {
+      "id": "SIM_04",
+      "mode": "MTR",
+      "stops": [
+        "O",
+        "V04",
+        "D"
+      ],
+      "seg_time_s": [
+        120,
+        130
+      ],
+      "headway_s": 180,
+      "capacity_per_vehicle": 180,
+      "fare_hkd": 8,
+      "accessible": true,
+      "low_floor": true,
+      "bidirectional": true,
+      "provenance": "simulated"
+    },
+    {
+      "id": "SIM_05",
+      "mode": "BUS",
+      "stops": [
+        "O",
+        "V05",
+        "D"
+      ],
+      "seg_time_s": [
+        130,
+        140
+      ],
+      "headway_s": 195,
+      "capacity_per_vehicle": 200,
+      "fare_hkd": 9,
+      "accessible": true,
+      "low_floor": true,
+      "bidirectional": true,
+      "provenance": "simulated"
+    },
+    {
+      "id": "SIM_06",
+      "mode": "MTR",
+      "stops": [
+        "O",
+        "V06",
+        "D"
+      ],
+      "seg_time_s": [
+        140,
+        150
+      ],
+      "headway_s": 210,
+      "capacity_per_vehicle": 220,
+      "fare_hkd": 10,
+      "accessible": true,
+      "low_floor": true,
+      "bidirectional": true,
+      "provenance": "simulated"
+    },
+    {
+      "id": "SIM_07",
+      "mode": "BUS",
+      "stops": [
+        "O",
+        "V07",
+        "D"
+      ],
+      "seg_time_s": [
+        150,
+        160
+      ],
+      "headway_s": 225,
+      "capacity_per_vehicle": 240,
+      "fare_hkd": 11,
+      "accessible": true,
+      "low_floor": true,
+      "bidirectional": true,
+      "provenance": "simulated"
+    },
+    {
+      "id": "SIM_08",
+      "mode": "MTR",
+      "stops": [
+        "O",
+        "V08",
+        "D"
+      ],
+      "seg_time_s": [
+        160,
+        170
+      ],
+      "headway_s": 240,
+      "capacity_per_vehicle": 260,
+      "fare_hkd": 12,
+      "accessible": true,
+      "low_floor": true,
+      "bidirectional": true,
+      "provenance": "simulated"
+    },
+    {
+      "id": "SIM_09",
+      "mode": "BUS",
+      "stops": [
+        "O",
+        "V09",
+        "D"
+      ],
+      "seg_time_s": [
+        170,
+        180
+      ],
+      "headway_s": 255,
+      "capacity_per_vehicle": 280,
+      "fare_hkd": 13,
+      "accessible": true,
+      "low_floor": true,
+      "bidirectional": true,
+      "provenance": "simulated"
+    }
+  ],
+  "walk_links": []
+}

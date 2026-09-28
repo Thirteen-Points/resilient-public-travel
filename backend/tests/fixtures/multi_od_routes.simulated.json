@@ -1,0 +1,455 @@
+{
+  "fixture": true,
+  "provenance": "simulated",
+  "note": "Compact C-Sim M0 fixture for 30 directed ODs. Profiles are synthetic and are not verified routes.",
+  "nodes": [
+    "TAW",
+    "KOT",
+    "MKK",
+    "HUH",
+    "EXC",
+    "ADM"
+  ],
+  "candidate_profiles": {
+    "mtr_accessible": {
+      "provenance": "simulated",
+      "route": {
+        "legs": [
+          {
+            "mode": "MTR",
+            "accessible": true,
+            "provenance": "simulated"
+          }
+        ],
+        "total": {
+          "time_s": 900,
+          "transfers": 0,
+          "walk_m": 120,
+          "fare_hkd": 12,
+          "reliability": 0.9,
+          "freshness_s": 0
+        },
+        "provenance": "simulated"
+      },
+      "route_parameters": {
+        "headway_s": 600,
+        "capacity_per_hour": 8,
+        "service_capacity_per_hour": 10,
+        "provenance": "simulated",
+        "note": "Simulated M0 capacity fixture"
+      }
+    },
+    "bus_accessible": {
+      "provenance": "simulated",
+      "route": {
+        "legs": [
+          {
+            "mode": "BUS",
+            "accessible": true,
+            "provenance": "simulated"
+          }
+        ],
+        "total": {
+          "time_s": 1200,
+          "transfers": 0,
+          "walk_m": 80,
+          "fare_hkd": 9,
+          "reliability": 0.75,
+          "freshness_s": 0
+        },
+        "provenance": "simulated"
+      },
+      "route_parameters": {
+        "headway_s": 600,
+        "capacity_per_hour": 8,
+        "service_capacity_per_hour": 10,
+        "provenance": "simulated",
+        "note": "Simulated M0 capacity fixture"
+      }
+    },
+    "mtr_inaccessible": {
+      "provenance": "simulated",
+      "route": {
+        "legs": [
+          {
+            "mode": "MTR",
+            "accessible": false,
+            "provenance": "simulated"
+          }
+        ],
+        "total": {
+          "time_s": 840,
+          "transfers": 0,
+          "walk_m": 100,
+          "fare_hkd": 11,
+          "reliability": 0.85,
+          "freshness_s": 0
+        },
+        "provenance": "simulated"
+      },
+      "route_parameters": {
+        "headway_s": 600,
+        "capacity_per_hour": 8,
+        "service_capacity_per_hour": 10,
+        "provenance": "simulated",
+        "note": "Simulated inaccessible M0 fixture; no accessibility evidence"
+      }
+    },
+    "bus_inaccessible": {
+      "provenance": "simulated",
+      "route": {
+        "legs": [
+          {
+            "mode": "BUS",
+            "accessible": false,
+            "provenance": "simulated"
+          }
+        ],
+        "total": {
+          "time_s": 900,
+          "transfers": 0,
+          "walk_m": 70,
+          "fare_hkd": 8.5,
+          "reliability": 0.72,
+          "freshness_s": 0
+        },
+        "provenance": "simulated"
+      },
+      "route_parameters": {
+        "headway_s": 600,
+        "capacity_per_hour": 8,
+        "service_capacity_per_hour": 10,
+        "provenance": "simulated",
+        "note": "Simulated inaccessible large-bus M0 fixture; no accessibility evidence"
+      }
+    },
+    "minibus_inaccessible": {
+      "provenance": "simulated",
+      "route": {
+        "legs": [
+          {
+            "mode": "MINIBUS",
+            "accessible": false,
+            "provenance": "simulated"
+          }
+        ],
+        "total": {
+          "time_s": 780,
+          "transfers": 0,
+          "walk_m": 60,
+          "fare_hkd": 8,
+          "reliability": 0.7,
+          "freshness_s": 0
+        },
+        "provenance": "simulated"
+      },
+      "route_parameters": {
+        "headway_s": 600,
+        "capacity_per_hour": 8,
+        "service_capacity_per_hour": 10,
+        "provenance": "simulated",
+        "note": "Simulated minibus M0 fixture; excluded for wheelchair users"
+      }
+    }
+  },
+  "od_route_sets": [
+    {
+      "origin": "TAW",
+      "destination": "KOT",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible",
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "TAW",
+      "destination": "MKK",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "TAW",
+      "destination": "HUH",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "TAW",
+      "destination": "EXC",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible",
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "TAW",
+      "destination": "ADM",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "KOT",
+      "destination": "TAW",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "KOT",
+      "destination": "MKK",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible",
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "KOT",
+      "destination": "HUH",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "KOT",
+      "destination": "EXC",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "KOT",
+      "destination": "ADM",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible",
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "MKK",
+      "destination": "TAW",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "MKK",
+      "destination": "KOT",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "MKK",
+      "destination": "HUH",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible",
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "MKK",
+      "destination": "EXC",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "minibus_inaccessible",
+        "mtr_inaccessible",
+        "bus_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "MKK",
+      "destination": "ADM",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "HUH",
+      "destination": "TAW",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible",
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "HUH",
+      "destination": "KOT",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "HUH",
+      "destination": "MKK",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "HUH",
+      "destination": "EXC",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible",
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "HUH",
+      "destination": "ADM",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "EXC",
+      "destination": "TAW",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "EXC",
+      "destination": "KOT",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible",
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "EXC",
+      "destination": "MKK",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "EXC",
+      "destination": "HUH",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "EXC",
+      "destination": "ADM",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible",
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "ADM",
+      "destination": "TAW",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "ADM",
+      "destination": "KOT",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "ADM",
+      "destination": "MKK",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible",
+        "mtr_inaccessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "ADM",
+      "destination": "HUH",
+      "demand_weight": 1,
+      "candidate_profiles": [
+        "mtr_accessible",
+        "bus_accessible"
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "origin": "ADM",
+      "destination": "EXC",
+      "demand_weight": 1,
+      "candidate_profiles": [],
+      "provenance": "simulated"
+    }
+  ]
+}
