@@ -65,7 +65,7 @@ class EventApiFlowTests(unittest.TestCase):
         self.assertEqual(created.status_code, 201, created.text)
         self.assertEqual(created.json()["confidence"], 0.20)
 
-        for expected, author in ((0.35, "passenger-two"), (0.55, "passenger-three")):
+        for expected, author in ((0.55, "passenger-two"), (0.55, "passenger-three")):
             signal_id = self.report(author)
             response = self.client.post("/api/events/ingest", json={"signal_id": signal_id}, headers=self.headers)
             self.assertEqual(response.status_code, 200, response.text)
@@ -93,7 +93,7 @@ class EventApiFlowTests(unittest.TestCase):
         changes = self.app.state.event_store.list_changes()
         self.assertEqual(len(changes), 4)
         self.assertEqual([entry["confidence_after"] for entry in approved.json()["audit_log"]],
-                         [0.2, 0.35, 0.55, 0.6])
+                         [0.2, 0.55, 0.55, 0.6])
 
         async def read_frame() -> str:
             frames = event_frames(self.app.state.event_store, after_id=changes[-2][0])

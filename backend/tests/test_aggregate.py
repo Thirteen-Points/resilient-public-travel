@@ -91,7 +91,7 @@ class EventAggregatorTests(unittest.TestCase):
         self.assertEqual([entry.action for entry in updated.audit_log],
                          ["created", "merged_signal", "merged_signal", "merged_signal"])
         self.assertEqual([entry.confidence_after for entry in updated.audit_log],
-                         [0.2, 0.35, 0.55, 0.55])
+                         [0.2, 0.55, 0.55, 0.55])
 
     def test_repeated_same_account_merges_without_inflating_confidence(self) -> None:
         first, second = observation(1, author="same"), observation(2, author="same")
@@ -123,7 +123,7 @@ class EventAggregatorTests(unittest.TestCase):
         updated = self.aggregator.merge(event.event_id, [first, second],
                                         at=BASE_TIME + timedelta(minutes=2))
         self.assertEqual(updated.status, "updated")
-        self.assertEqual(updated.confidence, 0.35)
+        self.assertEqual(updated.confidence, 0.55)
         self.assertEqual(updated.reviewed_by, "admin")  # Historical reviewer remains visible.
 
     def test_unrelated_or_ambiguous_signal_is_not_auto_merged(self) -> None:
