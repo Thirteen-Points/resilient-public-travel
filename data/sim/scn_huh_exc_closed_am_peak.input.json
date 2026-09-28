@@ -1,0 +1,25 @@
+{
+  "scenario_id": "scn_huh_exc_closed_am_peak",
+  "fixture": true,
+  "provenance": "simulated",
+  "data_status": "C-Data pending verification; values are algorithm fixtures only",
+  "seed": 20260922,
+  "population": 10000,
+  "time_range": ["08:00", "09:00"],
+  "window_min": 60,
+  "route_source": "backend/tests/fixtures/c_route_output.simulated.json",
+  "route_supply": [
+    {"route_id":"sim_route_rail","headway_s":180,"capacity_per_hour":3400,"service_capacity_per_hour":4000,"provenance":"simulated","note":"C-Sim M0 rail fixture；等待 C-Data 替换"},
+    {"route_id":"sim_route_bus","headway_s":900,"capacity_per_hour":460,"service_capacity_per_hour":541.1764705882,"provenance":"simulated","note":"C-Sim M0 bus fixture；等待 C-Data 替换"}
+  ],
+  "assumptions": [
+    "需求为 10,000 人、工作日早高峰 08:00–09:00；需求量与到达分布均为模拟值",
+    "画像比例为上班族 55% / 学生 20% / 游客 10% / 长者 10% / 轮椅 5%，均为模拟值",
+    "OD 起点权重来自走廊五个受影响站的 800 米圈代理权重，为模拟值；终点统一为 ADM",
+    "路线、ETA、步行、票价、可靠度和 freshness_s 读取 C-Sim 自有的 C-Route 标准输出 simulated fixture，不改动公共字段",
+    "M0 只使用一条模拟轨道路线和一条模拟巴士路线验证适配、容量、公平与运力缺口，不代表真实网络覆盖",
+    "全部班距、车型容量与可用比例在 C-Data 核验前均为 simulated fixture，不作为真实或 real-derived 数据发布",
+    "水桶容量为班次 × 单车载客 × 可用比例 × 0.85；排队利用率使用乘 0.85 前的物理服务能力",
+    "未能在一小时窗口内获得公平且可达分配的乘客计入 unstoppable_demand，不回填或隐藏"
+  ]
+}

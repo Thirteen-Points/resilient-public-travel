@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "version": "fixture-v0",
+    "built_at": "2026-09-22",
+    "catchment_m": 800,
+    "note": "Deliberately imperfect fixture for normalizer tests. Never rendered in the app."
+  },
+  "nodes": [
+    { "id": "FX_OK", "name_en": "Fixture OK", "name_zh": "示例", "kind": "mtr_station", "lat": 22.3, "lng": 114.17, "lines": ["FXL"], "accessible": true, "provenance": "real", "catchment_m": 800 },
+    { "id": "FX_BAD_COORD", "name_en": "Bad Coordinate", "name_zh": "坏坐标", "kind": "mtr_station", "lat": "22.3", "lng": 114.17, "lines": ["FXL"], "accessible": true, "provenance": "maybe" },
+    { "id": "FX_NO_NAME", "name_en": "Missing Chinese Name", "kind": "bus_stop", "lat": 22.31, "lng": 114.18, "lines": [], "accessible": "partial", "provenance": "simulated" }
+  ],
+  "lines": [
+    { "id": "FXL", "name_en": "Fixture Line", "mode": "MTR", "stops": ["FX_OK", "FX_BAD_COORD"], "provenance": "real" },
+    { "id": "FX_TELEPORT", "name_en": "Impossible Mode", "mode": "TELEPORT", "stops": ["FX_OK"], "provenance": "simulated" }
+  ]
+}

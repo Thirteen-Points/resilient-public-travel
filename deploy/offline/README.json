@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "version": "offline-1.0",
+    "built_at": "2026-09-22",
+    "description": "Minimal offline data package for ResilientRoute. Contains enough data to run the demo without any network connection.",
+    "data_version": "1.0",
+    "source": "See data/PROVENANCE.md for full source tracking",
+    "provenance": "mixed (real + real-derived + simulated)"
+  },
+  "includes": {
+    "network": "Minimal transit network: 16 MTR stations, 4 bus stops, 2 piers, 13 lines, 7 walk links",
+    "calendar": "Service calendar with 3 schedule types and 2026 public holidays",
+    "events": "3 seed events (low/medium/high confidence) for demo",
+    "routes": "8 seed candidate routes for TAW->ADM with 2 persona picks",
+    "sim": "1 placeholder SimResult (10k population, guided vs unguided)"
+  },
+  "files": [
+    "data/network/stations.json",
+    "data/network/lines.json",
+    "data/network/walk_links.json",
+    "data/network/bus_routes.json",
+    "data/access/access_points.json",
+    "data/calendar.json",
+    "data/weather_impact.json",
+    "data/capacity_method.md",
+    "data/PROVENANCE.md",
+    "data/DATA_QUALITY.md",
+    "contracts/seed/network.seed.json",
+    "contracts/seed/event.seed.json",
+    "contracts/seed/routes.seed.json",
+    "contracts/seed/sim.seed.json"
+  ],
+  "startup_instructions": {
+    "windows": "scripts\\start.bat --offline",
+    "linux_mac": "./scripts/start.sh --offline",
+    "docker": "docker-compose -f deploy/docker-compose.yml up",
+    "python_direct": "python -m uvicorn backend.app.main:app (with OFFLINE_MODE=true in .env)"
+  },
+  "notes": [
+    "All data in this package is labelled with provenance (real/real-derived/simulated).",
+    "No external API calls are made in offline mode.",
+    "LLM is disabled by default. Route queries use deterministic logic.",
+    "The demo scenario (TAW->ADM, ERL cross-harbour closed) works fully offline.",
+    "For full functionality, set OFFLINE_MODE=false and configure LLM in .env."
+  ]
+}

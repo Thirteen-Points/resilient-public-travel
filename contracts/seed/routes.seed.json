@@ -1,176 +1,2973 @@
 {
   "meta": {
-    "version": "seed-v0",
+    "version": "seed-v2-ten-cards-top3",
     "built_at": "2026-09-21",
     "scenario": "evt_seed_003（红磡—会展过海段关闭，大围—九龙塘段拥挤 capacity_factor 0.9）",
-    "od": {"origin": "TAW", "destination": "ADM", "depart_at": "2026-09-22T08:20:00+08:00", "service_day": "weekday"},
-    "purpose": "让 A 在 C 的引擎就绪前完成整个前端（地图着色 / 路线卡片 / 画像对比）。数值为示意，provenance=real-derived。",
+    "od": {
+      "origin": "TAW",
+      "destination": "ADM",
+      "depart_at": "2026-09-22T08:20:00+08:00",
+      "service_day": "weekday"
+    },
+    "purpose": "同OD同事件10张物理路径不同的普通simulated示例；严格多样性公开查询仅9，轮椅因无障碍unknown无结果，未满足轮椅top3。",
     "candidate_count_target": 10,
-    "included_here": 8,
-    "diversity_note": "至少 2 种模式；任两条途经节点 Jaccard < 0.7；避开受影响区段（ERL:HUH-EXC 与 ERL:EXC-ADM）"
+    "included_here": 10,
+    "diversity_note": "数量10不等于10个独立替代走廊；候选来自未放宽硬约束的原图搜索，普通全局多样性不变。",
+    "provenance": "simulated"
   },
   "routes": [
     {
-      "route_id": "r_seed_001",
-      "label": "屯馬綫 → 尖東 → 步行 → 尖沙咀 → 荃灣綫 → 金鐘",
+      "route_id": "r_da67c274e39e0c00",
+      "label": "ERL + KTL + TWL",
       "legs": [
-        {"mode":"MTR","line":"TML","from":"TAW","to":"ETS","headway_s":180,"travel_s":1380,"walk_m":0,"fare_hkd":0,"accessible":true,"provenance":"real-derived"},
-        {"mode":"WALK","from":"ETS","to":"TST","travel_s":300,"walk_m":420,"accessible":true,"provenance":"real-derived"},
-        {"mode":"MTR","line":"TWL","from":"TST","to":"ADM","headway_s":120,"travel_s":300,"walk_m":0,"fare_hkd":12.5,"accessible":true,"provenance":"real-derived"}
+        {
+          "mode": "MTR",
+          "from": "TAW",
+          "to": "KOT",
+          "depart": "2026-09-22T08:20:00+08:00",
+          "arrive": "2026-09-22T08:24:30+08:00",
+          "headway_s": 200.0,
+          "in_vehicle_s": 270.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "ERL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "KOT",
+          "to": "YMT",
+          "depart": "2026-09-22T08:25:00+08:00",
+          "arrive": "2026-09-22T08:34:00+08:00",
+          "headway_s": 120.0,
+          "in_vehicle_s": 540.0,
+          "walk_m": 0,
+          "fare_hkd": 0.0,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "KTL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "YMT",
+          "to": "ADM",
+          "depart": "2026-09-22T08:34:00+08:00",
+          "arrive": "2026-09-22T08:44:00+08:00",
+          "headway_s": 120.0,
+          "in_vehicle_s": 600.0,
+          "walk_m": 0,
+          "fare_hkd": 0.0,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "TWL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        }
       ],
-      "total": {"time_s":1980,"time_range_s":[1760,2210],"transfers":1,"walk_m":420,"fare_hkd":12.5,"co2_g":820,"reliability":0.86,"freshness_s":45},
-      "score": 0.81,
+      "total": {
+        "time_s": 1440.0,
+        "time_range_s": [
+          1352.7340668856855,
+          1527.2659331143145
+        ],
+        "transfers": 2,
+        "walk_m": 0,
+        "fare_hkd": 12.5,
+        "co2_g": 377.6459250773652,
+        "reliability": 0.9527124634696297,
+        "freshness_s": 117540.0
+      },
+      "score": 0.7253817690399843,
       "score_breakdown": [
-        {"criterion":"time","raw":1980,"normalized":0.72,"weight":0.45,"contribution":0.324},
-        {"criterion":"transfers","raw":1,"normalized":0.50,"weight":0.10,"contribution":0.050},
-        {"criterion":"walk","raw":420,"normalized":0.48,"weight":0.10,"contribution":0.048},
-        {"criterion":"reliability","raw":0.86,"normalized":0.86,"weight":0.35,"contribution":0.301}
+        {
+          "criterion": "time",
+          "raw": 1440.0,
+          "normalized": 1.0,
+          "weight": 0.45,
+          "contribution": 0.45
+        },
+        {
+          "criterion": "transfers",
+          "raw": 2,
+          "normalized": 0.3333333333333333,
+          "weight": 0.1,
+          "contribution": 0.03333333333333333
+        },
+        {
+          "criterion": "walk",
+          "raw": 0,
+          "normalized": 1.0,
+          "weight": 0.1,
+          "contribution": 0.1
+        },
+        {
+          "criterion": "price",
+          "raw": 12.5,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.31268409057227237,
+          "normalized": 0.31268409057227237,
+          "weight": 0.05,
+          "contribution": 0.01563420452861362
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.9527124634696297,
+          "normalized": 0.9527124634696297,
+          "weight": 0.1,
+          "contribution": 0.09527124634696298
+        },
+        {
+          "criterion": "carbon",
+          "raw": 377.6459250773652,
+          "normalized": 0.6185274397991531,
+          "weight": 0.05,
+          "contribution": 0.03092637198995766
+        },
+        {
+          "criterion": "freshness",
+          "raw": 117540.0,
+          "normalized": 0.004332256822334126,
+          "weight": 0.05,
+          "contribution": 0.0002166128411167063
+        }
       ],
-      "warnings": ["含 420 米站内步行通道，轮椅使用者需确认电梯可用性"],
-      "notes": [],
-      "explain": "全程轨道，不依赖已经九成满的过海巴士；代价是要走一段站内通道。",
-      "provenance": "real-derived"
+      "load_estimate": {
+        "expected_wait_s": 100.0,
+        "load_factor": 0,
+        "users_on_route": 0,
+        "capacity_per_hour": 43528.5,
+        "board_refusal_prob": 0
+      },
+      "warnings": [
+        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+        "ERL 数据较旧",
+        "ERL 受事件影响，运力系数 0.9",
+        "KTL 数据较旧",
+        "TWL 数据较旧",
+        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+        "负载来自显式模拟场景，不代表真实客流",
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+      ],
+      "notes": [
+        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+      ],
+      "explain": "ERL + KTL + TWL：约 23–25 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "evidence": [
+        {
+          "source": "ERL",
+          "freshness_s": 116400.0
+        },
+        {
+          "source": "KTL",
+          "freshness_s": 116700.0
+        },
+        {
+          "source": "KTL",
+          "freshness_s": 116940.0
+        },
+        {
+          "source": "KTL",
+          "freshness_s": 117090.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117240.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117390.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117540.0
+        },
+        {
+          "event_id": "evt_seed_003",
+          "used": true
+        },
+        {
+          "source": "route_model_v1",
+          "freshness_s": 0
+        },
+        {
+          "source": "c_route_zero_demand_fixture",
+          "freshness_s": 0
+        },
+        {
+          "source": "contracts/seed/network.seed.json",
+          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "freshness_s": 117540.0
+        },
+        {
+          "source": "contracts/seed/event.seed.json",
+          "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
+          "freshness_s": 117540.0
+        }
+      ],
+      "provenance": "simulated"
     },
     {
-      "route_id": "r_seed_002",
-      "label": "屯馬綫 → 何文田 → 觀塘綫 → 油麻地 → 荃灣綫 → 金鐘",
+      "route_id": "r_8232b6602c377cc6",
+      "label": "ERL + TML + KTL + TWL",
       "legs": [
-        {"mode":"MTR","line":"TML","from":"TAW","to":"HOM","headway_s":180,"travel_s":1080,"walk_m":0,"fare_hkd":0,"accessible":true,"provenance":"real-derived"},
-        {"mode":"MTR","line":"KTL","from":"HOM","to":"YMT","headway_s":120,"travel_s":210,"walk_m":60,"fare_hkd":0,"accessible":true,"provenance":"real-derived"},
-        {"mode":"MTR","line":"TWL","from":"YMT","to":"ADM","headway_s":120,"travel_s":600,"walk_m":0,"fare_hkd":12.5,"accessible":true,"provenance":"real-derived"}
+        {
+          "mode": "MTR",
+          "from": "TAW",
+          "to": "HUH",
+          "depart": "2026-09-22T08:20:00+08:00",
+          "arrive": "2026-09-22T08:30:45+08:00",
+          "headway_s": 200.0,
+          "in_vehicle_s": 645.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "ERL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "HUH",
+          "to": "HOM",
+          "depart": "2026-09-22T08:31:00+08:00",
+          "arrive": "2026-09-22T08:34:00+08:00",
+          "headway_s": 180.0,
+          "in_vehicle_s": 180.0,
+          "walk_m": 0,
+          "fare_hkd": 0,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "TML",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "HOM",
+          "to": "YMT",
+          "depart": "2026-09-22T08:34:00+08:00",
+          "arrive": "2026-09-22T08:37:30+08:00",
+          "headway_s": 120.0,
+          "in_vehicle_s": 210.0,
+          "walk_m": 0,
+          "fare_hkd": 0,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "KTL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "YMT",
+          "to": "ADM",
+          "depart": "2026-09-22T08:38:00+08:00",
+          "arrive": "2026-09-22T08:48:00+08:00",
+          "headway_s": 120.0,
+          "in_vehicle_s": 600.0,
+          "walk_m": 0,
+          "fare_hkd": 0.0,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "TWL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        }
       ],
-      "total": {"time_s":2190,"time_range_s":[1980,2420],"transfers":2,"walk_m":180,"fare_hkd":12.5,"co2_g":880,"reliability":0.88,"freshness_s":45},
-      "score": 0.74,
+      "total": {
+        "time_s": 1680.0,
+        "time_range_s": [
+          1585.3372528641578,
+          1774.6627471358422
+        ],
+        "transfers": 3,
+        "walk_m": 0,
+        "fare_hkd": 12.5,
+        "co2_g": 487.45646140970234,
+        "reliability": 0.956032247438536,
+        "freshness_s": 117780.0
+      },
+      "score": 0.6686625019812564,
       "score_breakdown": [
-        {"criterion":"time","raw":2190,"normalized":0.63,"weight":0.45,"contribution":0.284},
-        {"criterion":"transfers","raw":2,"normalized":0.33,"weight":0.10,"contribution":0.033},
-        {"criterion":"walk","raw":180,"normalized":0.78,"weight":0.10,"contribution":0.078},
-        {"criterion":"reliability","raw":0.88,"normalized":0.88,"weight":0.35,"contribution":0.308}
+        {
+          "criterion": "time",
+          "raw": 1680.0,
+          "normalized": 0.9047619047619048,
+          "weight": 0.45,
+          "contribution": 0.40714285714285714
+        },
+        {
+          "criterion": "transfers",
+          "raw": 3,
+          "normalized": 0.25,
+          "weight": 0.1,
+          "contribution": 0.025
+        },
+        {
+          "criterion": "walk",
+          "raw": 0,
+          "normalized": 1.0,
+          "weight": 0.1,
+          "contribution": 0.1
+        },
+        {
+          "criterion": "price",
+          "raw": 12.5,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.30643980667791293,
+          "normalized": 0.30643980667791293,
+          "weight": 0.05,
+          "contribution": 0.015321990333895648
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.956032247438536,
+          "normalized": 0.956032247438536,
+          "weight": 0.1,
+          "contribution": 0.0956032247438536
+        },
+        {
+          "criterion": "carbon",
+          "raw": 487.45646140970234,
+          "normalized": 0.5076042081420311,
+          "weight": 0.05,
+          "contribution": 0.025380210407101558
+        },
+        {
+          "criterion": "freshness",
+          "raw": 117780.0,
+          "normalized": 0.004284387070968585,
+          "weight": 0.05,
+          "contribution": 0.00021421935354842925
+        }
       ],
-      "warnings": [],
-      "notes": ["换乘 2 次，比最快方案多约 4 分钟，但步行最少"],
-      "explain": "换乘多一次，但全程室内、步行仅 180 米；对不想在户外走的人更友好。",
-      "provenance": "real-derived"
+      "load_estimate": {
+        "expected_wait_s": 100.0,
+        "load_factor": 0,
+        "users_on_route": 0,
+        "capacity_per_hour": 42500.0,
+        "board_refusal_prob": 0
+      },
+      "warnings": [
+        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+        "ERL 数据较旧",
+        "ERL 受事件影响，运力系数 0.9",
+        "TML 数据较旧",
+        "KTL 数据较旧",
+        "TWL 数据较旧",
+        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+        "负载来自显式模拟场景，不代表真实客流",
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+      ],
+      "notes": [
+        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+      ],
+      "explain": "ERL + TML + KTL + TWL：约 26–30 分钟，换乘 3 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "evidence": [
+        {
+          "source": "ERL",
+          "freshness_s": 116400.0
+        },
+        {
+          "source": "ERL",
+          "freshness_s": 116670.0
+        },
+        {
+          "source": "ERL",
+          "freshness_s": 116835.0
+        },
+        {
+          "source": "TML",
+          "freshness_s": 117060.0
+        },
+        {
+          "source": "KTL",
+          "freshness_s": 117240.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117480.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117630.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117780.0
+        },
+        {
+          "event_id": "evt_seed_003",
+          "used": true
+        },
+        {
+          "source": "route_model_v1",
+          "freshness_s": 0
+        },
+        {
+          "source": "c_route_zero_demand_fixture",
+          "freshness_s": 0
+        },
+        {
+          "source": "contracts/seed/network.seed.json",
+          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "freshness_s": 117780.0
+        },
+        {
+          "source": "contracts/seed/event.seed.json",
+          "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
+          "freshness_s": 117780.0
+        }
+      ],
+      "provenance": "simulated"
     },
     {
-      "route_id": "r_seed_003",
-      "label": "屯馬綫 → 鑽石山 → 觀塘綫 → 油麻地 → 荃灣綫 → 金鐘（全电梯路径）",
+      "route_id": "r_8d0ba92684b1d1e2",
+      "label": "TML + KTL + TWL",
       "legs": [
-        {"mode":"MTR","line":"TML","from":"TAW","to":"DIH","headway_s":180,"travel_s":420,"walk_m":0,"fare_hkd":0,"accessible":true,"provenance":"real-derived"},
-        {"mode":"MTR","line":"KTL","from":"DIH","to":"YMT","headway_s":120,"travel_s":990,"walk_m":80,"fare_hkd":0,"accessible":true,"provenance":"real-derived"},
-        {"mode":"MTR","line":"TWL","from":"YMT","to":"ADM","headway_s":120,"travel_s":600,"walk_m":0,"fare_hkd":12.5,"accessible":true,"provenance":"real-derived"}
+        {
+          "mode": "MTR",
+          "from": "TAW",
+          "to": "HOM",
+          "depart": "2026-09-22T08:21:00+08:00",
+          "arrive": "2026-09-22T08:36:00+08:00",
+          "headway_s": 180.0,
+          "in_vehicle_s": 900.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "TML",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "HOM",
+          "to": "YMT",
+          "depart": "2026-09-22T08:36:00+08:00",
+          "arrive": "2026-09-22T08:39:30+08:00",
+          "headway_s": 120.0,
+          "in_vehicle_s": 210.0,
+          "walk_m": 0,
+          "fare_hkd": 0,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "KTL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "YMT",
+          "to": "ADM",
+          "depart": "2026-09-22T08:40:00+08:00",
+          "arrive": "2026-09-22T08:50:00+08:00",
+          "headway_s": 120.0,
+          "in_vehicle_s": 600.0,
+          "walk_m": 0,
+          "fare_hkd": 0.0,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "TWL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        }
       ],
-      "total": {"time_s":2520,"time_range_s":[2290,2760],"transfers":2,"walk_m":260,"fare_hkd":12.5,"co2_g":910,"reliability":0.90,"freshness_s":45},
-      "score": 0.79,
+      "total": {
+        "time_s": 1800.0,
+        "time_range_s": [
+          1687.0326941264793,
+          1912.9673058735207
+        ],
+        "transfers": 2,
+        "walk_m": 0,
+        "fare_hkd": 12.5,
+        "co2_g": 470.0858589846166,
+        "reliability": 0.9510283528741148,
+        "freshness_s": 117900.0
+      },
+      "score": 0.6560291958919676,
       "score_breakdown": [
-        {"criterion":"time","raw":2520,"normalized":0.52,"weight":0.25,"contribution":0.130},
-        {"criterion":"transfers","raw":2,"normalized":0.33,"weight":0.10,"contribution":0.033},
-        {"criterion":"walk","raw":260,"normalized":0.35,"weight":0.15,"contribution":0.053},
-        {"criterion":"reliability","raw":0.90,"normalized":0.90,"weight":0.25,"contribution":0.225},
-        {"criterion":"comfort","raw":0.75,"normalized":0.75,"weight":0.10,"contribution":0.075}
+        {
+          "criterion": "time",
+          "raw": 1800.0,
+          "normalized": 0.8571428571428572,
+          "weight": 0.45,
+          "contribution": 0.38571428571428573
+        },
+        {
+          "criterion": "transfers",
+          "raw": 2,
+          "normalized": 0.3333333333333333,
+          "weight": 0.1,
+          "contribution": 0.03333333333333333
+        },
+        {
+          "criterion": "walk",
+          "raw": 0,
+          "normalized": 1.0,
+          "weight": 0.1,
+          "contribution": 0.1
+        },
+        {
+          "criterion": "price",
+          "raw": 12.5,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.30816335568933645,
+          "normalized": 0.30816335568933645,
+          "weight": 0.05,
+          "contribution": 0.015408167784466823
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.9510283528741148,
+          "normalized": 0.9510283528741148,
+          "weight": 0.1,
+          "contribution": 0.09510283528741148
+        },
+        {
+          "criterion": "carbon",
+          "raw": 470.0858589846166,
+          "normalized": 0.5251508245340152,
+          "weight": 0.05,
+          "contribution": 0.02625754122670076
+        },
+        {
+          "criterion": "freshness",
+          "raw": 117900.0,
+          "normalized": 0.004260650915389564,
+          "weight": 0.05,
+          "contribution": 0.0002130325457694782
+        }
       ],
-      "warnings": ["行程较长；建议预留 40 分钟以上"],
-      "notes": ["不含小巴与阶梯换乘（满足轮椅用户的硬约束）"],
-      "explain": "为轮椅使用者筛出的首选：全程重铁 + 站内电梯换乘，步行 260 米，不使用任何小巴。",
-      "provenance": "real-derived"
+      "load_estimate": {
+        "expected_wait_s": 90.0,
+        "load_factor": 0,
+        "users_on_route": 0,
+        "capacity_per_hour": 42500.0,
+        "board_refusal_prob": 0
+      },
+      "warnings": [
+        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+        "TML 数据较旧",
+        "KTL 数据较旧",
+        "TWL 数据较旧",
+        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+        "负载来自显式模拟场景，不代表真实客流",
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
+        "此普通示例路径物理连通，但与其他方案高度重合/共用换乘点，未入普通严格多样性查询；不代表独立替代走廊"
+      ],
+      "notes": [
+        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+      ],
+      "explain": "TML + KTL + TWL：约 28–32 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "evidence": [
+        {
+          "source": "TML",
+          "freshness_s": 116460.0
+        },
+        {
+          "source": "TML",
+          "freshness_s": 116880.0
+        },
+        {
+          "source": "KTL",
+          "freshness_s": 117360.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117600.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117750.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117900.0
+        },
+        {
+          "event_id": "evt_seed_003",
+          "used": true
+        },
+        {
+          "source": "route_model_v1",
+          "freshness_s": 0
+        },
+        {
+          "source": "c_route_zero_demand_fixture",
+          "freshness_s": 0
+        },
+        {
+          "source": "contracts/seed/network.seed.json",
+          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "freshness_s": 117900.0
+        },
+        {
+          "source": "contracts/seed/event.seed.json",
+          "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
+          "freshness_s": 117900.0
+        }
+      ],
+      "provenance": "simulated"
     },
     {
-      "route_id": "r_seed_004",
-      "label": "東鐵綫（擁擠）→ 九龍塘 → 觀塘綫 → 油麻地 → 荃灣綫 → 金鐘",
+      "route_id": "r_a3da1ce3aa06f995",
+      "label": "ERL + TML + 步行 + TWL",
       "legs": [
-        {"mode":"MTR","line":"ERL","from":"TAW","to":"KOT","headway_s":240,"travel_s":330,"walk_m":0,"fare_hkd":0,"accessible":true,"provenance":"real-derived","note":"该段运力下降至 90%，车厢拥挤"},
-        {"mode":"MTR","line":"KTL","from":"KOT","to":"YMT","headway_s":120,"travel_s":780,"walk_m":60,"fare_hkd":0,"accessible":true,"provenance":"real-derived"},
-        {"mode":"MTR","line":"TWL","from":"YMT","to":"ADM","headway_s":120,"travel_s":600,"walk_m":0,"fare_hkd":12.5,"accessible":true,"provenance":"real-derived"}
+        {
+          "mode": "MTR",
+          "from": "TAW",
+          "to": "HUH",
+          "depart": "2026-09-22T08:20:00+08:00",
+          "arrive": "2026-09-22T08:30:45+08:00",
+          "headway_s": 200.0,
+          "in_vehicle_s": 645.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "ERL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "HUH",
+          "to": "ETS",
+          "depart": "2026-09-22T08:33:00+08:00",
+          "arrive": "2026-09-22T08:37:00+08:00",
+          "headway_s": 180.0,
+          "in_vehicle_s": 240.0,
+          "walk_m": 0,
+          "fare_hkd": 0,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "TML",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "ETS",
+          "to": "TST",
+          "depart": "2026-09-22T08:37:00+08:00",
+          "arrive": "2026-09-22T08:42:00+08:00",
+          "in_vehicle_s": 300.0,
+          "walk_m": 420,
+          "fare_hkd": 0.0,
+          "accessible": true,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "TST",
+          "to": "ADM",
+          "depart": "2026-09-22T08:43:00+08:00",
+          "arrive": "2026-09-22T08:48:00+08:00",
+          "headway_s": 120.0,
+          "in_vehicle_s": 300.0,
+          "walk_m": 0,
+          "fare_hkd": 0,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "TWL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        }
       ],
-      "total": {"time_s":2070,"time_range_s":[1790,2450],"transfers":2,"walk_m":180,"fare_hkd":12.5,"co2_g":860,"reliability":0.74,"freshness_s":45},
-      "score": 0.66,
+      "total": {
+        "time_s": 1680.0,
+        "time_range_s": [
+          1583.82225527202,
+          1776.17774472798
+        ],
+        "transfers": 2,
+        "walk_m": 420,
+        "fare_hkd": 12.5,
+        "co2_g": 395.42328086188735,
+        "reliability": 0.9553285805655818,
+        "freshness_s": 117780.0
+      },
+      "score": 0.6492465982885218,
       "score_breakdown": [
-        {"criterion":"time","raw":2070,"normalized":0.68,"weight":0.45,"contribution":0.306},
-        {"criterion":"transfers","raw":2,"normalized":0.33,"weight":0.10,"contribution":0.033},
-        {"criterion":"reliability","raw":0.74,"normalized":0.74,"weight":0.35,"contribution":0.259}
+        {
+          "criterion": "time",
+          "raw": 1680.0,
+          "normalized": 0.9047619047619048,
+          "weight": 0.45,
+          "contribution": 0.40714285714285714
+        },
+        {
+          "criterion": "transfers",
+          "raw": 2,
+          "normalized": 0.3333333333333333,
+          "weight": 0.1,
+          "contribution": 0.03333333333333333
+        },
+        {
+          "criterion": "walk",
+          "raw": 420,
+          "normalized": 0.6074766355140186,
+          "weight": 0.1,
+          "contribution": 0.06074766355140187
+        },
+        {
+          "criterion": "price",
+          "raw": 12.5,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.444943388545546,
+          "normalized": 0.444943388545546,
+          "weight": 0.05,
+          "contribution": 0.0222471694272773
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.9553285805655818,
+          "normalized": 0.9553285805655818,
+          "weight": 0.1,
+          "contribution": 0.09553285805655819
+        },
+        {
+          "criterion": "carbon",
+          "raw": 395.42328086188735,
+          "normalized": 0.6005699484709104,
+          "weight": 0.05,
+          "contribution": 0.03002849742354552
+        },
+        {
+          "criterion": "freshness",
+          "raw": 117780.0,
+          "normalized": 0.004284387070968585,
+          "weight": 0.05,
+          "contribution": 0.00021421935354842925
+        }
       ],
-      "warnings": ["该方案仍使用东铁线，但只乘搭未受影响的 大围→九龙塘 段（当前较拥挤，可能需要等 1–2 班）"],
-      "notes": ["时间接近最快方案，但可靠度较低"],
-      "explain": "只用了东铁线仍在运行的一小段（大围→九龙塘），避开过海段；车厢拥挤，可靠度打折。",
-      "provenance": "real-derived"
+      "load_estimate": {
+        "expected_wait_s": 100.0,
+        "load_factor": 0,
+        "users_on_route": 0,
+        "capacity_per_hour": 42500.0,
+        "board_refusal_prob": 0
+      },
+      "warnings": [
+        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+        "ERL 数据较旧",
+        "ERL 受事件影响，运力系数 0.9",
+        "TML 数据较旧",
+        "步行通道 数据较旧",
+        "站内步行通道，时长与电梯可用性待核实（关键：轮椅方案依赖它）",
+        "TWL 数据较旧",
+        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+        "负载来自显式模拟场景，不代表真实客流",
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+      ],
+      "notes": [
+        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+      ],
+      "explain": "ERL + TML + 步行 + TWL：约 26–30 分钟，换乘 2 次，步行 420 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "evidence": [
+        {
+          "source": "ERL",
+          "freshness_s": 116400.0
+        },
+        {
+          "source": "ERL",
+          "freshness_s": 116670.0
+        },
+        {
+          "source": "ERL",
+          "freshness_s": 116835.0
+        },
+        {
+          "source": "TML",
+          "freshness_s": 117180.0
+        },
+        {
+          "source": "WALK_0:ETS>TST",
+          "freshness_s": 117420.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117780.0
+        },
+        {
+          "event_id": "evt_seed_003",
+          "used": true
+        },
+        {
+          "source": "route_model_v1",
+          "freshness_s": 0
+        },
+        {
+          "source": "c_route_zero_demand_fixture",
+          "freshness_s": 0
+        },
+        {
+          "source": "contracts/seed/network.seed.json",
+          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "freshness_s": 117780.0
+        },
+        {
+          "source": "contracts/seed/event.seed.json",
+          "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
+          "freshness_s": 117780.0
+        }
+      ],
+      "provenance": "simulated"
     },
     {
-      "route_id": "r_seed_005",
-      "label": "過海巴士 182 → 金鐘（東）",
+      "route_id": "r_5b0329d9b10b809c",
+      "label": "TML + KTL + TWL",
       "legs": [
-        {"mode":"BUS","line":"182","from":"BS_TAW","to":"BS_ADM_E","headway_s":900,"travel_s":2640,"walk_m":0,"fare_hkd":20.8,"accessible":true,"provenance":"real-derived"}
+        {
+          "mode": "MTR",
+          "from": "TAW",
+          "to": "DIH",
+          "depart": "2026-09-22T08:21:00+08:00",
+          "arrive": "2026-09-22T08:28:00+08:00",
+          "headway_s": 180.0,
+          "in_vehicle_s": 420.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "TML",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "DIH",
+          "to": "YMT",
+          "depart": "2026-09-22T08:28:00+08:00",
+          "arrive": "2026-09-22T08:42:00+08:00",
+          "headway_s": 120.0,
+          "in_vehicle_s": 840.0,
+          "walk_m": 0,
+          "fare_hkd": 0.0,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "KTL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "YMT",
+          "to": "ADM",
+          "depart": "2026-09-22T08:42:00+08:00",
+          "arrive": "2026-09-22T08:52:00+08:00",
+          "headway_s": 120.0,
+          "in_vehicle_s": 600.0,
+          "walk_m": 0,
+          "fare_hkd": 0.0,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "TWL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        }
       ],
-      "total": {"time_s":3180,"time_range_s":[2540,4130],"transfers":0,"walk_m":150,"fare_hkd":20.8,"co2_g":1650,"reliability":0.55,"freshness_s":120},
-      "score": 0.42,
+      "total": {
+        "time_s": 1920.0,
+        "time_range_s": [
+          1805.7420731179145,
+          2034.2579268820855
+        ],
+        "transfers": 2,
+        "walk_m": 0,
+        "fare_hkd": 12.5,
+        "co2_g": 484.5578101793136,
+        "reliability": 0.9535645609474832,
+        "freshness_s": 118020.0
+      },
+      "score": 0.6342336023212333,
       "score_breakdown": [
-        {"criterion":"time","raw":3180,"normalized":0.19,"weight":0.35,"contribution":0.067},
-        {"criterion":"transfers","raw":0,"normalized":1.00,"weight":0.15,"contribution":0.150},
-        {"criterion":"reliability","raw":0.55,"normalized":0.55,"weight":0.25,"contribution":0.138},
-        {"criterion":"price","raw":20.8,"normalized":0.20,"weight":0.10,"contribution":0.020}
+        {
+          "criterion": "time",
+          "raw": 1920.0,
+          "normalized": 0.8095238095238095,
+          "weight": 0.45,
+          "contribution": 0.3642857142857143
+        },
+        {
+          "criterion": "transfers",
+          "raw": 2,
+          "normalized": 0.3333333333333333,
+          "weight": 0.1,
+          "contribution": 0.03333333333333333
+        },
+        {
+          "criterion": "walk",
+          "raw": 0,
+          "normalized": 1.0,
+          "weight": 0.1,
+          "contribution": 0.1
+        },
+        {
+          "criterion": "price",
+          "raw": 12.5,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.3103926948734131,
+          "normalized": 0.3103926948734131,
+          "weight": 0.05,
+          "contribution": 0.015519634743670655
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.9535645609474832,
+          "normalized": 0.9535645609474832,
+          "weight": 0.1,
+          "contribution": 0.09535645609474833
+        },
+        {
+          "criterion": "carbon",
+          "raw": 484.5578101793136,
+          "normalized": 0.5105322310136116,
+          "weight": 0.05,
+          "contribution": 0.02552661155068058
+        },
+        {
+          "criterion": "freshness",
+          "raw": 118020.0,
+          "normalized": 0.00423704626172023,
+          "weight": 0.05,
+          "contribution": 0.00021185231308601152
+        }
       ],
-      "warnings": ["唯一全日直达金钟的过海巴士，但经两个堵点，行程约 50–70 分钟", "该线平时载客率已高，故障期间可能需等 2–3 班"],
-      "notes": ["不用换乘，适合不想换乘且时间宽裕的乘客"],
-      "explain": "零换乘的过海巴士，但路程最长、路况不可控；系统把它作为「不想换乘」偏好的候选。",
-      "provenance": "real-derived"
+      "load_estimate": {
+        "expected_wait_s": 90.0,
+        "load_factor": 0,
+        "users_on_route": 0,
+        "capacity_per_hour": 42500.0,
+        "board_refusal_prob": 0
+      },
+      "warnings": [
+        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+        "TML 数据较旧",
+        "KTL 数据较旧",
+        "TWL 数据较旧",
+        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+        "负载来自显式模拟场景，不代表真实客流",
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
+        "此普通示例路径物理连通，但与其他方案高度重合/共用换乘点，未入普通严格多样性查询；不代表独立替代走廊"
+      ],
+      "notes": [
+        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+      ],
+      "explain": "TML + KTL + TWL：约 30–34 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "evidence": [
+        {
+          "source": "TML",
+          "freshness_s": 116460.0
+        },
+        {
+          "source": "KTL",
+          "freshness_s": 116880.0
+        },
+        {
+          "source": "KTL",
+          "freshness_s": 117180.0
+        },
+        {
+          "source": "KTL",
+          "freshness_s": 117420.0
+        },
+        {
+          "source": "KTL",
+          "freshness_s": 117570.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117720.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 117870.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 118020.0
+        },
+        {
+          "event_id": "evt_seed_003",
+          "used": true
+        },
+        {
+          "source": "route_model_v1",
+          "freshness_s": 0
+        },
+        {
+          "source": "c_route_zero_demand_fixture",
+          "freshness_s": 0
+        },
+        {
+          "source": "contracts/seed/network.seed.json",
+          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "freshness_s": 118020.0
+        },
+        {
+          "source": "contracts/seed/event.seed.json",
+          "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
+          "freshness_s": 118020.0
+        }
+      ],
+      "provenance": "simulated"
     },
     {
-      "route_id": "r_seed_006",
-      "label": "過海巴士 982X → 金鐘（東）（僅平日高峰，$6 分段）",
+      "route_id": "r_b59174a6ed64d8cf",
+      "label": "TML + 步行 + TWL",
       "legs": [
-        {"mode":"BUS","line":"982X","from":"BS_TAW","to":"BS_ADM_E","headway_s":1800,"travel_s":2400,"walk_m":0,"fare_hkd":6.0,"accessible":true,"provenance":"real-derived"}
+        {
+          "mode": "MTR",
+          "from": "TAW",
+          "to": "ETS",
+          "depart": "2026-09-22T08:21:00+08:00",
+          "arrive": "2026-09-22T08:43:00+08:00",
+          "headway_s": 180.0,
+          "in_vehicle_s": 1320.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "TML",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "ETS",
+          "to": "TST",
+          "depart": "2026-09-22T08:43:00+08:00",
+          "arrive": "2026-09-22T08:48:00+08:00",
+          "in_vehicle_s": 300.0,
+          "walk_m": 420,
+          "fare_hkd": 0.0,
+          "accessible": true,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "TST",
+          "to": "ADM",
+          "depart": "2026-09-22T08:49:00+08:00",
+          "arrive": "2026-09-22T08:54:00+08:00",
+          "headway_s": 120.0,
+          "in_vehicle_s": 300.0,
+          "walk_m": 0,
+          "fare_hkd": 0,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "TWL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        }
       ],
-      "total": {"time_s":2940,"time_range_s":[2400,3760],"transfers":0,"walk_m":150,"fare_hkd":6.0,"co2_g":1580,"reliability":0.48,"freshness_s":120},
-      "score": 0.45,
+      "total": {
+        "time_s": 2040.0,
+        "time_range_s": [
+          1889.7120462960356,
+          2190.2879537039644
+        ],
+        "transfers": 1,
+        "walk_m": 420,
+        "fare_hkd": 12.5,
+        "co2_g": 429.5423181381969,
+        "reliability": 0.9425144820403738,
+        "freshness_s": 118140.0
+      },
+      "score": 0.5962547986742324,
       "score_breakdown": [
-        {"criterion":"time","raw":2940,"normalized":0.28,"weight":0.20,"contribution":0.056},
-        {"criterion":"price","raw":6.0,"normalized":0.85,"weight":0.35,"contribution":0.298},
-        {"criterion":"reliability","raw":0.48,"normalized":0.48,"weight":0.25,"contribution":0.120},
-        {"criterion":"transfers","raw":0,"normalized":1.00,"weight":0.10,"contribution":0.100}
+        {
+          "criterion": "time",
+          "raw": 2040.0,
+          "normalized": 0.7619047619047619,
+          "weight": 0.45,
+          "contribution": 0.34285714285714286
+        },
+        {
+          "criterion": "transfers",
+          "raw": 1,
+          "normalized": 0.5,
+          "weight": 0.1,
+          "contribution": 0.05
+        },
+        {
+          "criterion": "walk",
+          "raw": 420,
+          "normalized": 0.6074766355140186,
+          "weight": 0.1,
+          "contribution": 0.06074766355140187
+        },
+        {
+          "criterion": "price",
+          "raw": 12.5,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.3976521212508342,
+          "normalized": 0.3976521212508342,
+          "weight": 0.05,
+          "contribution": 0.019882606062541712
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.9425144820403738,
+          "normalized": 0.9425144820403738,
+          "weight": 0.1,
+          "contribution": 0.09425144820403739
+        },
+        {
+          "criterion": "carbon",
+          "raw": 429.5423181381969,
+          "normalized": 0.5661051876007499,
+          "weight": 0.05,
+          "contribution": 0.028305259380037497
+        },
+        {
+          "criterion": "freshness",
+          "raw": 118140.0,
+          "normalized": 0.004213572381420016,
+          "weight": 0.05,
+          "contribution": 0.0002106786190710008
+        }
       ],
-      "warnings": ["只开平日早晚高峰，且载客率已 >90%，很可能上不了车", "非高峰时段与假日无服务"],
-      "notes": ["最便宜（大围站分段 $6）"],
-      "explain": "价格最低的学生友好选项，但运力极其有限——系统如实标出「可能上不了车」。",
-      "provenance": "real-derived"
+      "load_estimate": {
+        "expected_wait_s": 90.0,
+        "load_factor": 0,
+        "users_on_route": 0,
+        "capacity_per_hour": 42500.0,
+        "board_refusal_prob": 0
+      },
+      "warnings": [
+        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+        "TML 数据较旧",
+        "步行通道 数据较旧",
+        "站内步行通道，时长与电梯可用性待核实（关键：轮椅方案依赖它）",
+        "TWL 数据较旧",
+        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+        "负载来自显式模拟场景，不代表真实客流",
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+      ],
+      "notes": [
+        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+      ],
+      "explain": "TML + 步行 + TWL：约 31–37 分钟，换乘 1 次，步行 420 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "evidence": [
+        {
+          "source": "TML",
+          "freshness_s": 116460.0
+        },
+        {
+          "source": "TML",
+          "freshness_s": 116880.0
+        },
+        {
+          "source": "TML",
+          "freshness_s": 117360.0
+        },
+        {
+          "source": "TML",
+          "freshness_s": 117540.0
+        },
+        {
+          "source": "WALK_0:ETS>TST",
+          "freshness_s": 117780.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 118140.0
+        },
+        {
+          "event_id": "evt_seed_003",
+          "used": true
+        },
+        {
+          "source": "route_model_v1",
+          "freshness_s": 0
+        },
+        {
+          "source": "c_route_zero_demand_fixture",
+          "freshness_s": 0
+        },
+        {
+          "source": "contracts/seed/network.seed.json",
+          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "freshness_s": 118140.0
+        },
+        {
+          "source": "contracts/seed/event.seed.json",
+          "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
+          "freshness_s": 118140.0
+        }
+      ],
+      "provenance": "simulated"
     },
     {
-      "route_id": "r_seed_007",
-      "label": "巴士 81C → 尖沙咀 → 天星小輪 → 中環 → 港島綫 → 金鐘",
+      "route_id": "r_a3bb2d93a795746f",
+      "label": "ERL + 步行 + BUS_182 + 步行",
       "legs": [
-        {"mode":"BUS","line":"81C","from":"BS_TAW","to":"TST","headway_s":900,"travel_s":2100,"walk_m":0,"fare_hkd":16.0,"accessible":true,"provenance":"real-derived"},
-        {"mode":"WALK","from":"TST","to":"PIER_TST","travel_s":420,"walk_m":350,"accessible":"partial","provenance":"real-derived"},
-        {"mode":"FERRY","line":"TST_CEN","from":"PIER_TST","to":"PIER_CEN","headway_s":420,"travel_s":480,"walk_m":0,"fare_hkd":5.0,"accessible":"partial","provenance":"real"},
-        {"mode":"MTR","line":"ISL","from":"CEN","to":"ADM","headway_s":120,"travel_s":120,"walk_m":0,"fare_hkd":5.5,"accessible":true,"provenance":"real-derived"}
+        {
+          "mode": "MTR",
+          "from": "TAW",
+          "to": "HUH",
+          "depart": "2026-09-22T08:20:00+08:00",
+          "arrive": "2026-09-22T08:30:45+08:00",
+          "headway_s": 200.0,
+          "in_vehicle_s": 645.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "ERL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "HUH",
+          "to": "BS_HUH_TUNNEL",
+          "depart": "2026-09-22T08:30:45+08:00",
+          "arrive": "2026-09-22T08:33:43.571429+08:00",
+          "in_vehicle_s": 178.571429,
+          "walk_m": 250,
+          "fare_hkd": 0.0,
+          "accessible": false,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "BUS",
+          "from": "BS_HUH_TUNNEL",
+          "to": "BS_ADM_E",
+          "depart": "2026-09-22T08:40:00+08:00",
+          "arrive": "2026-09-22T08:59:00+08:00",
+          "headway_s": 900.0,
+          "in_vehicle_s": 1140.0,
+          "walk_m": 0,
+          "fare_hkd": 20.8,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "BUS_182",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "BS_ADM_E",
+          "to": "ADM",
+          "depart": "2026-09-22T08:59:00+08:00",
+          "arrive": "2026-09-22T09:01:22.857143+08:00",
+          "in_vehicle_s": 142.857143,
+          "walk_m": 200,
+          "fare_hkd": 0.0,
+          "accessible": false,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        }
       ],
-      "total": {"time_s":3960,"time_range_s":[3300,4980],"transfers":3,"walk_m":900,"fare_hkd":26.5,"co2_g":980,"reliability":0.42,"freshness_s":180},
-      "score": 0.31,
+      "total": {
+        "time_s": 2482.857143,
+        "time_range_s": [
+          1965.3898215818704,
+          3000.32446441813
+        ],
+        "transfers": 1,
+        "walk_m": 450,
+        "fare_hkd": 33.3,
+        "co2_g": 558.7913669970235,
+        "reliability": 0.8373718799090476,
+        "freshness_s": 118740.0
+      },
+      "score": 0.5022674807234957,
       "score_breakdown": [
-        {"criterion":"time","raw":3960,"normalized":0.0,"weight":0.30,"contribution":0.0},
-        {"criterion":"transfers","raw":3,"normalized":0.25,"weight":0.15,"contribution":0.038},
-        {"criterion":"walk","raw":900,"normalized":0.0,"weight":0.15,"contribution":0.0},
-        {"criterion":"reliability","raw":0.42,"normalized":0.42,"weight":0.25,"contribution":0.105}
+        {
+          "criterion": "time",
+          "raw": 2482.857143,
+          "normalized": 0.5861678003968254,
+          "weight": 0.45,
+          "contribution": 0.2637755101785714
+        },
+        {
+          "criterion": "transfers",
+          "raw": 1,
+          "normalized": 0.5,
+          "weight": 0.1,
+          "contribution": 0.05
+        },
+        {
+          "criterion": "walk",
+          "raw": 450,
+          "normalized": 0.5794392523364487,
+          "weight": 0.1,
+          "contribution": 0.05794392523364487
+        },
+        {
+          "criterion": "price",
+          "raw": 33.3,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.4965725314480277,
+          "normalized": 0.4965725314480277,
+          "weight": 0.05,
+          "contribution": 0.024828626572401386
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.8373718799090476,
+          "normalized": 0.8373718799090476,
+          "weight": 0.1,
+          "contribution": 0.08373718799090477
+        },
+        {
+          "criterion": "carbon",
+          "raw": 558.7913669970235,
+          "normalized": 0.4355464755966413,
+          "weight": 0.05,
+          "contribution": 0.021777323779832065
+        },
+        {
+          "criterion": "freshness",
+          "raw": 118740.0,
+          "normalized": 0.004098139362822902,
+          "weight": 0.05,
+          "contribution": 0.00020490696814114509
+        }
       ],
-      "warnings": ["步行 900 米、换乘 3 次；渡轮受大风影响会停航", "轮椅使用者：天星小轮下层每班仅限 4 名轮椅乘客"],
-      "notes": ["碳排放最低的非轨道选项之一", "不含小巴"],
-      "explain": "混合模式备选：巴士 + 渡轮 + 地铁。慢且受天气影响，但提供了一条完全绕开隧道的通路。",
-      "provenance": "real-derived"
+      "load_estimate": {
+        "expected_wait_s": 450.0,
+        "load_factor": 0,
+        "users_on_route": 0,
+        "capacity_per_hour": 465.8,
+        "board_refusal_prob": 0
+      },
+      "warnings": [
+        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+        "ERL 数据较旧",
+        "ERL 受事件影响，运力系数 0.9",
+        "步行通道 数据较旧",
+        "BUS_182 数据较旧",
+        "唯全日直达金钟/中环的沙田过海线；班距与票价为推算，待核实",
+        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+        "负载来自显式模拟场景，不代表真实客流",
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+      ],
+      "notes": [
+        "票价超过配置基线 1.3 倍",
+        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+      ],
+      "explain": "ERL + 步行 + BUS_182 + 步行：约 33–50 分钟，换乘 1 次，步行 450 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "evidence": [
+        {
+          "source": "ERL",
+          "freshness_s": 116400.0
+        },
+        {
+          "source": "ERL",
+          "freshness_s": 116670.0
+        },
+        {
+          "source": "ERL",
+          "freshness_s": 116835.0
+        },
+        {
+          "source": "WALK_3:HUH>BS_HUH_TUNNEL",
+          "freshness_s": 117045.0
+        },
+        {
+          "source": "BUS_182",
+          "freshness_s": 117600.0
+        },
+        {
+          "source": "WALK_4:BS_ADM_E>ADM",
+          "freshness_s": 118740.0
+        },
+        {
+          "event_id": "evt_seed_003",
+          "used": true
+        },
+        {
+          "source": "route_model_v1",
+          "freshness_s": 0
+        },
+        {
+          "source": "c_route_zero_demand_fixture",
+          "freshness_s": 0
+        },
+        {
+          "source": "contracts/seed/network.seed.json",
+          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "freshness_s": 118740.0
+        },
+        {
+          "source": "contracts/seed/event.seed.json",
+          "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
+          "freshness_s": 118740.0
+        }
+      ],
+      "provenance": "simulated"
     },
     {
-      "route_id": "r_seed_008",
-      "label": "綠色小巴 481B → 荃灣 → （轉乘未建模，仅作极端备援）",
+      "route_id": "r_8d4bf8596c86646e",
+      "label": "步行 + BUS_182 + 步行",
       "legs": [
-        {"mode":"MINIBUS","line":"481B","from":"BS_TAW","to":"BS_TW","headway_s":1200,"travel_s":1500,"walk_m":0,"fare_hkd":12.3,"accessible":false,"provenance":"real"}
+        {
+          "mode": "WALK",
+          "from": "TAW",
+          "to": "BS_TAW",
+          "depart": "2026-09-22T08:20:00+08:00",
+          "arrive": "2026-09-22T08:21:47.142857+08:00",
+          "in_vehicle_s": 107.142857,
+          "walk_m": 150,
+          "fare_hkd": 0.0,
+          "accessible": false,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "BUS",
+          "from": "BS_TAW",
+          "to": "BS_ADM_E",
+          "depart": "2026-09-22T08:30:00+08:00",
+          "arrive": "2026-09-22T09:14:00+08:00",
+          "headway_s": 900.0,
+          "in_vehicle_s": 2640.0,
+          "walk_m": 0,
+          "fare_hkd": 20.8,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "BUS_182",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "BS_ADM_E",
+          "to": "ADM",
+          "depart": "2026-09-22T09:14:00+08:00",
+          "arrive": "2026-09-22T09:16:22.857143+08:00",
+          "in_vehicle_s": 142.857143,
+          "walk_m": 200,
+          "fare_hkd": 0.0,
+          "accessible": false,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        }
       ],
-      "total": {"time_s":3900,"time_range_s":[3000,5400],"transfers":3,"walk_m":600,"fare_hkd":12.3,"co2_g":760,"reliability":0.30,"freshness_s":300},
-      "score": 0.12,
+      "total": {
+        "time_s": 3382.857143,
+        "time_range_s": [
+          2198.2074936809254,
+          4567.5067923190745
+        ],
+        "transfers": 0,
+        "walk_m": 350,
+        "fare_hkd": 20.8,
+        "co2_g": 989.9687801359372,
+        "reliability": 0.7267433642141494,
+        "freshness_s": 119640.0
+      },
+      "score": 0.36560724485489904,
       "score_breakdown": [
-        {"criterion":"time","raw":3900,"normalized":0.02,"weight":0.30,"contribution":0.006},
-        {"criterion":"reliability","raw":0.30,"normalized":0.30,"weight":0.30,"contribution":0.090},
-        {"criterion":"price","raw":12.3,"normalized":0.45,"weight":0.20,"contribution":0.090}
+        {
+          "criterion": "time",
+          "raw": 3382.857143,
+          "normalized": 0.22902494325396816,
+          "weight": 0.45,
+          "contribution": 0.10306122446428567
+        },
+        {
+          "criterion": "transfers",
+          "raw": 0,
+          "normalized": 1.0,
+          "weight": 0.1,
+          "contribution": 0.1
+        },
+        {
+          "criterion": "walk",
+          "raw": 350,
+          "normalized": 0.6728971962616823,
+          "weight": 0.1,
+          "contribution": 0.06728971962616824
+        },
+        {
+          "criterion": "price",
+          "raw": 20.8,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.44770839479001967,
+          "normalized": 0.44770839479001967,
+          "weight": 0.05,
+          "contribution": 0.022385419739500985
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.7267433642141494,
+          "normalized": 0.7267433642141494,
+          "weight": 0.1,
+          "contribution": 0.07267433642141495
+        },
+        {
+          "criterion": "carbon",
+          "raw": 989.9687801359372,
+          "normalized": 0.0,
+          "weight": 0.05,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "freshness",
+          "raw": 119640.0,
+          "normalized": 0.003930892070583687,
+          "weight": 0.05,
+          "contribution": 0.00019654460352918439
+        }
       ],
-      "warnings": ["小巴 19 座、无低地台，轮椅使用者**不可使用**", "绕行路线，仅宜极端备援"],
-      "notes": ["不符合轮椅与低步行偏好（已硬过滤）"],
-      "explain": "极端情况下的备援路线；系统对轮椅用户自动排除小巴。",
-      "provenance": "real"
+      "load_estimate": {
+        "expected_wait_s": 450.0,
+        "load_factor": 0,
+        "users_on_route": 0,
+        "capacity_per_hour": 465.8,
+        "board_refusal_prob": 0
+      },
+      "warnings": [
+        "步行通道 数据较旧",
+        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+        "BUS_182 数据较旧",
+        "唯全日直达金钟/中环的沙田过海线；班距与票价为推算，待核实",
+        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+        "负载来自显式模拟场景，不代表真实客流",
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+      ],
+      "notes": [
+        "票价超过配置基线 1.3 倍",
+        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+      ],
+      "explain": "步行 + BUS_182 + 步行：约 37–76 分钟，换乘 0 次，步行 350 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "evidence": [
+        {
+          "source": "WALK_1:TAW>BS_TAW",
+          "freshness_s": 116400.0
+        },
+        {
+          "source": "BUS_182",
+          "freshness_s": 117000.0
+        },
+        {
+          "source": "BUS_182",
+          "freshness_s": 118500.0
+        },
+        {
+          "source": "WALK_4:BS_ADM_E>ADM",
+          "freshness_s": 119640.0
+        },
+        {
+          "event_id": "evt_seed_003",
+          "used": true
+        },
+        {
+          "source": "route_model_v1",
+          "freshness_s": 0
+        },
+        {
+          "source": "c_route_zero_demand_fixture",
+          "freshness_s": 0
+        },
+        {
+          "source": "contracts/seed/network.seed.json",
+          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "freshness_s": 119640.0
+        },
+        {
+          "source": "contracts/seed/event.seed.json",
+          "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
+          "freshness_s": 119640.0
+        }
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "route_id": "r_007c4e09879d19cc",
+      "label": "TML + 步行 + 步行 + FERRY_TST_CEN + 步行 + TWL",
+      "legs": [
+        {
+          "mode": "MTR",
+          "from": "TAW",
+          "to": "ETS",
+          "depart": "2026-09-22T08:21:00+08:00",
+          "arrive": "2026-09-22T08:43:00+08:00",
+          "headway_s": 180.0,
+          "in_vehicle_s": 1320.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "TML",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "ETS",
+          "to": "TST",
+          "depart": "2026-09-22T08:43:00+08:00",
+          "arrive": "2026-09-22T08:48:00+08:00",
+          "in_vehicle_s": 300.0,
+          "walk_m": 420,
+          "fare_hkd": 0.0,
+          "accessible": true,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "TST",
+          "to": "PIER_TST",
+          "depart": "2026-09-22T08:48:00+08:00",
+          "arrive": "2026-09-22T08:52:10+08:00",
+          "in_vehicle_s": 250.0,
+          "walk_m": 350,
+          "fare_hkd": 0.0,
+          "accessible": false,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "FERRY",
+          "from": "PIER_TST",
+          "to": "PIER_CEN",
+          "depart": "2026-09-22T08:54:00+08:00",
+          "arrive": "2026-09-22T09:02:00+08:00",
+          "headway_s": 360.0,
+          "in_vehicle_s": 480.0,
+          "walk_m": 0,
+          "fare_hkd": 6.5,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "FERRY_TST_CEN",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "PIER_CEN",
+          "to": "CEN",
+          "depart": "2026-09-22T09:02:00+08:00",
+          "arrive": "2026-09-22T09:05:34.285714+08:00",
+          "in_vehicle_s": 214.285714,
+          "walk_m": 300,
+          "fare_hkd": 0.0,
+          "accessible": false,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "CEN",
+          "to": "ADM",
+          "depart": "2026-09-22T09:08:00+08:00",
+          "arrive": "2026-09-22T09:10:00+08:00",
+          "headway_s": 240.0,
+          "in_vehicle_s": 120.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "TWL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        }
+      ],
+      "total": {
+        "time_s": 3000.0,
+        "time_range_s": [
+          2777.6300864081227,
+          3222.3699135918773
+        ],
+        "transfers": 2,
+        "walk_m": 1070,
+        "fare_hkd": 31.5,
+        "co2_g": 555.668976301476,
+        "reliability": 0.9421612074982437,
+        "freshness_s": 119280.0
+      },
+      "score": 0.34986000810954426,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 3000.0,
+          "normalized": 0.38095238095238093,
+          "weight": 0.45,
+          "contribution": 0.17142857142857143
+        },
+        {
+          "criterion": "transfers",
+          "raw": 2,
+          "normalized": 0.3333333333333333,
+          "weight": 0.1,
+          "contribution": 0.03333333333333333
+        },
+        {
+          "criterion": "walk",
+          "raw": 1070,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "price",
+          "raw": 31.5,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.5749421909597232,
+          "normalized": 0.5749421909597232,
+          "weight": 0.05,
+          "contribution": 0.028747109547986163
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.9421612074982437,
+          "normalized": 0.9421612074982437,
+          "weight": 0.1,
+          "contribution": 0.09421612074982438
+        },
+        {
+          "criterion": "carbon",
+          "raw": 555.668976301476,
+          "normalized": 0.4387005050551447,
+          "weight": 0.05,
+          "contribution": 0.021935025252757236
+        },
+        {
+          "criterion": "freshness",
+          "raw": 119280.0,
+          "normalized": 0.00399695594143465,
+          "weight": 0.05,
+          "contribution": 0.0001998477970717325
+        }
+      ],
+      "load_estimate": {
+        "expected_wait_s": 180.0,
+        "load_factor": 0,
+        "users_on_route": 0,
+        "capacity_per_hour": 2550.0,
+        "board_refusal_prob": 0
+      },
+      "warnings": [
+        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+        "TML 数据较旧",
+        "步行通道 数据较旧",
+        "站内步行通道，时长与电梯可用性待核实（关键：轮椅方案依赖它）",
+        "FERRY_TST_CEN 数据较旧",
+        "台风迫近停航（确切门槛待核实）；票价待核实是否为当前价",
+        "TWL 数据较旧",
+        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+        "较长步行：全程累计 1070 米，请预留时间",
+        "负载来自显式模拟场景，不代表真实客流",
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+      ],
+      "notes": [
+        "步行 1070 米，超过 500 米软偏好",
+        "票价超过配置基线 1.3 倍",
+        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+      ],
+      "explain": "TML + 步行 + 步行 + FERRY_TST_CEN + 步行 + TWL：约 46–54 分钟，换乘 2 次，步行 1070 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "evidence": [
+        {
+          "source": "TML",
+          "freshness_s": 116460.0
+        },
+        {
+          "source": "TML",
+          "freshness_s": 116880.0
+        },
+        {
+          "source": "TML",
+          "freshness_s": 117360.0
+        },
+        {
+          "source": "TML",
+          "freshness_s": 117540.0
+        },
+        {
+          "source": "WALK_0:ETS>TST",
+          "freshness_s": 117780.0
+        },
+        {
+          "source": "WALK_5:TST>PIER_TST",
+          "freshness_s": 118080.0
+        },
+        {
+          "source": "FERRY_TST_CEN",
+          "freshness_s": 118440.0
+        },
+        {
+          "source": "WALK_6:PIER_CEN>CEN",
+          "freshness_s": 118920.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 119280.0
+        },
+        {
+          "event_id": "evt_seed_003",
+          "used": true
+        },
+        {
+          "source": "route_model_v1",
+          "freshness_s": 0
+        },
+        {
+          "source": "c_route_zero_demand_fixture",
+          "freshness_s": 0
+        },
+        {
+          "source": "contracts/seed/network.seed.json",
+          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "freshness_s": 119280.0
+        },
+        {
+          "source": "contracts/seed/event.seed.json",
+          "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
+          "freshness_s": 119280.0
+        }
+      ],
+      "provenance": "simulated"
+    },
+    {
+      "route_id": "r_a6162cc3a32c489b",
+      "label": "步行 + BUS_81C + 步行 + FERRY_TST_CEN + 步行 + TWL",
+      "legs": [
+        {
+          "mode": "WALK",
+          "from": "TAW",
+          "to": "BS_TAW",
+          "depart": "2026-09-22T08:20:00+08:00",
+          "arrive": "2026-09-22T08:21:47.142857+08:00",
+          "in_vehicle_s": 107.142857,
+          "walk_m": 150,
+          "fare_hkd": 0.0,
+          "accessible": false,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "BUS",
+          "from": "BS_TAW",
+          "to": "TST",
+          "depart": "2026-09-22T08:30:00+08:00",
+          "arrive": "2026-09-22T09:05:00+08:00",
+          "headway_s": 900.0,
+          "in_vehicle_s": 2100.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": true,
+          "provenance": "simulated",
+          "line": "BUS_81C",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "TST",
+          "to": "PIER_TST",
+          "depart": "2026-09-22T09:05:00+08:00",
+          "arrive": "2026-09-22T09:09:10+08:00",
+          "in_vehicle_s": 250.0,
+          "walk_m": 350,
+          "fare_hkd": 0.0,
+          "accessible": false,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "FERRY",
+          "from": "PIER_TST",
+          "to": "PIER_CEN",
+          "depart": "2026-09-22T09:11:00+08:00",
+          "arrive": "2026-09-22T09:19:00+08:00",
+          "headway_s": 420.0,
+          "in_vehicle_s": 480.0,
+          "walk_m": 0,
+          "fare_hkd": 6.5,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "FERRY_TST_CEN",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "WALK",
+          "from": "PIER_CEN",
+          "to": "CEN",
+          "depart": "2026-09-22T09:19:00+08:00",
+          "arrive": "2026-09-22T09:22:34.285714+08:00",
+          "in_vehicle_s": 214.285714,
+          "walk_m": 300,
+          "fare_hkd": 0.0,
+          "accessible": false,
+          "provenance": "simulated",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "from",
+                "to",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        },
+        {
+          "mode": "MTR",
+          "from": "CEN",
+          "to": "ADM",
+          "depart": "2026-09-22T09:24:00+08:00",
+          "arrive": "2026-09-22T09:26:00+08:00",
+          "headway_s": 240.0,
+          "in_vehicle_s": 120.0,
+          "walk_m": 0,
+          "fare_hkd": 12.5,
+          "accessible": false,
+          "provenance": "simulated",
+          "line": "TWL",
+          "evidence": [
+            {
+              "source": "contracts/seed/network.seed.json",
+              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "fields": [
+                "mode",
+                "line",
+                "from",
+                "to",
+                "headway_s",
+                "in_vehicle_s",
+                "walk_m",
+                "accessible"
+              ],
+              "status": "simulated-engine-computation-not-official-verification"
+            },
+            {
+              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "fields": [
+                "fare_hkd"
+              ],
+              "status": "simulated-fare-policy"
+            }
+          ]
+        }
+      ],
+      "total": {
+        "time_s": 3960.0,
+        "time_range_s": [
+          3003.191934254535,
+          4916.808065745465
+        ],
+        "transfers": 2,
+        "walk_m": 800,
+        "fare_hkd": 31.5,
+        "co2_g": 955.7760054228138,
+        "reliability": 0.8114640876902408,
+        "freshness_s": 120240.0
+      },
+      "score": 0.17028511739204183,
+      "score_breakdown": [
+        {
+          "criterion": "time",
+          "raw": 3960.0,
+          "normalized": 0.0,
+          "weight": 0.45,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "transfers",
+          "raw": 2,
+          "normalized": 0.3333333333333333,
+          "weight": 0.1,
+          "contribution": 0.03333333333333333
+        },
+        {
+          "criterion": "walk",
+          "raw": 800,
+          "normalized": 0.25233644859813087,
+          "weight": 0.1,
+          "contribution": 0.02523364485981309
+        },
+        {
+          "criterion": "price",
+          "raw": 31.5,
+          "normalized": 0.0,
+          "weight": 0.1,
+          "contribution": 0.0
+        },
+        {
+          "criterion": "comfort",
+          "raw": 0.5730721598920592,
+          "normalized": 0.5730721598920592,
+          "weight": 0.05,
+          "contribution": 0.02865360799460296
+        },
+        {
+          "criterion": "reliability",
+          "raw": 0.8114640876902408,
+          "normalized": 0.8114640876902408,
+          "weight": 0.1,
+          "contribution": 0.08114640876902408
+        },
+        {
+          "criterion": "carbon",
+          "raw": 955.7760054228138,
+          "normalized": 0.03453924547845666,
+          "weight": 0.05,
+          "contribution": 0.001726962273922833
+        },
+        {
+          "criterion": "freshness",
+          "raw": 120240.0,
+          "normalized": 0.0038232032269108476,
+          "weight": 0.05,
+          "contribution": 0.0001911601613455424
+        }
+      ],
+      "load_estimate": {
+        "expected_wait_s": 450.0,
+        "load_factor": 0,
+        "users_on_route": 0,
+        "capacity_per_hour": 465.8,
+        "board_refusal_prob": 0
+      },
+      "warnings": [
+        "步行通道 数据较旧",
+        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+        "BUS_81C 数据较旧",
+        "不过海；用于接驳到尖沙咀再换乘",
+        "FERRY_TST_CEN 数据较旧",
+        "台风迫近停航（确切门槛待核实）；票价待核实是否为当前价",
+        "TWL 数据较旧",
+        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+        "较长步行：全程累计 800 米，请预留时间",
+        "负载来自显式模拟场景，不代表真实客流",
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+      ],
+      "notes": [
+        "步行 800 米，超过 500 米软偏好",
+        "票价超过配置基线 1.3 倍",
+        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+      ],
+      "explain": "步行 + BUS_81C + 步行 + FERRY_TST_CEN + 步行 + TWL：约 50–82 分钟，换乘 2 次，步行 800 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "evidence": [
+        {
+          "source": "WALK_1:TAW>BS_TAW",
+          "freshness_s": 116400.0
+        },
+        {
+          "source": "BUS_81C",
+          "freshness_s": 117000.0
+        },
+        {
+          "source": "WALK_5:TST>PIER_TST",
+          "freshness_s": 119100.0
+        },
+        {
+          "source": "FERRY_TST_CEN",
+          "freshness_s": 119460.0
+        },
+        {
+          "source": "WALK_6:PIER_CEN>CEN",
+          "freshness_s": 119940.0
+        },
+        {
+          "source": "TWL",
+          "freshness_s": 120240.0
+        },
+        {
+          "event_id": "evt_seed_003",
+          "used": true
+        },
+        {
+          "source": "route_model_v1",
+          "freshness_s": 0
+        },
+        {
+          "source": "c_route_zero_demand_fixture",
+          "freshness_s": 0
+        },
+        {
+          "source": "contracts/seed/network.seed.json",
+          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "freshness_s": 120240.0
+        },
+        {
+          "source": "contracts/seed/event.seed.json",
+          "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
+          "freshness_s": 120240.0
+        }
+      ],
+      "provenance": "simulated"
     }
   ],
   "persona_top_picks": [
@@ -179,24 +2976,59 @@
       "persona": "commuter",
       "preset": "fastest",
       "urgency": "high",
-      "top": ["r_seed_001", "r_seed_004", "r_seed_002"],
-      "headline": "首选：屯马线→尖东→步行→尖沙咀→荃湾线（约 29–37 分钟）",
-      "reason": "你赶时间：系统把时间权重调到最高，接受 1 次换乘与 420 米步行；同时避开九成满的过海巴士。"
+      "top": [
+        "r_da67c274e39e0c00",
+        "r_8232b6602c377cc6",
+        "r_a3da1ce3aa06f995"
+      ],
+      "headline": "模拟通勤top3：与公开查询fastest画像同顺序",
+      "reason": "仅使用模型可通行路径，时间票价和客流均为模拟。",
+      "mobility": "standard"
     },
     {
       "profile_id": "p_wheelchair",
       "persona": "wheelchair",
       "preset": "most_stable",
       "urgency": "normal",
-      "top": ["r_seed_003", "r_seed_002", "r_seed_001"],
-      "headline": "首选：屯马线→钻石山→观塘线→油麻地→荃湾线（约 38–46 分钟，全程电梯）",
-      "reason": "你的行程被硬约束过滤：不含小巴、不含阶梯换乘、步行 ≤ 400 米。因此首选比最快方案多约 9 分钟，但全程可用。",
-      "hard_filters_applied": ["no_minibus", "no_stairs", "max_walk_400m"]
+      "top": [
+        "r_da67c274e39e0c00",
+        "r_8d0ba92684b1d1e2",
+        "r_5b0329d9b10b809c"
+      ],
+      "headline": "轮椅推荐受阻：起终点及核心站无障碍证据未知",
+      "reason": "TAW/ADM及其他核心站accessible=null、accessibility_status=unknown，公开查询0条；top3缺3条，软多样性回退不可绕过硬约束，不能以坐标或入口POI证明无障碍。",
+      "hard_filters_applied": [
+        "no_minibus",
+        "no_stairs",
+        "max_walk_400m",
+        "max_transfers_2"
+      ],
+      "mobility": "wheelchair",
+      "max_walk_m": 400,
+      "max_transfers": 2,
+      "walking_speed_mps": 0.7
     }
   ],
   "excluded_route_examples": [
-    {"route": "大围 → 步行 → 红磡 → 过海巴士 180/其他", "reason": "步行 4.7 公里超出 800 米步行圈规则"},
-    {"route": "大围 → 680/681 → 港岛", "reason": "该等路线不服务大围/沙田（数据核实结果）"},
-    {"route": "大围 → 88K → 九龙塘", "reason": "88K 疑已于 2025-08-04 取消（待核实）"}
+    {
+      "route": "大围 → 步行 → 红磡 → 过海巴士 180/其他",
+      "reason": "大围起点到红磡步行 4.7 公里超出起点接入点 800 米搜索半径；800 米不是整条路线累计 walk_m 上限"
+    },
+    {
+      "route": "大围 → 680/681 → 港岛",
+      "reason": "该等路线不服务大围/沙田（数据核实结果）"
+    },
+    {
+      "route": "大围 → 88K → 九龙塘",
+      "reason": "88K 疑已于 2025-08-04 取消（待核实）"
+    },
+    {
+      "route": "旧 r_seed_006 / 982X",
+      "reason": "headway=null，精确班次未核验，旧卡排除；以新稳定ID展示不同的模型合法路径"
+    },
+    {
+      "route": "旧 r_seed_008 / 481B→BS_TW",
+      "reason": "未建模终点，旧卡排除；不补造BS_TW，新示例使用不同稳定ID"
+    }
   ]
 }

@@ -1,0 +1,72 @@
+"""Optional FastAPI adapter owned by C-Route; no application-global edits."""
+from fastapi import APIRouter, FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException
+from starlette.responses import JSONResponse
+
+from ..graph.adapter import DataUnavailable
+from ..graph.build import thaw
+
+
+def error(status, code, message):
+    return JSONResponse(status_code=status, content={'error': {
+        'code': code, 'message': message, 'fallback': '展示上一次成功数据并标记数据较旧；暂无缓存时提示重试'}})
+
+
+def create_router(engine):
+    router = APIRouter(prefix='/api')
+
+    @router.get('/graph/network')
+    def network():
+        return thaw(engine.snapshots.current.network.source)
+
+    @router.get('/graph/snapshot')
+    def snapshot():
+        return engine.snapshots.current.describe()
+
+    @router.post('/routes/query')
+    async def query(request: Request):
+        try:
+            payload = await request.json()
+            if not isinstance(payload, dict):
+                raise ValueError('Query body must be an object')
+            allowed = {'origin', 'destination', 'depart_at', 'profile', 'event_ids'}
+            if set(payload) - allowed:
+                raise ValueError('Unknown query fields')
+            for key in ('origin', 'destination', 'depart_at'):
+                if not isinstance(payload.get(key), str) or not payload[key]:
+                    raise ValueError(f'{key} must be a nonempty string')
+            if 'profile' in payload and not isinstance(payload['profile'], dict):
+                raise ValueError('profile must be an object')
+            if 'event_ids' in payload and (not isinstance(payload['event_ids'], list) or
+                                          any(not isinstance(x, str) for x in payload['event_ids'])):
+                raise ValueError('event_ids must be a string array')
+            return engine.query(**payload)
+        except DataUnavailable as exc:
+            return error(503, 'DATA_UNAVAILABLE', str(exc))
+        except (ValueError, TypeError, KeyError, AttributeError) as exc:
+            return error(400, 'INVALID_ROUTE_QUERY', str(exc))
+        except Exception:
+            return error(500, 'ROUTE_ENGINE_ERROR', '路线服务暂时不可用')
+
+    return router
+
+
+def create_app(engine):
+    """Standalone integration target; main app may include only create_router()."""
+    app = FastAPI()
+    app.include_router(create_router(engine))
+
+    @app.exception_handler(HTTPException)
+    async def http_error(request, exc):
+        return error(exc.status_code, 'HTTP_ERROR', str(exc.detail))
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_error(request, exc):
+        return error(422, 'INVALID_REQUEST', '请求格式不正确')
+
+    @app.exception_handler(Exception)
+    async def server_error(request, exc):
+        return error(500, 'ROUTE_ENGINE_ERROR', '路线服务暂时不可用')
+
+    return app

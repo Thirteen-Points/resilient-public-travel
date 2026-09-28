@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "version": "fixture-v0",
+    "built_at": "2026-09-22",
+    "purpose": "Deliberately imperfect fixture for normalizer tests.",
+    "provenance": "simulated"
+  },
+  "events": [
+    {
+      "event_id": "evt_fx_ok",
+      "version": 1,
+      "status": "published",
+      "title": "Valid fixture event",
+      "summary": "All required fields present and valid.",
+      "line": "FXL",
+      "severity": 3,
+      "confidence": 0.8,
+      "affected_segments": [
+        { "from_node": "FX_OK", "to_node": "FX_BAD_COORD", "impact": "closed", "capacity_factor": 0.0 }
+      ],
+      "window": { "start": "2026-09-22T08:00:00+08:00", "end": null },
+      "updated_at": "2026-09-22T08:10:00+08:00",
+      "published_at": "2026-09-22T08:10:00+08:00",
+      "expires_at": null,
+      "signals": ["sig_fx_ok"],
+      "provenance": "simulated"
+    },
+    {
+      "event_id": "evt_fx_rumour",
+      "version": 1,
+      "status": "rumour",
+      "title": "Off-status event",
+      "summary": "status is outside the shared enum and severity is a string.",
+      "line": "FXL",
+      "severity": "high",
+      "confidence": 1.4,
+      "affected_segments": [
+        { "from_node": "FX_OK", "to_node": "FX_NO_NAME", "impact": "crowded", "capacity_factor": 1.5 }
+      ],
+      "window": { "start": "2026-09-22T08:00:00+08:00", "end": "2026-09-22T09:00:00+08:00" },
+      "updated_at": "2026-09-22T08:05:00+08:00",
+      "published_at": null,
+      "signals": [],
+      "provenance": "simulated"
+    },
+    {
+      "event_id": "evt_fx_missing_optional",
+      "version": 2,
+      "status": "pending_review",
+      "title": "Missing optional fields",
+      "summary": "published_at and expires_at absent; optional published_at must not raise an issue, required expires_at must.",
+      "line": "FXL",
+      "severity": 2,
+      "confidence": 0.3,
+      "affected_segments": [],
+      "window": { "start": "2026-09-22T08:00:00+08:00", "end": null },
+      "updated_at": "2026-09-22T08:06:00+08:00",
+      "signals": ["sig_fx_ok"],
+      "provenance": "simulated"
+    }
+  ],
+  "signals": [
+    { "signal_id": "sig_fx_ok", "received_at": "2026-09-22T08:03:00+08:00", "source_type": "social", "source_name": "fixture", "raw_text": "fixture text", "provenance": "simulated" }
+  ]
+}
