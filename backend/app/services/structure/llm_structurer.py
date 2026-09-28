@@ -142,16 +142,11 @@ class LlmEventStructurer:
         self.timeout_seconds = timeout_seconds
         self.max_attempts = max_attempts
 
-    def structure(self, signal: Signal) -> EventStructureResult:
-        if self.client is None:
-            return EventStructureResult(
-                signal_id=signal.signal_id,
-                observed_at=signal.received_at,
-                draft=self.fallback.extract(signal),
-                method=self._fallback_method,
-                attempts=0,
-                errors=(),
-            )
+    def structure(self, signal: Signal, *, allow_llm: bool = True) -> EventStructureResult:
+        """Set allow_llm=False when offline or over budget to skip every model call."""
+
+        if self.client is None or not allow_llm:
+            return self._fallback_result(signal, attempts=0, errors=())
 
         errors: list[str] = []
         schema = StructuredEventDraft.model_json_schema()
@@ -195,14 +190,27 @@ class LlmEventStructurer:
                 errors=tuple(errors),
             )
 
-        fallback_draft = self.fallback.extract(signal)
+        return self._fallback_result(signal, attempts=self.max_attempts, errors=tuple(errors))
+
+    def _fallback_result(
+        self, signal: Signal, *, attempts: int, errors: tuple[str, ...]
+    ) -> EventStructureResult:
+        try:
+            fallback_draft = self.fallback.extract(signal)
+            method = self._fallback_method
+        except Exception:
+            # A broken rule adapter must not stop signal intake or expose text
+            # from the provider. The conservative template is the last resort.
+            fallback_draft = ConservativeTemplateFallback().extract(signal)
+            method = "template_fallback"
+            errors += ("rule fallback failed",)
         return EventStructureResult(
             signal_id=signal.signal_id,
             observed_at=signal.received_at,
             draft=fallback_draft,
-            method=self._fallback_method,
-            attempts=self.max_attempts,
-            errors=tuple(errors),
+            method=method,
+            attempts=attempts,
+            errors=errors,
         )
 
     @staticmethod

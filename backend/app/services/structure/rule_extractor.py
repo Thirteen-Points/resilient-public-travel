@@ -9,7 +9,11 @@ from __future__ import annotations
 import re
 
 from ..signal_models import Signal
-from .llm_structurer import ExtractedSegment, StructuredEventDraft
+from .llm_structurer import (
+    ConservativeTemplateFallback,
+    ExtractedSegment,
+    StructuredEventDraft,
+)
 
 
 # This small dictionary is deliberately limited to the six-station corridor
@@ -24,8 +28,24 @@ STATIONS: dict[str, tuple[str, ...]] = {
 }
 ERL_ALIASES = ("東鐵綫", "东铁线", "東鐵線", "东铁", "東鐵", "East Rail Line", "ERL", "EAL")
 MTR_ALIASES = ("港鐵", "港铁", "地鐵", "地铁", "MTR")
-SPAN_CONNECTOR = re.compile(r"^\s*(?:站)?\s*(?:至|到|往|—|–|－|→|->|~|－)\s*$", re.IGNORECASE)
-NEGATED_DISRUPTION = re.compile(r"(?:沒有|没有|未有|無|无|並無|并无|未發生|未发生)(?:\S{0,2})(?:故障|延誤|延误|停運|停运|停駛|停驶|異常|异常)")
+STATION_ORDER = tuple(STATIONS)
+CLAUSE_BREAK = re.compile(r"[，,。.;；！!?？\n]|但是|然而|(?<![A-Za-z])but(?![A-Za-z])|但")
+SPAN_CONNECTOR = re.compile(
+    r"^\s*(?:站)?\s*(?:至|到|往|—|–|－|→|->|~|to)\s*$", re.IGNORECASE
+)
+NEGATED_DISRUPTION = re.compile(
+    r"(?:沒有|没有|未有|無|无|並無|并无|未發生|未发生|未|no|not)"
+    r"\s*(?:任何|發生|发生|出現|出现|any)?\s*"
+    r"(?:信號故障|信号故障|故障|延誤|延误|停運|停运|停駛|停驶|"
+    r"服務暫停|服务暂停|暫停|暂停|異常|异常|颱風|台风|暴雨|"
+    r"delay|disruption|failure|suspension)",
+    re.IGNORECASE,
+)
+UNCERTAIN_CLAIM = re.compile(
+    r"疑似|似乎|可能|未確認|未确认|尚未確認|尚未确认|未经確認|未经确认|"
+    r"未經證實|未经证实|unconfirmed|possibly|suspected|might be",
+    re.IGNORECASE,
+)
 
 
 def _mentions(text: str, aliases: tuple[str, ...]) -> bool:
@@ -61,7 +81,7 @@ def _station_mentions(text: str) -> list[tuple[int, int, str]]:
 
 
 def _impact(text: str) -> str | None:
-    if _mentions(text, ("暫停服務", "暂停服务", "停運", "停运", "停駛", "停驶", "停開", "停开", "封閉", "封闭", "closed", "suspended")):
+    if _mentions(text, ("暫停服務", "暂停服务", "服務暫停", "服务暂停", "停運", "停运", "停駛", "停驶", "停開", "停开", "封閉", "封闭", "closed", "suspended")):
         return "closed"
     if _mentions(text, ("減班", "减班", "班次減少", "班次减少", "reduced service")):
         return "reduced_capacity"
@@ -90,42 +110,75 @@ def _event_type(text: str) -> str:
     return "other"
 
 
+def _positive_clauses(text: str) -> list[str]:
+    """Discard only denied claims, not a separate positive claim after 'but'."""
+
+    clauses = (part.strip() for part in CLAUSE_BREAK.split(text))
+    return [
+        clause
+        for clause in clauses
+        if clause
+        and not NEGATED_DISRUPTION.search(clause)
+        and not UNCERTAIN_CLAIM.search(clause)
+        and (_impact(clause) is not None or _event_type(clause) != "other")
+    ]
+
+
+def _adjacent(first: str, second: str) -> bool:
+    """Event segments must correspond to one graph edge in the six-stop corridor."""
+
+    return abs(STATION_ORDER.index(first) - STATION_ORDER.index(second)) == 1
+
+
 class RuleEventExtractor:
     """Extract only explicit, contract-safe fields without network access."""
 
     def extract(self, signal: Signal) -> StructuredEventDraft:
         text = signal.raw_text.strip()
-        # A denial of an incident is not positive evidence of one.  Retain the
-        # original report for the reviewer, but make no categorical claims.
-        denied = bool(NEGATED_DISRUPTION.search(text))
-        mentions = _station_mentions(text)
-        line = "ERL" if not denied and _mentions(text, ERL_ALIASES) else None
-        mode = "MTR" if line or (not denied and _mentions(text, MTR_ALIASES)) else None
-        impact = None if denied else _impact(text)
+        positive = _positive_clauses(text)
+        if not positive:
+            return ConservativeTemplateFallback().extract(signal)
+
+        line = "ERL" if any(_mentions(clause, ERL_ALIASES) for clause in positive) else None
+        mode = "MTR" if line or any(_mentions(clause, MTR_ALIASES) for clause in positive) else None
         segments: list[ExtractedSegment] = []
-        if line and impact:
+        for index, clause in enumerate(positive):
+            if not _mentions(clause, ERL_ALIASES):
+                continue
+            impact = _impact(clause)
+            # A following clause with no station can describe the same span,
+            # e.g. "HUH to EXC signal failure, cross-harbour service suspended".
+            if impact is None and index + 1 < len(positive):
+                following = positive[index + 1]
+                if not _station_mentions(following):
+                    impact = _impact(following)
+            if impact is None:
+                continue
+            mentions = _station_mentions(clause)
             for first, second in zip(mentions, mentions[1:]):
-                if first[2] == second[2]:
+                if not _adjacent(first[2], second[2]):
                     continue
-                between = text[first[1] : second[0]]
+                between = clause[first[1] : second[0]]
                 if SPAN_CONNECTOR.fullmatch(between):
-                    segments.append(
-                        ExtractedSegment(
-                            from_node=first[2], to_node=second[2], impact=impact
-                        )
+                    segment = ExtractedSegment(
+                        from_node=first[2], to_node=second[2], impact=impact
                     )
+                    if segment not in segments:
+                        segments.append(segment)
 
         direction = None
-        if not denied and _mentions(text, ("雙向", "双向", "兩個方向", "两个方向", "both directions")):
+        supported_text = " ".join(positive)
+        if _mentions(supported_text, ("雙向", "双向", "兩個方向", "两个方向", "both directions")):
             direction = "both"
-        elif line and not denied:
-            if _mentions(text, ("往金鐘", "往金钟", "金鐘方向", "金钟方向", "towards Admiralty")):
+        elif line:
+            if _mentions(supported_text, ("往金鐘", "往金钟", "金鐘方向", "金钟方向", "towards Admiralty")):
                 direction = "southbound"
-            elif _mentions(text, ("往大圍", "往大围", "大圍方向", "大围方向", "towards Tai Wai")):
+            elif _mentions(supported_text, ("往大圍", "往大围", "大圍方向", "大围方向", "towards Tai Wai")):
                 direction = "northbound"
 
+        causes = {_event_type(clause) for clause in positive} - {"other"}
         return StructuredEventDraft(
-            event_type="other" if denied else _event_type(text),
+            event_type=next(iter(causes)) if len(causes) == 1 else "other",
             title="待核实：" + text[:115],
             summary=text[:1000],
             mode=mode,
