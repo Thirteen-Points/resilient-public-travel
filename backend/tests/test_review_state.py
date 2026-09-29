@@ -235,6 +235,27 @@ class ReviewStateTestCase(unittest.TestCase):
                 self.assertEqual(after.reviewed_by, "admin_b")
                 self.assert_one_change(before, after, "review_expired")
 
+    def test_due_expiry_is_idempotent_and_audited(self) -> None:
+        payload = self.payload("published")
+        deadline = BASE_TIME + timedelta(minutes=30)
+        payload["expires_at"] = deadline.isoformat()
+        before = self.store.create_event(payload)
+        self.assertEqual(self.reviews.expire_due(at=deadline - timedelta(seconds=1)), [])
+        self.assertEqual(self.store.get_event(before.event_id).version, 1)
+        changed = self.reviews.expire_due(at=deadline)[0]
+        self.assertEqual(changed.status, "expired")
+        self.assert_one_change(before, changed, "auto_expired")
+        self.assertEqual(self.reviews.expire_due(at=deadline + timedelta(hours=1)), [])
+        self.assertEqual(len(self.store.list_changes(after_id=0)), 2)
+
+    def test_due_expiry_only_applies_to_previously_public_events(self) -> None:
+        for status in ("draft", "pending_review", "rejected"):
+            payload = self.payload(status, f"evt_due_{status}")
+            payload["expires_at"] = (BASE_TIME + timedelta(minutes=1)).isoformat()
+            self.store.create_event(payload)
+        self.assertEqual(self.reviews.expire_due(at=BASE_TIME + timedelta(hours=1)), [])
+        self.assertTrue(all(event.version == 1 for event in self.store.list_events()))
+
     def test_expire_disallowed_statuses_without_mutation(self) -> None:
         for status in ("draft", "pending_review", "rejected", "expired"):
             with self.subTest(status=status):

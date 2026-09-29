@@ -157,6 +157,33 @@ class EventReviewService:
             at=timestamp,
         )
 
+    def expire_due(self, *, at: datetime | None = None) -> list[Event]:
+        """Reconcile timed-out public cards on demand and emit audit changes.
+
+        API reads and the event stream call this method, so it needs no
+        separate scheduler. A repeated read cannot append a second expiry.
+        """
+        now = self._review_time(at)
+        expired: list[Event] = []
+        for current in self.store.list_events():
+            if current.status not in {"published", "updated"}:
+                continue
+            deadlines = [value for value in (current.expires_at, current.window.end) if value]
+            if not deadlines or min(deadlines) > now:
+                continue
+            try:
+                expired.append(self.store.update_event(
+                    current.event_id,
+                    {"status": "expired", "expires_at": now},
+                    actor="system", action="auto_expired", at=now,
+                ))
+            except RuntimeError:
+                # Another reader won the optimistic write. Its audit entry is
+                # already durable and will be delivered by the SSE cursor.
+                if self.store.get_event(current.event_id).status not in {"expired", "rejected"}:
+                    raise
+        return expired
+
     @staticmethod
     def _require_actor(actor: str) -> None:
         if not actor or not actor.strip():
