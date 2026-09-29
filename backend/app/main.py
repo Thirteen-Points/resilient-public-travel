@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .api.events import router as events_router
+from .api.personas import router as personas_router
 from .api.review import router as review_router
 from .api.signals import router as signals_router
 from .api.stream import router as stream_router
@@ -134,6 +135,7 @@ def create_app(
     )
     application.include_router(signals_router)
     application.include_router(events_router)
+    application.include_router(personas_router)
     application.include_router(review_router)
     application.include_router(stream_router)
 

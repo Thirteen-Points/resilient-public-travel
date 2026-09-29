@@ -1,0 +1,39 @@
+[
+  {
+    "user_id": "demo_commuter", "persona": "commuter", "mobility": "standard",
+    "walking_speed_mps": 1.4, "max_walk_m": 800, "max_transfers": 3,
+    "price_sensitive": 0.3, "has_discount_card": false, "urgency": "high", "preset": "fastest",
+    "weights": {"time": 0.40, "transfers": 0.10, "walk": 0.10, "price": 0.10, "comfort": 0.05, "reliability": 0.15, "carbon": 0.05, "freshness": 0.05},
+    "hard_flags": [], "note": "模拟通勤画像：优先时间与可靠性；不代表真实个人。"
+  },
+  {
+    "user_id": "demo_student", "persona": "student", "mobility": "standard",
+    "walking_speed_mps": 1.4, "max_walk_m": 1000, "max_transfers": 3,
+    "price_sensitive": 0.8, "has_discount_card": false, "urgency": "normal", "preset": "fastest",
+    "weights": {"time": 0.15, "transfers": 0.10, "walk": 0.10, "price": 0.40, "comfort": 0.05, "reliability": 0.10, "carbon": 0.05, "freshness": 0.05},
+    "hard_flags": [], "note": "模拟学生画像：重视费用；优惠资格未作假设。"
+  },
+  {
+    "user_id": "demo_tourist", "persona": "tourist", "mobility": "standard",
+    "walking_speed_mps": 1.2, "max_walk_m": 1200, "max_transfers": 3,
+    "price_sensitive": 0.4, "has_discount_card": false, "urgency": "normal", "preset": "most_stable",
+    "weights": {"time": 0.15, "transfers": 0.10, "walk": 0.20, "price": 0.10, "comfort": 0.20, "reliability": 0.10, "carbon": 0.10, "freshness": 0.05},
+    "hard_flags": [], "note": "模拟游客画像：重视舒适度与步行体验；不代表真实个人。"
+  },
+  {
+    "user_id": "demo_elderly", "persona": "elderly", "mobility": "reduced",
+    "walking_speed_mps": 0.8, "max_walk_m": 400, "max_transfers": 2,
+    "price_sensitive": 0.4, "has_discount_card": false, "urgency": "normal", "preset": "most_stable",
+    "weights": {"time": 0.10, "transfers": 0.20, "walk": 0.20, "price": 0.05, "comfort": 0.20, "reliability": 0.20, "carbon": 0.00, "freshness": 0.05},
+    "hard_flags": ["no_stairs", "no_minibus", "no_non_lowfloor_bus"],
+    "note": "模拟行动较慢画像：保守地减少步行与换乘；不代表所有长者。"
+  },
+  {
+    "user_id": "demo_wheelchair", "persona": "wheelchair", "mobility": "wheelchair",
+    "walking_speed_mps": 0.7, "max_walk_m": 400, "max_transfers": 2,
+    "price_sensitive": 0.4, "has_discount_card": false, "urgency": "normal", "preset": "most_stable",
+    "weights": {"time": 0.15, "transfers": 0.10, "walk": 0.25, "price": 0.05, "comfort": 0.15, "reliability": 0.25, "carbon": 0.00, "freshness": 0.05},
+    "hard_flags": ["no_stairs", "no_minibus", "no_non_lowfloor_bus"],
+    "note": "模拟轮椅画像：保守无障碍限制；不宣称任何路线已获认证。"
+  }
+]
