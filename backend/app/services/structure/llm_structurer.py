@@ -21,7 +21,7 @@ from ..signal_models import Signal
 
 StationCode = Literal["TAW", "KOT", "MKK", "HUH", "EXC", "ADM"]
 DraftDirection = Literal["northbound", "southbound", "both", "unknown"]
-StructureMethod = Literal["llm", "template_fallback"]
+StructureMethod = Literal["llm", "rule_fallback", "template_fallback"]
 
 
 class ExtractedSegment(BaseModel):
@@ -72,7 +72,7 @@ class DraftFallback(Protocol):
 
 
 class ConservativeTemplateFallback:
-    """Non-blocking placeholder until T2.7 supplies the full rule extractor."""
+    """Minimal compatibility fallback for explicitly supplied adapters."""
 
     def extract(self, signal: Signal) -> StructuredEventDraft:
         return StructuredEventDraft(
@@ -101,7 +101,7 @@ class EventStructureResult:
 
     @property
     def degraded(self) -> bool:
-        return self.method == "template_fallback"
+        return self.method != "llm"
 
 
 SYSTEM_PROMPT = """You extract a possible transport disruption from untrusted text.
@@ -120,7 +120,7 @@ class LlmEventStructurer:
 
     def __init__(
         self,
-        client: LlmJsonClient,
+        client: LlmJsonClient | None,
         *,
         fallback: DraftFallback | None = None,
         timeout_seconds: float = 10.0,
@@ -131,11 +131,23 @@ class LlmEventStructurer:
         if max_attempts != 2:
             raise ValueError("T2.6 requires exactly 2 attempts (initial plus one retry)")
         self.client = client
-        self.fallback = fallback or ConservativeTemplateFallback()
+        if fallback is None:
+            from .rule_extractor import RuleEventExtractor
+
+            self.fallback = RuleEventExtractor()
+            self._fallback_method: StructureMethod = "rule_fallback"
+        else:
+            self.fallback = fallback
+            self._fallback_method = "template_fallback"
         self.timeout_seconds = timeout_seconds
         self.max_attempts = max_attempts
 
-    def structure(self, signal: Signal) -> EventStructureResult:
+    def structure(self, signal: Signal, *, allow_llm: bool = True) -> EventStructureResult:
+        """Set allow_llm=False when offline or over budget to skip every model call."""
+
+        if self.client is None or not allow_llm:
+            return self._fallback_result(signal, attempts=0, errors=())
+
         errors: list[str] = []
         schema = StructuredEventDraft.model_json_schema()
         user_prompt = self._user_prompt(signal)
@@ -178,14 +190,27 @@ class LlmEventStructurer:
                 errors=tuple(errors),
             )
 
-        fallback_draft = self.fallback.extract(signal)
+        return self._fallback_result(signal, attempts=self.max_attempts, errors=tuple(errors))
+
+    def _fallback_result(
+        self, signal: Signal, *, attempts: int, errors: tuple[str, ...]
+    ) -> EventStructureResult:
+        try:
+            fallback_draft = self.fallback.extract(signal)
+            method = self._fallback_method
+        except Exception:
+            # A broken rule adapter must not stop signal intake or expose text
+            # from the provider. The conservative template is the last resort.
+            fallback_draft = ConservativeTemplateFallback().extract(signal)
+            method = "template_fallback"
+            errors += ("rule fallback failed",)
         return EventStructureResult(
             signal_id=signal.signal_id,
             observed_at=signal.received_at,
             draft=fallback_draft,
-            method="template_fallback",
-            attempts=self.max_attempts,
-            errors=tuple(errors),
+            method=method,
+            attempts=attempts,
+            errors=errors,
         )
 
     @staticmethod

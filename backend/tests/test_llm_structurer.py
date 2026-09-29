@@ -111,13 +111,13 @@ class LlmEventStructurerTestCase(unittest.TestCase):
         self.assertEqual(result.attempts, 2)
         self.assertEqual(result.errors, ("attempt 1: schema validation failed",))
 
-    def test_two_timeouts_use_non_blocking_template_fallback(self) -> None:
+    def test_two_timeouts_use_offline_rule_fallback(self) -> None:
         client = FakeJsonClient([TimeoutError(), TimeoutError()])
 
         result = LlmEventStructurer(client).structure(signal())
 
         self.assertTrue(result.degraded)
-        self.assertEqual(result.method, "template_fallback")
+        self.assertEqual(result.method, "rule_fallback")
         self.assertEqual(result.attempts, 2)
         self.assertEqual(len(result.errors), 2)
         self.assertEqual(result.draft.event_type, "other")

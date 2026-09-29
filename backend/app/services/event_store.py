@@ -179,6 +179,30 @@ class EventStore:
             rows = connection.execute(sql, parameters).fetchall()
             return [self._event_from_row(connection, row) for row in rows]
 
+    def list_changes(self, *, after_id: int = 0, limit: int = 100) -> list[tuple[int, Event, AuditEntry]]:
+        """Read durable audit sequence for SSE replay after reconnect."""
+
+        if after_id < 0 or not 1 <= limit <= 1000:
+            raise ValueError("invalid change cursor or limit")
+        with self._connection() as connection:
+            rows = connection.execute(
+                """SELECT audit_id, event_id, at, actor, action, confidence_after FROM audit_log
+                   WHERE audit_id > ? ORDER BY audit_id LIMIT ?""",
+                (after_id, limit),
+            ).fetchall()
+            result: list[tuple[int, Event, AuditEntry]] = []
+            for row in rows:
+                event_row = connection.execute(
+                    "SELECT payload_json FROM events WHERE event_id = ?", (row["event_id"],)
+                ).fetchone()
+                if event_row is not None:
+                    change = AuditEntry(
+                        at=row["at"], actor=row["actor"], action=row["action"],
+                        confidence_after=row["confidence_after"],
+                    )
+                    result.append((row["audit_id"], self._event_from_row(connection, event_row), change))
+            return result
+
     def update_event(
         self,
         event_id: str,

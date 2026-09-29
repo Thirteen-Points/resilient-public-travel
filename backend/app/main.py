@@ -1,7 +1,8 @@
-"""Combined M0 API: B-owned signal intake plus C route/simulation services."""
+"""Combined API for signals, reviewed events, routes, and simulation."""
 
 from __future__ import annotations
 
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -12,9 +13,13 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from .api.events import router as events_router
+from .api.review import router as review_router
 from .api.signals import router as signals_router
-from .services.event_store import DEFAULT_DB_PATH
+from .api.stream import router as stream_router
+from .services.event_store import DEFAULT_DB_PATH, EventStore
 from .services.signal_store import SignalStore
+from .services.structure.llm_structurer import LlmJsonClient
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -100,14 +105,23 @@ class Runtime:
 runtime = Runtime()
 
 
-def create_app(*, db_path: str | Path = DEFAULT_DB_PATH) -> FastAPI:
-    """Compose B's signal persistence and C's deterministic M0 endpoints."""
+def create_app(
+    *, db_path: str | Path = DEFAULT_DB_PATH,
+    review_token: str | None = None,
+    llm_client: LlmJsonClient | None = None,
+) -> FastAPI:
+    """Compose B's reviewed-event APIs and C's deterministic services."""
     store = SignalStore(db_path)
+    event_store = EventStore(db_path)
 
     @asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncIterator[None]:
         store.initialize()
+        event_store.initialize()
         application.state.signal_store = store
+        application.state.event_store = event_store
+        application.state.review_token = review_token if review_token is not None else os.getenv("REVIEW_API_TOKEN")
+        application.state.llm_client = llm_client
         yield
 
     application = FastAPI(title="ResilientRoute API", version="m0-integrated", lifespan=lifespan)
@@ -119,6 +133,9 @@ def create_app(*, db_path: str | Path = DEFAULT_DB_PATH) -> FastAPI:
         allow_headers=["Content-Type", "Authorization"],
     )
     application.include_router(signals_router)
+    application.include_router(events_router)
+    application.include_router(review_router)
+    application.include_router(stream_router)
 
     @application.get("/api/health")
     def health() -> JSONResponse:

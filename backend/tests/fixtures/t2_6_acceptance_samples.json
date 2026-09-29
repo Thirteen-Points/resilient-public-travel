@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "purpose": "T2.6 real-model structure acceptance",
+    "privacy": "All texts are anonymised and adapted; they contain no user identity or live operational claim.",
+    "provenance": "simulated"
+  },
+  "samples": [
+    {
+      "sample_id": "signal-failure-zh",
+      "lang": "zh-HK",
+      "source_note": "Anonymised and adapted from a public-transport disruption notice style.",
+      "text": "東鐵綫紅磡至會展之間懷疑發生信號故障，雙向列車服務暫停，消息仍待核實。"
+    },
+    {
+      "sample_id": "train-failure-zh",
+      "lang": "zh-HK",
+      "source_note": "Anonymised and adapted from a passenger report style.",
+      "text": "有乘客報告東鐵綫列車在九龍塘站發生列車故障，往金鐘方向服務受阻。"
+    },
+    {
+      "sample_id": "door-fault-zh",
+      "lang": "zh-HK",
+      "source_note": "Anonymised and adapted from a station announcement style.",
+      "text": "旺角東站廣播指一列東鐵綫列車出現車門故障，往大圍方向列車行駛緩慢。"
+    },
+    {
+      "sample_id": "power-failure-zh",
+      "lang": "zh-HK",
+      "source_note": "Anonymised and adapted from a service alert style.",
+      "text": "東鐵綫大圍至九龍塘之間有未經核實的供電故障報告，列車服務暫停。"
+    },
+    {
+      "sample_id": "slow-service-en",
+      "lang": "en",
+      "source_note": "Anonymised and adapted English passenger-report style.",
+      "text": "An unverified report says East Rail Line trains between Hung Hom and Exhibition Centre are delayed in both directions."
+    },
+    {
+      "sample_id": "suspension-en",
+      "lang": "en",
+      "source_note": "Anonymised and adapted English service-alert style.",
+      "text": "East Rail Line service from Exhibition Centre to Admiralty is suspended towards Admiralty; confirmation is pending."
+    },
+    {
+      "sample_id": "crowd-zh",
+      "lang": "zh-HK",
+      "source_note": "Anonymised and adapted crowd observation.",
+      "text": "未經核實的現場消息稱紅磡站東鐵綫月台非常擁擠，列車服務仍然運作。"
+    },
+    {
+      "sample_id": "weather-zh",
+      "lang": "zh-HK",
+      "source_note": "Anonymised and adapted weather-impact report; not an official warning.",
+      "text": "受暴雨影響，有報告指東鐵綫大圍至九龍塘列車行駛緩慢，尚待官方確認。"
+    },
+    {
+      "sample_id": "insufficient-info",
+      "lang": "zh-HK",
+      "source_note": "Anonymised sparse user report.",
+      "text": "有人說金鐘站情況不尋常，但沒有提供路線、方向或故障資料。"
+    },
+    {
+      "sample_id": "negated-event",
+      "lang": "zh-HK",
+      "source_note": "Anonymised denial used to test conservative extraction.",
+      "text": "站內廣播表示東鐵綫紅磡至會展之間沒有信號故障，也沒有列車延誤。"
+    }
+  ]
+}
