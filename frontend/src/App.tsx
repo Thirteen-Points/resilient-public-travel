@@ -228,10 +228,10 @@ export function App() {
       <button type="button" className={css.brand} onClick={() => setScreen('journey')} aria-label="ResilientRoute home">rr<span>.</span></button>
       <nav aria-label="Main navigation">
         <button type="button" aria-current={screen === 'report' ? 'page' : undefined} onClick={() => { setScreen('report'); setPicking(null) }}>Report</button>
+        <button type="button" aria-current={screen === 'agent' ? 'page' : undefined} onClick={() => { setScreen('agent'); setPicking(null) }}>Agent</button>
         <button type="button" aria-current={screen === 'journey' || screen === 'results' || screen === 'detail' ? 'page' : undefined} onClick={() => { setScreen('journey'); setPicking(null) }}>Plan journey</button>
         <button type="button" aria-current={screen === 'updates' ? 'page' : undefined} onClick={() => setScreen('updates')}>Updates</button>
         <button type="button" aria-current={screen === 'review' ? 'page' : undefined} onClick={() => { setScreen('review'); setPicking(null) }}>Review</button>
-        <button type="button" aria-current={screen === 'agent' ? 'page' : undefined} onClick={() => { setScreen('agent'); setPicking(null) }}>Agent</button>
         <button type="button" aria-current={screen === 'sources' ? 'page' : undefined} onClick={() => setScreen('sources')}>How it works</button>
       </nav>
       <button type="button" className={css.demo} onClick={switchDataMode}>{SEED_MODE ? 'FIXED SEED · USE API' : 'API MODE · USE SEED'}</button>

@@ -89,7 +89,7 @@
 .mapLegend { position: absolute; right: 32px; bottom: 40px; z-index: 400; padding: 9px 14px; border-radius: 99px; background: #fffffff2; color: #385267; font-size: 11px; box-shadow: 0 4px 14px #244d5923; }
 .widePanel { width: min(1050px, calc(100% - 64px)); }
 .widePanel h1 { font-size: 36px; }
-.eventGrid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+.eventGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px; }
 .eventCard { min-width: 0; border: 1px solid #dde6dd; border-radius: 14px; padding: 16px; font-size: 11px; }
 .eventTop, .eventMeta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; color: #66776d; font-size: 10px; }
 .published, .pending { border-radius: 99px; padding: 4px 7px; font-weight: 700; }
@@ -143,7 +143,7 @@
 .routeFreshness { white-space: normal; line-height: 1.5; }
 .queryStamp { border-left: 2px solid #a0be77; padding: 6px 10px; margin: 0 0 15px; color: #4d6840; background: #f4f8ec; font-size: 11px; line-height: 1.5; }
 .queryStamp small { font-size: 9px; overflow-wrap: anywhere; }
-.timeline { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 22px; margin: 20px 0; background: #f3f6ed; border: 1px solid #e0e7d4; border-radius: 20px; }
+.timeline { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 16px; padding: 22px; margin: 20px 0; background: #f3f6ed; border: 1px solid #e0e7d4; border-radius: 20px; }
 .timeline li > span { display: block; color: #748363; font-size: 9px; letter-spacing: .03em; }
 .timeline strong { display: block; font-size: 42px; font-weight: 500; letter-spacing: -.05em; margin: 10px 0 0; color: #39582a; }
 .timeline strong small { font-size: 17px; }
@@ -214,7 +214,7 @@
 /* Standalone pages (Updates / Review / How it works): content pane on the
    left while the map docks as a card on the right. Widths track the map
    card so the split stays balanced at any window size. */
-.pagePane { position: absolute; z-index: 500; top: 112px; bottom: 28px; left: 32px; right: calc(min(420px, 36vw) + 64px); overflow-y: auto; overscroll-behavior: contain; padding: 34px 36px 30px; border-radius: 28px; background: white; box-shadow: 0 12px 38px #1f5b6d30; scrollbar-width: thin; animation: pageIn .5s cubic-bezier(.22,1,.36,1) both; }
+.pagePane { container-type: inline-size; position: absolute; z-index: 500; top: 112px; bottom: 28px; left: 32px; right: calc(min(420px, 36vw) + 64px); overflow-y: auto; overscroll-behavior: contain; padding: 34px 36px 30px; border-radius: 28px; background: white; box-shadow: 0 12px 38px #1f5b6d30; scrollbar-width: thin; animation: pageIn .5s cubic-bezier(.22,1,.36,1) both; }
 /* Full variant (How it works): no map card, opaque full-width page. */
 .pagePane.full { right: 32px; background: #fbfcf9; }
 .pagePane > .pagePanel { margin: 0; width: auto; max-width: none; padding: 0; border-radius: 0; background: transparent; box-shadow: none; }

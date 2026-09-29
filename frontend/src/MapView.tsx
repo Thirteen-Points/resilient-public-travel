@@ -42,8 +42,12 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     const bounds = L.latLngBounds(corridor)
     const fit = () => {
       map.invalidateSize()
-      const left = element.current!.clientWidth >= 800 ? 500 : 24
-      map.fitBounds(bounds, { paddingTopLeft: [left, 64], paddingBottomRight: [72, 82], maxZoom: 13, animate: false })
+      // Full-bleed mode reserves the left panel area; the docked card is small
+      // and needs near-uniform padding or the corridor sits off-centre.
+      const wide = element.current!.clientWidth >= 800 && element.current!.clientHeight >= 500
+      const pad = wide ? { topLeft: [500, 64] as [number, number], bottomRight: [72, 82] as [number, number] }
+        : { topLeft: [22, 22] as [number, number], bottomRight: [22, 22] as [number, number] }
+      map.fitBounds(bounds, { paddingTopLeft: pad.topLeft, paddingBottomRight: pad.bottomRight, maxZoom: 13, animate: false })
     }
     fit()
     resetRef.current = fit
@@ -172,9 +176,9 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     }
   }, [network, published, routes, selectedRouteId])
 
-  // Re-fit the corridor once the dock/undock size transition has settled.
+  // Re-fit the corridor after the dock/undock size transition settles so the
+  // corridor recentres in whichever geometry is now active.
   useEffect(() => {
-    if (!docked) return
     const timer = setTimeout(() => resetRef.current(), 620)
     return () => clearTimeout(timer)
   }, [docked])
