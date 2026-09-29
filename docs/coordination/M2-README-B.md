@@ -1,7 +1,9 @@
 # M2 README contribution from B
 
-Status: completed for documentation and offline verification; real-model acceptance remains partial.
-Baseline: `fe6cb4f` on `Mingquan-Xia`; rechecked after concurrent B commits `d7bfa18` and `e0b3ce6`. README integration belongs to A; this file changes no shared README sections or API contracts.
+Status: B's documentation and offline verification are complete; real-model and cross-team acceptance remain partial.
+Historical baseline: `fe6cb4f` on `Mingquan-Xia`; rechecked after B commits `d7bfa18` and `e0b3ce6`. The 2026-09-29 local M2 recheck used `b344581` on `XMQM2` and passed 127 backend tests and the B contract-seed validator. README integration belongs to A; this file changes no shared README sections or API contracts. Remote `XMQM2` status was not verified because GitHub was unreachable during the recheck.
+
+Upload review: the descriptions below are B's handoff at `b344581`, not a fresh description of the integrated application. The later `XMQM2` checkout at `a82e790` includes A/C frontend, route-engine and AI-adapter work. Consult the root README and revalidate integrated behavior before copying any section into current release materials. On that checkout, 179 backend tests passed with `PYTHONPATH=backend`, and the B seed validator passed; neither check exercised a real model or live source.
 
 ## English sections for A to merge into the root README
 
@@ -57,13 +59,13 @@ Read each record's `provenance`, source URL and timestamp alongside its notes. E
 
 AI is restricted to extracting supported text and categorical fields into an unverified draft. `StructuredEventDraft` rejects extra fields, including `severity`, `confidence` and `capacity_factor`. AI must not invent routes, stations, travel times, ETA ranges, delay minutes, fares, headways, capacity, passenger counts, load or diversion percentages. Numeric event facts come from explicit reviewer input and confidence from deterministic code; future traffic calculations must come from the deterministic engine and traceable data. Schema validation checks structure, not factual correctness, and does not constitute semantic verification of numbers embedded in free-text titles or summaries.
 
-The shipped app has no real model adapter and defaults to offline rules (`create_app(llm_client=None)`). `LlmJsonClient.generate_json(...)` is an injection boundary, not a connected provider. It receives a requested 10-second timeout; an adapter must enforce that timeout. Unit-test fake clients demonstrate retry and fallback behavior only. The ten-sample real-model acceptance harness exists, but its live run and target of at least 8/10 first-pass successes remain uncompleted. Preference parsing, AI route explanations/chat, tool calling, provider failover and token/cost controls remain planned on this branch. The prompt omits `author_hint`, but passes raw report text; it is not an implemented personal-data redaction system.
+At the `b344581` B handoff, `create_app(llm_client=None)` used offline rules for event structuring. `LlmJsonClient.generate_json(...)` was an injection boundary, and fake-client tests demonstrated retry and fallback only. The ten-sample real-model acceptance target of at least 8/10 first-pass successes was not completed in that handoff. Later C work added an AI adapter and related features to the integrated branch; this B-only check has not certified their live behavior. The B event-structuring prompt omitted `author_hint` but passed raw report text; it was not a personal-data redaction system.
 
 ### Server-side configuration
 
-The only environment variable read by the current API is `REVIEW_API_TOKEN`. Supply it privately on the server; no secret value belongs in the README, Git, browser source or URLs. Protected endpoints return 503 when it is missing and 401 for missing/incorrect authorization. The current shared-token mechanism is limited to a controlled demonstration; CORS configuration and production identity/permissions remain integration work.
+At the B handoff, the event-review API read `REVIEW_API_TOKEN`. Supply it privately on the server; no secret value belongs in the README, Git, browser source or URLs. Protected endpoints return 503 when it is missing and 401 for missing/incorrect authorization. The shared-token mechanism is limited to a controlled demonstration; production identity and permissions require separate review. The integrated application now reads additional runtime and AI configuration variables; see its current root README and `backend/app/runtime_config.py`.
 
-`create_app(db_path=..., review_token=..., llm_client=...)` provides Python-level configuration. The default database is `backend/app/data/events.sqlite3`; these parameters are not environment-variable names. `OPENAI_API_KEY` is mentioned in the pending acceptance record, but the current API does not read it; setting it alone does not enable a model. No provider/model/base-URL environment configuration is implemented in this API.
+`create_app(db_path=..., review_token=..., llm_client=...)` provides Python-level configuration for B's event API. The default database is `backend/app/data/events.sqlite3`; these parameters are not environment-variable names. The pending T2.6 acceptance record mentions `OPENAI_API_KEY`, but setting it alone does not prove B's event-structuring acceptance. The integrated C adapter uses its own provider configuration.
 
 ## Evidence and validation record (for A; do not copy as product claims)
 
@@ -76,7 +78,7 @@ The only environment variable read by the current API is `REVIEW_API_TOKEN`. Sup
 | Provenance | `backend/app/services/ingest/hko.py:HkoWarningPoller`; `mtr_eta.py:MtrEtaAnomalyPoller`, `parse_station_observation`; `social_mock.py:SocialMockPlayer`; `contracts/seed/*.json` metadata/notes; corresponding `test_hko.py`, `test_mtr_eta.py`, `test_social_mock.py` |
 | Model/configuration limits | `backend/app/main.py:create_app`; `backend/app/services/structure/acceptance.py`; `backend/tests/test_structure_acceptance.py`; `docs/coordination/T2.6-real-model-acceptance.md` |
 
-Commands actually run from the repository root on 2026-09-27:
+Historical commands actually run from the repository root on 2026-09-27:
 
 - `git status --short --branch`, `git remote -v`, `git log -4 --oneline`: correct repository and branch; initially clean. An unrelated `.venv-b-evidence/` appeared during work and was preserved.
 - `python --version` and `python -m unittest discover -s backend/tests -v`: failed because Python was not on PATH.
@@ -91,14 +93,16 @@ Commands actually run from the repository root on 2026-09-27:
 - GitHub access in the sandbox failed; remote synchronization uses separately approved Git commands. No real HKO/MTR/model calls were run.
 - Concurrent B work added the protected Signal inbox and bilingual disclaimer (`backend/app/api/disclaimer.md`); both handoffs were read, and the complete 127-test suite was rerun successfully after their commits. Other staged evidence files were preserved and excluded. Git commit initially failed because no author identity was configured; the existing branch author's name/email are used only as command-scoped Git options, without changing repository or global configuration.
 
-Manual verification: compared these paragraphs against handlers, service fields, tests and B handoff records. No runnable service, frontend, graph or model capability was inferred from plan text alone. Changed files: only this B-owned handoff document.
+Local M2 recheck on 2026-09-29 from the repository root: `.\.venv\Scripts\python.exe -m unittest discover -s backend/tests -v` passed 127 tests (exit 0), and `.\.venv\Scripts\python.exe scripts/validate_contract_seeds.py` passed (exit 0) with four readable seed files, three valid Events and five valid Signals under B's contracts. The pre-existing untracked `.venv-readme-b/` was left alone. This recheck made no live-source or model requests, and did not verify browser delivery or deployment. `git ls-remote --heads origin XMQM2` could not connect to GitHub, so remote upload is unconfirmed.
+
+Historical 2026-09-27 manual verification: compared these paragraphs against handlers, service fields, tests and B handoff records. No runnable service, frontend, graph or model capability was inferred from plan text alone. That earlier task changed only this B-owned handoff document; the current local M2 check also updates the B evidence/report documents and adds a new round report.
 
 ## Items for A / orchestrator confirmation
 
-1. Confirm placement and wording of these English sections in A's M2 README. The root README currently contains only the project title and group description; no explicit README owner is recorded there, so this contribution is supplied separately.
+1. Reconcile these historical B sections with A's now-expanded root README before reusing them in M2 materials.
 2. Resolve plan drift explicitly: `03-contracts.md` lists `ERL_E` / `ERL_W`, while the implemented draft uses `ERL`; ingestion returns `IngestResult`, not a complete Event; FastAPI errors use `detail`, not the planned error envelope. Its generic Signal-injection description is also broader than the implemented user-only POST. Do not advertise every planned endpoint as shipped.
 3. Confirm the demonstrated 0.60 publication path and how UI badges explain the unverified `real` user channel, simulated fixtures, mixed Event provenance, and approximate source independence. A's frontend and C's graph/route consumption are not verified here.
-4. Resolve model-selection drift between `02-architecture.md` and the later T2.6 acceptance record together with C. Neither selection is a shipped client or completed acceptance result.
+4. Resolve model-selection drift between `02-architecture.md` and the later T2.6 acceptance record together with C. The integrated branch now has C's adapter, but this B record does not establish a completed real-model acceptance result.
 5. Confirm controlled-demo authorization delivery (trusted backend proxy or authorized streaming fetch), precise CORS origins, UI behavior while a published card is `updated`, and which future live-source/model checks must precede stronger README claims.
 
 Recommended next action: A merges the approved sections; B/C separately complete live model acceptance and cross-team integration before changing the documented limitations.
