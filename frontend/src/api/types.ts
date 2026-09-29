@@ -18,6 +18,7 @@ export interface NetworkLine {
   id: string
   name_en: string
   mode: string
+  operator?: string | string[]
   stops: string[]
   provenance: Provenance
 }
@@ -45,6 +46,8 @@ export interface Event {
   line: string
   severity: number
   confidence: number
+  confidence_factors?: Array<{ factor: string; weight: number; score: number; note: string }>
+  audit_log?: Array<{ at: string; actor: string; action: string; confidence_after?: number }>
   affected_segments: AffectedSegment[]
   window: { start: string; end: string | null }
   updated_at: string
