@@ -148,6 +148,10 @@
 .timeline strong { display: block; font-size: 42px; font-weight: 500; letter-spacing: -.05em; margin: 10px 0 0; color: #39582a; }
 .timeline strong small { font-size: 17px; }
 .timeline p { color: #607152; font-size: 10px; line-height: 1.5; }
+.timelineStatus { display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 99px; background: #e7efdb; color: #4a6444; font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+.timelineStatus[data-status=published] { background: #dbedc4; color: #3d5b23; }
+.timelineStatus[data-status=pending_review], .timelineStatus[data-status=draft] { background: #fdf0d5; color: #7a5a1e; }
+.timelineStatus[data-status=expired] { background: #ecebe2; color: #6d6a55; }
 .timeline li > div { height: 5px; background: #dfe7d1; border-radius: 4px; overflow: hidden; }
 .timeline i { display: block; height: 100%; background: #7f9f4f; border-radius: inherit; }
 .reviewLink { padding: 10px 16px; margin-bottom: 18px; border: 0; border-radius: 30px; background: #2f4933; color: #ecf8d9; font-size: 12px; }
@@ -218,7 +222,10 @@
 /* Full variant (How it works): no map card, opaque full-width page. */
 .pagePane.full { right: 32px; background: #fbfcf9; }
 .pagePane > .pagePanel { margin: 0; width: auto; max-width: none; padding: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.pagePane :global(.reviewPanel) { max-height: none; overflow: visible; }
+/* Panels that bring their own card chrome (review console, updates page) drop
+   it inside the pane: no card-in-card and no nested scrollbars. data-panel is
+   the stable hook; hashed CSS-module class names are not addressable here. */
+.pagePane [data-panel] { margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; max-height: none; overflow: visible; }
 @keyframes pageIn { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
 @media (max-width: 1080px) { .pagePane, .pagePane.full { right: 24px; left: 24px; } }
 @media (prefers-reduced-motion: reduce) { .pagePane { animation: none; } }

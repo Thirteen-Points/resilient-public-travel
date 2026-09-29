@@ -108,7 +108,10 @@
 .confidence meter { display: block; width: 100%; height: 16px; accent-color: #6c9952; }
 .confidence small { display: block; font-size: 10px; line-height: 1.5; color: #78866e; }
 .segmentEdit { padding: 10px 10px 0; border: 1px solid #e2e9da; border-radius: 12px; margin-bottom: 8px; }
-.reviewActions { position: sticky; bottom: 0; display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-top: 20px; padding: 16px; border: 1px solid #dce6d0; border-radius: 16px; background: #f4f7edf5; backdrop-filter: blur(10px); font-size: 12px; }
+/* Sticky action bar inside the page pane: opaque so form fields never show
+   through it while scrolling. The pane scrolls as a whole and carries 30px of
+   bottom padding, so the negative offset docks the bar flush to its edge. */
+.reviewActions { position: sticky; z-index: 5; bottom: -30px; display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-top: 20px; padding: 16px; border: 1px solid #dce6d0; border-radius: 16px; background: #f7faf1; box-shadow: 0 -6px 24px #24401f1f; font-size: 12px; }
 .reviewActions small { display: block; font-size: 10px; color: #718062; margin-top: 5px; }
 .audit { margin-top: 18px; font-size: 11px; color: #617454; }
 .audit summary { cursor: pointer; }
@@ -120,8 +123,18 @@
 .dialog p, .dialog li { color: #63755a; font-size: 12px; line-height: 1.65; }
 .dialog .actions { justify-content: flex-end; margin-top: 24px; }
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
-@container (max-width: 980px) { .reviewLayout { grid-template-columns: 190px minmax(0, 1fr); } .evidenceColumns { grid-template-columns: 1fr; } .evidence { max-height: 310px; overflow-y: auto; } }
-@container (max-width: 820px) { .reviewLayout { grid-template-columns: 1fr; } .queue { border-right: 0; border-bottom: 1px solid #e4eadf; padding: 18px 0; } .queueItems { grid-template-columns: repeat(3, minmax(135px, 1fr)); overflow-x: auto; padding-bottom: 6px; } .reviewWork { padding: 20px 0 0; } }
+@container (max-width: 980px) { .reviewLayout { grid-template-columns: 190px minmax(0, 1fr); } .evidenceColumns { grid-template-columns: 1fr; } }
+/* Narrow pane: queue on top as a horizontal strip with search and filter
+   side by side, evidence and form stacked full width below. */
+@container (max-width: 820px) {
+  .reviewLayout { grid-template-columns: 1fr; }
+  .queue { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; align-items: start; border-right: 0; border-bottom: 1px solid #e4eadf; padding: 18px 0; }
+  .queueTitle, .queueItems { grid-column: 1 / -1; }
+  .queueTitle { margin-bottom: 0; }
+  .queue input, .queue select { margin-bottom: 0; }
+  .queueItems { grid-template-columns: repeat(3, minmax(150px, 1fr)); overflow-x: auto; padding-bottom: 6px; }
+  .reviewWork { padding: 20px 0 0; }
+}
 @container (max-width: 560px) { .fieldPair { grid-template-columns: 1fr; gap: 0; } }
 @media (max-width: 700px) {
   .agentPanel, .reviewPanel { margin: 16px 12px; max-width: calc(100% - 24px); padding: 22px 18px; }
