@@ -8,6 +8,8 @@ import { AgentAvatar } from './components/AgentAvatar'
 import { AgentPanel } from './components/AgentPanel'
 import { ReviewConsole, type ReviewLog } from './components/ReviewConsole'
 import { HowItWorksPage } from './components/HowItWorksPage'
+import { UpdatesPage } from './components/UpdatesPage'
+import { ProvenanceBadge } from './components/ProvenanceBadge'
 import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
 import type { DemoMeta, Event, Network, Preset, RouteCandidate, Signal } from './api/types'
@@ -30,10 +32,6 @@ const PRESETS: { id: Preset; label: string }[] = [
   { id: 'fewest_transfers', label: 'Fewer transfers' },
   { id: 'least_walking', label: 'Less walking' },
 ]
-
-function ProvenanceBadge({ value }: { value: string }) {
-  return <span className={css.provenance}>{value === 'real' ? 'Real station record' : value === 'real-derived' ? 'Derived estimate' : 'Simulated seed'}</span>
-}
 
 function StationField({ id, label, value, network, active, onFocus, onSelect, onPickMap, invalid }: {
   id: string; label: string; value: string; network: Network; active: boolean
@@ -89,7 +87,7 @@ function RouteCard({ route, letter, network, selected, onSelect, onDetail }: {
     </button>
     <div className={css.routeFooter}><span>Score {Math.round(route.score * 100)}/100 · Estimated</span><button type="button" onClick={onDetail}>View steps →</button></div>
     <div className={css.scoreTrack} aria-label={`Route score ${Math.round(route.score * 100)} out of 100`}><span style={{ width: `${route.score * 100}%` }} /></div>
-    <div className={css.routeCaveat}><ProvenanceBadge value={route.provenance} /><span>{route.warnings[0] ?? 'No specific warning in fixture; verify service.'}</span></div>
+    <div className={css.routeCaveat}><ProvenanceBadge value={route.provenance} compact /><span>{route.warnings[0] ?? 'No specific warning in fixture; verify service.'}</span></div>
     <p className={css.routeFreshness}>{route.notes[0] ?? 'Illustrative candidate'} · {SEED_MODE ? 'Seed age at snapshot' : 'Source age at query'} {route.total.freshness_s}s</p>
     <div className={css.lineChips}>{Array.from(new Set(route.legs.filter(leg => leg.line).map(leg => leg.line!))).map(id => {
       const style = lineStyle(resolveLine(network, id), id)
@@ -100,22 +98,6 @@ function RouteCard({ route, letter, network, selected, onSelect, onDetail }: {
       <p>{route.explain}</p><strong>Risks</strong>{route.warnings.length ? route.warnings.map(note => <p key={note}>{note}</p>) : <p>No specific seed warning; verify current service.</p>}<strong>Preference notes</strong>{route.notes.map(note => <p key={note}>{note}</p>)}<p>Source: {SEED_MODE ? 'routes.seed.json' : 'route engine API'} · {route.provenance}. Freshness is measured at query time.</p>
     </details>
     <p className={css.routeDisclaimer}>Academic estimate · not official travel advice.</p>
-  </article>
-}
-
-function EventCard({ event, signals, network }: { event: Event; signals: Signal[]; network: Network }) {
-  const nodes = nodeIndex(network)
-  const evidence = signals.filter(signal => event.signals.includes(signal.signal_id))
-  return <article data-enter className={css.eventCard}>
-    <div className={css.eventTop}><span className={event.status === 'published' ? css.published : css.pending}>{event.status === 'published' ? '● Published' : event.status.replaceAll('_', ' ')}</span><span>{Math.round(event.confidence * 100)}% confidence</span></div>
-    <h3>{event.title}</h3><p>{event.summary}</p>
-    <p className={css.segment}>{event.affected_segments.map(segment => `${nodes.get(segment.from_node)?.name_en ?? segment.from_node} → ${nodes.get(segment.to_node)?.name_en ?? segment.to_node}`).join(' · ')}</p>
-    <div className={css.track}><span style={{ width: `${event.confidence * 100}%` }} /></div>
-    <div className={css.eventMeta}><span>{event.signals.length} signals · Severity {event.severity}</span><span>{formatHkt(event.updated_at)}</span></div>
-    <ProvenanceBadge value={event.provenance} />
-    {event.audit_log?.length ? <details><summary>Confidence history</summary><ol>{event.audit_log.map((entry, index) => <li key={index}>{formatHkt(entry.at)} · {entry.action} · {entry.actor}{entry.confidence_after !== undefined ? ` · ${Math.round(entry.confidence_after * 100)}%` : ''}</li>)}</ol></details> : null}
-    {event.confidence_factors?.length ? <details><summary>Confidence factors</summary>{event.confidence_factors.map(factor => <p key={factor.factor}>{factor.factor}: {Math.round(factor.score * 100)}% · weight {Math.round(factor.weight * 100)}% · {factor.note}</p>)}</details> : null}
-    <details><summary>Evidence &amp; effect</summary><p>{event.status === 'published' ? 'This published state alone changes the map.' : 'Unreviewed; does not change the map or routing.'}</p><ul>{evidence.map(signal => <li key={signal.signal_id}>{signal.source_type}: {signal.source_name}</li>)}</ul>{evidence.length < event.signals.length && <p>Some referenced signals lack a separate record in this fixture.</p>}</details>
   </article>
 }
 
@@ -238,6 +220,8 @@ export function App() {
     setPicked(`Closest accessible seed point: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. Confirm access on site.`)
   }
   const activeRoutes = screen === 'results' || screen === 'detail' ? routes : []
+  // Standalone pages dock the map as a right-hand card while content takes the left pane.
+  const docked = screen === 'updates' || screen === 'review' || screen === 'sources'
   return <div ref={root} className={css.shell}>
     <header className={css.header}>
       <button type="button" className={css.brand} onClick={() => setScreen('journey')} aria-label="ResilientRoute home">rr<span>.</span></button>
@@ -253,9 +237,13 @@ export function App() {
     </header>
     <main className={css.stage}>
       {!SEED_MODE && <div className={css.connectionStatus} role="status"><strong>{live.connected ? 'Event stream connected' : 'Event stream unavailable · polling every 3s'}</strong>{(live.warning || live.routeWarning) && <p>{live.warning} {live.routeWarning}</p>}<button type="button" onClick={() => void live.refresh()}>Refresh</button></div>}
-      <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} />
+      <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} docked={docked} />
+      {docked && <div className={css.pagePane}>
+        {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta.sources} onClose={() => setScreen('journey')} />}
+        {screen === 'updates' && <UpdatesPage events={events} signals={signals} network={network} seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} onOpenReview={() => setScreen('review')} onBack={() => setScreen('journey')} />}
+        {screen === 'review' && <ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} live={!SEED_MODE} />}
+      </div>}
       {screen === 'agent' && <AgentPanel published={published} departAt={hktDeparture(departureDate, departure)} onRoutes={preference => void showRoutes('TAW', 'ADM', preference)} onBack={() => setScreen('journey')} />}
-      {screen === 'review' && <ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} live={!SEED_MODE} />}
       {screen === 'report' && (SEED_MODE ? <section className={css.panel}><h1>Reports use the API.</h1><p>Switch to API mode to submit an unverified report.</p><button type="button" onClick={switchDataMode}>Use API mode</button></section> : <SignalReportForm onAccepted={() => void live.refresh()} />)}
       {screen === 'journey' && <div data-panel className={css.panel}>
           <h1>Where are you<br />heading?</h1>
@@ -287,14 +275,6 @@ export function App() {
           <p className={css.tiny}>{SEED_MODE ? 'Fixed illustrative candidates.' : 'API candidates on the modelled network.'} Published events affect the network overlay. Times, fares and scores are derived estimates.</p>
         </section>
       </>}
-      {screen === 'updates' && <section data-panel className={`${css.panel} ${css.widePanel}`}>
-        <button type="button" className={css.back} onClick={() => setScreen('journey')}>← Back to journey</button>
-        <span className={css.kicker}>{SEED_MODE ? 'SCENARIO SNAPSHOT' : 'API GENERATED AT'} · {formatHkt(meta.snapshotAt)}</span><h1>What we know.</h1>
-        <p className={css.subhead}>{SEED_MODE ? 'Three stages of one simulated incident.' : 'Events and confidence supplied by the API.'} Pending reports do not change routes or the map.</p>
-        <ol className={css.timeline} aria-label="Seed confidence timeline">{events.map((event, index) => <li data-enter key={event.event_id}><span>0{index + 1} · {formatHkt(event.updated_at)}</span><strong>{Math.round(event.confidence * 100)}<small>%</small></strong><p>{SEED_MODE ? (index === 0 ? 'First report' : index === 1 ? 'Corroborating signals' : 'Official demo evidence') : event.title} · {event.status.replaceAll('_', ' ')}</p><div><i data-confidence style={{ width: `${event.confidence * 100}%` }} /></div></li>)}</ol>
-        <button type="button" className={css.reviewLink} onClick={() => setScreen('review')}>Open the review desk →</button>
-        <div className={css.eventGrid}>{events.map(event => <EventCard key={event.event_id} event={event} signals={signals} network={network} />)}</div>
-      </section>}
       {screen === 'detail' && selected && <section data-panel className={`${css.panel} ${css.detailPanel}`}>
         <button type="button" className={css.back} onClick={() => setScreen('results')}>← All routes</button><span className={css.kicker}>ROUTE DETAILS · DERIVED ESTIMATE</span>
         <h1>{nodes.get(origin)?.name_en} <span>→</span><br />{nodes.get(destination)?.name_en}</h1>
@@ -305,7 +285,6 @@ export function App() {
         {selected.score_breakdown && <div className={css.breakdown}><h2>Score factors</h2>{selected.score_breakdown.map(factor => <div key={factor.criterion}><span>{factor.criterion}</span><span>weight {Math.round(factor.weight * 100)}% · contribution {factor.contribution.toFixed(3)}</span></div>)}</div>}
         <ProvenanceBadge value={selected.provenance} /><p className={css.tiny}>Source: {SEED_MODE ? 'routes.seed.json' : 'route engine API'} · {formatHkt(meta.snapshotAt)} · {meta.disclaimer}</p>
       </section>}
-      {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta.sources} onClose={() => setScreen('journey')} />}
     </main>
     <div ref={toast} role="status" aria-live="polite" className={success.text ? css.successToast : css.hiddenToast}>{success.text && <><span>✓</span><strong>{success.text}</strong></>}</div>
   </div>

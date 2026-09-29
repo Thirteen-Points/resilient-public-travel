@@ -13,9 +13,11 @@ type Props = {
   selectedRouteId: string | null
   picking: boolean
   onMapPick: (point: { lat: number; lng: number }) => void
+  /** Standalone-page mode: shrink to the right-hand card. */
+  docked?: boolean
 }
 
-export function MapView({ network, published, routes, selectedRouteId, picking, onMapPick }: Props) {
+export function MapView({ network, published, routes, selectedRouteId, picking, onMapPick, docked = false }: Props) {
   const element = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const overlaysRef = useRef<L.LayerGroup | null>(null)
@@ -170,7 +172,14 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     }
   }, [network, published, routes, selectedRouteId])
 
-  return <div className={`${css.wrap} ${picking ? css.picking : ''}`}>
+  // Re-fit the corridor once the dock/undock size transition has settled.
+  useEffect(() => {
+    if (!docked) return
+    const timer = setTimeout(() => resetRef.current(), 620)
+    return () => clearTimeout(timer)
+  }, [docked])
+
+  return <div className={`${css.wrap} ${picking ? css.picking : ''} ${docked ? css.docked : ''}`}>
     <div ref={element} className={css.map} tabIndex={0} aria-label="Hong Kong schematic network map. Scroll to zoom around the pointer; use arrow keys to pan and plus or minus to zoom." />
     <div className={css.tools}><button type="button" onClick={() => resetRef.current()} aria-label="Fit corridor on map">◎ Fit corridor</button><span>Zoom {zoom.toFixed(2)}</span></div>
     <details className={css.legend}><summary>Network colours <span>↗</span></summary><div>{network.lines.map(line => { const style = lineStyle(line); return <p key={line.id}><i style={{ background: lineGradient(style.colors) }} /><span>{style.label}</span></p> })}<p><i style={{ background: lineStyle(undefined, 'unmapped').colors[0] }} /><span>Unknown line · assigned colour (example)</span></p><hr /><p>Bold + white outline: selected candidate</p><p>Red dashes: closed · amber dots: affected</p><p>Scroll at your pointer to zoom. Pinch or use + / −. All paths are schematic.</p></div></details>
