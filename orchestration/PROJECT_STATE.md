@@ -1,10 +1,10 @@
 # Project State
 
-Last updated: 2026-09-22
+Last updated: 2026-09-29
 
 ## Current Objective
 
-等待用户提供真实项目目标、四个 Agent 的最终职责和第一轮任务。
+等待用户提供真实项目目标、四个 Agent 的最终职责和第一轮任务；已完成的项目文件上传到 GitHub 对应里程碑分支。
 
 ## Current Architecture
 
@@ -23,6 +23,7 @@ Last updated: 2026-09-22
 - 配置四个项目级 Codex subagents。
 - 添加本地结构验证脚本。
 - 完成 LEVEL 1 与 LEVEL 2 的部署准备。
+- 创建首个本地 Git commit，并将 23 个编排源文件上传到 `Thirteen-Points/resilient-public-travel` 的 `Mingquan-Xia` 分支 `orchestration/` 目录。
 
 ## In Progress
 
@@ -33,7 +34,6 @@ Last updated: 2026-09-22
 - 用真实业务项目目标替换或扩展当前 bootstrap 目标。
 - 用户确认或修改 Agent A/B/C/D 的默认职责。
 - 用户提供第一轮真实任务后创建 `runs/round-001/`。
-- 创建首个 Git commit。
 
 ## Blockers
 
@@ -46,6 +46,7 @@ Last updated: 2026-09-22
 - 先保证 LEVEL 1 可用，再配置 LEVEL 2；暂不建设 LEVEL 3。
 - Agent A/B/D 默认只读；Agent C 可在明确允许文件范围内实施修改。
 - 并发不足时，四个 Agent 分批运行，不伪装为同时执行。
+- 已完成并验证的文件不只留在本地：M0 上传到 `Mingquan-Xia`，M1 上传到 `XMQM1`，M2 上传到 `XMQM2`；通过合并申请进入 `main`。
 
 ## Assumptions
 
@@ -55,8 +56,9 @@ Last updated: 2026-09-22
 ## Known Issues
 
 - 当前还没有真实产品代码、领域目标或 Agent 最终职责。
-- 当前 Codex 会话早于 `AGENTS.md` 创建；新的任务/会话会自动加载它。
+- 外层编排目录是独立的本地 Git 仓库；GitHub 副本位于产品仓库的 `orchestration/` 子目录。
 
 ## Next Milestone
 
 接收用户的真实任务，创建并执行 Round 001。
+
