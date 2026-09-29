@@ -1,0 +1,2 @@
+WARN event evt_seed_003: published demo event is simulated, not operational evidence
+PASS: four seed files readable; 1 documented warning(s)

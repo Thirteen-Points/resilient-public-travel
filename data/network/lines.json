@@ -1,9 +1,11 @@
 {
   "meta": {
-    "version": "1.0",
+    "version": "1.1",
     "built_at": "2026-09-22",
-    "description": "Transit line definitions with headways, capacities, fares, and provenance. Headways from MTR service index (real). Segment times are real-derived. Alternative line capacities are estimated.",
-    "provenance_note": "See data/PROVENANCE.md for source tracking of each value."
+    "updated_at": "2026-09-25",
+    "description": "Transit line definitions with headways, capacities, fares, and provenance. ERL headway band and all modelled line memberships/stop orders verified against official sources on 2026-09-25; segment times and bus/minibus/ferry headways remain real-derived estimates.",
+    "provenance_note": "See data/PROVENANCE.md (S17-S20, S25-S28, S31). ERL capacity is a LegCo secondary figure; bus capacities are vehicle-type estimates; no capacity field is an operator-published measurement. TD headway GTFS expresses variable frequency bands that a single headway_s value cannot represent, so peak-only bus headways stay null.",
+    "excluded_lines_note": "GMB_481B removed from runnable lines: endpoint BS_TW was manually confirmed invalid and the official stop sequence was unverified (matches contracts/seed missing_nodes_note). Route 481B itself remains registered per TD ROUTE_GMB row 2003214 (2025-12-25) - see data/network/bus_routes.json."
   },
   "lines": [
     {
@@ -25,13 +27,14 @@
       "capacity_note": "9-car R-Stock, 6 pax/m^2. Source: LegCo paper (secondary). Awaiting primary verification.",
       "accessible": true,
       "fare_baseline": true,
-      "provenance": "real",
-      "source": "MTR service index + LegCo paper",
-      "source_url": "https://www.mtr.com.hk/en/customer/services/train_service_index.html",
-      "retrieved_at": "2026-09-21",
+      "provenance": "real-derived",
+      "source": "MTR open-data CSV (stops/order/facilities/fares) + MTR service index (headway band) + LegCo paper (capacity)",
+      "source_url": "https://data.gov.hk/en-data/dataset/mtr-data-routes-fares-barrier-free-facilities",
+      "retrieved_at": "2026-09-25",
       "confidence": "high",
-      "data_status": "verified",
-      "scope_note": "Only TAW-ADM corridor modelled; stations beyond TAW not included"
+      "data_status": "unverified",
+      "scope_note": "Only TAW-ADM corridor modelled; stations beyond TAW not included",
+      "note": "Stop order TAW(9)-KOT(10)-MKK(11)-HUH(12)-EXC(13)-ADM(14) verified field-level 2026-09-25 (mtr_lines_and_stations.csv); station accessibility verified (barrier_free_facilities.csv, all six AJ8=Y). Official headway bands (Admiralty-Sheung Shui): AM peak 2.7-5.5, PM 3.2, off-peak 4-8, Sat/Sun/PH 3.8-8 min - the headway_s values are in-band modelling choices, not official point values. Official adult fares (mtr_lines_fares.csv): TAW-ADM Octopus 17.1/single 19.0; HUH-EXC 10.6/12.5; EXC-ADM 4.9/5.0. seg_time_s values remain estimates (official ~17 min end-to-end claim not re-verified)."
     },
     {
       "id": "TML",
@@ -54,10 +57,11 @@
       "provenance": "real-derived",
       "source": "MTR service index (headway) + industry estimate (capacity)",
       "source_url": "https://www.mtr.com.hk/en/customer/services/train_service_index.html",
-      "retrieved_at": "2026-09-21",
+      "retrieved_at": "2026-09-25",
       "confidence": "medium",
       "data_status": "unverified",
-      "collapsed_stops_note": "Intermediate stops (Hin Keng, Kai Tak, Sung Wong Toi, To Kwa Wan) collapsed into edge weights"
+      "collapsed_stops_note": "Intermediate stops (Hin Keng, Kai Tak, Sung Wong Toi, To Kwa Wan) collapsed into edge weights; modelled stop order matches the official TML sequence ETS-HUH-HOM-TKW-DIH-HIK-TAW (verified 2026-09-25)",
+      "note": "Line membership and order verified against mtr_lines_and_stations.csv 2026-09-25; headways not re-verified against a current official band and remain estimates."
     },
     {
       "id": "KTL",
@@ -80,9 +84,11 @@
       "provenance": "real-derived",
       "source": "MTR service index (headway) + industry estimate (capacity)",
       "source_url": "https://www.mtr.com.hk/en/customer/services/train_service_index.html",
-      "retrieved_at": "2026-09-21",
+      "retrieved_at": "2026-09-25",
       "confidence": "medium",
-      "data_status": "unverified"
+      "data_status": "unverified",
+      "collapsed_stops_note": "WTS/LOF (between DIH and KOT) and SKM (between KOT and PRE) collapsed into edge weights; modelled order matches the official KTL sequence DIH-WTS-LOF-KOT-SKM-PRE-MOK-YMT-HOM (verified 2026-09-25)",
+      "note": "Line membership and order verified against mtr_lines_and_stations.csv 2026-09-25; headways remain estimates."
     },
     {
       "id": "TWL",
@@ -105,9 +111,10 @@
       "provenance": "real-derived",
       "source": "MTR service index (headway) + industry estimate (capacity)",
       "source_url": "https://www.mtr.com.hk/en/customer/services/train_service_index.html",
-      "retrieved_at": "2026-09-21",
+      "retrieved_at": "2026-09-25",
       "confidence": "medium",
-      "data_status": "unverified"
+      "data_status": "unverified",
+      "note": "Modelled stops are adjacent in the official TWL sequence (YMT-JOR-TST-ADM-CEN, verified 2026-09-25); headways remain estimates."
     },
     {
       "id": "ISL",
@@ -130,9 +137,10 @@
       "provenance": "real-derived",
       "source": "MTR service index (headway) + industry estimate (capacity)",
       "source_url": "https://www.mtr.com.hk/en/customer/services/train_service_index.html",
-      "retrieved_at": "2026-09-21",
+      "retrieved_at": "2026-09-25",
       "confidence": "medium",
-      "data_status": "unverified"
+      "data_status": "unverified",
+      "note": "Modelled stops are adjacent in the official ISL sequence (WAC-ADM-CEN, verified 2026-09-25); headways remain estimates."
     },
     {
       "id": "SIL",
@@ -155,7 +163,7 @@
       "provenance": "real-derived",
       "source": "MTR service index + industry estimate",
       "source_url": "https://www.mtr.com.hk/en/customer/services/train_service_index.html",
-      "retrieved_at": "2026-09-21",
+      "retrieved_at": "2026-09-25",
       "confidence": "low",
       "data_status": "unverified",
       "scope_note": "Only ADM endpoint modelled; not a corridor alternative"
@@ -182,12 +190,12 @@
       "service_hours": "06:00-23:50",
       "fare_hkd": [16.0, 20.8],
       "provenance": "real-derived",
-      "source": "KMB open data API (route/hours) + estimated headway/fare/capacity",
-      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/182/outbound/1",
-      "retrieved_at": "2026-09-21",
+      "source": "TD ROUTE_BUS/RSTOP_BUS XML (route/order/fare) + estimated headway/capacity",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "retrieved_at": "2026-09-25",
       "confidence": "medium",
       "data_status": "unverified",
-      "note": "Only full-day direct cross-harbour bus from Sha Tin to Central/Admiralty. Headway and exact fare unverified."
+      "note": "Route 1051 愉翠苑-Central (Macao Ferry), full fare HK$20.8 verified (row 2026-01-14); the HK$16.0 lower bound is an unverified section fare. Boards 大圍轉車站-新翠邨 (859) outbound / 大圍站 (6042) inbound; stops 紅隧轉車站 (219/9015). Headway values are estimates - TD GTFS shows variable frequency bands. Earlier KMB-API sourcing (S11) was unverifiable and is superseded by the TD XML evidence."
     },
     {
       "id": "BUS_982X",
@@ -199,23 +207,25 @@
       "stops": ["BS_TAW", "BS_ADM_E"],
       "seg_time_s": [2400],
       "headway_s": {
-        "weekday_peak": 1800,
+        "weekday_peak": null,
         "weekday_offpeak": null,
         "saturday": null,
         "sunday_ph": null
       },
+      "headway_status": "no_single_headway_applicable_unverified_official",
       "capacity_per_vehicle": 137,
       "accessible": true,
       "tunnel": "WHC",
       "service_calendar": "weekday_peak_only",
-      "fare_hkd": [6.0, 16.0],
+      "fare_hkd": [6.0, 20.8],
       "provenance": "real-derived",
-      "source": "KMB open data API + estimated values",
-      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/982X/",
-      "retrieved_at": "2026-09-21",
+      "source": "TD ROUTE_BUS/RSTOP_BUS XML (route/order/fare) + user-provided timetable screenshots (weekday departures) + estimated values",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "retrieved_at": "2026-09-25",
       "confidence": "medium",
       "data_status": "unverified",
-      "note": "Weekday peak only, one-way. Load factor already >90%. $6 TAW section fare is cheapest cross-harbour option."
+      "headway_note": "A single headway_s value cannot faithfully express the documented service: weekday gaps are direction- and time-dependent (to Fleming Road 06:55-08:10: 20/15/9/12/13/6 min; to Yu Chui Court 17:47-18:27: uniform 8 min). The departures come from user-provided screenshots with no capture date or verifiable official origin shown, so no field is promoted to verified; headway_s stays null and consumers must use the per-trip schedule in data/network/bus_routes.json (982X.schedule_evidence) instead. No off-peak, Saturday, Sunday or public-holiday service evidence exists; nothing beyond the two weekday panels is claimed.",
+      "note": "Full fare corrected 16.0 -> 20.8 per TD rows 8104/8308/8644 (2026-06-12); the HK$6.0 Tai Wai section fare is an appendix claim, unverified. Variants: 8104/8308 AM 愉翠苑/水泉澳->灣仔(菲林明道) via 西隧 (911), boarding 大圍轉車站 6041/6015; 8644 PM 金鐘站(東)->愉翠苑 via 西隧 (921). The screenshots' two panels match variants 8104/8644 by OD only (no variant ID displayed)."
     },
     {
       "id": "BUS_985B",
@@ -227,23 +237,24 @@
       "stops": ["BS_TIN_SUM", "BS_ADM_E"],
       "seg_time_s": [2400],
       "headway_s": {
-        "weekday_peak": 1800,
+        "weekday_peak": null,
         "weekday_offpeak": null,
         "saturday": null,
         "sunday_ph": null
       },
+      "headway_status": "unverified_exact_departures",
       "capacity_per_vehicle": 137,
       "accessible": true,
       "tunnel": "WHC",
       "service_calendar": "weekday_peak_only",
-      "fare_hkd": [19.5, 19.5],
+      "fare_hkd": [20.8, 20.8],
       "provenance": "real-derived",
-      "source": "KMB open data API + estimated values",
-      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/985B/",
-      "retrieved_at": "2026-09-21",
+      "source": "TD ROUTE_BUS/RSTOP_BUS XML (route/order/fare) + estimated values",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "retrieved_at": "2026-09-25",
       "confidence": "medium",
       "data_status": "unverified",
-      "note": "Via Hin Keng. Third stop already ~70% full."
+      "note": "Full fare corrected 19.5 -> 20.8 per TD row 8705 (2025-04-03). Current AM service is 田心村->灣仔(軒尼詩道) (route 8705, via 顯徑邨, 西隧 911); no PM-return row exists for 985B in the 2026-09-11 master data (only route 985, 8697 金鐘站(東)->美田). The modelled BS_ADM_E endpoint therefore approximates the 灣仔 alighting area - modelling gap recorded in PROVENANCE.md, contract stops left unchanged."
     },
     {
       "id": "BUS_81C",
@@ -263,13 +274,14 @@
       "capacity_per_vehicle": 137,
       "accessible": true,
       "tunnel": null,
+      "fare_hkd": [10.2, 10.2],
       "provenance": "real-derived",
-      "source": "KMB open data API + estimated values",
-      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/81C/",
-      "retrieved_at": "2026-09-21",
+      "source": "TD ROUTE_BUS/RSTOP_BUS XML (route/order/fare) + estimated headway/capacity",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "retrieved_at": "2026-09-25",
       "confidence": "medium",
       "data_status": "unverified",
-      "note": "Does not cross harbour. Used for connecting to TST for ferry/KTL interchange."
+      "note": "Does not cross harbour (route 1336 耀安->尖沙咀東(麼地道), full fare HK$10.2 verified, row 2025-08-11). Boards 大圍轉車站 859 outbound / 6042 inbound. Headway values are estimates (TD GTFS variable bands)."
     },
     {
       "id": "BUS_170",
@@ -292,37 +304,12 @@
       "service_hours": "06:00-23:45",
       "fare_hkd": [20.8, 20.8],
       "provenance": "real-derived",
-      "source": "KMB open data API + estimated values",
-      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/170/",
-      "retrieved_at": "2026-09-21",
+      "source": "TD ROUTE_BUS/RSTOP_BUS XML (route/order/fare) + estimated headway/capacity",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "retrieved_at": "2026-09-25",
       "confidence": "medium",
       "data_status": "unverified",
-      "note": "HK Island end only reaches Causeway Bay / Aberdeen, not Admiralty/Central. Partial network only."
-    },
-    {
-      "id": "GMB_481B",
-      "name_zh": "綠色小巴481B",
-      "name_en": "GMB 481B",
-      "mode": "MINIBUS",
-      "bidirectional": true,
-      "operator": "Minibus (smartbus)",
-      "stops": ["BS_TAW"],
-      "seg_time_s": [],
-      "headway_s": {
-        "weekday_peak": 900,
-        "weekday_offpeak": 1500,
-        "saturday": 1500,
-        "sunday_ph": 1800
-      },
-      "capacity_per_vehicle": 19,
-      "accessible": false,
-      "fare_hkd": [12.3, 12.3],
-      "provenance": "real",
-      "source": "Transport Department (capacity); route data estimated",
-      "retrieved_at": "2026-09-21",
-      "confidence": "high",
-      "data_status": "verified",
-      "note": "19-seat, no low-floor. Wheelchair users CANNOT use. Lateral connection to Tsuen Wan, not cross-harbour. Endpoint BS_TW (Tsuen Wan) not yet modelled."
+      "note": "Route 1047/8470 沙田站->華富(中), full fare HK$20.8 verified (row 2026-07-23). Serves 大圍轉車站-新翠邨 (859) outbound and 大圍站 (6042) inbound; stops 紅隧轉車站 9014/9015. HK Island end only reaches 华富/Causeway Bay area, not Admiralty/Central. Headway values are estimates. Partial network only."
     },
     {
       "id": "FERRY_TST_CEN",
@@ -345,13 +332,13 @@
       "service_hours": "06:30-23:30",
       "fare_hkd": [4.0, 6.5],
       "weather_sensitive": true,
-      "provenance": "real",
+      "provenance": "real-derived",
       "source": "Star Ferry official website",
-      "source_url": "https://www.starferry.com.hk",
-      "retrieved_at": "2026-09-21",
+      "source_url": "https://www.starferry.com.hk/en/service",
+      "retrieved_at": "2026-09-25",
       "confidence": "medium",
       "data_status": "unverified",
-      "note": "Fares may be 2023 prices. Typhoon cancellation threshold unverified. Wheelchair: lower deck limited to 4 per sailing."
+      "note": "Timetable verified 2026-09-25: Mon-Fri 06:30-23:30 (bands 10/12, 6, 6/8, 10/12 min), Sat/Sun/PH 10/12, 6/8, 10/12; modelled headway_s covers the 6/8-min core bands, not the 10/12-min early/late bands. Fares verified: adult lower deck $4.0 weekday / $5.6 weekend, upper deck $5.0 / $6.5 - fare_hkd [4.0, 6.5] spans the adult range. Wheelchair: lower deck limited to 4 per sailing (verified). Vessel capacity and typhoon suspension threshold remain unverified; operator notes sailing times vary with sea/weather/traffic."
     }
   ]
 }

@@ -3,6 +3,18 @@
 > This document explains how vehicle and line capacities are derived.
 > All capacities are `real-derived` unless explicitly marked `real` (e.g. minibus statutory limit).
 > A reviewer should be able to reproduce any line's hourly capacity from this document.
+>
+> **2026-09-25 (M1) status note**: the ERL headway *band* is now officially
+> verified (MTR service index: Admiralty–Sheung Shui AM peak 2.7–5.5 min, PM
+> 3.2, off-peak 4–8, Sat/Sun/PH 3.8–8) — the 180 s/162 s point values used
+> below are in-band modelling choices, not official point measurements. Star
+> Ferry adult fares were verified the same day (lower $4.0/$5.6, upper
+> $5.0/$6.5); its vessel capacity remains unpublished and unverified. No
+> official capacity source was found for MTR trains, buses or the ferry in
+> this pass, so every `capacity_per_vehicle` stays `real-derived`/unverified.
+> Green minibus 19-seat statutory maximum unchanged (Cap 374D). GMB_481B is
+> excluded from the runnable network (endpoint invalid); its 65 pax/hour
+> worked example is illustrative only.
 
 ---
 
@@ -57,18 +69,55 @@ capacity = 4 x 137 x 0.85 = 466 pax/hour
 
 ### BUS 982X - Peak-only cross-harbour
 
-```
-headway_peak = 1800s (30 min) -> frequency = 3600/1800 = 2 veh/hour
-capacity_per_vehicle = 137
-eta_max = 0.85
-capacity = 2 x 137 x 0.85 = 233 pax/hour
-```
+> **RETIRED FIGURE (2026-09-25).** The older version of this example assumed a
+> fixed 30-minute headway (`1800 s` -> 2 veh/h -> **233 pax/hour**). That
+> assumption is contradicted by the weekday departure times now recorded in
+> `data/network/bus_routes.json` (982X `schedule_evidence`, user-provided
+> timetable screenshots) and MUST NOT be used as an M1 demo capacity
+> conclusion. 982X gaps are direction- and time-dependent, so no single
+> headway-based hourly capacity exists for this route.
+
+What the recorded weekday departures actually support, as directly observed
+facts: **7 departures in the 06:55–08:10 span** (AM, to Wan Chai) and
+**6 departures in the 17:47–18:27 span** (PM, to Yu Chui Court). Those are
+trip counts, not hourly capacities. Any frequency derived from them must
+follow this document's own formula — `frequency = 3600 / headway_s` — applied
+to the average observed headway. A departures-÷-span rate is NOT used here:
+it miscounts the span boundaries (7 departures span 6 headways; 6 departures
+span 5), which is how the earlier 5.6/9 veh/h figures went wrong.
+
+| Direction (weekday, user screenshots) | Span | Departures | Gaps (min) | Average headway | Implied frequency (§1 formula) |
+|---|---|---|---|---|---|
+| 愉翠苑 -> 灣仔(菲林明道) | 06:55–08:10 (75 min) | 7 | 20/15/9/12/13/6 | 75/6 = 12.5 min | 60/12.5 = **4.8 veh/h** |
+| 金鐘(東) -> 愉翠苑巴士總站 | 17:47–18:27 (40 min) | 6 | uniform 8 | 8 min | **7.5 veh/h** |
+
+Assumptions if one insists on an hourly bucket: the average headway stands in
+for the real gaps — a false smoothness for the AM direction, whose
+instantaneous rate swings from ~3 veh/h at a 20-min gap to ~10 veh/h at a
+6-min gap — plus `capacity_per_vehicle` 137 (industry estimate, unverified)
+and `eta_max` 0.85. Under those assumptions:
+AM ≈ 4.8 × 137 × 0.85 ≈ **559 pax/hour** and PM ≈ 7.5 × 137 × 0.85 ≈
+**873 pax/hour**. These are derived illustrations, NOT official or all-day
+figures: each rests on a single narrow span (75 minutes AM, 40 minutes PM —
+the PM span alone is shorter than an hour) rather than a full service period;
+they are computed from user-provided screenshots that are not verified
+against an official source; and there is no evidence for off-peak, Saturday,
+Sunday, public-holiday or opposite-direction service. Demo wording must cite
+direction, span and assumptions, or omit the number entirely.
 
 ### GMB 481B - Green minibus
 
+> **HISTORICAL / HYPOTHETICAL EXAMPLE ONLY — NOT IN THE RUNNABLE NETWORK
+> (2026-09-25).** GMB_481B has been removed from runnable
+> `network.lines`/`contracts/seed` (endpoint `BS_TW` manually confirmed
+> invalid; official stop sequence unverified). The arithmetic below is kept
+> solely to illustrate the minibus statutory-capacity method and the
+> wheelchair exclusion. It must NOT be mixed into any current M1 demo
+> capacity conclusion, and the route is not an operational candidate.
+
 ```
-headway_peak = 900s (15 min) -> frequency = 3600/900 = 4 veh/hour
-capacity_per_vehicle = 19
+headway_peak = 900s (15 min) -> frequency = 3600/900 = 4 veh/hour  (headway estimate, unverified)
+capacity_per_vehicle = 19 (statutory maximum, real)
 eta_max = 0.85
 capacity = 4 x 19 x 0.85 = 65 pax/hour (non-accessible, wheelchair excluded)
 ```
@@ -84,16 +133,45 @@ capacity = 10 x 300 x 0.85 = 2,550 pax/hour
 
 ## 4. Key Insight for Demo
 
-| Route | Capacity (pax/hour) | Ratio to ERL |
-|---|---|---|
-| ERL (normal, peak) | ~53,200 | 1.0x |
-| TML (alternative) | ~42,500 | 0.8x |
-| BUS 182 (full-day) | ~466 | 0.009x |
-| BUS 982X (peak-only) | ~233 | 0.004x |
-| GMB 481B | ~65 | 0.001x |
+> **2026-09-25 caveat.** The two bus rows below are NOT comparable
+> all-day capacity claims. The 182 figure rests on an *estimated* headway
+> (TD GTFS shows variable bands), and the 982X figures are span-derived
+> illustrations from user-provided, unverified screenshots (average observed
+> headway per the §1 formula, applied within each recorded span) — see §3
+> before quoting either. GMB 481B is a historical/hypothetical example
+> for a route that is NOT in the runnable network.
 
-> One ERL train = ~20 double-decker buses. This is the core argument for the project:
-> diverting MTR passengers to buses is physically impossible when buses are already 90%+ full.
+| Route | Capacity (pax/hour) | Basis | Ratio to ERL |
+|---|---|---|---|
+| ERL (normal, peak) | ~53,200 | in-band headway model + LegCo secondary capacity | 1.0x |
+| TML (alternative) | ~42,500 | estimated headway + estimated capacity | 0.8x |
+| BUS 182 (full-day) | ~466 | estimated 15-min peak headway x 137 x 0.85 | 0.009x |
+| BUS 982X | ≈559 AM (06:55–08:10 span, to Wan Chai) / ≈873 PM (17:47–18:27 span, to Yu Chui Court) | user-screenshot departures; average observed headway (12.5 / 8 min) via the §1 formula within each span only — not all-day, not officially verified | ≈0.011x / ≈0.016x |
+| GMB 481B | ~65 | **historical example only — NOT in runnable network** | 0.001x |
+
+**Rail-vs-bus capacity gap — derived illustration and stated risk, NOT a
+verified fact (rewritten 2026-09-25).** One ERL train's rated capacity
+(≈2,845 pax at 6 pax/m², LegCo paper — secondary source, unverified) is
+≈ 20–21 double-decker buses at the industry-estimate ≈137 pax/veh
+(unverified), and ≈ 15 at the 4 pax/m² density (≈2,061). The ratio is a
+derivation that inherits both inputs' data grades — a planning
+illustration, not an operational measurement. Beyond the per-trip ratio,
+the modelled cross-harbour bus supply in the §4 table (182 ≈ 466 pax/h on
+an estimated headway; 982X ≈ 559 / ≈ 873 pax/h as span-derived
+illustrations) sits one to two orders of magnitude below the ERL hourly
+figure, and the >90% peak load factor cited for 982X rests on a single web
+search (§5 item 4), not continuous monitoring.
+
+**Retired absolute wording.** The earlier closing claim — "diverting MTR
+passengers to buses is physically impossible when buses are already 90%+
+full" — promoted one unverified observation into a general fact and drew an
+absolute conclusion the evidence cannot carry. The supported demo statement
+is a qualified risk: at the documented (unverified) load-factor claim and
+the §4 capacity grades, the modelled bus lines could absorb only a small
+fraction of a disrupted ERL peak load; in the simulation the remainder
+surfaces as unmet demand (`unstoppable_demand`, see `data/sim/README.md`)
+rather than being absorbed. Scope: TAW–ADM corridor, modelled lines only,
+peak windows; every number above keeps its real-derived/simulated grade.
 
 ## 5. Data Gaps
 
@@ -101,3 +179,4 @@ capacity = 10 x 300 x 0.85 = 2,550 pax/hour
 2. **Bus capacity**: No KMB/CTB fleet type or capacity data in open APIs.
 3. **Ferry capacity**: No official vessel capacity data.
 4. **Actual vs theoretical**: Real-world load factors unknown. The >90% load factor for 982X is from a single web search, not continuous monitoring.
+5. **982X schedule provenance (2026-09-25)**: the weekday directional departures recorded in `bus_routes.json` come from user-provided timetable screenshots with no capture date or verifiable official origin shown; they have not been re-checked against an official source. No off-peak, Saturday, Sunday or public-holiday evidence exists for 982X, and no departure evidence at all exists for 985B.

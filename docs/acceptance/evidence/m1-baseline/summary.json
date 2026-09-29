@@ -1,0 +1,1046 @@
+{
+  "revision": "75fe0b05bb54ff78cac44f39e485a968760a8920",
+  "generated_at": "2026-09-24T02:57:15.067805+00:00",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "provenance": "simulated",
+  "checks": [
+    {
+      "name": "compile_backend",
+      "status": "PASS",
+      "command": [
+        "python",
+        "-m",
+        "compileall",
+        "-q",
+        "backend/app"
+      ],
+      "returncode": 0,
+      "tests": null,
+      "expected_minimum": null,
+      "elapsed_s": 0.5513,
+      "log": "compile_backend.txt",
+      "files_changed_during_check": []
+    },
+    {
+      "name": "cross_module",
+      "status": "PASS",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/cross_module",
+        "-v"
+      ],
+      "returncode": 0,
+      "tests": 20,
+      "expected_minimum": 1,
+      "elapsed_s": 3.395,
+      "log": "cross_module.txt",
+      "files_changed_during_check": []
+    },
+    {
+      "name": "consumer_contracts",
+      "status": "PASS",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/integration",
+        "-v"
+      ],
+      "returncode": 0,
+      "tests": 40,
+      "expected_minimum": 40,
+      "elapsed_s": 2.9746,
+      "log": "consumer_contracts.txt",
+      "files_changed_during_check": []
+    },
+    {
+      "name": "owner_regression",
+      "status": "PASS",
+      "command": [
+        "python",
+        "-m",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--import-mode=importlib",
+        "backend/app/engine/tests",
+        "backend/tests"
+      ],
+      "returncode": 0,
+      "tests": 222,
+      "expected_minimum": 1,
+      "elapsed_s": 7.7671,
+      "log": "owner_regression.txt",
+      "files_changed_during_check": []
+    },
+    {
+      "name": "validate_data",
+      "status": "PASS",
+      "command": [
+        "python",
+        "scripts/validate_data.py"
+      ],
+      "returncode": 0,
+      "tests": null,
+      "expected_minimum": null,
+      "elapsed_s": 0.1894,
+      "log": "validate_data.txt",
+      "files_changed_during_check": []
+    },
+    {
+      "name": "preflight",
+      "status": "PASS",
+      "command": [
+        "python",
+        "scripts/preflight.py"
+      ],
+      "returncode": 0,
+      "tests": null,
+      "expected_minimum": null,
+      "elapsed_s": 0.4189,
+      "log": "preflight.txt",
+      "files_changed_during_check": []
+    }
+  ],
+  "http": {
+    "scope": "ASGI integrated app; event injected at C receive boundary",
+    "provenance": "simulated",
+    "checks": {
+      "http_queries_ok": true,
+      "snapshot_changed": true,
+      "routes_recomputed": true,
+      "closed_edge_absent": true,
+      "ai_off_query_ok": true,
+      "ai_matches_refreshed_routes": true,
+      "no_llm_transport": true
+    },
+    "snapshot_before": {
+      "snapshot_id": "g_acc91a895b1bd322",
+      "affected_edges": []
+    },
+    "snapshot_after": {
+      "snapshot_id": "g_b8e605076eff86a2",
+      "affected_edges": [
+        {
+          "from_node": "O",
+          "to_node": "V00",
+          "line": "SIM_00",
+          "capacity_factor": 0.0,
+          "event_ids": [
+            "m1_simulated_receipt"
+          ]
+        },
+        {
+          "from_node": "V00",
+          "to_node": "O",
+          "line": "SIM_00",
+          "capacity_factor": 0.0,
+          "event_ids": [
+            "m1_simulated_receipt"
+          ]
+        }
+      ]
+    },
+    "route_ids_before": [
+      "r_9f3a7d0e02196f00",
+      "r_acf6ef11a6b60eac",
+      "r_01d3d843edc9d79e",
+      "r_126454efad26a63d",
+      "r_96127d2bbc8ae296",
+      "r_906c7b4a7d9f9dda",
+      "r_4cf239f4c5a00c84",
+      "r_e705e122bd0b8c08",
+      "r_90b11f4d7419eb20",
+      "r_f598b79a2f4feeb3"
+    ],
+    "route_ids_after": [
+      "r_acf6ef11a6b60eac",
+      "r_01d3d843edc9d79e",
+      "r_126454efad26a63d",
+      "r_96127d2bbc8ae296",
+      "r_4cf239f4c5a00c84",
+      "r_906c7b4a7d9f9dda",
+      "r_e705e122bd0b8c08",
+      "r_90b11f4d7419eb20",
+      "r_f598b79a2f4feeb3"
+    ],
+    "event": {
+      "event_id": "m1_simulated_receipt",
+      "version": 2,
+      "status": "published",
+      "created_at": "2026-09-22T08:03:20+08:00",
+      "updated_at": "2026-09-22T08:20:00+08:00",
+      "published_at": "2026-09-22T08:20:00+08:00",
+      "expires_at": null,
+      "event_type": "signal_failure",
+      "title": "Simulated C-receipt closure",
+      "summary": "Test injection, not a B publication",
+      "mode": "MTR",
+      "line": "SIM_00",
+      "direction": "both",
+      "affected_segments": [
+        {
+          "from_node": "O",
+          "to_node": "V00",
+          "impact": "closed",
+          "capacity_factor": 0
+        }
+      ],
+      "window": {
+        "start": "2026-09-22T08:20:00+08:00",
+        "end": null,
+        "end_confidence": "unknown"
+      },
+      "severity": 4,
+      "confidence": 0.9,
+      "confidence_factors": [
+        {
+          "factor": "source_authority",
+          "weight": 0.35,
+          "score": 1.0,
+          "note": "Simulated test evidence; no actual authority or report"
+        },
+        {
+          "factor": "multi_source_agreement",
+          "weight": 0.25,
+          "score": 0.8,
+          "note": "Simulated test evidence; no actual authority or report"
+        },
+        {
+          "factor": "physical_consistency",
+          "weight": 0.2,
+          "score": 1.0,
+          "note": "Simulated test evidence; no actual authority or report"
+        },
+        {
+          "factor": "admin_confirmation",
+          "weight": 0.2,
+          "score": 1.0,
+          "note": "Simulated test evidence; no actual authority or report"
+        }
+      ],
+      "signals": [],
+      "reviewed_by": "simulated-c-receipt-fixture",
+      "audit_log": [],
+      "provenance": "simulated"
+    },
+    "missing_b_endpoints": [
+      "GET /api/events/published",
+      "POST /api/events/{id}/review",
+      "GET /api/stream/events"
+    ],
+    "mounted_paths": [
+      "/",
+      "/api/ai/chat",
+      "/api/graph/network",
+      "/api/graph/snapshot",
+      "/api/health",
+      "/api/health/deep",
+      "/api/meta",
+      "/api/routes/query",
+      "/api/signals",
+      "/api/sim/load",
+      "/api/sim/result",
+      "/health"
+    ],
+    "llm_transport_calls": 0
+  },
+  "performance": {
+    "scope": "Single process serial engine timings, cold includes JSON/build/query; excludes process startup, B, A, HTTP and live-data validation",
+    "percentile_method": "nearest rank",
+    "datasets": [
+      {
+        "dataset": "synthetic",
+        "provenance": "simulated",
+        "samples": [
+          {
+            "cold_build_query_s": 0.006221099989488721,
+            "cached_query_s": 0.0012397999817039818,
+            "snapshot_swap_s": 0.0003412999794818461,
+            "receipt_to_route_s": 0.004100799997104332,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.006606999988434836,
+            "cached_query_s": 0.0013522999943234026,
+            "snapshot_swap_s": 0.00036460001138038933,
+            "receipt_to_route_s": 0.003562800004146993,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.0031365999893750995,
+            "cached_query_s": 0.0007663000142201781,
+            "snapshot_swap_s": 0.00019439999596215785,
+            "receipt_to_route_s": 0.002810500009218231,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.006296200008364394,
+            "cached_query_s": 0.0015328000008594245,
+            "snapshot_swap_s": 0.0004015000013168901,
+            "receipt_to_route_s": 0.002821300004143268,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.0032934999908320606,
+            "cached_query_s": 0.0018413999932818115,
+            "snapshot_swap_s": 0.0004962000239174813,
+            "receipt_to_route_s": 0.004203500022413209,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.006226700003026053,
+            "cached_query_s": 0.0016087999974843115,
+            "snapshot_swap_s": 0.00042490000487305224,
+            "receipt_to_route_s": 0.004535399988526478,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.006015999999362975,
+            "cached_query_s": 0.0017556000093463808,
+            "snapshot_swap_s": 0.0004928999987896532,
+            "receipt_to_route_s": 0.004154499998548999,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.006355599995004013,
+            "cached_query_s": 0.0018423000001348555,
+            "snapshot_swap_s": 0.0004972000024281442,
+            "receipt_to_route_s": 0.004222200019285083,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.007058999995933846,
+            "cached_query_s": 0.0016686000162735581,
+            "snapshot_swap_s": 0.0004948000132571906,
+            "receipt_to_route_s": 0.004013099998701364,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.0041913999884855,
+            "cached_query_s": 0.0008849000150803477,
+            "snapshot_swap_s": 0.0007203999848570675,
+            "receipt_to_route_s": 0.003699099994264543,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.004574899998260662,
+            "cached_query_s": 0.0009563000057823956,
+            "snapshot_swap_s": 0.0002565000031609088,
+            "receipt_to_route_s": 0.002114400005666539,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.0025639000232331455,
+            "cached_query_s": 0.0006766000005882233,
+            "snapshot_swap_s": 0.0001993000041693449,
+            "receipt_to_route_s": 0.002626600005896762,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.006365200009895489,
+            "cached_query_s": 0.0013550999865401536,
+            "snapshot_swap_s": 0.0003501000173855573,
+            "receipt_to_route_s": 0.0025935000157915056,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.0030092999804764986,
+            "cached_query_s": 0.0007241000130306929,
+            "snapshot_swap_s": 0.0004254999803379178,
+            "receipt_to_route_s": 0.0022877999872434884,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.0026578999822959304,
+            "cached_query_s": 0.0006674000178463757,
+            "snapshot_swap_s": 0.0002077000099234283,
+            "receipt_to_route_s": 0.0017649999936111271,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.0026390999846626073,
+            "cached_query_s": 0.0006900000153109431,
+            "snapshot_swap_s": 0.00019660001271404326,
+            "receipt_to_route_s": 0.0017188999918289483,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.002514899999368936,
+            "cached_query_s": 0.000735800014808774,
+            "snapshot_swap_s": 0.0005598999850917608,
+            "receipt_to_route_s": 0.0022708000033162534,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.0027025000017601997,
+            "cached_query_s": 0.0006739000091329217,
+            "snapshot_swap_s": 0.00019610000890679657,
+            "receipt_to_route_s": 0.001710400014417246,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.0025003000046126544,
+            "cached_query_s": 0.0006690000009257346,
+            "snapshot_swap_s": 0.00019469999824650586,
+            "receipt_to_route_s": 0.0016987999842967838,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.002444100013235584,
+            "cached_query_s": 0.0011637999850790948,
+            "snapshot_swap_s": 0.000447300000814721,
+            "receipt_to_route_s": 0.003653899999335408,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.004372100025648251,
+            "cached_query_s": 0.0009170000266749412,
+            "snapshot_swap_s": 0.00023370000417344272,
+            "receipt_to_route_s": 0.0018530999950598925,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.003025000012712553,
+            "cached_query_s": 0.0019819999870378524,
+            "snapshot_swap_s": 0.000528200005646795,
+            "receipt_to_route_s": 0.004607399983797222,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.006005400005960837,
+            "cached_query_s": 0.0017936000076588243,
+            "snapshot_swap_s": 0.0005107999895699322,
+            "receipt_to_route_s": 0.005544399988139048,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.006384799984516576,
+            "cached_query_s": 0.0013195000065024942,
+            "snapshot_swap_s": 0.0005366000114008784,
+            "receipt_to_route_s": 0.0021063000021968037,
+            "routes_before": 10,
+            "routes_after": 9
+          },
+          {
+            "cold_build_query_s": 0.0043172000150661916,
+            "cached_query_s": 0.0019037000020034611,
+            "snapshot_swap_s": 0.0004721999866887927,
+            "receipt_to_route_s": 0.0034728999889921397,
+            "routes_before": 10,
+            "routes_after": 9
+          }
+        ],
+        "statistics": {
+          "cold_build_query_s": {
+            "p50_s": 0.0043172000150661916,
+            "p95_s": 0.006606999988434836,
+            "max_s": 0.007058999995933846
+          },
+          "cached_query_s": {
+            "p50_s": 0.0012397999817039818,
+            "p95_s": 0.0019037000020034611,
+            "max_s": 0.0019819999870378524
+          },
+          "snapshot_swap_s": {
+            "p50_s": 0.00042490000487305224,
+            "p95_s": 0.0005598999850917608,
+            "max_s": 0.0007203999848570675
+          },
+          "receipt_to_route_s": {
+            "p50_s": 0.002821300004143268,
+            "p95_s": 0.004607399983797222,
+            "max_s": 0.005544399988139048
+          }
+        },
+        "snapshot_under_2s": true
+      },
+      {
+        "dataset": "repository_seed",
+        "provenance": "simulated",
+        "samples": [
+          {
+            "cold_build_query_s": 0.009401299990713596,
+            "cached_query_s": 0.0009271999879274517,
+            "snapshot_swap_s": 0.0003634000022429973,
+            "receipt_to_route_s": 0.006419100012863055,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.0074760999996215105,
+            "cached_query_s": 0.0024754999903962016,
+            "snapshot_swap_s": 0.0009126999939326197,
+            "receipt_to_route_s": 0.01452109997626394,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.008183900004951283,
+            "cached_query_s": 0.0009413999796379358,
+            "snapshot_swap_s": 0.0003732999903149903,
+            "receipt_to_route_s": 0.009219800005666912,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.018965600000228733,
+            "cached_query_s": 0.0023083999985828996,
+            "snapshot_swap_s": 0.0009115000138990581,
+            "receipt_to_route_s": 0.015763200004585087,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.015631699992809445,
+            "cached_query_s": 0.0023828999837860465,
+            "snapshot_swap_s": 0.0008987999754026532,
+            "receipt_to_route_s": 0.017054199997801334,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.01086619999841787,
+            "cached_query_s": 0.0012256000190973282,
+            "snapshot_swap_s": 0.0010074999881908298,
+            "receipt_to_route_s": 0.016349999990779907,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.011925099999643862,
+            "cached_query_s": 0.0013919000048190355,
+            "snapshot_swap_s": 0.0004931000003125519,
+            "receipt_to_route_s": 0.006966700020711869,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.011324099992634729,
+            "cached_query_s": 0.000976100011030212,
+            "snapshot_swap_s": 0.0003877999843098223,
+            "receipt_to_route_s": 0.006819200003519654,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.009159499983070418,
+            "cached_query_s": 0.0009824000007938594,
+            "snapshot_swap_s": 0.0004120999947190285,
+            "receipt_to_route_s": 0.008818899979814887,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.01013999999850057,
+            "cached_query_s": 0.0009809999901335686,
+            "snapshot_swap_s": 0.00038519999361597,
+            "receipt_to_route_s": 0.006832199986092746,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.007574799994472414,
+            "cached_query_s": 0.0009391999919898808,
+            "snapshot_swap_s": 0.00037570000858977437,
+            "receipt_to_route_s": 0.007289000001037493,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.007655299996258691,
+            "cached_query_s": 0.0009314999915659428,
+            "snapshot_swap_s": 0.0003775999939534813,
+            "receipt_to_route_s": 0.006914500001585111,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.007583099999465048,
+            "cached_query_s": 0.0009377999813295901,
+            "snapshot_swap_s": 0.00037460000021383166,
+            "receipt_to_route_s": 0.007233100011944771,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.010130199982086197,
+            "cached_query_s": 0.002413400012301281,
+            "snapshot_swap_s": 0.0009616999886929989,
+            "receipt_to_route_s": 0.011651600012555718,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.010465100000146776,
+            "cached_query_s": 0.001860800024587661,
+            "snapshot_swap_s": 0.0006361000123433769,
+            "receipt_to_route_s": 0.009553599986247718,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.008320900000398979,
+            "cached_query_s": 0.001212499977555126,
+            "snapshot_swap_s": 0.00042699999175965786,
+            "receipt_to_route_s": 0.008904699992854148,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.007973200001288205,
+            "cached_query_s": 0.0009490000084042549,
+            "snapshot_swap_s": 0.0003816999960690737,
+            "receipt_to_route_s": 0.0071662999980617315,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.007689999998547137,
+            "cached_query_s": 0.0009429999918211251,
+            "snapshot_swap_s": 0.00036380000528879464,
+            "receipt_to_route_s": 0.006881100009195507,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.007491600001230836,
+            "cached_query_s": 0.0009453000093344599,
+            "snapshot_swap_s": 0.00036570001975633204,
+            "receipt_to_route_s": 0.013716000015847385,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.01607670000521466,
+            "cached_query_s": 0.0011993999942205846,
+            "snapshot_swap_s": 0.0004385999927762896,
+            "receipt_to_route_s": 0.0100897999946028,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.010326300020096824,
+            "cached_query_s": 0.0011132999788969755,
+            "snapshot_swap_s": 0.0004087999986950308,
+            "receipt_to_route_s": 0.006417999975383282,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.007389500009594485,
+            "cached_query_s": 0.0009450999787077308,
+            "snapshot_swap_s": 0.000523599999723956,
+            "receipt_to_route_s": 0.0071530000132042915,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.0077813999960199,
+            "cached_query_s": 0.0009354999929200858,
+            "snapshot_swap_s": 0.00036940001882612705,
+            "receipt_to_route_s": 0.006592799996724352,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.01126899998052977,
+            "cached_query_s": 0.0016299000126309693,
+            "snapshot_swap_s": 0.0006575000006705523,
+            "receipt_to_route_s": 0.008405600005062297,
+            "routes_before": 10,
+            "routes_after": 10
+          },
+          {
+            "cold_build_query_s": 0.008494299981975928,
+            "cached_query_s": 0.0009508999937679619,
+            "snapshot_swap_s": 0.0003738000232260674,
+            "receipt_to_route_s": 0.006498800008557737,
+            "routes_before": 10,
+            "routes_after": 10
+          }
+        ],
+        "statistics": {
+          "cold_build_query_s": {
+            "p50_s": 0.009159499983070418,
+            "p95_s": 0.01607670000521466,
+            "max_s": 0.018965600000228733
+          },
+          "cached_query_s": {
+            "p50_s": 0.0009809999901335686,
+            "p95_s": 0.002413400012301281,
+            "max_s": 0.0024754999903962016
+          },
+          "snapshot_swap_s": {
+            "p50_s": 0.0004087999986950308,
+            "p95_s": 0.0009616999886929989,
+            "max_s": 0.0010074999881908298
+          },
+          "receipt_to_route_s": {
+            "p50_s": 0.007289000001037493,
+            "p95_s": 0.016349999990779907,
+            "max_s": 0.017054199997801334
+          }
+        },
+        "snapshot_under_2s": true
+      }
+    ]
+  },
+  "dependency_versions": {
+    "fastapi": "0.141.1",
+    "httpx": "0.28.1",
+    "pytest": "8.4.2",
+    "jsonschema": "4.26.0"
+  },
+  "source_sha256": {
+    "backend/__init__.py": "f4ad3c9e997bcca2235411600e2d61d5201334eead5ae225ff65364875d0c799",
+    "backend/app/__init__.py": "a5c721f646c7a0e9b60cedd09224f8f971ac4f7d8f1af5bb35870420c9f11e73",
+    "backend/app/ai/__init__.py": "1cf9b3374cc5598a44e487824d6dd68886e9d1780c08b279068e654f01fe31df",
+    "backend/app/ai/fallback.py": "47b1a713bde619af9473e93effb59dd0370851c66b9761b1a81b05b28f5ffe23",
+    "backend/app/ai/handlers.py": "ae34cebcb8c923b7430d69e7c9caa2b1085937af028183594710202502790f1b",
+    "backend/app/ai/llm_client.py": "cb9f519d1c15e9d8bd28956a849560895b7644d100e45314255ff05c12fcb557",
+    "backend/app/ai/query.py": "7587d3a2dad8b5b5f2b1fe66d85f0382cc442b28ce085ea263bc022dd82231ef",
+    "backend/app/ai/schemas.py": "c19edd054623e39078cccd685dc55bb9735d62d9c0375426df131b9f4796e811",
+    "backend/app/ai/tools.py": "24c4f894b2db3700383f7d783a60d951bc6282fca6b205bed53e2c2796e8e281",
+    "backend/app/api/__init__.py": "2bb6f31fdab55e6d31604cde5cd9194aa028b1dcc4117fb6447bb3caac6b7788",
+    "backend/app/api/signals.py": "409b9b60b482879136c8d59659703ddc5024643409e56bc19d76b3b3c3601b84",
+    "backend/app/data/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/app/engine/__init__.py": "69f0db2645e85fa49fd99d37909b5abb47013a031446075d4eafe9e68bcf5d2c",
+    "backend/app/engine/__main__.py": "a1d66a4a183d1a7367ccd25a6e878e596753674c0853c41fd97a76f2e2d31bec",
+    "backend/app/engine/api.py": "e2748b1ce4edaa132f0e68ddd561fab40f16198baaa6f414a22f267585cd6968",
+    "backend/app/engine/cache.py": "235bf6eb877c5ab75c2d85bb3f7fae6fa26f26a4b3ca555e1e299d2cee695299",
+    "backend/app/engine/candidates.py": "c3bcc835f6fdcd78670b1e0dd24137904b5020bbae012bf010686f0815443217",
+    "backend/app/engine/constraints.py": "825c01b6f5ffd2741a7f973631379e6058b1b12fa846753ff43136fe1f750de1",
+    "backend/app/engine/coverage.py": "cc886bf6c229aaa0fe88da9a7de53519c15d8dec43e41ca65339254edaf0eccf",
+    "backend/app/engine/eco.py": "42a52247d7f89c2d524bd18d022e346362532299b53668b33b9df60719082bdf",
+    "backend/app/engine/fairness.py": "8c7d716ace7f9dca10acc94d399bd2f36410d7929da001fdec0fc2bda7700609",
+    "backend/app/engine/handlers.py": "bdb8c84d5b91a3ef08dd13a24a9f36647845cba7b4b7fa0b2c9891f75615daae",
+    "backend/app/engine/load.py": "446a1292217d4ddaef9c134a342bafb1f97a12ed43c5d5d12e632de582597780",
+    "backend/app/engine/load_provider.py": "e4fb21ca711c5165299fa55a8c6322b9c7ea01dbd424f67565b5fad7352a4863",
+    "backend/app/engine/m0.py": "8fc7f696b8e7b37b8fd824ad302017ef6ea661ac285ab8a6c2c5a4be1d01a862",
+    "backend/app/engine/queue.py": "fc7abbfcc47cb74bf20267b627cd8fe7d0c049cbca7567f45f5ce54fb2a06851",
+    "backend/app/engine/score.py": "dec7f6386ee4860c249083bf740406594795f4d1f60706d8efa061026c24d2a2",
+    "backend/app/engine/service.py": "59916d5b01c015053695255040e45288b4eeb8760cd0529a24a38b52847d0b59",
+    "backend/app/engine/sim_adapter.py": "343c3d5b1c333de864fd2277897d47fc104818bec1c8f2d268a56f60dd00674e",
+    "backend/app/engine/tests/test_c_route.py": "777882eb63a47be5ea27ab46c293d10446731eaf029ca5825322805c3cc78d8f",
+    "backend/app/engine/tests/test_contracts.py": "e1631e5a2c9d8aaa5ec9cc3b520910a06b377d9c2cd409137485614b92d20fee",
+    "backend/app/engine/tests/test_corridor_coverage.py": "311f12bd32e8b4e9916d7f09b1eda796da249a6505a975276004b796bcf0aeb2",
+    "backend/app/engine/tests/test_handlers.py": "5f5624f3de4c5b36cb0238f9a3a5a0b7553205913c6f82bfa0157f60c0d3058b",
+    "backend/app/engine/tests/test_m0.py": "f4df38b7caa4c037a1ccb1399f786db1ab7fd163152c834432edb3398b6ae4ce",
+    "backend/app/engine/tests/test_m0_timing.py": "dd0f1c6fc6784ac5c702129ff7aa3a7e274d5a0da2ba1a54798f002b0da52ce3",
+    "backend/app/engine/tests/test_operational_candidates.py": "68a1a363ae61a3693bd27c18f728fdcc9b1b7083615dd6e1c4d3fb057f28c3f2",
+    "backend/app/engine/tests/test_repaired_seed.py": "e7419636bdba62a17063a86d47ceb26a8ed534a75b1de8953ccdd9c57feff440",
+    "backend/app/engine/tests/test_wheelchair_top3.py": "309d1eed2338b28e62836f97e63e6ff2a9793a9ab7fbc6f532d25ef9c3acadfb",
+    "backend/app/engine/walk.py": "c749c053f7112a93640b7d699267e1fb4db8987db90c7609d913781a1a7672a5",
+    "backend/app/graph/__init__.py": "5d8b0665d4c09c6ef493614aeada7d88d8b03ba32718cccdb38640fa4fcb0418",
+    "backend/app/graph/adapter.py": "3242358710ae225d0ab69feabef39329f006d61b23c68e853492133bda28516f",
+    "backend/app/graph/build.py": "cf687ea38a6a574b29f45408a988f6eb15f38c644d599dbaedf75b611fa639db",
+    "backend/app/graph/snapshot.py": "a864ecea3e0cc7fa4c6a4bf9b37c01dd73eb5ec7c179c457fc2d658ac9a6dabb",
+    "backend/app/main.py": "149082a7dff39fb4d9833571776930c0046cd92340874f77eb370430c7ac4550",
+    "backend/app/runtime_config.py": "2a6cf9bf61d0a8ed0f28bc351026d55fa8bf67842de0a35e7bb52fe815f69670",
+    "backend/app/services/__init__.py": "de9814938f87c797ca5165dbbf554b7df2c3bbb088115f07f46342d5a01e8cda",
+    "backend/app/services/event_models.py": "a131d1510553c2a4e31120e5d94906bbc3fd769009386074d623e34529450900",
+    "backend/app/services/event_store.py": "afe1574238b360baf3f243eb7f575eed6139367142a4ee6750dced6538de04e9",
+    "backend/app/services/ingest/__init__.py": "b7b2bf1311e3e5e85856aae464b89c4070fd5c31c004278ac64e7bff7d593cf8",
+    "backend/app/services/ingest/hko.py": "99c4b6630f4b36e199a5a8b24002b54834e3569fae83f7c4befa9ef33b893c6f",
+    "backend/app/services/ingest/mtr_eta.py": "a750f3ae89c53199b9dbe10a39ef2ca3ec5a045b84fcf97f569313ce70db650c",
+    "backend/app/services/ingest/social_mock.py": "39588fabc31be5887ed58e95eb67430e40a050bbd3a0781eaae38ad0f52346bc",
+    "backend/app/services/review_state.py": "89f825ba5559bfca7aee5d4f56079464804555e31f6efb513dc60889b2bf0ba6",
+    "backend/app/services/signal_models.py": "a103788432c07291c30905ff13c81bdb2e0952d13cc6bc58d7280cbee0456f81",
+    "backend/app/services/signal_store.py": "a03e4b1829a087e2f89950cf34c66fffd14f7b292a31c68d4cb1aa05d53b8ebd",
+    "backend/app/services/structure/__init__.py": "d315a4488eda5a5dfe20bf5b39945116839a245112d1560114befe4776624fbe",
+    "backend/app/services/structure/llm_structurer.py": "26c51a3d4fa5e22482a2a5c534344ae57e5878ca38ab39715a0ae07af9d31cdc",
+    "backend/app/sim/__init__.py": "cee6ec87f32da1193dc4ea154f297ec1dcbb5b4633dee9d5914be85f77374114",
+    "backend/app/sim/adapters.py": "4ae322e29047d0b3ee1538034d30c6c7590b0bf7843b54236c97ae743d91e28c",
+    "backend/app/sim/api.py": "35e7bf7819204cfeca162781a0d744fc62bca515f2e4695c949d77d7cbe736ae",
+    "backend/app/sim/cache.py": "c2779725166fecc84919fd485ae0c840eeded4525f9f4ee2710672c003714c72",
+    "backend/app/sim/models.py": "e78f4189f9eabd07d08095051cb929ff474d8a3e43a5ba02dcf6bc2912022112",
+    "backend/app/sim/multi_od.py": "c3af778e4d79ae2c67f5f0c02681c480dbf7e1f34651fe84d1d33bdda2714f00",
+    "backend/app/sim/population.py": "866ab212afee3bf86f79f3361482fec4eac544a26858e0ee7d5b98e11ff931a9",
+    "backend/app/sim/replanning.py": "ca55f9b7df1b7a29f48f319bec622a69216e1c9ddc23b7b912c4733ce41774a0",
+    "backend/app/sim/run.py": "31a4b7309f1d33d45d7c327b69fca05ca3ad4eb8add2661906515d87f057df93",
+    "backend/app/sim/service.py": "0222d2ad3be41319c9bace31880e6da03c0951c99ef67644c06d3f7e267799fc",
+    "backend/tests/__init__.py": "2b377429c0df8525d5cbe2ca733ef3b9abb1c23c713c2416b39d69bb2440528a",
+    "backend/tests/test_ai.py": "a7e1f9b935a2e08a542bdfee818aae1a989ee70c393812f7dfaee69dec544e2f",
+    "backend/tests/test_contract_seeds.py": "78dc547295f6eef05a240e65f3fd3370aa23fed671fdb6ba9d76dd07c90445a1",
+    "backend/tests/test_event_store.py": "492d1c837237b7d565c277714928d8136d3c3081d8cb0c97375d577fd375811b",
+    "backend/tests/test_hko.py": "0727e4f5807666d0f9d7f88ecd1a4d5abd213601a1437468d9b21790e26dcff7",
+    "backend/tests/test_llm_structurer.py": "a6f976025a73b64dd5d54c41cef3aa06dc472b5740e54edf80aa7fc7b317f0e8",
+    "backend/tests/test_m0_app_integration.py": "2bb566b64adab9f614a9481384b4e997f25c57834180b05958b07855ebbbb1ce",
+    "backend/tests/test_mtr_eta.py": "f8cdc3959508d3f7e005784f7fa9fd12944af1a0f48dd1564e76662c24c5d5e3",
+    "backend/tests/test_review_state.py": "4b83710962f263810b40d2b6c1cbb7a11d7070dba0b5f3faa06f9acfe361f1a9",
+    "backend/tests/test_signal_api.py": "7404de721ec63be3cbef267d28eae1d4ad74fae5ed1666700da11698f33a0b0f",
+    "backend/tests/test_sim_adapters.py": "4393d2992757ec0f6b72ebda9badb8d930a180fb33a02af6574cfc27609c9f2e",
+    "backend/tests/test_sim_m0.py": "347ba6ab817275daf2c9510bba4bb500f855255adcd7c469dd0234143ec23df4",
+    "backend/tests/test_sim_multi_od.py": "b81d7c8d9af0aaff866e7b244cca8f9ce6073e60e02b4563b150d40677a0d88a",
+    "backend/tests/test_sim_seed.py": "28776efc371f6a380b35fa0772665749ec4f300f42d69408cf59723da5c31c54",
+    "backend/tests/test_social_mock.py": "43d04172d10bf2fac49adf308a4ea29425fd2490a02a53b1b0a946c6762317c7",
+    "backend/app/ai/fixtures/chat_tool_results.simulated.json": "432d0035f450a1486de685a568c2909321e6e2e2ec54f5c6f5c2153f34ea182c",
+    "backend/app/engine/fixtures/corridor_access.simulated.json": "827939bd83c2401f062086bf198baac9d0f6325fb27a9f09369cc3770b76fe52",
+    "backend/app/engine/fixtures/events.synthetic.json": "a15efcaf2d1e1a4c210988ab8bb7169c167565ee4dbaf3d051a755676553cf5e",
+    "backend/app/engine/fixtures/network.synthetic.json": "a6560fbb18b9844b441727a73c75e2b11d684d832f465b1f9f9103f5c98df3ed",
+    "backend/app/engine/fixtures/routing.synthetic.json": "0d8580ebb5592a41dfab580f05270315a69edd15203dfeea02ff36a600b0fc7d",
+    "backend/app/engine/fixtures/seed_policy.json": "3020ae10023c811b9c199b19a8c5d6e713e1439b17c047bc65ad1ccc57ea00dc",
+    "backend/app/engine/reports/route-seed-repair-review.json": "d52ff74aacf9c745f6167349d5c3dfa926e1341c24bac96f7c959b9089fc0266",
+    "backend/tests/fixtures/b_updates.simulated.json": "e9e9b186b086086e7b345da2e47453a8b4d73b89bfaa40c18d85cc9106fe083a",
+    "backend/tests/fixtures/c_route_output.simulated.json": "1cef136b2d2de39ac483158cb10a23c609083a9a548ccfba38e277dd27baad4b",
+    "backend/tests/fixtures/multi_od_routes.simulated.json": "b3727d550009d1bc5db44aa5983762603c2cb2a0882f0cb21c688b246e8de106",
+    "tests/cross_module/test_audit_gate.py": "a513c90e5fe35a2ae6adf519b7f33eeb70d86432417ae9cbf1ef2c881e5925d7",
+    "tests/cross_module/test_m0_audit.py": "553b4dded88bf7a2d1abdfebdf327dee9a7b93b62cb380601e7189bf775e6278",
+    "tests/cross_module/test_m1_receipt.py": "a600b2b7b7b8897fbf8614bb84e0dc967db737f7d09b19d53aa2f4a4a43b32ff",
+    "tests/cross_module/test_module_chain.py": "afabf4b02fba7b2ac90829e1b4c9715a0987f840d5476bbaac355744659b7a8b",
+    "tests/integration/test_consumer_contracts.py": "c49ff038c19bfbcb5f9fccdf1b8130d1e1062107d8ef2bc7f9fe27801d2ebdfc",
+    "tests/integration/test_harness.py": "3b55bb1fee9b81db1c87efe4d330dfa68aaa6f79b5afae51d7271165098e2f0b",
+    "tests/test_data_integrity.py": "ad073c38ae1c86cdfe793db925d80efa636ebbe52ed9abaf4c4045ae043dba91",
+    "tests/test_devops_runtime.py": "ef6219d133cc4d768c0d5e5afdb88c0ab6559c48141a72f53a54f487ffb7040d",
+    "tests/test_load_queue.py": "54706a94693c081be476a8587267b2edb149034e611bb95ad4e8820297d6484a",
+    "tests/test_od_smoke.py": "1e4afc8365ddccb129ae1f6a8c286c643080da6823d00b281c06c38bd2be68a5",
+    "tests/test_population_fairness.py": "c91f2738e7d32765132ba0ab7d174a036d9dfa06f6085830c77c5ca154562630",
+    "tests/test_replanning_service.py": "89e3cca6685baf74a8b03d74953fd667b5a36384e708a839cafb0d0d2b46db6f",
+    "tests/test_sim_contract.py": "87d4dd0dc8ee02ecd67f2765ba6d3c63dcb23e58fffacf7119843e3289154681",
+    "tests/test_simulation_cache.py": "a7172091b343d8d38c0dbb9005dd6b1da018642b70512a84d744674307f5cb26",
+    "tests/cross_module/fixtures/scenario.json": "11ec0dc9825ec78982dcc408aef86b70eab5c8da42d049bfbd9b159a8e916e20",
+    "tests/integration/fixtures/simulated-contracts.json": "efea30bc8b65acc851c75c0101c784c2ed06f8bcb8efe43e9e8fb206603970f3",
+    "scripts/generate_contract_schemas.py": "728e524a81301122b2104a4a96a83adc92627f6babdf7856055ce00b71447c6e",
+    "scripts/integration/__init__.py": "6ee743e7e618824fa09e8484d1ff0ce5afba05a16e97b4e5f0b38f12bdd0342e",
+    "scripts/integration/__main__.py": "de022fa5b1bb18bfb8739cbc15ce30499487955f4df4738df47492f57ea90c3e",
+    "scripts/integration/audit_all.py": "3bfdb75acee50d158c8465416f83ab05c1a91b42db32b24b591e4130657f7961",
+    "scripts/integration/checks.py": "5ced9ba4e06c2952e468083d9985f52001c2336140ecb5a5a723cb42431018d8",
+    "scripts/integration/contracts.py": "93d322ffddb92435cef731e2407698d6011b5824381ded5572412663a3343781",
+    "scripts/integration/fixture_source.py": "d4a862e0a403659b8e578c55fead2791dd964c01ada7e4e490617fcfd6764cb2",
+    "scripts/integration/m0_c_inventory.py": "8e4819e9ca2119beed0d0f69fd428b77db7de493492a8db407785f6259a273e6",
+    "scripts/integration/m0_probe.py": "ef1c8da6522fc10b83518a2af5109aa40718838eecb4deba6fde31e36195a6c1",
+    "scripts/integration/m1_acceptance.py": "0468b2f7d384c204657b9ece0a92c8469ad346c57803ae319568eabf4415ed1c",
+    "scripts/integration/module_bridge.py": "9e89cfb58c30b245752d244295d631e8176dc0ab6f3a480ebbd8032bfa28e0b4",
+    "scripts/integration/multi_od.py": "c58f536904a68e0c1b86b7254317b195b72c764107f2e55eddd8406266d6abf6",
+    "scripts/integration/provenance_audit.py": "fbd0c7e6c3b98b41cc1a13d1da1c8df0b4a693c23c540b20f36445c3e4212414",
+    "scripts/integration/runner.py": "7abf90670e8152fe33d4b0fb37686f2d4f5d50705fa67f14b1b70f8b8df11c15",
+    "scripts/od_smoke.py": "5b05652876493e020c8a8398d7aeb833f2f987fcb85812c8f8fbc29da04ac013",
+    "scripts/precompute_sim.py": "2d03134e98e6e2a575576974db7fa13dca1fa8b46fe2018b6b700532a1bacc2e",
+    "scripts/preflight.py": "b3ecd6cf309a8708c53bad0cd860c37bb4167917196c7baeafb545a4bf4a9220",
+    "scripts/validate_contract_seeds.py": "ec6ac500c8d702836505ee3e17e2e178740105deb790fe40eb9e9358eed6e412",
+    "scripts/validate_data.py": "bd7af103ba4a7a86b68154325b13f90978d6755d9cbe6b5e79ca0765eacdba78",
+    "scripts/verify_sim_m0.py": "da841e8c4639a8cfb7b509e84d96433b4037218905828cba41327c8a0d301914",
+    "scripts/verify_sim_multi_od_m0.py": "a003248a6e929568f5492c2b967f8f35472a2ea7f20c435afca5f52c29f04671",
+    "contracts/schemas/event.schema.json": "2a5e1ce47d639e48cc3cef630f5f99d0866e86a0471fd7580c2136fe108015d9",
+    "contracts/schemas/signal.schema.json": "39d6f3b50b0ca527914ea0fbbc411f117b15461b37df61bdcf69c37d36f2a248",
+    "contracts/seed/event.seed.json": "0b962163ae1be58e9219aa989e122fdb6fe201d8d2f4b874e1ed3411e543cf85",
+    "contracts/seed/network.seed.json": "a2a925c8d69e75b8c108d7c5e01468815c17349c62b347105f417294596bae86",
+    "contracts/seed/routes.seed.json": "92decb912405755344840e4518f57aa00ee5c3b10ac9c68f58fa7b1d5872b7b0",
+    "contracts/seed/sim.seed.json": "c02a1c725defb41bff401ed1d81e86698e68022cfc30a2d520f4e6f7ca5dfe0f",
+    "data/access/access_points.json": "decfd4059382b18059fb7f4155c7daf50c7d671376fe89691b73340b4a4e4034",
+    "data/access/station_entrances.json": "f14685f212a4e32e5d8d9fdd70b3488e66f29ea998c9b523e72537982a927476",
+    "data/calendar.json": "3072b5db7fcc934a1f43f22bd589fec2fcb84a1eed4d815453585bbe9cca61bf",
+    "data/network/bus_routes.json": "0cdc2385adba02bcca2fb9e1a7f8178153aa9c8fff2589723b8ba9d36ce2aac5",
+    "data/network/lines.json": "33771ff03d667f0a9991e0860e5c0a78814ef54bb034db7e317ce4539d561ae8",
+    "data/network/stations.json": "18d06d215e5de8005ee8397c9d309c0ba528c3de9202175459676960d72fb74b",
+    "data/network/walk_links.json": "36344ebe0bd563bf1802115486cf31b80436468c7297dc3954eea010d64bde75",
+    "data/sim/m0-multi-od-verification.json": "87e0ffedc31ea3cbeaca1de8b893ceb5ac87fc38af79c5457643c073f9b3859b",
+    "data/sim/m0-verification.json": "c1b3d82f5182355c6df57343cab53d519f3f60dbbd48353e7690b58dc67281d2",
+    "data/sim/scn_huh_exc_closed_am_peak.input.json": "5877777e0b2150e780cedb89a65715bc9379da1a71f72b94e893f15f8be3431e",
+    "data/sim/scn_huh_exc_closed_am_peak.json": "9042f9ac151706031c9c14f31b72c450600f884321c4314819dc57b10a79909d",
+    "data/weather_impact.json": "294a8825e121e2287ca6f068b18b16e8ecf4de291f3f2187749ffd87c77dfca8",
+    "data/capacity_method.md": "ea29df0f9fed50ccb2dbee43ff4b81ccc1d46c8f4d482c5b4f91ee8b156750ac",
+    "data/DATA_QUALITY.md": "2ce0ea3b7a0611c85185d0ed93995c0ebeabe3877b65076cd40619d464f73d61",
+    "data/m0-source-checks.md": "89556edd89da356eceb67ae52029e9b6a584c81b6d3aa1bffb06e8309fb5415e",
+    "data/PROVENANCE.md": "c3bdea0f1b02a59da27314657af3a005b14abb1c00ae18e4e7f02b72449f61ef",
+    "data/sim/README.md": "90acd08019c7b3d1e19a544019ee363d9de519e5b398181b0ce5099fb728be58",
+    "docs/plan/03-contracts.md": "cd82a9c5f3b1b6a9f795285f7fb821fda3c8ef059327ec5afc60a323b1b07100",
+    "contracts/README.md": "a10b1f9c89a55f11c6318dd5e99df0c2cab86fadc8a056f223835433169f8b01",
+    "backend/.env.example": "a0f7be4b8b50cd059a7c68f5fb93b66e739813f13256c93a0bee8c103c237864",
+    "scripts/start_backend.ps1": "a6552212fb6913500c9e8e16a0b4028b097bf08d1fecfe88f3db638830c3d273",
+    "scripts/sync_github_tasks.ps1": "53b188662c0bfc8fe87c033fb7f4023c7c35b658973ccf0d0c0da3785bce8e40"
+  },
+  "end_source_sha256": {
+    "backend/__init__.py": "f4ad3c9e997bcca2235411600e2d61d5201334eead5ae225ff65364875d0c799",
+    "backend/app/__init__.py": "a5c721f646c7a0e9b60cedd09224f8f971ac4f7d8f1af5bb35870420c9f11e73",
+    "backend/app/ai/__init__.py": "1cf9b3374cc5598a44e487824d6dd68886e9d1780c08b279068e654f01fe31df",
+    "backend/app/ai/fallback.py": "47b1a713bde619af9473e93effb59dd0370851c66b9761b1a81b05b28f5ffe23",
+    "backend/app/ai/handlers.py": "ae34cebcb8c923b7430d69e7c9caa2b1085937af028183594710202502790f1b",
+    "backend/app/ai/llm_client.py": "cb9f519d1c15e9d8bd28956a849560895b7644d100e45314255ff05c12fcb557",
+    "backend/app/ai/query.py": "7587d3a2dad8b5b5f2b1fe66d85f0382cc442b28ce085ea263bc022dd82231ef",
+    "backend/app/ai/schemas.py": "c19edd054623e39078cccd685dc55bb9735d62d9c0375426df131b9f4796e811",
+    "backend/app/ai/tools.py": "24c4f894b2db3700383f7d783a60d951bc6282fca6b205bed53e2c2796e8e281",
+    "backend/app/api/__init__.py": "2bb6f31fdab55e6d31604cde5cd9194aa028b1dcc4117fb6447bb3caac6b7788",
+    "backend/app/api/signals.py": "409b9b60b482879136c8d59659703ddc5024643409e56bc19d76b3b3c3601b84",
+    "backend/app/data/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend/app/engine/__init__.py": "69f0db2645e85fa49fd99d37909b5abb47013a031446075d4eafe9e68bcf5d2c",
+    "backend/app/engine/__main__.py": "a1d66a4a183d1a7367ccd25a6e878e596753674c0853c41fd97a76f2e2d31bec",
+    "backend/app/engine/api.py": "e2748b1ce4edaa132f0e68ddd561fab40f16198baaa6f414a22f267585cd6968",
+    "backend/app/engine/cache.py": "235bf6eb877c5ab75c2d85bb3f7fae6fa26f26a4b3ca555e1e299d2cee695299",
+    "backend/app/engine/candidates.py": "c3bcc835f6fdcd78670b1e0dd24137904b5020bbae012bf010686f0815443217",
+    "backend/app/engine/constraints.py": "825c01b6f5ffd2741a7f973631379e6058b1b12fa846753ff43136fe1f750de1",
+    "backend/app/engine/coverage.py": "cc886bf6c229aaa0fe88da9a7de53519c15d8dec43e41ca65339254edaf0eccf",
+    "backend/app/engine/eco.py": "42a52247d7f89c2d524bd18d022e346362532299b53668b33b9df60719082bdf",
+    "backend/app/engine/fairness.py": "8c7d716ace7f9dca10acc94d399bd2f36410d7929da001fdec0fc2bda7700609",
+    "backend/app/engine/handlers.py": "bdb8c84d5b91a3ef08dd13a24a9f36647845cba7b4b7fa0b2c9891f75615daae",
+    "backend/app/engine/load.py": "446a1292217d4ddaef9c134a342bafb1f97a12ed43c5d5d12e632de582597780",
+    "backend/app/engine/load_provider.py": "e4fb21ca711c5165299fa55a8c6322b9c7ea01dbd424f67565b5fad7352a4863",
+    "backend/app/engine/m0.py": "8fc7f696b8e7b37b8fd824ad302017ef6ea661ac285ab8a6c2c5a4be1d01a862",
+    "backend/app/engine/queue.py": "fc7abbfcc47cb74bf20267b627cd8fe7d0c049cbca7567f45f5ce54fb2a06851",
+    "backend/app/engine/score.py": "dec7f6386ee4860c249083bf740406594795f4d1f60706d8efa061026c24d2a2",
+    "backend/app/engine/service.py": "59916d5b01c015053695255040e45288b4eeb8760cd0529a24a38b52847d0b59",
+    "backend/app/engine/sim_adapter.py": "343c3d5b1c333de864fd2277897d47fc104818bec1c8f2d268a56f60dd00674e",
+    "backend/app/engine/tests/test_c_route.py": "777882eb63a47be5ea27ab46c293d10446731eaf029ca5825322805c3cc78d8f",
+    "backend/app/engine/tests/test_contracts.py": "e1631e5a2c9d8aaa5ec9cc3b520910a06b377d9c2cd409137485614b92d20fee",
+    "backend/app/engine/tests/test_corridor_coverage.py": "311f12bd32e8b4e9916d7f09b1eda796da249a6505a975276004b796bcf0aeb2",
+    "backend/app/engine/tests/test_handlers.py": "5f5624f3de4c5b36cb0238f9a3a5a0b7553205913c6f82bfa0157f60c0d3058b",
+    "backend/app/engine/tests/test_m0.py": "f4df38b7caa4c037a1ccb1399f786db1ab7fd163152c834432edb3398b6ae4ce",
+    "backend/app/engine/tests/test_m0_timing.py": "dd0f1c6fc6784ac5c702129ff7aa3a7e274d5a0da2ba1a54798f002b0da52ce3",
+    "backend/app/engine/tests/test_operational_candidates.py": "68a1a363ae61a3693bd27c18f728fdcc9b1b7083615dd6e1c4d3fb057f28c3f2",
+    "backend/app/engine/tests/test_repaired_seed.py": "e7419636bdba62a17063a86d47ceb26a8ed534a75b1de8953ccdd9c57feff440",
+    "backend/app/engine/tests/test_wheelchair_top3.py": "309d1eed2338b28e62836f97e63e6ff2a9793a9ab7fbc6f532d25ef9c3acadfb",
+    "backend/app/engine/walk.py": "c749c053f7112a93640b7d699267e1fb4db8987db90c7609d913781a1a7672a5",
+    "backend/app/graph/__init__.py": "5d8b0665d4c09c6ef493614aeada7d88d8b03ba32718cccdb38640fa4fcb0418",
+    "backend/app/graph/adapter.py": "3242358710ae225d0ab69feabef39329f006d61b23c68e853492133bda28516f",
+    "backend/app/graph/build.py": "cf687ea38a6a574b29f45408a988f6eb15f38c644d599dbaedf75b611fa639db",
+    "backend/app/graph/snapshot.py": "a864ecea3e0cc7fa4c6a4bf9b37c01dd73eb5ec7c179c457fc2d658ac9a6dabb",
+    "backend/app/main.py": "149082a7dff39fb4d9833571776930c0046cd92340874f77eb370430c7ac4550",
+    "backend/app/runtime_config.py": "2a6cf9bf61d0a8ed0f28bc351026d55fa8bf67842de0a35e7bb52fe815f69670",
+    "backend/app/services/__init__.py": "de9814938f87c797ca5165dbbf554b7df2c3bbb088115f07f46342d5a01e8cda",
+    "backend/app/services/event_models.py": "a131d1510553c2a4e31120e5d94906bbc3fd769009386074d623e34529450900",
+    "backend/app/services/event_store.py": "afe1574238b360baf3f243eb7f575eed6139367142a4ee6750dced6538de04e9",
+    "backend/app/services/ingest/__init__.py": "b7b2bf1311e3e5e85856aae464b89c4070fd5c31c004278ac64e7bff7d593cf8",
+    "backend/app/services/ingest/hko.py": "99c4b6630f4b36e199a5a8b24002b54834e3569fae83f7c4befa9ef33b893c6f",
+    "backend/app/services/ingest/mtr_eta.py": "a750f3ae89c53199b9dbe10a39ef2ca3ec5a045b84fcf97f569313ce70db650c",
+    "backend/app/services/ingest/social_mock.py": "39588fabc31be5887ed58e95eb67430e40a050bbd3a0781eaae38ad0f52346bc",
+    "backend/app/services/review_state.py": "89f825ba5559bfca7aee5d4f56079464804555e31f6efb513dc60889b2bf0ba6",
+    "backend/app/services/signal_models.py": "a103788432c07291c30905ff13c81bdb2e0952d13cc6bc58d7280cbee0456f81",
+    "backend/app/services/signal_store.py": "a03e4b1829a087e2f89950cf34c66fffd14f7b292a31c68d4cb1aa05d53b8ebd",
+    "backend/app/services/structure/__init__.py": "d315a4488eda5a5dfe20bf5b39945116839a245112d1560114befe4776624fbe",
+    "backend/app/services/structure/llm_structurer.py": "26c51a3d4fa5e22482a2a5c534344ae57e5878ca38ab39715a0ae07af9d31cdc",
+    "backend/app/sim/__init__.py": "cee6ec87f32da1193dc4ea154f297ec1dcbb5b4633dee9d5914be85f77374114",
+    "backend/app/sim/adapters.py": "4ae322e29047d0b3ee1538034d30c6c7590b0bf7843b54236c97ae743d91e28c",
+    "backend/app/sim/api.py": "35e7bf7819204cfeca162781a0d744fc62bca515f2e4695c949d77d7cbe736ae",
+    "backend/app/sim/cache.py": "c2779725166fecc84919fd485ae0c840eeded4525f9f4ee2710672c003714c72",
+    "backend/app/sim/models.py": "e78f4189f9eabd07d08095051cb929ff474d8a3e43a5ba02dcf6bc2912022112",
+    "backend/app/sim/multi_od.py": "c3af778e4d79ae2c67f5f0c02681c480dbf7e1f34651fe84d1d33bdda2714f00",
+    "backend/app/sim/population.py": "866ab212afee3bf86f79f3361482fec4eac544a26858e0ee7d5b98e11ff931a9",
+    "backend/app/sim/replanning.py": "ca55f9b7df1b7a29f48f319bec622a69216e1c9ddc23b7b912c4733ce41774a0",
+    "backend/app/sim/run.py": "31a4b7309f1d33d45d7c327b69fca05ca3ad4eb8add2661906515d87f057df93",
+    "backend/app/sim/service.py": "0222d2ad3be41319c9bace31880e6da03c0951c99ef67644c06d3f7e267799fc",
+    "backend/tests/__init__.py": "2b377429c0df8525d5cbe2ca733ef3b9abb1c23c713c2416b39d69bb2440528a",
+    "backend/tests/test_ai.py": "a7e1f9b935a2e08a542bdfee818aae1a989ee70c393812f7dfaee69dec544e2f",
+    "backend/tests/test_contract_seeds.py": "78dc547295f6eef05a240e65f3fd3370aa23fed671fdb6ba9d76dd07c90445a1",
+    "backend/tests/test_event_store.py": "492d1c837237b7d565c277714928d8136d3c3081d8cb0c97375d577fd375811b",
+    "backend/tests/test_hko.py": "0727e4f5807666d0f9d7f88ecd1a4d5abd213601a1437468d9b21790e26dcff7",
+    "backend/tests/test_llm_structurer.py": "a6f976025a73b64dd5d54c41cef3aa06dc472b5740e54edf80aa7fc7b317f0e8",
+    "backend/tests/test_m0_app_integration.py": "2bb566b64adab9f614a9481384b4e997f25c57834180b05958b07855ebbbb1ce",
+    "backend/tests/test_mtr_eta.py": "f8cdc3959508d3f7e005784f7fa9fd12944af1a0f48dd1564e76662c24c5d5e3",
+    "backend/tests/test_review_state.py": "4b83710962f263810b40d2b6c1cbb7a11d7070dba0b5f3faa06f9acfe361f1a9",
+    "backend/tests/test_signal_api.py": "7404de721ec63be3cbef267d28eae1d4ad74fae5ed1666700da11698f33a0b0f",
+    "backend/tests/test_sim_adapters.py": "4393d2992757ec0f6b72ebda9badb8d930a180fb33a02af6574cfc27609c9f2e",
+    "backend/tests/test_sim_m0.py": "347ba6ab817275daf2c9510bba4bb500f855255adcd7c469dd0234143ec23df4",
+    "backend/tests/test_sim_multi_od.py": "b81d7c8d9af0aaff866e7b244cca8f9ce6073e60e02b4563b150d40677a0d88a",
+    "backend/tests/test_sim_seed.py": "28776efc371f6a380b35fa0772665749ec4f300f42d69408cf59723da5c31c54",
+    "backend/tests/test_social_mock.py": "43d04172d10bf2fac49adf308a4ea29425fd2490a02a53b1b0a946c6762317c7",
+    "backend/app/ai/fixtures/chat_tool_results.simulated.json": "432d0035f450a1486de685a568c2909321e6e2e2ec54f5c6f5c2153f34ea182c",
+    "backend/app/engine/fixtures/corridor_access.simulated.json": "827939bd83c2401f062086bf198baac9d0f6325fb27a9f09369cc3770b76fe52",
+    "backend/app/engine/fixtures/events.synthetic.json": "a15efcaf2d1e1a4c210988ab8bb7169c167565ee4dbaf3d051a755676553cf5e",
+    "backend/app/engine/fixtures/network.synthetic.json": "a6560fbb18b9844b441727a73c75e2b11d684d832f465b1f9f9103f5c98df3ed",
+    "backend/app/engine/fixtures/routing.synthetic.json": "0d8580ebb5592a41dfab580f05270315a69edd15203dfeea02ff36a600b0fc7d",
+    "backend/app/engine/fixtures/seed_policy.json": "3020ae10023c811b9c199b19a8c5d6e713e1439b17c047bc65ad1ccc57ea00dc",
+    "backend/app/engine/reports/route-seed-repair-review.json": "d52ff74aacf9c745f6167349d5c3dfa926e1341c24bac96f7c959b9089fc0266",
+    "backend/tests/fixtures/b_updates.simulated.json": "e9e9b186b086086e7b345da2e47453a8b4d73b89bfaa40c18d85cc9106fe083a",
+    "backend/tests/fixtures/c_route_output.simulated.json": "1cef136b2d2de39ac483158cb10a23c609083a9a548ccfba38e277dd27baad4b",
+    "backend/tests/fixtures/multi_od_routes.simulated.json": "b3727d550009d1bc5db44aa5983762603c2cb2a0882f0cb21c688b246e8de106",
+    "tests/cross_module/test_audit_gate.py": "a513c90e5fe35a2ae6adf519b7f33eeb70d86432417ae9cbf1ef2c881e5925d7",
+    "tests/cross_module/test_m0_audit.py": "553b4dded88bf7a2d1abdfebdf327dee9a7b93b62cb380601e7189bf775e6278",
+    "tests/cross_module/test_m1_receipt.py": "a600b2b7b7b8897fbf8614bb84e0dc967db737f7d09b19d53aa2f4a4a43b32ff",
+    "tests/cross_module/test_module_chain.py": "afabf4b02fba7b2ac90829e1b4c9715a0987f840d5476bbaac355744659b7a8b",
+    "tests/integration/test_consumer_contracts.py": "c49ff038c19bfbcb5f9fccdf1b8130d1e1062107d8ef2bc7f9fe27801d2ebdfc",
+    "tests/integration/test_harness.py": "3b55bb1fee9b81db1c87efe4d330dfa68aaa6f79b5afae51d7271165098e2f0b",
+    "tests/test_data_integrity.py": "ad073c38ae1c86cdfe793db925d80efa636ebbe52ed9abaf4c4045ae043dba91",
+    "tests/test_devops_runtime.py": "ef6219d133cc4d768c0d5e5afdb88c0ab6559c48141a72f53a54f487ffb7040d",
+    "tests/test_load_queue.py": "54706a94693c081be476a8587267b2edb149034e611bb95ad4e8820297d6484a",
+    "tests/test_od_smoke.py": "1e4afc8365ddccb129ae1f6a8c286c643080da6823d00b281c06c38bd2be68a5",
+    "tests/test_population_fairness.py": "c91f2738e7d32765132ba0ab7d174a036d9dfa06f6085830c77c5ca154562630",
+    "tests/test_replanning_service.py": "89e3cca6685baf74a8b03d74953fd667b5a36384e708a839cafb0d0d2b46db6f",
+    "tests/test_sim_contract.py": "87d4dd0dc8ee02ecd67f2765ba6d3c63dcb23e58fffacf7119843e3289154681",
+    "tests/test_simulation_cache.py": "a7172091b343d8d38c0dbb9005dd6b1da018642b70512a84d744674307f5cb26",
+    "tests/cross_module/fixtures/scenario.json": "11ec0dc9825ec78982dcc408aef86b70eab5c8da42d049bfbd9b159a8e916e20",
+    "tests/integration/fixtures/simulated-contracts.json": "efea30bc8b65acc851c75c0101c784c2ed06f8bcb8efe43e9e8fb206603970f3",
+    "scripts/generate_contract_schemas.py": "728e524a81301122b2104a4a96a83adc92627f6babdf7856055ce00b71447c6e",
+    "scripts/integration/__init__.py": "6ee743e7e618824fa09e8484d1ff0ce5afba05a16e97b4e5f0b38f12bdd0342e",
+    "scripts/integration/__main__.py": "de022fa5b1bb18bfb8739cbc15ce30499487955f4df4738df47492f57ea90c3e",
+    "scripts/integration/audit_all.py": "3bfdb75acee50d158c8465416f83ab05c1a91b42db32b24b591e4130657f7961",
+    "scripts/integration/checks.py": "5ced9ba4e06c2952e468083d9985f52001c2336140ecb5a5a723cb42431018d8",
+    "scripts/integration/contracts.py": "93d322ffddb92435cef731e2407698d6011b5824381ded5572412663a3343781",
+    "scripts/integration/fixture_source.py": "d4a862e0a403659b8e578c55fead2791dd964c01ada7e4e490617fcfd6764cb2",
+    "scripts/integration/m0_c_inventory.py": "8e4819e9ca2119beed0d0f69fd428b77db7de493492a8db407785f6259a273e6",
+    "scripts/integration/m0_probe.py": "ef1c8da6522fc10b83518a2af5109aa40718838eecb4deba6fde31e36195a6c1",
+    "scripts/integration/m1_acceptance.py": "0468b2f7d384c204657b9ece0a92c8469ad346c57803ae319568eabf4415ed1c",
+    "scripts/integration/module_bridge.py": "9e89cfb58c30b245752d244295d631e8176dc0ab6f3a480ebbd8032bfa28e0b4",
+    "scripts/integration/multi_od.py": "c58f536904a68e0c1b86b7254317b195b72c764107f2e55eddd8406266d6abf6",
+    "scripts/integration/provenance_audit.py": "fbd0c7e6c3b98b41cc1a13d1da1c8df0b4a693c23c540b20f36445c3e4212414",
+    "scripts/integration/runner.py": "7abf90670e8152fe33d4b0fb37686f2d4f5d50705fa67f14b1b70f8b8df11c15",
+    "scripts/od_smoke.py": "5b05652876493e020c8a8398d7aeb833f2f987fcb85812c8f8fbc29da04ac013",
+    "scripts/precompute_sim.py": "2d03134e98e6e2a575576974db7fa13dca1fa8b46fe2018b6b700532a1bacc2e",
+    "scripts/preflight.py": "b3ecd6cf309a8708c53bad0cd860c37bb4167917196c7baeafb545a4bf4a9220",
+    "scripts/validate_contract_seeds.py": "ec6ac500c8d702836505ee3e17e2e178740105deb790fe40eb9e9358eed6e412",
+    "scripts/validate_data.py": "bd7af103ba4a7a86b68154325b13f90978d6755d9cbe6b5e79ca0765eacdba78",
+    "scripts/verify_sim_m0.py": "da841e8c4639a8cfb7b509e84d96433b4037218905828cba41327c8a0d301914",
+    "scripts/verify_sim_multi_od_m0.py": "a003248a6e929568f5492c2b967f8f35472a2ea7f20c435afca5f52c29f04671",
+    "contracts/schemas/event.schema.json": "2a5e1ce47d639e48cc3cef630f5f99d0866e86a0471fd7580c2136fe108015d9",
+    "contracts/schemas/signal.schema.json": "39d6f3b50b0ca527914ea0fbbc411f117b15461b37df61bdcf69c37d36f2a248",
+    "contracts/seed/event.seed.json": "0b962163ae1be58e9219aa989e122fdb6fe201d8d2f4b874e1ed3411e543cf85",
+    "contracts/seed/network.seed.json": "a2a925c8d69e75b8c108d7c5e01468815c17349c62b347105f417294596bae86",
+    "contracts/seed/routes.seed.json": "92decb912405755344840e4518f57aa00ee5c3b10ac9c68f58fa7b1d5872b7b0",
+    "contracts/seed/sim.seed.json": "c02a1c725defb41bff401ed1d81e86698e68022cfc30a2d520f4e6f7ca5dfe0f",
+    "data/access/access_points.json": "decfd4059382b18059fb7f4155c7daf50c7d671376fe89691b73340b4a4e4034",
+    "data/access/station_entrances.json": "f14685f212a4e32e5d8d9fdd70b3488e66f29ea998c9b523e72537982a927476",
+    "data/calendar.json": "3072b5db7fcc934a1f43f22bd589fec2fcb84a1eed4d815453585bbe9cca61bf",
+    "data/network/bus_routes.json": "0cdc2385adba02bcca2fb9e1a7f8178153aa9c8fff2589723b8ba9d36ce2aac5",
+    "data/network/lines.json": "33771ff03d667f0a9991e0860e5c0a78814ef54bb034db7e317ce4539d561ae8",
+    "data/network/stations.json": "18d06d215e5de8005ee8397c9d309c0ba528c3de9202175459676960d72fb74b",
+    "data/network/walk_links.json": "36344ebe0bd563bf1802115486cf31b80436468c7297dc3954eea010d64bde75",
+    "data/sim/m0-multi-od-verification.json": "87e0ffedc31ea3cbeaca1de8b893ceb5ac87fc38af79c5457643c073f9b3859b",
+    "data/sim/m0-verification.json": "c1b3d82f5182355c6df57343cab53d519f3f60dbbd48353e7690b58dc67281d2",
+    "data/sim/scn_huh_exc_closed_am_peak.input.json": "5877777e0b2150e780cedb89a65715bc9379da1a71f72b94e893f15f8be3431e",
+    "data/sim/scn_huh_exc_closed_am_peak.json": "9042f9ac151706031c9c14f31b72c450600f884321c4314819dc57b10a79909d",
+    "data/weather_impact.json": "294a8825e121e2287ca6f068b18b16e8ecf4de291f3f2187749ffd87c77dfca8",
+    "data/capacity_method.md": "ea29df0f9fed50ccb2dbee43ff4b81ccc1d46c8f4d482c5b4f91ee8b156750ac",
+    "data/DATA_QUALITY.md": "2ce0ea3b7a0611c85185d0ed93995c0ebeabe3877b65076cd40619d464f73d61",
+    "data/m0-source-checks.md": "89556edd89da356eceb67ae52029e9b6a584c81b6d3aa1bffb06e8309fb5415e",
+    "data/PROVENANCE.md": "c3bdea0f1b02a59da27314657af3a005b14abb1c00ae18e4e7f02b72449f61ef",
+    "data/sim/README.md": "90acd08019c7b3d1e19a544019ee363d9de519e5b398181b0ce5099fb728be58",
+    "docs/plan/03-contracts.md": "cd82a9c5f3b1b6a9f795285f7fb821fda3c8ef059327ec5afc60a323b1b07100",
+    "contracts/README.md": "a10b1f9c89a55f11c6318dd5e99df0c2cab86fadc8a056f223835433169f8b01",
+    "backend/.env.example": "a0f7be4b8b50cd059a7c68f5fb93b66e739813f13256c93a0bee8c103c237864",
+    "scripts/start_backend.ps1": "a6552212fb6913500c9e8e16a0b4028b097bf08d1fecfe88f3db638830c3d273",
+    "scripts/sync_github_tasks.ps1": "53b188662c0bfc8fe87c033fb7f4023c7c35b658973ccf0d0c0da3785bce8e40"
+  },
+  "full_chain_status": "BLOCKED: B delivery wiring and A live refresh not accepted; route PR/data refresh pending",
+  "exit_code": 2
+}

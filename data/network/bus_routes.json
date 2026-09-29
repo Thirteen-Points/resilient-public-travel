@@ -1,9 +1,10 @@
 {
   "meta": {
-    "version": "1.0",
+    "version": "1.1",
     "built_at": "2026-09-22",
-    "description": "Bus route verification log. Each route is marked as serving Tai Wai/Sha Tin or excluded. Based on KMB open data API and data.gov.hk.",
-    "provenance_note": "Routes verified against KMB open data API (https://data.etabus.gov.hk/v1/transport/kmb/). Excluded routes confirmed via route endpoint data."
+    "updated_at": "2026-09-25",
+    "description": "Bus route verification log. Each route is marked as serving Tai Wai/Sha Tin or excluded. Verified against Transport Department ROUTE_BUS.xml / RSTOP_BUS.xml / ROUTE_GMB.xml (generated 2026-09-11, fetched 2026-09-25).",
+    "provenance_note": "The original 2026-09-21 pass relied on the KMB open-data API, which the checker could not actually access (ledger S11) - those verified flags were downgraded unless re-confirmed. Field-level evidence now comes from TD XML master rows (route, operator, origin, destination, full fare, LAST_UPDATE_DATE) and direction-specific stop sequences; see PROVENANCE.md S17/S18/S31. Headway fields are estimates: TD headway GTFS (S20) expresses variable frequency bands that a single number cannot safely summarise."
   },
   "serving_tai_wai": [
     {
@@ -19,11 +20,11 @@
       "fare_hkd": [16.0, 20.8],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/182/outbound/1",
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
       "provenance": "real-derived",
-      "note": "Only full-day direct cross-harbour bus from Sha Tin. Headway and fare estimated."
+      "note": "Route 1051, full fare HK$20.8, row 2026-01-14 (S17). Boards 大圍轉車站-新翠邨 (859) outbound and 大圍站 (6042) inbound; stops 紅隧轉車站 (219/9015). Headway and the HK$16 section fare are estimates, unverified."
     },
     {
       "route_id": "182P",
@@ -34,41 +35,44 @@
       "service_hours": "weekday_peak_only",
       "calendar_type": "weekday_peak",
       "serves_tai_wai": true,
-      "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
+      "verified": false,
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml absence check (data.gov.hk)",
       "provenance": "real-derived",
-      "note": "Peak-hour special service, one-way"
+      "note": "No master row in ROUTE_BUS.xml generated 2026-09-11 - route not currently listed. The 2026-09-21 KMB-API determination was never verifiable (S11). Do not treat as an operational candidate."
     },
     {
       "route_id": "182X",
       "operator": "KMB+CTB",
-      "origin_zh": "愉翠苑",
-      "destination_zh": "中環",
+      "origin_zh": "中環(港澳碼頭)",
+      "destination_zh": "愉翠苑",
       "tunnel": "CHT",
       "service_hours": "weekday_peak_only",
       "calendar_type": "weekday_peak",
+      "fare_hkd": [20.8, 20.8],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
       "provenance": "real-derived",
-      "note": "Peak-hour express, one-way"
+      "note": "Route 8307 中環(港澳碼頭)->愉翠苑, full fare 20.8, row 2026-01-14; one direction only (corrected origin/destination order per TD master row)."
     },
     {
       "route_id": "N182",
       "operator": "KMB+CTB",
       "origin_zh": "廣源",
-      "destination_zh": "中環",
+      "destination_zh": "中環(港澳碼頭)",
       "tunnel": "CHT",
       "service_hours": "overnight",
       "calendar_type": "daily_overnight",
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
       "provenance": "real-derived",
-      "note": "Overnight only cross-harbour option"
+      "note": "Route 1434, full fare HK$31.2 (overnight), row 2026-01-14. Serves 大圍轉車站 859 outbound / 846+6042 inbound."
     },
     {
       "route_id": "982X",
@@ -78,60 +82,89 @@
       "tunnel": "WHC",
       "service_hours": "weekday_peak_only",
       "calendar_type": "weekday_peak",
-      "fare_hkd": [6.0, 16.0],
+      "fare_hkd": [6.0, 20.8],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/982X/",
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (route/order/fare, data.gov.hk); weekday departures from user-provided timetable screenshots",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
       "provenance": "real-derived",
-      "note": "Weekday peak only, one-way. Load factor already >90%. $6 TAW section fare is cheapest."
+      "schedule_evidence": {
+        "source": "User-provided timetable screenshots (two direction panels). No capture date and no verifiable official origin are shown on the images; the times have NOT been re-checked against an official source and must not be presented as operator-verified.",
+        "days": "Monday to Friday only, as displayed on the screenshots. No weekend / public-holiday / off-peak evidence exists in any source this pass.",
+        "provenance_note": "Route existence, operator, OD and full fare remain TD-XML-verified (this file, verified_at 2026-09-25). The departure times themselves rest only on the user-provided screenshots; no provenance upgrade was made.",
+        "directions": [
+          {
+            "direction": "往灣仔菲林明道 (to Fleming Road, Wan Chai)",
+            "od_match_note": "OD/direction corresponds to TD variant 8104 (愉翠苑->灣仔(菲林明道)); the screenshots themselves do not display the variant ID.",
+            "departures": ["06:55", "07:15", "07:30", "07:39", "07:51", "08:04", "08:10"],
+            "gaps_min": [20, 15, 9, 12, 13, 6],
+            "window": "06:55-08:10",
+            "boarding_point_note": "The screenshot panel does not state the departure stop. TD stop sequence boards 大圍轉車站 6041/6015 after the 愉翠苑 origin; the times are recorded verbatim as displayed, not re-interpreted as Tai Wai boarding times."
+          },
+          {
+            "direction": "往愉翠苑巴士總站 (to Yu Chui Court B/T)",
+            "od_match_note": "OD/direction corresponds to TD variant 8644 (金鐘站(東)->愉翠苑); the screenshots themselves do not display the variant ID.",
+            "departures": ["17:47", "17:55", "18:03", "18:11", "18:19", "18:27"],
+            "gaps_min": [8, 8, 8, 8, 8],
+            "window": "17:47-18:27",
+            "boarding_stop_code": "ST871 (verbatim from the screenshot; not mapped to any seed/network node)",
+            "terminus_note": "Screenshot legend reads 翡翠苑; recorded as 愉翠苑 (Yu Chui Court), matching the TD-verified destination of variant 8644."
+          }
+        ]
+      },
+      "note": "Full fare 20.8 verified (TD rows 8104/8308/8644, 2026-06-12). The HK$6 Tai Wai section fare remains unverified. Boards 大圍轉車站 6041/6015 via 西隧 (911). Weekday directional departures recorded from user-provided screenshots (see schedule_evidence; unverified against official sources). Load factor >90% claim is from a single web search, not monitoring."
     },
     {
       "route_id": "985",
       "operator": "KMB+CTB",
-      "origin_zh": "美田",
-      "destination_zh": "金鐘(東)/銅鑼灣",
+      "origin_zh": "美田(美致樓)",
+      "destination_zh": "灣仔(軒尼詩道)",
       "tunnel": "WHC",
       "service_hours": "weekday_peak_only",
       "calendar_type": "weekday_peak",
-      "fare_hkd": [19.5, 19.5],
+      "fare_hkd": [20.8, 20.8],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "provenance": "real-derived"
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "provenance": "real-derived",
+      "note": "AM route 1174 美田->灣仔; PM return 8697 金鐘站(東)->美田; full fare 20.8 verified. Serves 田心村 (6015) AM outbound. Destination corrected from the stale 金鐘(東)/銅鑼灣 per TD master rows."
     },
     {
       "route_id": "985A",
       "operator": "KMB+CTB",
-      "origin_zh": "美田",
-      "destination_zh": "金鐘(東)",
+      "origin_zh": "美田(美致樓)",
+      "destination_zh": "灣仔(軒尼詩道)",
       "tunnel": "WHC",
       "service_hours": "weekday_peak_only",
       "calendar_type": "weekday_peak",
+      "fare_hkd": [20.8, 20.8],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "provenance": "real-derived"
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "provenance": "real-derived",
+      "note": "Route 8704 美田->灣仔(軒尼詩道), full fare 20.8 verified (row 2025-04-03); serves 田心村 (6015). No PM-return row in master data. Destination corrected from the stale 金鐘(東)."
     },
     {
       "route_id": "985B",
       "operator": "KMB+CTB",
       "origin_zh": "大圍(田心村)",
-      "destination_zh": "金鐘(東)/銅鑼灣",
+      "destination_zh": "灣仔(軒尼詩道)",
       "tunnel": "WHC",
       "service_hours": "weekday_peak_only",
       "calendar_type": "weekday_peak",
-      "fare_hkd": [19.5, 19.5],
+      "fare_hkd": [20.8, 20.8],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/985B/",
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
       "provenance": "real-derived",
-      "note": "Via Hin Keng. Third stop ~70% full."
+      "note": "Route 8705 田心村->灣仔(軒尼詩道) via 顯徑邨, 西隧 (911); full fare corrected 19.5 -> 20.8 (row 2025-04-03). The data-appendix claims 金鐘(東)/銅鑼灣 terminus and ~70% third-stop load are unverified/stale; no PM-return row for 985B in the 2026-09-11 master data."
     },
     {
       "route_id": "170",
@@ -146,11 +179,11 @@
       "fare_hkd": [20.8, 20.8],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/170/",
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
       "provenance": "real-derived",
-      "note": "HK Island end only reaches Causeway Bay / Aberdeen, NOT Admiralty/Central"
+      "note": "Routes 1047/8470, full fare 20.8 verified (rows 2026-07-23/24). Serves 大圍轉車站-新翠邨 (859) outbound and 大圍站 (6042) inbound; stops 紅隧轉車站 9014/9015. HK Island end only reaches 华富 area, NOT Admiralty/Central. Headway values are estimates."
     },
     {
       "route_id": "81C",
@@ -159,13 +192,14 @@
       "destination_zh": "尖沙咀東(麼地道)",
       "tunnel": null,
       "calendar_type": "daily",
+      "fare_hkd": [10.2, 10.2],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "source_url": "https://data.etabus.gov.hk/v1/transport/kmb/route/81C/",
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
       "provenance": "real-derived",
-      "note": "Does not cross harbour. Via Tai Chung Road / Che Kung Temple Road = Tai Wai area"
+      "note": "Route 1336, full fare HK$10.2 verified (row 2025-08-11). Boards 大圍轉車站 859 outbound / 6042 inbound; does not cross harbour."
     },
     {
       "route_id": "87B",
@@ -173,56 +207,70 @@
       "origin_zh": "新田圍",
       "destination_zh": "維港灣(大角咀)",
       "tunnel": "Lion Rock Tunnel",
+      "fare_hkd": [7.8, 7.8],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
       "provenance": "real-derived",
-      "note": "Kowloon end is Tai Kok Tsui"
+      "note": "Route 1370, full fare HK$7.8 verified (row 2025-03-14). Serves 大圍轉車站 6041/6015/859. Kowloon end is 維港灣 (Island Harbourview), Tai Kok Tsui area."
     },
     {
       "route_id": "80X",
       "operator": "KMB",
-      "origin_zh": "沙田各點",
+      "origin_zh": "秦石",
       "destination_zh": "觀塘碼頭",
+      "fare_hkd": [8.1, 8.1],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "provenance": "real-derived"
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "provenance": "real-derived",
+      "note": "Route 1333 秦石->觀塘碼頭, full fare 8.1 verified (row 2025-12-17). Origin corrected from the vague 沙田各點; serves Sha Tin (秦石) with no Tai Wai-area stops (RSTOP checked 2026-09-25)."
     },
     {
       "route_id": "82X",
       "operator": "KMB",
-      "origin_zh": "沙田各點",
-      "destination_zh": "黃大仙",
+      "origin_zh": "濱景花園",
+      "destination_zh": "黃大仙(循環線)",
+      "fare_hkd": [6.5, 6.5],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "provenance": "real-derived"
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "provenance": "real-derived",
+      "note": "Route 1345 濱景花園->黃大仙(循環線), fare 6.5 verified (row 2025-09-02). Origin corrected from the vague 沙田各點; no Tai Wai-area stops (RSTOP checked 2026-09-25)."
     },
     {
       "route_id": "83X",
       "operator": "KMB",
-      "origin_zh": "沙田各點",
-      "destination_zh": "尖沙咀東",
+      "origin_zh": "黃泥頭",
+      "destination_zh": "觀塘碼頭",
+      "fare_hkd": [8.1, 8.1],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "provenance": "real-derived"
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "provenance": "real-derived",
+      "note": "Routes 1348/8492 黃泥頭/水泉澳->觀塘碼頭, fare 8.1 verified (rows 2026-08-07). Destination corrected from the stale 尖沙咀東 per TD master rows; no Tai Wai-area stops (RSTOP checked 2026-09-25)."
     },
     {
       "route_id": "280X",
       "operator": "KMB",
-      "origin_zh": "沙田各點",
-      "destination_zh": "尖沙咀東",
+      "origin_zh": "穗禾苑",
+      "destination_zh": "尖沙咀東(麼地道)",
+      "fare_hkd": [10.2, 10.2],
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "KMB open data API",
-      "provenance": "real-derived"
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_BUS.xml / RSTOP_BUS.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml",
+      "provenance": "real-derived",
+      "note": "Routes 8229/8510 穗禾苑/駿景園->尖沙咀東(麼地道), fare 10.2 verified (rows 2026-05-04/2025-01-05). Origin corrected from the vague 沙田各點; no Tai Wai-area stops (RSTOP checked 2026-09-25)."
     },
     {
       "route_id": "481B",
@@ -239,86 +287,86 @@
       "low_floor": false,
       "serves_tai_wai": true,
       "verified": true,
-      "verified_at": "2026-09-21",
-      "source": "Transport Department",
+      "verified_at": "2026-09-25",
+      "source": "TD ROUTE_GMB.xml (data.gov.hk)",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_GMB.xml",
       "provenance": "real",
-      "note": "19-seat, no low-floor. Wheelchair users CANNOT use. Lateral connection to Tsuen Wan, not cross-harbour."
+      "note": "ROUTE_GMB row 2003214: 荃灣街市街->大圍銅鑼灣山路(輔助服務), fare HK$12.3, row 2025-12-25. 19-seat statutory maximum (Cap 374D), no low-floor - wheelchair users CANNOT use. REMOVED from the runnable network (endpoint BS_TW invalid per manual confirmation; official stop sequence unverified - see contracts/seed missing_nodes_note). Lateral connection to Tsuen Wan, not cross-harbour. Headway/service-hours values are unverified estimates."
     }
   ],
   "excluded_routes": [
     {
       "route_id": "680",
-      "reason": "Serves Ma On Shan, not Tai Wai",
+      "reason": "Serves Ma On Shan, not Tai Wai. Confirmed no Tai Wai-area stops in TD RSTOP_BUS sequences (checked 2026-09-25).",
       "verified": true,
-      "verified_at": "2026-09-21"
+      "verified_at": "2026-09-25"
     },
     {
       "route_id": "680X",
-      "reason": "Serves Ma On Shan, not Tai Wai",
+      "reason": "Serves Ma On Shan, not Tai Wai. Confirmed no Tai Wai-area stops in TD RSTOP_BUS sequences (checked 2026-09-25).",
       "verified": true,
-      "verified_at": "2026-09-21"
+      "verified_at": "2026-09-25"
     },
     {
       "route_id": "681",
-      "reason": "Serves Ma On Shan, not Tai Wai",
+      "reason": "Serves Ma On Shan, not Tai Wai. Confirmed no Tai Wai-area stops in TD RSTOP_BUS sequences (checked 2026-09-25).",
       "verified": true,
-      "verified_at": "2026-09-21"
+      "verified_at": "2026-09-25"
     },
     {
       "route_id": "682",
-      "reason": "Serves Ma On Shan (Wu Kai Sha), not Tai Wai",
+      "reason": "Serves Ma On Shan (Wu Kai Sha), not Tai Wai. Confirmed no Tai Wai-area stops in TD RSTOP_BUS sequences (checked 2026-09-25).",
       "verified": true,
-      "verified_at": "2026-09-21"
+      "verified_at": "2026-09-25"
     },
     {
       "route_id": "682P",
-      "reason": "Serves Ma On Shan (Wu Kai Sha), not Tai Wai",
+      "reason": "Serves Ma On Shan (Wu Kai Sha), not Tai Wai. Confirmed no Tai Wai-area stops in TD RSTOP_BUS sequences (checked 2026-09-25).",
       "verified": true,
-      "verified_at": "2026-09-21"
+      "verified_at": "2026-09-25"
     },
     {
       "route_id": "307",
-      "reason": "Serves Tai Po, not Tai Wai",
+      "reason": "Serves Tai Po, not Tai Wai. Confirmed no Tai Wai-area stops in TD RSTOP_BUS sequences (checked 2026-09-25).",
       "verified": true,
-      "verified_at": "2026-09-21"
+      "verified_at": "2026-09-25"
     },
     {
       "route_id": "673",
-      "reason": "Serves Sheung Shui, not Tai Wai",
+      "reason": "Serves Sheung Shui, not Tai Wai. Confirmed no Tai Wai-area stops in TD RSTOP_BUS sequences (checked 2026-09-25).",
       "verified": true,
-      "verified_at": "2026-09-21"
+      "verified_at": "2026-09-25"
     },
     {
       "route_id": "978",
-      "reason": "Serves Fanling, not Tai Wai",
+      "reason": "Serves Fanling, not Tai Wai. RSTOP shows only 百福田心球場 (a North District place name), no Tai Wai stop (checked 2026-09-25).",
       "verified": true,
-      "verified_at": "2026-09-21"
+      "verified_at": "2026-09-25"
     },
     {
       "route_id": "968",
-      "reason": "Serves Yuen Long, not Tai Wai",
+      "reason": "Serves Yuen Long, not Tai Wai. Confirmed no Tai Wai-area stops in TD RSTOP_BUS sequences (checked 2026-09-25).",
       "verified": true,
-      "verified_at": "2026-09-21"
+      "verified_at": "2026-09-25"
     },
     {
       "route_id": "948X",
-      "reason": "Serves Tsing Yi, not Tai Wai",
+      "reason": "Serves Tsing Yi, not Tai Wai. Confirmed no Tai Wai-area stops in TD RSTOP_BUS sequences (checked 2026-09-25).",
       "verified": true,
-      "verified_at": "2026-09-21"
+      "verified_at": "2026-09-25"
     },
     {
       "route_id": "88K",
-      "reason": "Possibly cancelled on 2025-08-04. One search confirmed, one unconfirmed.",
-      "verified": false,
-      "verified_at": "2026-09-21",
-      "note": "T7.2 item #1 - needs B verification. Excluded from network data."
+      "reason": "NOT cancelled: route 1380 顯徑->駿景園 exists in TD ROUTE_BUS.xml (row 2026-06-15, fare HK$5.4) and serves 大圍站總站 (847). The 2025-08-04 cancellation claim is unconfirmed. Excluded anyway: local Hin Keng-Royal Ascot feeder, not a corridor alternative.",
+      "verified": true,
+      "verified_at": "2026-09-25",
+      "note": "T7.2 item #1 resolved. Prior entry claimed a possible 2025-08-04 cancellation, contradicted by current master data."
     },
     {
       "route_id": "80M",
-      "reason": "Proposed cancellation in 2025-26 Sha Tin District Bus Route Plan. Replacement: 85/85A/81K.",
-      "verified": false,
-      "verified_at": "2026-09-21",
-      "note": "Excluded from network data pending confirmation."
+      "reason": "No master row in TD ROUTE_BUS.xml generated 2026-09-11, consistent with the proposed cancellation in the 2025-26 Sha Tin District Bus Route Plan (replacement 85/85A/81K, all present in master data).",
+      "verified": true,
+      "verified_at": "2026-09-25"
     }
   ]
 }

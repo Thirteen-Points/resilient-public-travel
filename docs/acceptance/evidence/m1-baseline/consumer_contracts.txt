@@ -1,0 +1,49 @@
+PENDING adapter: No module adapter provided; runtime implementation not verified
+PENDING adapter: No module adapter provided; runtime implementation not verified
+FAIL    adapter: ModuleNotFoundError: No module named 'nonexistent_module'
+FAIL    exception: ZeroDivisionError: division by zero
+test_all_error_statuses_require_envelope (test_consumer_contracts.ConsumerContractTests.test_all_error_statuses_require_envelope) ... ok
+test_all_public_fixture_objects (test_consumer_contracts.ConsumerContractTests.test_all_public_fixture_objects) ... ok
+test_all_registered_success_responses (test_consumer_contracts.ConsumerContractTests.test_all_registered_success_responses) ... ok
+test_bad_enum_and_missing_timezone (test_consumer_contracts.ConsumerContractTests.test_bad_enum_and_missing_timezone) ... ok
+test_empty_evidence_not_accepted (test_consumer_contracts.ConsumerContractTests.test_empty_evidence_not_accepted) ... ok
+test_every_required_root_field (test_consumer_contracts.ConsumerContractTests.test_every_required_root_field) ... ok
+test_missing_and_renamed_nested_fields (test_consumer_contracts.ConsumerContractTests.test_missing_and_renamed_nested_fields) ... ok
+test_nonfinite_bool_numeric_and_wrong_types (test_consumer_contracts.ConsumerContractTests.test_nonfinite_bool_numeric_and_wrong_types) ... ok
+test_nullable_event_times (test_consumer_contracts.ConsumerContractTests.test_nullable_event_times) ... ok
+test_route_response_is_array_not_private_envelope (test_consumer_contracts.ConsumerContractTests.test_route_response_is_array_not_private_envelope) ... ok
+test_transit_line_required_but_walk_line_optional (test_consumer_contracts.ConsumerContractTests.test_transit_line_required_but_walk_line_optional) ... ok
+test_unknown_extensions_are_preserved (test_consumer_contracts.ConsumerContractTests.test_unknown_extensions_are_preserved) ... ok
+test_unsupported_endpoint_never_passes (test_consumer_contracts.ConsumerContractTests.test_unsupported_endpoint_never_passes) ... ok
+test_loader_injection_replaces_values_not_validation_logic (test_consumer_contracts.DataAdapterTests.test_loader_injection_replaces_values_not_validation_logic) ... ok
+test_missing_object_does_not_become_default_data (test_consumer_contracts.DataAdapterTests.test_missing_object_does_not_become_default_data) ... ok
+test_returns_independent_copies (test_consumer_contracts.DataAdapterTests.test_returns_independent_copies) ... ok
+test_simulated_fixture_cannot_claim_verified_provenance (test_consumer_contracts.DataAdapterTests.test_simulated_fixture_cannot_claim_verified_provenance) ... ok
+test_compressed_leg_closure_both_directions_and_status (test_harness.BoundaryTests.test_compressed_leg_closure_both_directions_and_status) ... ok
+test_contract_drift_is_not_silently_aliased (test_harness.BoundaryTests.test_contract_drift_is_not_silently_aliased) ... ok
+test_disconnected_route_and_wrong_destination (test_harness.BoundaryTests.test_disconnected_route_and_wrong_destination) ... ok
+test_finite_numbers_and_calendar (test_harness.BoundaryTests.test_finite_numbers_and_calendar) ... ok
+test_json_rejects_nan (test_harness.BoundaryTests.test_json_rejects_nan) ... ok
+test_missing_signal_and_unreviewed_publication (test_harness.BoundaryTests.test_missing_signal_and_unreviewed_publication) ... ok
+test_no_benefit_can_be_reported_honestly (test_harness.BoundaryTests.test_no_benefit_can_be_reported_honestly) ... ok
+test_placeholder_delta_and_overload_are_rejected (test_harness.BoundaryTests.test_placeholder_delta_and_overload_are_rejected) ... ok
+test_tampered_score (test_harness.BoundaryTests.test_tampered_score) ... ok
+test_unknown_stop_and_count (test_harness.BoundaryTests.test_unknown_stop_and_count) ... ok
+test_unverified_real (test_harness.BoundaryTests.test_unverified_real) ... ok
+test_valid_synthetic_objects (test_harness.BoundaryTests.test_valid_synthetic_objects) ... ok
+test_wheelchair_all_results_not_only_top_one (test_harness.BoundaryTests.test_wheelchair_all_results_not_only_top_one) ... ok
+test_cli_missing_inputs_exit_two (test_harness.RunnerTests.test_cli_missing_inputs_exit_two) ... ok
+test_missing_modules_never_pass (test_harness.RunnerTests.test_missing_modules_never_pass) ... ok
+test_missing_seed_is_failure (test_harness.RunnerTests.test_missing_seed_is_failure) ... ok
+test_nearest_rank_p95 (test_harness.RunnerTests.test_nearest_rank_p95) ... ok
+test_offline_corruption_and_traversal (test_harness.RunnerTests.test_offline_corruption_and_traversal) ... ok
+test_report_error_is_failure_not_skip (test_harness.RunnerTests.test_report_error_is_failure_not_skip) ... ok
+test_fallback_requires_observed_injection (test_harness.WiringTests.test_fallback_requires_observed_injection) ... ok
+test_lifecycle_runs_and_ui_remains_pending (test_harness.WiringTests.test_lifecycle_runs_and_ui_remains_pending) ... ok
+test_performance_rejects_fast_invalid_response (test_harness.WiringTests.test_performance_rejects_fast_invalid_response) ... ok
+test_runtime_catches_cross_module_closure_leak (test_harness.WiringTests.test_runtime_catches_cross_module_closure_leak) ... ok
+
+----------------------------------------------------------------------
+Ran 40 tests in 2.536s
+
+OK

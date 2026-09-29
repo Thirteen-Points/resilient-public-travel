@@ -5,7 +5,9 @@
     "description": "Service calendar for MTR and bus routes. Four schedule types: weekday, Saturday, Sunday/PH. Public holidays use Sunday schedule.",
     "source": "MTR service index + GovHK holiday list",
     "source_url": "https://www.gov.hk/en/about/abouthk/holiday/2026.htm",
-    "provenance": "real"
+    "provenance": "real",
+    "checked_at": "2026-09-25",
+    "provenance_note": "All three in-window holiday rows verified field-level against the GovHK 2026 holiday page on 2026-09-25 (PROVENANCE S26). Line operating hours are partially verified: MTR first/last-train page was under maintenance on 2026-09-25 (not re-verified); bus hours rest on the unverifiable KMB API attempt (S11) unless noted. TD master rows carry no service-hours field."
   },
   "schedule_types": {
     "weekday": {
@@ -29,9 +31,9 @@
     }
   },
   "public_holidays_2026": [
-    {"date": "2026-09-26", "day": "Saturday", "name_zh": "中秋節翌日", "name_en": "The day following the Mid-Autumn Festival", "schedule_type": "sunday_ph"},
-    {"date": "2026-10-01", "day": "Thursday", "name_zh": "國慶日", "name_en": "National Day", "schedule_type": "sunday_ph"},
-    {"date": "2026-10-19", "day": "Monday", "name_zh": "重陽節翌日", "name_en": "The day following Chung Yeung Festival", "schedule_type": "sunday_ph", "note": "Beyond delivery window (10/18)"}
+    {"date": "2026-09-26", "day": "Saturday", "name_zh": "中秋節翌日", "name_en": "The day following the Chinese Mid-Autumn Festival", "schedule_type": "sunday_ph", "verified": true, "verified_at": "2026-09-25"},
+    {"date": "2026-10-01", "day": "Thursday", "name_zh": "國慶日", "name_en": "National Day", "schedule_type": "sunday_ph", "verified": true, "verified_at": "2026-09-25"},
+    {"date": "2026-10-19", "day": "Monday", "name_zh": "重陽節翌日", "name_en": "The day following Chung Yeung Festival", "schedule_type": "sunday_ph", "note": "Beyond delivery window (10/18)", "verified": true, "verified_at": "2026-09-25"}
   ],
   "service_exceptions": [
     {
@@ -67,15 +69,15 @@
     }
   ],
   "operating_hours": {
-    "ERL": {"first_train": "05:30", "last_train": "00:30", "provenance": "real", "note": "Approximate; verify on MTR website"},
+    "ERL": {"first_train": "05:30", "last_train": "00:30", "provenance": "real-derived", "note": "Approximate; MTR first/last-train page under maintenance 2026-09-25, not re-verified"},
     "TML": {"first_train": "05:30", "last_train": "00:30", "provenance": "real-derived"},
     "KTL": {"first_train": "06:00", "last_train": "01:00", "provenance": "real-derived"},
     "TWL": {"first_train": "06:00", "last_train": "00:50", "provenance": "real-derived"},
     "ISL": {"first_train": "06:00", "last_train": "00:50", "provenance": "real-derived"},
-    "BUS_182": {"first": "06:00", "last": "23:50", "provenance": "real", "source": "KMB API"},
-    "BUS_170": {"first": "06:00", "last": "23:45", "provenance": "real", "source": "KMB API"},
+    "BUS_182": {"first": "06:00", "last": "23:50", "provenance": "real-derived", "note": "KMB API unverifiable (S11); TD master row carries no service-hours field"},
+    "BUS_170": {"first": "06:00", "last": "23:45", "provenance": "real-derived", "note": "KMB API unverifiable (S11); TD master row carries no service-hours field"},
     "BUS_81C": {"first": "05:30", "last": "23:30", "provenance": "real-derived"},
-    "GMB_481B": {"first": "06:30", "last": "23:00", "provenance": "real"},
-    "FERRY_TST_CEN": {"first": "06:30", "last": "23:30", "provenance": "real", "source": "Star Ferry website"}
+    "GMB_481B": {"first": "06:30", "last": "23:00", "provenance": "real-derived", "note": "TD GMB master row carries no service-hours field; excluded from runnable network regardless"},
+    "FERRY_TST_CEN": {"first": "06:30", "last": "23:30", "provenance": "real", "source": "Star Ferry website", "note": "Verified against operator timetable 2026-09-25 (S27)"}
   }
 }

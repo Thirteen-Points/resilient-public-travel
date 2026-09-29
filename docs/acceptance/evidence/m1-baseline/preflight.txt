@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "offline": true,
+  "llm_required": false,
+  "validation": {
+    "ok": true,
+    "output": "WARN event evt_seed_003: published demo event is simulated, not operational evidence\nPASS: four seed files readable; 1 documented warning(s)\n"
+  },
+  "start_command": "python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000",
+  "health_url": "http://127.0.0.1:8000/api/health",
+  "notes": [
+    "No network call is made by this preflight.",
+    "When AI_ENABLED=true without a key, the service keeps deterministic fallback mode."
+  ]
+}
