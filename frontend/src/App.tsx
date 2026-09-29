@@ -220,9 +220,10 @@ export function App() {
     setPicked(`Closest accessible seed point: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. Confirm access on site.`)
   }
   const activeRoutes = screen === 'results' || screen === 'detail' ? routes : []
-  // Standalone pages: Updates/Review dock the map as a right-hand card;
-  // How-it-works is a full-width page without the map.
-  const docked = screen === 'updates' || screen === 'review'
+  // Map footprint: full behind the floating panels, a right-hand card beside
+  // page content, faded out on the plain How-it-works page.
+  const mapMode: 'full' | 'docked' | 'hidden' =
+    screen === 'updates' || screen === 'review' ? 'docked' : screen === 'sources' ? 'hidden' : 'full'
   return <div ref={root} className={css.shell}>
     <header className={css.header}>
       <button type="button" className={css.brand} onClick={() => setScreen('journey')} aria-label="ResilientRoute home">rr<span>.</span></button>
@@ -238,8 +239,8 @@ export function App() {
     </header>
     <main className={css.stage}>
       {!SEED_MODE && <div className={css.connectionStatus} role="status"><strong>{live.connected ? 'Event stream connected' : 'Event stream unavailable · polling every 3s'}</strong>{(live.warning || live.routeWarning) && <p>{live.warning} {live.routeWarning}</p>}<button type="button" onClick={() => void live.refresh()}>Refresh</button></div>}
-      <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} docked={docked} />
-      {(docked || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
+      <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} mode={mapMode} />
+      {(mapMode === 'docked' || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
         {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta.sources} onClose={() => setScreen('journey')} />}
         {screen === 'updates' && <UpdatesPage events={events} signals={signals} network={network} seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} onOpenReview={() => setScreen('review')} onBack={() => setScreen('journey')} />}
         {screen === 'review' && <ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} live={!SEED_MODE} />}

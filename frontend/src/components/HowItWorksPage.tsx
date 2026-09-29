@@ -32,7 +32,7 @@ export function HowItWorksPage({
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  return <div className={css.page}>
+  return <div className={css.page} data-panel>
     <span className={css.kicker}>How this demo works</span>
     <h1 className={css.title}>Clarity before <span>certainty.</span></h1>
 
