@@ -215,19 +215,19 @@
 .quietAction:hover { background: #eef1e8; }
 .state .quietAction { margin: 6px 8px 0 0; }
 
-/* Standalone pages (Updates / Review / How it works): content pane on the
-   left while the map docks as a card on the right. Widths track the map
-   card so the split stays balanced at any window size. */
-.pagePane { container-type: inline-size; position: absolute; z-index: 500; top: 112px; bottom: 28px; left: 32px; right: calc(min(420px, 36vw) + 64px); overflow-y: auto; overscroll-behavior: contain; padding: 34px 36px 30px; border-radius: 28px; background: white; box-shadow: 0 12px 38px #1f5b6d30; scrollbar-width: thin; animation: pageIn .5s cubic-bezier(.22,1,.36,1) both; }
-/* Full variant (How it works): no map card, opaque full-width page. */
-.pagePane.full { right: 32px; background: #fbfcf9; }
+/* Standalone pages (Updates / Review / How it works): content sits directly on
+   the page under the header, while the map docks as a card on the right.
+   Widths track the map card so the split stays balanced at any window size. */
+.pagePane { container-type: inline-size; position: absolute; z-index: 500; top: 16px; bottom: 20px; left: 32px; right: calc(min(420px, 36vw) + 64px); overflow-y: auto; overscroll-behavior: contain; padding: 24px 36px 28px; scrollbar-width: thin; animation: pageIn .5s cubic-bezier(.22,1,.36,1) both; }
+/* Full variant (How it works): opaque full-width page under the header. */
+.pagePane.full { top: 0; bottom: 0; left: 0; right: 0; padding: 30px clamp(24px, 6vw, 72px) 80px; background: #fbfcf9; }
 .pagePane > .pagePanel { margin: 0; width: auto; max-width: none; padding: 0; border-radius: 0; background: transparent; box-shadow: none; }
 /* Panels that bring their own card chrome (review console, updates page) drop
    it inside the pane: no card-in-card and no nested scrollbars. data-panel is
    the stable hook; hashed CSS-module class names are not addressable here. */
 .pagePane [data-panel] { margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; max-height: none; overflow: visible; }
 @keyframes pageIn { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
-@media (max-width: 1080px) { .pagePane, .pagePane.full { right: 24px; left: 24px; } }
+@media (max-width: 1080px) { .pagePane { right: 24px; left: 24px; } }
 @media (prefers-reduced-motion: reduce) { .pagePane { animation: none; } }
 
 
