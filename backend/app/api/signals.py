@@ -7,11 +7,12 @@ from datetime import datetime, timezone
 from typing import Annotated, Literal
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from pydantic import BaseModel, ConfigDict, StringConstraints
 
 from ..services.signal_models import Signal
-from ..services.signal_store import SignalAlreadyExistsError, SignalStore
+from ..services.signal_store import SignalAlreadyExistsError, SignalNotFoundError, SignalStore
+from .review import require_reviewer
 
 
 MAX_REPORT_LENGTH = 2000
@@ -50,6 +51,38 @@ router = APIRouter(prefix="/api", tags=["signals"])
 
 def get_signal_store(request: Request) -> SignalStore:
     return request.app.state.signal_store
+
+
+@router.get("/signals", response_model=list[Signal])
+def list_signals(
+    request: Request,
+    unlinked_only: bool = False,
+    x_review_token: str | None = Header(default=None),
+) -> list[Signal]:
+    """Expose raw reports only to reviewers; linked reports remain stored."""
+    require_reviewer(request, x_review_token)
+    signals = request.app.state.signal_store.list_signals()
+    if not unlinked_only:
+        return signals
+    linked = {
+        signal_id
+        for event in request.app.state.event_store.list_events()
+        for signal_id in event.signals
+    }
+    return [signal for signal in signals if signal.signal_id not in linked]
+
+
+@router.get("/signals/{signal_id}", response_model=Signal)
+def get_signal(
+    signal_id: str, request: Request,
+    x_review_token: str | None = Header(default=None),
+) -> Signal:
+    """Read the original evidence alongside a structured draft or Event."""
+    require_reviewer(request, x_review_token)
+    try:
+        return request.app.state.signal_store.get_signal(signal_id)
+    except SignalNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Signal not found") from exc
 
 
 def build_user_signal(
