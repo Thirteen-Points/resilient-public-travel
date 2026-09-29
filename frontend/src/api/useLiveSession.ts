@@ -81,10 +81,28 @@ export function useLiveSession(enabled: boolean) {
           })
           }
         } else notices.push(`Event status unavailable; retained overlays may be stale. ${eventResult.error}`)
-        const nextSignature = JSON.stringify([snapshot, eventResult.value?.[1]])
-        if (nextSignature !== signature) { signature = nextSignature; routeDirty = true }
-        setBundle(previous => ({ network, meta, events: eventResult.value?.[0] ?? previous?.events ?? [], published: eventResult.value?.[1] ?? previous?.published ?? [], signals: previous?.signals ?? [] }))
-        setError(''); setWarning(notices.join(' ')); setRevision(value => value + 1)
+        // Reference stability: the map rebuilds its layers whenever network or
+        // published change identity, so identical data must keep old references
+        // and polling alone must not re-render anything.
+        const nextSignature = JSON.stringify([
+          snapshot,
+          network.meta.version,
+          eventResult.value?.[0]?.map(event => [event.event_id, event.version, event.status, event.updated_at]),
+          eventResult.value?.[1],
+        ])
+        const changed = nextSignature !== signature
+        if (changed) { signature = nextSignature; routeDirty = true }
+        if (changed) {
+          setBundle(previous => ({
+            network,
+            meta,
+            events: eventResult.value?.[0] ?? previous?.events ?? [],
+            published: eventResult.value?.[1] ?? previous?.published ?? [],
+            signals: previous?.signals ?? [],
+          }))
+          setRevision(value => value + 1)
+        }
+        setError(''); setWarning(notices.join(' '))
         if (routeDirty && lastQuery.current) {
           try { await query(lastQuery.current); routeDirty = false } catch { /* query retains old cards with a stale notice; next poll retries */ }
         }

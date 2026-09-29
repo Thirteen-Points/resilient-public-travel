@@ -7,6 +7,7 @@ import { DeparturePicker, hktDeparture } from './components/DeparturePicker'
 import { AgentAvatar } from './components/AgentAvatar'
 import { AgentPanel } from './components/AgentPanel'
 import { ReviewConsole, type ReviewLog } from './components/ReviewConsole'
+import { HowItWorksPage } from './components/HowItWorksPage'
 import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
 import type { DemoMeta, Event, Network, Preset, RouteCandidate, Signal } from './api/types'
@@ -179,8 +180,8 @@ export function App() {
     if (!SEED_MODE) setSelectedId(previous => routes.some(route => route.route_id === previous) ? previous : routes[0]?.route_id ?? null)
   }, [routes])
 
-  if (loadError || (!bundle && live.error)) return <div className={css.state}><p role="alert">Could not load {SEED_MODE ? 'seed' : 'API'} data. {loadError || live.error}</p><button onClick={() => void live.refresh()}>Retry API</button> <button onClick={switchDataMode}>{SEED_MODE ? 'Use API' : 'Open fixed seed demo'}</button></div>
-  if (!bundle) return <div className={css.state}>Loading {SEED_MODE ? 'the demo snapshot' : 'API data'}… <button onClick={switchDataMode}>{SEED_MODE ? 'Use API' : 'Open fixed seed demo'}</button></div>
+  if (loadError || (!bundle && live.error)) return <div className={css.state}><p role="alert">Could not load {SEED_MODE ? 'seed' : 'API'} data. {loadError || live.error}</p><button className={css.quietAction} onClick={() => void live.refresh()}>Retry API</button> <button className={css.quietAction} onClick={switchDataMode}>{SEED_MODE ? 'Use API' : 'Open fixed seed demo'}</button></div>
+  if (!bundle) return <div className={css.state}>Loading {SEED_MODE ? 'the demo snapshot' : 'API data'}… <button className={css.quietAction} onClick={switchDataMode}>{SEED_MODE ? 'Use API' : 'Open fixed seed demo'}</button></div>
   const { network, events, signals, published, meta } = bundle
   const nodes = nodeIndex(network)
   const celebrate = (text: string) => setSuccess(previous => ({ text, revision: previous.revision + 1 }))
@@ -304,15 +305,7 @@ export function App() {
         {selected.score_breakdown && <div className={css.breakdown}><h2>Score factors</h2>{selected.score_breakdown.map(factor => <div key={factor.criterion}><span>{factor.criterion}</span><span>weight {Math.round(factor.weight * 100)}% · contribution {factor.contribution.toFixed(3)}</span></div>)}</div>}
         <ProvenanceBadge value={selected.provenance} /><p className={css.tiny}>Source: {SEED_MODE ? 'routes.seed.json' : 'route engine API'} · {formatHkt(meta.snapshotAt)} · {meta.disclaimer}</p>
       </section>}
-      {screen === 'sources' && <section data-panel className={`${css.panel} ${css.sourcesPanel}`}>
-        <button type="button" className={css.back} onClick={() => setScreen('journey')}>← Back to journey</button><span className={css.kicker}>HOW THIS DEMO WORKS</span><h1>Clarity before certainty.</h1>
-        <p>Network, event, route and simulation seeds load through a shared data-source boundary. The map displays modelled nodes, schematic links, and only effective published events. Unreviewed reports remain visible on the Updates screen but do not modify routing.</p>
-        {SEED_MODE ? <p>Route choices are fixed Tai Wai → Admiralty seed candidates. Station-search, map selection and departure input are interface demonstrations, not live timetable, geocoding or accessibility verification.</p> : <p>Route queries use the backend engine. Service times, fares and capacities remain modelled estimates. The Agent conversation uses local templates.</p>}
-        <p><strong>Snapshot:</strong> {formatHkt(meta.snapshotAt)} · <strong>Network:</strong> {network.meta.version} · <strong>Access radius:</strong> {network.meta.catchment_m} m straight-line.</p>
-        <p>{meta.disclaimer}</p>
-        <h2>What changes in this demo?</h2>{SEED_MODE ? <p>Review decisions live only in this browser session. Publishing replaces the previous incident stage and updates the map overlay and Agent alert. Routes remain fixed seed estimates. The selected departure is sent as an HKT query value; there is no timetable recalculation or live Agent API.</p> : <><p>Review decisions are saved by the event API. Published-event and graph changes trigger route recalculation. Missing services and stale data are shown explicitly.</p><h2>API sources</h2><ul>{live.bundle?.meta.sources.map((source, index) => <li key={index}>{typeof source === 'string' ? source : `${source.name}${source.last_ok ? ` · last successful update ${formatHkt(source.last_ok)}` : ' · update time unavailable'}`}</li>)}</ul></>}
-        <h2>Colour & motion credits</h2><p>Lines follow <a href="https://www.mtr.com.hk/ch/customer/services/system_map.html" target="_blank" rel="noreferrer">MTR colours</a> and local operator branding. Joint bus services show both colours; unknown services receive a stable assigned colour. Geometry remains schematic.</p><p>Our route companion is an adaptation of <a href="https://github.com/jeremy-prt/bloub" target="_blank" rel="noreferrer">Bloub</a>'s clock-free bot engine (MIT): resting ball, sphere-projected eyes, deterministic blink calendar, and the measured triangle silhouette, coloured with its own palette. <a href="https://github.com/Jakubantalik/Libraries.dev/tree/main/packages/border-beam" target="_blank" rel="noreferrer">BorderBeam</a> handles the focused composer. Reduced-motion preferences are respected.</p>
-      </section>}
+      {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta.sources} onClose={() => setScreen('journey')} />}
     </main>
     <div ref={toast} role="status" aria-live="polite" className={success.text ? css.successToast : css.hiddenToast}>{success.text && <><span>✓</span><strong>{success.text}</strong></>}</div>
   </div>

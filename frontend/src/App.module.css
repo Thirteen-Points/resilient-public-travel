@@ -206,4 +206,10 @@
   box-shadow: 0 3px 12px #0002;
 }
 .connectionStatus p { margin: 6px 0; }
-.connectionStatus button { margin-top: 4px; text-decoration: underline; }
+.connectionStatus button { margin-top: 4px; padding: 0; border: 0; background: none; color: #2376a8; font-size: 11px; font-weight: 700; text-decoration: underline; }
+
+/* Shared quiet action for state panels; mirrors Experience .secondary. */
+.quietAction { min-height: 36px; padding: 8px 16px; border: 1px solid #d1dccd; border-radius: 30px; background: #f7f8f2; color: #385441; font-size: 12px; font-weight: 700; }
+.quietAction:hover { background: #eef1e8; }
+.state .quietAction { margin: 6px 8px 0 0; }
+
