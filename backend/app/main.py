@@ -9,6 +9,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from dotenv import load_dotenv
+
+# Load before Runtime()/settings read REVIEW_API_TOKEN and AI provider keys.
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -105,6 +110,68 @@ class Runtime:
 runtime = Runtime()
 
 
+GRAPH_ACTIVE_STATUSES = frozenset({"published", "updated"})
+
+
+def sync_engine_events(event_store: EventStore) -> str | None:
+    """Mirror reviewer-approved Events into the routing engine.
+
+    The engine keeps its own immutable snapshots; only published or re-approval-
+    pending ('updated') events close or degrade graph edges.  A sync failure must
+    never fail the review write itself, so the previous snapshot stays live.
+    """
+
+    engine = runtime.engine
+    if engine is None:
+        return None
+    try:
+        events = [
+            event.model_dump(mode="json")
+            for event in event_store.list_events()
+            if event.status in GRAPH_ACTIVE_STATUSES
+        ]
+        snapshot = engine.snapshots.replace_events(events)
+        return snapshot.snapshot_id
+    except Exception:
+        return None
+
+
+class EngineSyncEventStore(EventStore):
+    """Push every persisted Event revision into the engine snapshot store."""
+
+    def __init__(self, db_path: str | Path) -> None:
+        super().__init__(db_path)
+        self.last_synced_snapshot: str | None = None
+
+    def _sync(self) -> None:
+        self.last_synced_snapshot = sync_engine_events(self)
+
+    def create_event(self, *args: Any, **kwargs: Any):
+        event = super().create_event(*args, **kwargs)
+        self._sync()
+        return event
+
+    def update_event(self, *args: Any, **kwargs: Any):
+        event = super().update_event(*args, **kwargs)
+        self._sync()
+        return event
+
+
+def build_llm_client() -> LlmJsonClient | None:
+    """Advertise the AI boundary only when a provider key is configured."""
+
+    from .runtime_config import settings
+
+    if not settings.ai_enabled:
+        return None
+    try:
+        from .services.structure.llm_api_client import OpenAiCompatJsonClient
+
+        return OpenAiCompatJsonClient.from_env()
+    except Exception:
+        return None
+
+
 def create_app(
     *, db_path: str | Path = DEFAULT_DB_PATH,
     review_token: str | None = None,
@@ -112,16 +179,17 @@ def create_app(
 ) -> FastAPI:
     """Compose B's reviewed-event APIs and C's deterministic services."""
     store = SignalStore(db_path)
-    event_store = EventStore(db_path)
+    event_store = EngineSyncEventStore(db_path)
 
     @asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncIterator[None]:
         store.initialize()
         event_store.initialize()
+        event_store._sync()
         application.state.signal_store = store
         application.state.event_store = event_store
         application.state.review_token = review_token if review_token is not None else os.getenv("REVIEW_API_TOKEN")
-        application.state.llm_client = llm_client
+        application.state.llm_client = llm_client if llm_client is not None else build_llm_client()
         yield
 
     application = FastAPI(title="ResilientRoute API", version="m0-integrated", lifespan=lifespan)
@@ -130,7 +198,7 @@ def create_app(
         allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
         allow_credentials=False,
         allow_methods=["GET", "POST", "OPTIONS"],
-        allow_headers=["Content-Type", "Authorization"],
+        allow_headers=["Content-Type", "Authorization", "x-review-token"],
     )
     application.include_router(signals_router)
     application.include_router(events_router)

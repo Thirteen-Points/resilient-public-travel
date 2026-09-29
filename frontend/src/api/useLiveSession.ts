@@ -102,8 +102,9 @@ export function useLiveSession(enabled: boolean) {
     return () => { disposed = true; active.current = false; ++queryVersion.current; clearInterval(timer); close() }
   }, [enabled, query])
 
-  const review = async (event: Event, action: 'edit' | 'publish' | 'reject', reason: string) => {
-    const saved = await eventApi.reviewEvent(event, action, reason)
+  const review = async (event: Event, action: 'edit' | 'publish' | 'reject', _reason: string) => {
+    // The API contract has no reason field; the caller's note stays in local logs.
+    const saved = await eventApi.reviewEvent(event, action)
     setBundle(previous => previous ? { ...previous, events: previous.events.map(item => item.event_id === saved.event_id ? saved : item) } : previous)
     // A successful write stays successful even if subsequent reads fail.
     // Refresh errors are shown separately and never invite a duplicate publication.
