@@ -220,8 +220,9 @@ export function App() {
     setPicked(`Closest accessible seed point: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. Confirm access on site.`)
   }
   const activeRoutes = screen === 'results' || screen === 'detail' ? routes : []
-  // Standalone pages dock the map as a right-hand card while content takes the left pane.
-  const docked = screen === 'updates' || screen === 'review' || screen === 'sources'
+  // Standalone pages: Updates/Review dock the map as a right-hand card;
+  // How-it-works is a full-width page without the map.
+  const docked = screen === 'updates' || screen === 'review'
   return <div ref={root} className={css.shell}>
     <header className={css.header}>
       <button type="button" className={css.brand} onClick={() => setScreen('journey')} aria-label="ResilientRoute home">rr<span>.</span></button>
@@ -238,7 +239,7 @@ export function App() {
     <main className={css.stage}>
       {!SEED_MODE && <div className={css.connectionStatus} role="status"><strong>{live.connected ? 'Event stream connected' : 'Event stream unavailable · polling every 3s'}</strong>{(live.warning || live.routeWarning) && <p>{live.warning} {live.routeWarning}</p>}<button type="button" onClick={() => void live.refresh()}>Refresh</button></div>}
       <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} docked={docked} />
-      {docked && <div className={css.pagePane}>
+      {(docked || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
         {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta.sources} onClose={() => setScreen('journey')} />}
         {screen === 'updates' && <UpdatesPage events={events} signals={signals} network={network} seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} onOpenReview={() => setScreen('review')} onBack={() => setScreen('journey')} />}
         {screen === 'review' && <ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} live={!SEED_MODE} />}
