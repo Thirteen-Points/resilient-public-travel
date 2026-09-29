@@ -1,0 +1,16 @@
+# Local Codex and test output
+.codex-log/
+*.log
+
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+
+# Common temporary files
+*.tmp
+*.bak
+
+# Nested product checkout and generated test environment
+resilient-public-travel/
+t214-check-env/
