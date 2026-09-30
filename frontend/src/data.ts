@@ -44,9 +44,21 @@ export function distanceMetres(a: { lat: number; lng: number }, b: { lat: number
   return 6371000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h))
 }
 
-export function nearestAccessPoint(network: Network, point: { lat: number; lng: number }) {
-  const ordered = network.nodes.filter(node => node.kind === 'mtr_station' && node.accessible === true)
+export function nearestAccessPoint(network: Network, point: { lat: number; lng: number }, requireAccessible = false) {
+  const ordered = network.nodes.filter(node => node.kind === 'mtr_station' &&
+    (!requireAccessible || node.accessible === true) && Number.isFinite(node.lat) && Number.isFinite(node.lng))
     .map(node => ({ node, metres: distanceMetres(node, point) }))
     .sort((a, b) => a.metres - b.metres)
   return ordered[0]?.metres <= network.meta.catchment_m ? ordered[0] : null
+}
+
+export function hktLocalInput(value: string) {
+  const date = new Date(value)
+  return Number.isFinite(date.getTime()) ? new Date(date.getTime() + 8 * 3600000).toISOString().slice(0, 16) : ''
+}
+
+export function legDuration(leg: RouteLeg): string {
+  const seconds = leg.travel_s ?? leg.in_vehicle_s
+  return typeof seconds === 'number' && Number.isFinite(seconds) && seconds >= 0
+    ? `About ${Math.round(seconds / 60)} min` : 'Travel time unavailable'
 }

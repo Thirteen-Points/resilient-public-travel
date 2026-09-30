@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Literal
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
@@ -48,8 +49,13 @@ def list_events(
 
 
 @router.get("/published", response_model=list[Event])
-def published_events(request: Request) -> list[Event]:
-    return request.app.state.event_store.list_events(status="published")
+def published_events(request: Request, at: datetime | None = None) -> list[Event]:
+    from ..graph.snapshot import active
+    instant = at or datetime.now(timezone.utc)
+    if instant.tzinfo is None:
+        raise HTTPException(status_code=422, detail="at must include a timezone")
+    return [event for event in request.app.state.event_store.approved_events()
+            if active(event.model_dump(mode='json'), instant)]
 
 
 @router.get("/{event_id}", response_model=Event)
