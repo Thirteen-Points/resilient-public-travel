@@ -82,7 +82,6 @@
 .scoreTrack { height: 4px; margin: 1px 12px 8px 47px; border-radius: 99px; overflow: hidden; background: #e5eae1; }
 .scoreTrack span { display: block; height: 100%; border-radius: inherit; background: #86c454; }
 .routeCaveat { display: flex; align-items: center; gap: 7px; margin: 0 12px 10px 47px; color: #74847b; font-size: 9px; line-height: 1.3; }
-.routeCaveat .provenance { flex: none; font-size: 8px; padding: 2px 4px; }
 .routeCaveat > span:last-child { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .routeFreshness { margin: -4px 12px 9px 47px; color: #819087; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .empty { padding: 20px; border-radius: 12px; background: #f3f6ef; font-size: 13px; }
@@ -90,7 +89,7 @@
 .mapLegend { position: absolute; right: 32px; bottom: 40px; z-index: 400; padding: 9px 14px; border-radius: 99px; background: #fffffff2; color: #385267; font-size: 11px; box-shadow: 0 4px 14px #244d5923; }
 .widePanel { width: min(1050px, calc(100% - 64px)); }
 .widePanel h1 { font-size: 36px; }
-.eventGrid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+.eventGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px; }
 .eventCard { min-width: 0; border: 1px solid #dde6dd; border-radius: 14px; padding: 16px; font-size: 11px; }
 .eventTop, .eventMeta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; color: #66776d; font-size: 10px; }
 .published, .pending { border-radius: 99px; padding: 4px 7px; font-weight: 700; }
@@ -102,7 +101,6 @@
 .track { height: 6px; border-radius: 9px; background: #e9efe9; overflow: hidden; }
 .track span { display: block; height: 100%; background: #78b348; }
 .eventMeta { margin: 9px 0; }
-.provenance { display: inline-block; border-radius: 5px; background: #eaf3f7; color: #42687d; padding: 4px 7px; font-size: 10px; font-weight: 700; }
 .eventCard details { margin-top: 11px; padding-top: 10px; border-top: 1px solid #e4eae4; }
 .eventCard summary { cursor: pointer; font-weight: 700; color: #287d9e; }
 .detailPanel { width: 500px; }
@@ -145,11 +143,15 @@
 .routeFreshness { white-space: normal; line-height: 1.5; }
 .queryStamp { border-left: 2px solid #a0be77; padding: 6px 10px; margin: 0 0 15px; color: #4d6840; background: #f4f8ec; font-size: 11px; line-height: 1.5; }
 .queryStamp small { font-size: 9px; overflow-wrap: anywhere; }
-.timeline { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 22px; margin: 20px 0; background: #f3f6ed; border: 1px solid #e0e7d4; border-radius: 20px; }
+.timeline { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 16px; padding: 22px; margin: 20px 0; background: #f3f6ed; border: 1px solid #e0e7d4; border-radius: 20px; }
 .timeline li > span { display: block; color: #748363; font-size: 9px; letter-spacing: .03em; }
 .timeline strong { display: block; font-size: 42px; font-weight: 500; letter-spacing: -.05em; margin: 10px 0 0; color: #39582a; }
 .timeline strong small { font-size: 17px; }
 .timeline p { color: #607152; font-size: 10px; line-height: 1.5; }
+.timelineStatus { display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 99px; background: #e7efdb; color: #4a6444; font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+.timelineStatus[data-status=published] { background: #dbedc4; color: #3d5b23; }
+.timelineStatus[data-status=pending_review], .timelineStatus[data-status=draft] { background: #fdf0d5; color: #7a5a1e; }
+.timelineStatus[data-status=expired] { background: #ecebe2; color: #6d6a55; }
 .timeline li > div { height: 5px; background: #dfe7d1; border-radius: 4px; overflow: hidden; }
 .timeline i { display: block; height: 100%; background: #7f9f4f; border-radius: inherit; }
 .reviewLink { padding: 10px 16px; margin-bottom: 18px; border: 0; border-radius: 30px; background: #2f4933; color: #ecf8d9; font-size: 12px; }
@@ -206,4 +208,28 @@
   box-shadow: 0 3px 12px #0002;
 }
 .connectionStatus p { margin: 6px 0; }
-.connectionStatus button { margin-top: 4px; text-decoration: underline; }
+.connectionStatus button { margin-top: 4px; padding: 0; border: 0; background: none; color: #2376a8; font-size: 11px; font-weight: 700; text-decoration: underline; }
+
+/* Shared quiet action for state panels; mirrors Experience .secondary. */
+.quietAction { min-height: 36px; padding: 8px 16px; border: 1px solid #d1dccd; border-radius: 30px; background: #f7f8f2; color: #385441; font-size: 12px; font-weight: 700; }
+.quietAction:hover { background: #eef1e8; }
+.state .quietAction { margin: 6px 8px 0 0; }
+
+/* Standalone pages (Updates / Review / How it works): content sits directly on
+   the page under the header, while the map docks as a card on the right.
+   Widths track the map card so the split stays balanced at any window size.
+   The pane morphs between the docked and full footprints on the same curve as
+   the map card; content entrance is owned once by usePageMotion (GSAP). */
+.pagePane { container-type: inline-size; position: absolute; z-index: 500; top: 16px; bottom: 20px; left: 32px; right: calc(min(420px, 36vw) + 64px); overflow-y: auto; overscroll-behavior: contain; padding: 24px 36px 28px; scrollbar-width: thin;
+  transition: top .55s cubic-bezier(.22,1,.36,1), bottom .55s cubic-bezier(.22,1,.36,1), left .55s cubic-bezier(.22,1,.36,1), right .55s cubic-bezier(.22,1,.36,1), padding .55s cubic-bezier(.22,1,.36,1); }
+/* Full variant (How it works): plain edge-to-edge page under the header. */
+.pagePane.full { top: 0; bottom: 0; left: 0; right: 0; padding: 30px clamp(24px, 6vw, 72px) 80px; }
+.pagePane > .pagePanel { margin: 0; width: auto; max-width: none; padding: 0; border-radius: 0; background: transparent; box-shadow: none; }
+/* Panels that bring their own card chrome (review console, updates page) drop
+   it inside the pane: no card-in-card and no nested scrollbars. data-panel is
+   the stable hook; hashed CSS-module class names are not addressable here. */
+.pagePane [data-panel] { margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; max-height: none; overflow: visible; }
+@media (max-width: 1080px) { .pagePane { right: 24px; left: 24px; } }
+@media (prefers-reduced-motion: reduce) { .pagePane { transition: none; } }
+
+
