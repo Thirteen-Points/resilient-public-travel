@@ -13,10 +13,10 @@ Scope: C-owned M2 work in `docs/plan/05-timeline.md` and T9.2 in `docs/plan/04-w
 
 ## Not Yet Verified or Incomplete
 
-- **M1 live demo run is blocked in this environment.** Attempted to launch the app with an isolated temporary SQLite database on port 18080. The bundled Python raised `ModuleNotFoundError: No module named 'uvicorn'`. No system `python` or `py` executable is available, and the bundled runtime also lacks FastAPI, Uvicorn, and NetworkX. Therefore the demo script has not produced a successful run result here.
-- **M1 visual end-to-end acceptance remains unverified.** The demo script exercises backend HTTP behavior; it does not capture a browser run proving that the map and route cards visibly refresh after publication.
+- **M1 end-to-end demo: completed once per A's report.** The run log or screenshot is not checked into this repository, so the report is team-confirmed rather than independently artifact-audited here. A repeat attempt in this environment was blocked before startup because the bundled Python lacks `uvicorn`; no system `python` or `py` executable is available.
+- **M1 browser evidence is not archived.** A reports running the demo, but this repository does not include a recording or screenshot of the map and route-card refresh. Preserve the successful run as completed; add the capture if submission evidence is required.
 - **T9.2 public deployment is incomplete/unverified.** No public frontend or API URL, Cloudflare Pages/Render deployment record, keep-alive monitor, or 10-minute idle/30-second wake-up evidence was found. `deploy/DEPLOYMENT.md` contains instructions and a placeholder URL only.
-- **Seed contract coverage is partial.** The four files parse, but `contracts/README.md` says Network, Route, and Simulation do not yet have JSON Schemas for full contract validation. `contracts/seed/sim.seed.json` is explicitly a simulated placeholder per `backend/app/sim/M0_HANDOFF.md`.
+- **Seed contract validation is complete on this branch.** All four seed bundles pass their JSON Schemas; Event and Signal items also pass Pydantic validation. Cross-file checks cover declared network counts, line-stop and walk-link node references, route leg endpoints and line IDs, persona route IDs, and simulation route IDs. `contracts/seed/sim.seed.json` remains an explicitly simulated placeholder per `backend/app/sim/M0_HANDOFF.md`.
 - **C-Sim outputs are not operational evidence.** `/api/sim/load` computes a capacity allocation from supplied route estimates, and `/api/sim/result` serves precomputed results. M0 verification is algorithm consistency against simulated fixtures, not validation of measured demand or operator capacity.
 
 ## M2 and P3/M3 Boundary
@@ -28,5 +28,8 @@ The 10,000-person strategy comparison is assigned to P3/M3 in `docs/plan/05-time
 | Check | Result |
 |---|---|
 | `python scripts/preflight.py` using the bundled Python runtime | Passed; four seed files readable, one documented simulated-event warning |
-| Start a local API with temporary SQLite, then run `scripts/demo_m1_story.py` | Blocked before startup: bundled Python has no `uvicorn`; system Python launchers unavailable |
+| `python scripts/validate_contract_seeds.py` | Passed; all four seeds satisfy JSON Schema, Event / Signal satisfy Pydantic, and cross-file IDs/counts are consistent |
+| `python -m unittest backend.tests.test_contract_seeds -v` | Passed; 14 focused tests, including rejection of malformed fields and invalid cross-file references |
+| A's M1 end-to-end demo run | Reported complete once; run evidence is not checked into the repository |
+| Repeat the local API/demo run in this environment | Blocked before startup: bundled Python has no `uvicorn`; system Python launchers unavailable |
 | Cloud deployment / idle wake-up | Not tested; no deployed address or credentials available in the repository |

@@ -4,7 +4,7 @@ Resilient Public Travel is a Hong Kong East Rail Line corridor prototype for hel
 
 ## Current Capabilities
 
-- **Event-to-reroute API path (M1):** reports can enter the signal API, be merged into an event, reviewed and published, then synchronized into a versioned route-engine snapshot. Route queries use the updated snapshot. `scripts/demo_m1_story.py` exercises this backend flow against a running local API. The script has not been run successfully in the current environment; see [M2 C status](docs/acceptance/m2-c-status.md).
+- **Event-to-reroute API path (M1):** reports can enter the signal API, be merged into an event, reviewed and published, then synchronized into a versioned route-engine snapshot. Route queries use the updated snapshot. `scripts/demo_m1_story.py` exercises this backend flow against a running local API; A reports one successful end-to-end run. A run log is not checked into the repository; see [M2 C status](docs/acceptance/m2-c-status.md).
 - **Interactive frontend:** includes a fixed seed-scenario mode and an API mode. In API mode, review actions use the backend and event-stream changes trigger refreshed event and route queries. The fixed seed mode is illustrative and does not recalculate routes.
 - **C-Sim:** `/api/sim/load` computes a capacity-bucket diversion plan from supplied route estimates, while `/api/sim/result` serves a precomputed scenario. M0 verification covers deterministic behavior against simulated fixtures. These checks do not establish real passenger demand or verified operating capacity.
 - **Data transparency:** source records and model inputs are classified as `real`, `real-derived`, or `simulated`; see [data/PROVENANCE.md](data/PROVENANCE.md) and [data/DATA_QUALITY.md](data/DATA_QUALITY.md).

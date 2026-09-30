@@ -27,10 +27,10 @@ below are preparation status against the 2–4 October interim milestone.
   routes to be recomputed. The report explicitly limits this evidence to the C
   receipt boundary; it does not certify the complete B-to-C-to-A workflow. See
   [`m1-c-baseline.md`](../acceptance/m1-c-baseline.md).
-- **M1 demo preparation:** `scripts/demo_m1_story.py` contains a happy-path
-  demonstration for signal intake, event review, publication, and rerouting.
-  This report does not claim the script has been run successfully. A checked-in
-  successful run log or independent end-to-end acceptance record was not found.
+- **M1 end-to-end demo:** A reports one successful run of the signal intake,
+  event review, publication, and rerouting story. A run log or screenshot is not
+  checked into the repository, so this is team-confirmed rather than independently
+  archived run evidence.
 - **Data and reproducibility groundwork:** The repository includes seed data,
   provenance and data-quality records, deterministic offline startup, and
   validation/preflight scripts. The data ledger distinguishes official-source
@@ -38,9 +38,9 @@ below are preparation status against the 2–4 October interim milestone.
 
 ## In progress
 
-- **M1 end-to-end confirmation:** Run and record the demo against the current
-  integrated application, including the frontend map and route-card refresh.
-  The checked-in C baseline does not establish those UI behaviors.
+- **M1 evidence packaging:** Archive the successful run evidence (for example,
+  a short screen capture or acceptance note) alongside the interim materials.
+  A has already run the demo once; the evidence is not currently checked in.
 - **Interim packaging:** Refresh the English README to match current endpoints
   and functionality; export a PNG architecture diagram; prepare the concise
   submission materials, board snapshot, and the P3/P4 plan.
@@ -61,17 +61,19 @@ below are preparation status against the 2–4 October interim milestone.
 
 ## Blockers and scope notes
 
-- The M1 acceptance report records that automatic B-to-C event delivery and
-  frontend refresh were outside its verified boundary. The demo script is
-  preparation, not proof that this full chain passed.
+- A reports that the integrated M1 demo has run successfully once. The checked-in
+  M1 C baseline has a narrower evidence boundary, and the repository does not
+  yet contain a run capture/log; include that evidence in the interim package if
+  required.
 - The coordination handoff records that the organization Project board had not
   been created and the 77 Issues had not been added. This status should be
   rechecked before submission.
 - The 10,000-person sandbox belongs to **P3 (5–11 October)** in the project
   timeline, not M2 interim acceptance. Any sandbox output must be presented as
   simulation, not observed passenger data.
-- Public deployment, a successful full end-to-end run, and a final video remain
-  unverified in the checked-in evidence reviewed for this report.
+- Public deployment and a final video remain unverified in the checked-in
+  evidence reviewed for this report. The M1 run is reported complete by A, but
+  the run evidence is not archived in the repository.
 
 ## Evidence
 
