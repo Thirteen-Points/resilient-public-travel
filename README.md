@@ -1,176 +1,99 @@
 # Resilient Public Travel
 
-A hackathon project by **Thirteen Points** — building a resilient public transit routing system for Hong Kong's East Rail Line corridor.
+Resilient Public Travel is a Hong Kong East Rail Line corridor prototype for helping passengers find alternatives during service disruptions. It combines reviewed incident reports, a deterministic route engine, accessibility-aware route data, and simulation tools. It is a prototype, not an official MTR service or live operational guidance.
 
-## What This Project Does
+## Current Capabilities
 
-When a major transit disruption hits the East Rail Line (Tai Wai → Admiralty), the system:
-1. **Detects** the event from multiple sources (HKO weather, MTR eta anomalies, social media, user reports)
-2. **Routes** passengers via alternative modes (bus, minibus, ferry, parallel MTR lines) with accessibility-aware scoring
-3. **Simulates** 10,000 travellers under selfish vs guided diversion strategies, showing honest capacity gaps
-4. **Displays** everything on an interactive map with provenance badges and confidence animations
+- **Event-to-reroute API path (M1):** reports can enter the signal API, be merged into an event, reviewed and published, then synchronized into a versioned route-engine snapshot. Route queries use the updated snapshot. `scripts/demo_m1_story.py` exercises this backend flow against a running local API. The script has not been run successfully in the current environment; see [M2 C status](docs/acceptance/m2-c-status.md).
+- **Interactive frontend:** includes a fixed seed-scenario mode and an API mode. In API mode, review actions use the backend and event-stream changes trigger refreshed event and route queries. The fixed seed mode is illustrative and does not recalculate routes.
+- **C-Sim:** `/api/sim/load` computes a capacity-bucket diversion plan from supplied route estimates, while `/api/sim/result` serves a precomputed scenario. M0 verification covers deterministic behavior against simulated fixtures. These checks do not establish real passenger demand or verified operating capacity.
+- **Data transparency:** source records and model inputs are classified as `real`, `real-derived`, or `simulated`; see [data/PROVENANCE.md](data/PROVENANCE.md) and [data/DATA_QUALITY.md](data/DATA_QUALITY.md).
 
-## Quick Start
+The 10,000-person multi-OD sandbox belongs to **P3/M3**, not M2, in the project timeline. Files named `data/sim/m2-*` are early simulated preparation and are not M2 interim deliverables or acceptance evidence. In the current comparison, guided total delay is higher than baseline; the simulated result does not show a benefit. Its route-level capacities also do not account for shared capacity across overlapping route segments. M3 acceptance and performance targets remain separate from the M2 interim package.
 
-### Prerequisites
-- Python 3.11+
-- No API keys required — the system runs fully offline by default
+## Run Locally
 
-### One-Click Run
+Requirements: Python 3.11 or newer. The deterministic backend does not require an LLM key.
 
-**Linux / macOS:**
-```bash
-./scripts/start.sh
-```
+Windows:
 
-**Windows:**
 ```cmd
 scripts\start.bat
 ```
 
-This will:
-1. Create a virtual environment and install dependencies
-2. Validate all data files
-3. Start the FastAPI server on `http://localhost:8000`
-
-### Offline Mode
-```bash
-./scripts/start.sh --offline    # Linux/macOS
-scripts\start.bat --offline     # Windows
-```
-
-All data is loaded from local JSON files — no internet connection needed.
-
-### Docker
-```bash
-cd deploy && docker-compose up --build
-```
-
-The Docker image defaults to offline mode with LLM disabled.
-
-## Health Checks
-
-| Endpoint | Purpose |
-|---|---|
-| `GET /api/health` | Basic liveness — is the process alive? |
-| `GET /api/health/deep` | Deep readiness — are data files loaded, directories present, core functions available? |
-| `GET /api/meta` | Data freshness, sources, and disclaimer |
-
-## API Endpoints
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/api/health` | Liveness check |
-| GET | `/api/health/deep` | Readiness check with data/LLM status |
-| GET | `/api/meta` | Freshness, sources, disclaimer |
-| GET | `/api/graph/network` | Full transit network (nodes, lines, walk links) |
-| GET | `/api/graph/snapshot` | Current snapshot with affected edges |
-
-> Route query, simulation, and AI chat endpoints will be added by C-Route, C-Sim, and C-AI agents respectively.
-
-## Architecture
-
-```
-                    ┌─────────────────────────────────┐
-                    │           Frontend (A)           │
-                    │   React + Leaflet + TypeScript  │
-                    └──────────┬──────────┬───────────┘
-                               │          │
-                    /api/routes  /api/sim  /api/graph
-                               │          │
-                    ┌──────────▼──────────▼───────────┐
-                    │         FastAPI Backend          │
-                    │  ┌─────────┐ ┌────────────────┐  │
-                    │  │ Event   │ │  Graph Engine  │  │
-                    │  │ Pipeline│ │  (C-Route)     │  │
-                    │  │ (B)     │ │                │  │
-                    │  └────┬────┘ └───────┬────────┘  │
-                    │       │              │            │
-                    │  ┌────▼──────────────▼────────┐  │
-                    │  │   Simulation Engine (C-Sim) │  │
-                    │  └─────────────┬───────────────┘  │
-                    │       ┌───────▼────────┐         │
-                    │       │  AI Layer (C-AI)│         │
-                    │       │  DeepSeek→Qwen   │         │
-                    │       │  →GLM→rules      │         │
-                    │       └──────────────────┘         │
-                    └──────────────────────────────────┘
-                               │
-                    ┌──────────▼──────────────────────┐
-                    │         Data Layer (C-Data)      │
-                    │  stations.json  lines.json       │
-                    │  walk_links.json  bus_routes.json│
-                    │  calendar.json  weather_impact   │
-                    │  PROVENANCE.md  DATA_QUALITY.md   │
-                    └─────────────────────────────────┘
-```
-
-## Data Provenance
-
-Every data value is tagged with one of three levels:
-
-| Level | Badge Color | Meaning |
-|---|---|---|
-| `real` | Green | From official source, verified |
-| `real-derived` | Yellow | Computed/estimated from real data |
-| `simulated` | Blue | Synthetic, for demonstration only |
-
-See `data/PROVENANCE.md` for the full provenance ledger.
-
-## Configuration
-
-Copy `.env.example` to `.env` and adjust as needed. All settings have safe defaults:
+Linux or macOS:
 
 ```bash
-cp .env.example .env
+./scripts/start.sh
 ```
 
-Key defaults:
-- `LLM_ENABLED=false` — system works without any LLM API key
-- `OFFLINE_MODE=false` — but all data is local, so it works offline anyway
-- `API_HOST=0.0.0.0`, `API_PORT=8000`
-
-## Testing
+Open `http://127.0.0.1:8000` locally, or visit `http://127.0.0.1:8000/docs` for the API reference. The scripts create a local virtual environment and install backend requirements, so the first run needs package access. For container startup:
 
 ```bash
-# Run all tests
-python -m pytest tests/ -v
+docker compose -f deploy/docker-compose.yml up --build
+```
 
-# Run data validation
-python scripts/validate_data.py
+Run the offline data preflight:
 
-# Run preflight check (demo readiness)
+```bash
 python scripts/preflight.py
 ```
 
-## Project Structure
+To exercise the M1 backend story, start the API with `REVIEW_API_TOKEN=dev-demo-token` and run:
 
+```bash
+REVIEW_API_TOKEN=dev-demo-token python scripts/demo_m1_story.py
 ```
-resilient-public-travel/
-├── data/                    # Transit data with provenance
-│   ├── network/             # Stations, lines, walk links, bus routes
-│   ├── access/              # 800m catchment access points
-│   ├── PROVENANCE.md        # Data source ledger
-│   ├── DATA_QUALITY.md      # Quality check results
-│   ├── calendar.json        # Service calendar (weekday/Sat/Sun+PH)
-│   ├── capacity_method.md   # Capacity calculation methodology
-│   └── weather_impact.json  # Weather penalty factors
-├── backend/                 # FastAPI backend
-│   └── app/
-│       ├── api/             # Health, meta, graph endpoints
-│       ├── config/          # Pydantic settings
-│       └── ...              # graph/engine/sim/ai (stubs for other agents)
-├── scripts/                 # Startup, validation, preflight
-├── deploy/                  # Docker, offline package, docs
-├── tests/                   # Automated tests
-├── contracts/               # Interface contracts and seed data
-└── docs/                    # Project documentation
+
+On Windows PowerShell, set the token with `$env:REVIEW_API_TOKEN='dev-demo-token'` before running the Python command. The script creates demo reports and an event in the configured event database, publishes the event after review, and checks the graph snapshot and route response. Use a disposable local database for repeated demonstrations.
+
+## API Surface
+
+| Method | Path | Purpose |
+|---|---|---|
+| `POST` | `/api/signals` | Submit a passenger report |
+| `POST` | `/api/events/ingest` | Structure or merge a submitted signal into an event |
+| `GET` | `/api/events` / `/api/events/published` | Read review queue or published events |
+| `POST` | `/api/events/{id}/review` | Approve, edit, reject, or expire an event |
+| `GET` | `/api/stream/events` | Receive event changes over SSE |
+| `GET` | `/api/graph/network` / `/api/graph/snapshot` | Read network and active disruption snapshot |
+| `POST` | `/api/routes/query` | Recompute route candidates against the current snapshot |
+| `POST` | `/api/sim/load` | Estimate route allocation and capacity shortfall from supplied estimates |
+| `GET` | `/api/sim/result?scenario_id=...` | Read a checked-in precomputed simulation result |
+| `GET` | `/api/health` / `/api/health/deep` | Check process health or core local readiness |
+| `GET` | `/api/meta` | Read snapshot and data-source disclaimer |
+
+## Architecture
+
+The diagram shows the implemented event-to-route API flow, the optional AI assistance boundary, and the separately scoped simulation work. The editable SVG is the source for the PNG.
+
+![Resilient Public Travel architecture](docs/architecture/resilient-public-travel.png)
+
+Source: [SVG diagram](docs/architecture/resilient-public-travel.svg). The broader product and algorithm design is documented in [docs/plan/02-architecture.md](docs/plan/02-architecture.md).
+
+## Data and Limitations
+
+Some source data comes from public agency feeds or published records. Derived values and synthetic fixtures are labelled separately. Current simulation inputs, passenger demand, route capacities, and residual capacity are simulated or estimated; they are not live measurements. A report or inferred anomaly is not an official service bulletin. Review decisions are required before an event changes the route graph.
+
+The backend and frontend have local startup and container configuration. **No public deployment address or external wake-up check is currently verified.** Cloud hosting instructions are in [deploy/DEPLOYMENT.md](deploy/DEPLOYMENT.md); those instructions are not evidence of a live deployment. For current M2 C-side evidence and gaps, see [docs/acceptance/m2-c-status.md](docs/acceptance/m2-c-status.md).
+
+## Project Layout
+
+```text
+backend/                 FastAPI event composition, route engine, and C-Sim
+contracts/seed/          Frozen demo inputs and API contract fixtures
+data/                    Network data, provenance, quality notes, and simulation results
+deploy/                  Docker, offline fallback, and deployment instructions
+docs/architecture/       Editable SVG architecture diagram and PNG export
+docs/plan/               Scope, contracts, architecture, and milestone plan
+frontend/                React and TypeScript user interface
+scripts/                 Startup, validation, preflight, and M1 demo
 ```
 
 ## Deployment
 
-See `deploy/DEPLOYMENT.md` for the full deployment guide and `deploy/TROUBLESHOOTING.md` for common issues.
+See [deploy/DEPLOYMENT.md](deploy/DEPLOYMENT.md) for local, Docker, and proposed cloud deployment instructions. Cloud deployment remains unverified.
 
 ## License
 
-This is an academic/hackathon project. Data sources are attributed in `data/PROVENANCE.md`.
+This is an academic hackathon project. Data sources are attributed in [data/PROVENANCE.md](data/PROVENANCE.md).
