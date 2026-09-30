@@ -1,0 +1,18 @@
+/* How-it-works page content (rendered inside the app's page pane).
+   Extension points (keep this structure when adding motion later):
+   - each <section data-reveal> maps 1:1 to a future scroll/entrance animation;
+   - theme tokens come from the shared :root palette only. */
+.kicker { display: block; color: #5d7767; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.title { margin: 10px 0 14px; font-weight: 600; font-size: clamp(32px, 4.6vw, 46px); line-height: 1.05; letter-spacing: -.045em; }
+.title span { color: #74a7b9; }
+.page { max-width: 880px; }
+.page p { color: #3d4f45; font-size: 14px; line-height: 1.65; }
+.facts { display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0; padding: 0; border: 0; }
+.facts div { padding: 10px 14px; border: 1px solid #dfe6da; border-radius: 14px; background: #fbfcf9; font-size: 12px; color: #385441; }
+.facts strong { display: block; margin-bottom: 2px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #6a8172; }
+section { margin-top: 34px; }
+section h2 { margin: 0 0 8px; font-size: 19px; font-weight: 600; letter-spacing: -.02em; }
+.disclaimer { padding: 14px 16px; border-left: 3px solid #b3e682; border-radius: 8px; background: #fbfcf9; color: #51655a; font-size: 13px; }
+.sourceList { margin: 0; padding: 0 0 0 18px; }
+.sourceList li { margin: 6px 0; color: #3d4f45; font-size: 13px; }
+.credits a { color: #2376a8; }
