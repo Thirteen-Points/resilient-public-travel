@@ -17,6 +17,7 @@ from ..services.aggregate import (
 from ..services.confidence import ConfidenceObservation, score_confidence
 from ..services.event_models import Event, EventStatus
 from ..services.event_store import EventAlreadyExistsError, EventNotFoundError
+from ..services.signal_models import Signal
 from ..services.signal_store import SignalNotFoundError
 from ..services.structure.llm_structurer import LlmEventStructurer, StructuredEventDraft
 
@@ -61,6 +62,26 @@ def get_event(
         return request.app.state.event_store.get_event(event_id)
     except EventNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Event not found") from exc
+
+
+@router.get("/{event_id}/signals", response_model=list[Signal])
+def get_event_signals(
+    event_id: str, request: Request,
+    x_review_token: str | None = Header(default=None),
+) -> list[Signal]:
+    """Related evidence only; absent inbox records are skipped, not invented."""
+    require_reviewer(request, x_review_token)
+    try:
+        event = request.app.state.event_store.get_event(event_id)
+    except EventNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Event not found") from exc
+    signals = []
+    for signal_id in event.signals:
+        try:
+            signals.append(request.app.state.signal_store.get_signal(signal_id))
+        except SignalNotFoundError:
+            continue
+    return signals
 
 
 @router.post("", response_model=Event, status_code=201)
