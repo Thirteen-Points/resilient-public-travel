@@ -17,6 +17,7 @@ from ..services.aggregate import (
 from ..services.confidence import ConfidenceObservation, score_confidence
 from ..services.event_models import Event, EventStatus
 from ..services.event_store import EventAlreadyExistsError, EventNotFoundError
+from ..services.review_state import EventReviewService
 from ..services.signal_models import Signal
 from ..services.signal_store import SignalNotFoundError
 from ..services.structure.llm_structurer import LlmEventStructurer, StructuredEventDraft
@@ -44,11 +45,13 @@ def list_events(
     x_review_token: str | None = Header(default=None),
 ) -> list[Event]:
     require_reviewer(request, x_review_token)
+    EventReviewService(request.app.state.event_store).expire_due()
     return request.app.state.event_store.list_events(status=status)
 
 
 @router.get("/published", response_model=list[Event])
 def published_events(request: Request) -> list[Event]:
+    EventReviewService(request.app.state.event_store).expire_due()
     return request.app.state.event_store.list_events(status="published")
 
 

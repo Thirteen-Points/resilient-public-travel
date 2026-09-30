@@ -11,6 +11,7 @@ from fastapi.responses import StreamingResponse
 
 from .review import require_reviewer
 from ..services.event_store import EventStore
+from ..services.review_state import EventReviewService
 
 
 router = APIRouter(prefix="/api/stream", tags=["stream"])
@@ -21,6 +22,7 @@ async def event_frames(store: EventStore, after_id: int, *, poll_seconds: float 
 
     cursor = after_id
     while True:
+        EventReviewService(store).expire_due()
         changes = store.list_changes(after_id=cursor)
         if changes:
             for audit_id, event, change in changes:
