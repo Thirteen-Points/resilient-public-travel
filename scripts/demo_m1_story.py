@@ -61,16 +61,28 @@ def query_routes(depart_at: str) -> dict:
     status, body = call("POST", "/api/routes/query", {
         "origin": "TAW", "destination": "ADM", "depart_at": depart_at})
     routes = body if isinstance(body, list) else (body or {}).get("routes", [])
-    uses_erl_cross_harbour = any(
-        {leg.get("from"), leg.get("to")} == {"HUH", "EXC"}
-        for route in routes for leg in route.get("legs", []))
-    return {"status": status, "count": len(routes), "erl_huh_exc": uses_erl_cross_harbour}
+    # The public route API combines adjacent ERL edges into one TAW->ADM leg.
+    # A direct ERL candidate therefore proves this demo corridor is available
+    # before closure, even though HUH->EXC is not a separate public leg.
+    direct_erl = sum(
+        len(route.get("legs", [])) == 1
+        and route["legs"][0].get("line") == "ERL"
+        and route["legs"][0].get("from") == "TAW"
+        and route["legs"][0].get("to") == "ADM"
+        for route in routes
+    )
+    return {"status": status, "count": len(routes), "direct_erl": direct_erl,
+            "ids": {route["route_id"] for route in routes}}
 
 
 def main() -> int:
     prepare_only = "--prepare" in sys.argv
     now = datetime.now(HKT)
-    depart_at = (now + timedelta(minutes=5)).isoformat()
+    # The documented M1 checkpoint uses the 08:20 peak-hour query.
+    departure = now.replace(hour=8, minute=20, second=0, microsecond=0)
+    if departure <= now + timedelta(minutes=5):
+        departure += timedelta(days=1)
+    depart_at = departure.isoformat()
     results: list[bool] = []
 
     status, health = call("GET", "/api/health")
@@ -86,10 +98,10 @@ def main() -> int:
                      {"action": "expire", "actor": "admin_demo"}, token=True)
 
     baseline = query_routes(depart_at)
-    results.append(step("baseline routes", baseline["status"] == 200 and baseline["count"] >= 5,
-                        f"{baseline['count']} candidates at {depart_at[11:16]} HKT "
-                        f"(peak-hour check: the 08:20 query returns >= 8), "
-                        f"ERL HUH-EXC used: {baseline['erl_huh_exc']}"))
+    results.append(step("baseline routes", baseline["status"] == 200
+                        and baseline["count"] >= 8 and baseline["direct_erl"] > 0,
+                        f"{baseline['count']} candidates at {depart_at[11:16]} HKT, "
+                        f"direct ERL TAW-ADM candidates: {baseline['direct_erl']}"))
 
     # 1. Two independent commuter reports.
     status, body = call("POST", "/api/signals", {"raw_text": REPORT_A, "author_hint": "CommuterA", "lang": "zh-HK"})
@@ -145,9 +157,12 @@ def main() -> int:
     results.append(step("snapshot closes HUH->EXC", closed, json.dumps(affected, ensure_ascii=False)))
 
     after = query_routes(depart_at)
-    results.append(step("routes recomputed", after["status"] == 200 and not after["erl_huh_exc"],
-                        f"{after['count']} candidates, ERL HUH-EXC used: {after['erl_huh_exc']} "
-                        f"(baseline {baseline['count']})"))
+    results.append(step("routes recomputed", after["status"] == 200
+                        and after["direct_erl"] == 0 and after["ids"] != baseline["ids"],
+                        f"{after['count']} candidates (baseline {baseline['count']}), "
+                        f"direct ERL TAW-ADM: {after['direct_erl']} "
+                        f"(baseline {baseline['direct_erl']}), "
+                        f"route IDs changed: {after['ids'] != baseline['ids']}"))
 
     print("\nM1 chain:", "COMPLETE" if all(results) else "BROKEN")
     return 0 if all(results) else 1
