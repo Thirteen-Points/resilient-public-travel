@@ -6,6 +6,10 @@ import { CORRIDOR_IDS, legCoordinates, nodeIndex } from './data'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
 import css from './MapView.module.css'
 
+/** Map footprint across screens: full-bleed behind a floating panel, a
+    right-hand card beside page content, or faded out for plain pages. */
+export type MapMode = 'full' | 'docked' | 'hidden'
+
 type Props = {
   network: Network
   published: Event[]
@@ -13,16 +17,17 @@ type Props = {
   selectedRouteId: string | null
   picking: boolean
   onMapPick: (point: { lat: number; lng: number }) => void
+  mode?: MapMode
 }
 
-export function MapView({ network, published, routes, selectedRouteId, picking, onMapPick }: Props) {
+export function MapView({ network, published, routes, selectedRouteId, picking, onMapPick, mode = 'full' }: Props) {
   const element = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const overlaysRef = useRef<L.LayerGroup | null>(null)
   const pickerRef = useRef(onMapPick)
   const [provider, setProvider] = useState('Loading basemap')
   const [zoom, setZoom] = useState(12)
-  const resetRef = useRef<() => void>(() => {})
+  const resetRef = useRef<(animated?: boolean) => void>(() => {})
   pickerRef.current = onMapPick
 
   useEffect(() => {
@@ -38,11 +43,18 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     L.control.zoom({ position: 'bottomright' }).addTo(map)
     const corridor = CORRIDOR_IDS.map(id => nodeIndex(network).get(id)!).map(node => [node.lat, node.lng] as L.LatLngTuple)
     const bounds = L.latLngBounds(corridor)
-    const fit = () => {
+    const fit = (animated = false) => {
       map.invalidateSize()
-      const left = element.current!.clientWidth >= 800 ? 500 : 24
-      map.fitBounds(bounds, { paddingTopLeft: [left, 64], paddingBottomRight: [72, 82], maxZoom: 13, animate: false })
+      // Full-bleed mode reserves the left panel area; the docked card is small
+      // and needs near-uniform padding or the corridor sits off-centre.
+      const wide = element.current!.clientWidth >= 800 && element.current!.clientHeight >= 500
+      const pad = wide ? { topLeft: [500, 64] as [number, number], bottomRight: [72, 82] as [number, number] }
+        : { topLeft: [22, 22] as [number, number], bottomRight: [22, 22] as [number, number] }
+      map.fitBounds(bounds, { paddingTopLeft: pad.topLeft, paddingBottomRight: pad.bottomRight,
+        maxZoom: 13, animate: animated && !motion.matches, duration: .5 })
     }
+    fit()
+    resetRef.current = fit
     fit()
     resetRef.current = fit
     setZoom(map.getZoom())
@@ -170,9 +182,19 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     }
   }, [network, published, routes, selectedRouteId])
 
-  return <div className={`${css.wrap} ${picking ? css.picking : ''}`}>
+  // Re-fit the corridor once the mode transition has settled so it recentres in
+  // whichever geometry is now active; hidden maps re-fit when shown again.
+  const firstMode = useRef(true)
+  useEffect(() => {
+    if (firstMode.current) { firstMode.current = false; return }
+    if (mode === 'hidden') return
+    const timer = setTimeout(() => resetRef.current(true), 620)
+    return () => clearTimeout(timer)
+  }, [mode])
+
+  return <div className={`${css.wrap} ${picking ? css.picking : ''} ${mode === 'docked' ? css.docked : ''} ${mode === 'hidden' ? css.hidden : ''}`}>
     <div ref={element} className={css.map} tabIndex={0} aria-label="Hong Kong schematic network map. Scroll to zoom around the pointer; use arrow keys to pan and plus or minus to zoom." />
-    <div className={css.tools}><button type="button" onClick={() => resetRef.current()} aria-label="Fit corridor on map">◎ Fit corridor</button><span>Zoom {zoom.toFixed(2)}</span></div>
+    <div className={css.tools}><button type="button" onClick={() => resetRef.current(true)} aria-label="Fit corridor on map">◎ Fit corridor</button><span>Zoom {zoom.toFixed(2)}</span></div>
     <details className={css.legend}><summary>Network colours <span>↗</span></summary><div>{network.lines.map(line => { const style = lineStyle(line); return <p key={line.id}><i style={{ background: lineGradient(style.colors) }} /><span>{style.label}</span></p> })}<p><i style={{ background: lineStyle(undefined, 'unmapped').colors[0] }} /><span>Unknown line · assigned colour (example)</span></p><hr /><p>Bold + white outline: selected candidate</p><p>Red dashes: closed · amber dots: affected</p><p>Scroll at your pointer to zoom. Pinch or use + / −. All paths are schematic.</p></div></details>
     <p className={css.caption}>ACADEMIC DEMO · Map &amp; stations schematic · {provider}</p>
     {picking && <p className={css.pickHint}>Tap near a station, within {network.meta.catchment_m} m. Or search by name.</p>}

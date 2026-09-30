@@ -1,10 +1,17 @@
 import { API_BASE_URL } from './liveTransitApi'
 import type { Event, Signal } from './types'
 
+// Demo credential only; the server remains the authority for review access.
+const REVIEW_TOKEN = import.meta.env.VITE_REVIEW_TOKEN as string | undefined
+
 async function request(path: string, body?: unknown): Promise<unknown> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: body === undefined ? 'GET' : 'POST',
-    headers: { Accept: 'application/json', ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) },
+    headers: {
+      Accept: 'application/json',
+      ...(REVIEW_TOKEN ? { 'x-review-token': REVIEW_TOKEN } : {}),
+      ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+    },
     body: body === undefined ? undefined : JSON.stringify(body),
     signal: AbortSignal.timeout(10000),
   })
@@ -28,20 +35,35 @@ export async function getEventSignals(id: string): Promise<Signal[]> {
   return data as Signal[]
 }
 
-// Proposed B handoff payload; see M1-INTEGRATION.md. The server owns status and audit history.
-export async function reviewEvent(event: Event, action: 'edit' | 'publish' | 'reject', reason: string): Promise<Event> {
-  const { title, summary, line, severity, window, affected_segments } = event
+// Backend review contract: {action: approve|edit|reject, actor, edits?}. The
+// server owns status, confidence and audit history; no reason field exists.
+export async function reviewEvent(event: Event, action: 'edit' | 'publish' | 'reject'): Promise<Event> {
+  const edits = action === 'edit'
+    ? {
+        event_type: event.event_type,
+        title: event.title,
+        summary: event.summary,
+        mode: event.mode,
+        line: event.line,
+        direction: event.direction,
+        affected_segments: event.affected_segments,
+        window: { ...event.window, end_confidence: event.window.end_confidence || 'unknown' },
+        severity: event.severity,
+      }
+    : undefined
   const result = await request(`/api/events/${encodeURIComponent(event.event_id)}/review`, {
     action: action === 'publish' ? 'approve' : action,
     actor: 'admin_demo',
-    ...(action === 'edit' ? { changes: { title, summary, line, severity, window, affected_segments } } : {}),
-    ...(reason ? { reason } : {}),
+    ...(edits ? { edits } : {}),
   })
   return events([result])[0]
 }
 
 export function subscribeEvents(onChange: () => void, onStatus: (connected: boolean) => void): () => void {
-  const stream = new EventSource(`${API_BASE_URL}/api/stream/events`)
+  // EventSource cannot send headers, so the review token rides as a query param.
+  const url = new URL(`${API_BASE_URL}/api/stream/events`)
+  if (REVIEW_TOKEN) url.searchParams.set('token', REVIEW_TOKEN)
+  const stream = new EventSource(url.toString())
   stream.onopen = () => onStatus(true)
   stream.onerror = () => onStatus(false)
   stream.onmessage = onChange
