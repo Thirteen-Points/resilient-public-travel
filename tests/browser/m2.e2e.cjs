@@ -36,7 +36,7 @@ const networkFailures = []
 ;(async () => {
   const apiPort = await port(), webPort = await port()
   const api = `http://127.0.0.1:${apiPort}`, web = `http://127.0.0.1:${webPort}`
-  const backend = start(process.env.M2_PYTHON || path.join(root, '.venv/Scripts/python.exe'), ['tests/browser/m2_server.py', String(apiPort)], { CORS_ORIGINS: web })
+  const backend = start(process.env.M2_PYTHON || path.join(root, '.venv/Scripts/python.exe'), ['tests/browser/m2_server.py', String(apiPort)], { CORS_ALLOWED_ORIGINS: web })
   backendProcess = backend
   const front = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', String(webPort), '--strictPort'], { cwd: path.join(root, 'frontend'), env: { ...process.env, VITE_API_BASE_URL: api }, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] })
   let frontLogs = ''; front.stdout.on('data', data => frontLogs += data); front.stderr.on('data', data => frontLogs += data); front.logs = () => frontLogs; children.push(front)

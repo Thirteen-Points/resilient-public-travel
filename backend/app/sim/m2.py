@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
+import math
 from typing import Any
 
 from backend.app.engine.fairness import check_extra_delay, rank_routes
@@ -25,10 +26,6 @@ def _guided_multi_od(
         for item in route_sets
         for supply in item.supplies
     }
-    if len(supplies) != sum(len(item.supplies) for item in route_sets):
-        # Duplicate IDs are intentionally represented once in this map; caller
-        # has already checked that all copies describe the same supply.
-        pass
     target_left = {key: value.bucket_capacity(window_min) for key, value in supplies.items()}
     physical_left = {key: value.service_capacity(window_min) for key, value in supplies.items()}
     assigned: dict[str, str] = {}
@@ -88,23 +85,39 @@ def run_m2_multi_od(
     time_range: tuple[str, str],
     assumptions: list[str],
 ) -> dict[str, Any]:
+    if not isinstance(scenario_id, str) or not scenario_id.strip():
+        raise ValueError("scenario_id is required")
     if not route_sets:
         raise ValueError("at least one OD route set is required")
     if not assumptions:
         raise ValueError("assumptions must be non-empty")
+    if isinstance(population, bool) or not isinstance(population, int) or population < 0:
+        raise ValueError("population must be a non-negative integer")
+    if not math.isfinite(window_min) or window_min <= 0:
+        raise ValueError("window_min must be finite and positive")
 
     route_by_id: dict[str, RouteOption] = {}
     supply_by_id = {}
+    seen_ods: set[tuple[str, str]] = set()
     for route_set in route_sets:
+        if route_set.od in seen_ods:
+            raise ValueError(f"duplicate OD route set: {route_set.origin}->{route_set.destination}")
+        seen_ods.add(route_set.od)
+        if not math.isfinite(route_set.demand_weight) or route_set.demand_weight <= 0:
+            raise ValueError(f"{route_set.origin}->{route_set.destination} demand_weight must be finite and positive")
+        route_ids = [route.route_id for route in route_set.routes]
+        supply_ids = [supply.route_id for supply in route_set.supplies]
+        if len(route_ids) != len(set(route_ids)) or set(route_ids) != set(supply_ids) or len(supply_ids) != len(set(supply_ids)):
+            raise ValueError(
+                f"{route_set.origin}->{route_set.destination} routes and supplies must have matching unique route_ids"
+            )
         for route, supply in zip(route_set.routes, route_set.supplies, strict=True):
             old_route = route_by_id.get(route.route_id)
             if old_route and old_route != route:
                 raise ValueError(f"shared route_id {route.route_id} has conflicting route semantics")
             old_supply = supply_by_id.get(supply.route_id)
-            if old_supply and (
-                old_supply.headway_s, old_supply.capacity_per_hour, old_supply.service_capacity_per_hour
-            ) != (supply.headway_s, supply.capacity_per_hour, supply.service_capacity_per_hour):
-                raise ValueError(f"shared route_id {supply.route_id} has conflicting capacity; cannot pool safely")
+            if old_supply and old_supply != supply:
+                raise ValueError(f"shared route_id {supply.route_id} has conflicting supply inputs; cannot pool safely")
             route_by_id.setdefault(route.route_id, route)
             supply_by_id.setdefault(supply.route_id, supply)
 
@@ -154,9 +167,20 @@ def run_m2_multi_od(
             "protected_assigned": len(protected_ids & assignments.keys()),
             "protected_unmet": len(protected_ids - served_ids),
             "route_load": [
-            {**row, "assigned_users": counts.get(row["route_id"], 0),
-                 "target_capacity_excess": max(0, counts.get(row["route_id"], 0) - supply_by_id[row["route_id"]].bucket_capacity(window_min)),
-                 "physical_capacity_excess": max(0, counts.get(row["route_id"], 0) - supply_by_id[row["route_id"]].service_capacity(window_min))}
+                {
+                    **row,
+                    "assigned_users": counts.get(row["route_id"], 0),
+                    "target_capacity_excess": max(
+                        0,
+                        counts.get(row["route_id"], 0)
+                        - supply_by_id[row["route_id"]].bucket_capacity(window_min),
+                    ),
+                    "physical_capacity_excess": max(
+                        0,
+                        counts.get(row["route_id"], 0)
+                        - supply_by_id[row["route_id"]].service_capacity(window_min),
+                    ),
+                }
                 for row in metrics["route_load"]
             ],
         }
@@ -212,5 +236,9 @@ def run_m2_multi_od(
         "population_summary": population_summary(agents),
         "capacity_calculations": [item.calculation() for item in supply_by_id.values()],
         "assumptions": assumptions,
-        "provenance": "simulated" if all(item.provenance == "simulated" for item in route_sets) else "mixed",
+        "provenance": (
+            route_sets[0].provenance
+            if len({item.provenance for item in route_sets}) == 1
+            else "mixed"
+        ),
     }

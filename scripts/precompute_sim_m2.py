@@ -68,8 +68,7 @@ def main() -> None:
                                       "diagnostics": result.get("diagnostics", [])})
                 if not result.get("routes"):
                     continue
-                routes, supplies = routes_from_c_route_output(result, fixture=True)
-                supply_by_id = {s.route_id: s for s in supplies}
+                routes, _ = routes_from_c_route_output(result, fixture=True)
                 for raw_route in result["routes"]:
                     route_id = raw_route["route_id"]
                     previous = merged_routes.get(route_id)
@@ -136,6 +135,71 @@ def main() -> None:
         "provenance": "simulated",
     }
     _json_write(out_dir / "m2-route-input.json", input_doc)
+    manifest = {
+        "manifest_version": "1.1",
+        "milestone": "M2 interim six-station multi-OD simulation",
+        "scenario_id": SCENARIO_ID,
+        "source_revision": input_doc["source_revision"],
+        "input_file": "data/sim/m2-route-input.json",
+        "result_file": "data/sim/m2-simulation-result.json",
+        "classification": "simulated",
+        "policy": (
+            "References identify inputs but do not upgrade simulated values to real or real-derived. "
+            "All route, demand, population, and capacity values in this scenario remain simulated."
+        ),
+        "inputs": [
+            {
+                "field": "population_and_persona_shares",
+                "value": POPULATION,
+                "classification": "simulated",
+                "source": "backend/app/sim/population.py",
+                "note": "Fixed-seed synthetic population and persona shares; not observed passenger data.",
+            },
+            {
+                "field": "random_seed",
+                "value": SEED,
+                "classification": "simulated",
+                "source": "scripts/precompute_sim_m2.py",
+                "note": "Fixed only for reproducibility; it is not an observed value.",
+            },
+            {
+                "field": "stations_and_directed_od_pairs",
+                "value": STATIONS,
+                "classification": "simulated",
+                "source": "scripts/precompute_sim_m2.py",
+                "note": "Six selected corridor stations produce 30 directed OD pairs with equal simulated demand weights.",
+            },
+            {
+                "field": "route_candidates_and_accessibility",
+                "value": "Seed-backed C-Route query at the fixed departure time",
+                "classification": "simulated",
+                "source": input_doc["data_version"]["network_file"],
+                "reference": input_doc["data_version"]["route_policy_file"],
+                "note": "The seed adapter forces simulated provenance; route candidates are not verified service guarantees.",
+            },
+            {
+                "field": "headway_and_route_capacity_parameters",
+                "value": "C-Route route_parameters from the current seed-backed engine",
+                "classification": "simulated",
+                "source": input_doc["data_version"]["route_policy_file"],
+                "note": "Scenario estimates are not operator-reported headways, vehicle capacity, or residual capacity.",
+            },
+            {
+                "field": "departure_time_and_service_window",
+                "value": {"depart_at": DEPART_AT, "time_range": TIME_RANGE, "window_min": WINDOW_MIN},
+                "classification": "simulated",
+                "source": "scripts/precompute_sim_m2.py",
+                "note": "The scenario does not resolve the service window through data/calendar.json.",
+            },
+        ],
+        "known_gaps": [
+            "No verified passenger-demand, residual-load, or operator capacity feed is connected.",
+            "Service-day and public-holiday rules from data/calendar.json are not applied to this fixed-time scenario.",
+            "Capacity is counted by route_id; overlapping physical line segments across distinct route IDs cannot be pooled or partitioned with the current C-Route contract.",
+            "Results are algorithm demonstrations and must not be presented as measured passenger flows, verified operational capacity, or operational forecasts.",
+        ],
+    }
+    _json_write(out_dir / "m2-input-manifest.json", manifest)
 
     result = run_m2_multi_od(
         scenario_id=SCENARIO_ID,

@@ -45,7 +45,7 @@ To configure a different API, set only the public endpoint in `frontend/.env.loc
 VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
 
-Restart Vite after configuration changes. For a deployed frontend, use an HTTPS API and set `CORS_ORIGINS` on the server to the exact frontend origins, separated by commas. A public deployment has not been verified by the local regression.
+Restart Vite after configuration changes. For a deployed frontend, use an HTTPS API and set `CORS_ALLOWED_ORIGINS` on the server to the exact frontend origins, separated by commas. A public deployment has not been verified by the local regression.
 
 ### Optional reviewer access for a controlled local demo
 
@@ -156,4 +156,4 @@ C-Sim includes sequential journey timeline simulation and contract validation fo
 
 ![Resilient Public Travel architecture](docs/architecture/resilient-public-travel.png)
 
-The [editable architecture SVG](docs/architecture/resilient-public-travel.svg) documents the event-to-route flow, optional AI assistance and separately scoped simulation work. Cloud deployment remains unverified; see [deployment instructions](deploy/DEPLOYMENT.md).
+The [editable architecture SVG](docs/architecture/resilient-public-travel.svg) documents the event-to-route flow, optional AI assistance and separately scoped simulation work. The frontend is available at [resilient-public-travel.pages.dev](https://resilient-public-travel.pages.dev/). Render API deployment and the frontend-to-API connection remain unverified. The Render Blueprint and health-ping workflow require service creation and the repository variable `RENDER_API_URL`. See [deployment instructions](deploy/DEPLOYMENT.md).
