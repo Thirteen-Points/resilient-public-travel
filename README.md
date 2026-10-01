@@ -156,4 +156,11 @@ C-Sim includes sequential journey timeline simulation and contract validation fo
 
 ![Resilient Public Travel architecture](docs/architecture/resilient-public-travel.png)
 
-The [editable architecture SVG](docs/architecture/resilient-public-travel.svg) documents the event-to-route flow, optional AI assistance and separately scoped simulation work. The frontend is available at [resilient-public-travel.pages.dev](https://resilient-public-travel.pages.dev/). Render API deployment and the frontend-to-API connection remain unverified. The Render Blueprint and health-ping workflow require service creation and the repository variable `RENDER_API_URL`. See [deployment instructions](deploy/DEPLOYMENT.md).
+The [editable architecture SVG](docs/architecture/resilient-public-travel.svg) documents the event-to-route flow, optional AI assistance and separately scoped simulation work. The frontend is available at [resilient-public-travel.pages.dev](https://resilient-public-travel.pages.dev/). The Render API is deployed at `https://resilient-public-travel-api.onrender.com`; the frontend-to-API connection still requires end-to-end verification. The Render Blueprint and health-ping workflow require service creation and the repository variable `RENDER_API_URL`. See [deployment instructions](deploy/DEPLOYMENT.md).
+
+## Administrator console
+
+The backend serves an English operations console at `/admin/` for reports,
+human review, encrypted AI settings and manual MTR/HKO collection. See
+[administrator setup and deployment](deploy/ADMIN.md). It requires a separate
+administrator login; credentials are never embedded in the Cloudflare frontend.

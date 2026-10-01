@@ -121,6 +121,15 @@ class HkoWarningPoller:
 
         return self._last_successful_warnsum
 
+    def export_state(self) -> dict:
+        return {"active_codes": sorted(self._last_active_codes) if self._last_active_codes is not None else None,
+                "summary": self._last_successful_warnsum}
+
+    def restore_state(self, state: Mapping) -> None:
+        codes = state.get("active_codes")
+        self._last_active_codes = frozenset(codes) if codes is not None else None
+        self._last_successful_warnsum = state.get("summary")
+
     def poll_once(self, *, received_at: datetime | None = None) -> HkoPollResult:
         """Poll once without raising for recoverable external-service failures."""
 

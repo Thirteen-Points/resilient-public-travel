@@ -121,7 +121,7 @@ def create_review_candidate(
         "provenance": signal.provenance,
     })
     try:
-        return request.app.state.event_store.create_event(candidate, actor="system")
+        return request.app.state.event_store.create_event(candidate, actor=getattr(request.state, "admin_identity", "system"))
     except EventAlreadyExistsError as exc:
         raise HTTPException(status_code=409, detail="Event already exists") from exc
 
@@ -140,7 +140,12 @@ def ingest_signal(
         signal = signals.get_signal(body.signal_id)
     except SignalNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Signal not found") from exc
-    structurer = LlmEventStructurer(request.app.state.llm_client)
+    client = request.app.state.llm_client
+    admin = getattr(request.app.state, "admin_store", None)
+    if admin and admin.ready and not getattr(request.app.state, "llm_injected", False):
+        from ..admin.config import llm_client
+        client = llm_client(admin.settings())
+    structurer = LlmEventStructurer(client)
     draft = structurer.structure(signal).draft
     observation = StructuredObservation(signal=signal, draft=draft)
     aggregator = EventAggregator(events, signals)
@@ -165,6 +170,8 @@ def ingest_signal(
         observations.append(observation)
     try:
         merged = aggregator.merge(match.event_id, observations)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail="Event changed; refresh before merging evidence") from exc
     except (UnrelatedSignalError, ValueError, SignalNotFoundError) as exc:
         raise HTTPException(status_code=409, detail="Signal requires manual review") from exc
     return IngestResult(signal_id=signal.signal_id, state="merged", draft=draft, event=merged)

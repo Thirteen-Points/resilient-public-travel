@@ -48,9 +48,11 @@ class EventReviewService:
         self.store = store
 
     def approve(
-        self, event_id: str, *, actor: str, at: datetime | None = None
+        self, event_id: str, *, actor: str, at: datetime | None = None, expected_version: int | None = None
     ) -> Event:
         current = self.store.get_event(event_id)
+        if expected_version is not None and current.version != expected_version:
+            raise RuntimeError("Event changed. Reload before reviewing.")
         timestamp = self._review_time(at)
         self._require_actor(actor)
         self._require_status("approve", current, {"pending_review", "updated"})
@@ -81,6 +83,7 @@ class EventReviewService:
             actor=actor.strip(),
             action="review_approved",
             at=timestamp,
+            expected_version=current.version,
         )
 
     def edit(
@@ -90,8 +93,11 @@ class EventReviewService:
         *,
         actor: str,
         at: datetime | None = None,
+        expected_version: int | None = None,
     ) -> Event:
         current = self.store.get_event(event_id)
+        if expected_version is not None and current.version != expected_version:
+            raise RuntimeError("Event changed. Reload before reviewing.")
         timestamp = self._review_time(at)
         self._require_actor(actor)
         self._require_status("edit", current, self._EDITABLE_STATUSES)
@@ -121,12 +127,15 @@ class EventReviewService:
             actor=actor.strip(),
             action="review_edited",
             at=timestamp,
+            expected_version=current.version,
         )
 
     def reject(
-        self, event_id: str, *, actor: str, at: datetime | None = None
+        self, event_id: str, *, actor: str, at: datetime | None = None, expected_version: int | None = None
     ) -> Event:
         current = self.store.get_event(event_id)
+        if expected_version is not None and current.version != expected_version:
+            raise RuntimeError("Event changed. Reload before reviewing.")
         timestamp = self._review_time(at)
         self._require_actor(actor)
         self._require_status("reject", current, {"draft", "pending_review", "updated"})
@@ -136,12 +145,15 @@ class EventReviewService:
             actor=actor.strip(),
             action="review_rejected",
             at=timestamp,
+            expected_version=current.version,
         )
 
     def expire(
-        self, event_id: str, *, actor: str, at: datetime | None = None
+        self, event_id: str, *, actor: str, at: datetime | None = None, expected_version: int | None = None
     ) -> Event:
         current = self.store.get_event(event_id)
+        if expected_version is not None and current.version != expected_version:
+            raise RuntimeError("Event changed. Reload before reviewing.")
         timestamp = self._review_time(at)
         self._require_actor(actor)
         self._require_status("expire", current, {"published", "updated"})
@@ -155,6 +167,7 @@ class EventReviewService:
             actor=actor.strip(),
             action="review_expired",
             at=timestamp,
+            expected_version=current.version,
         )
 
     def expire_due(self, *, at: datetime | None = None) -> list[Event]:

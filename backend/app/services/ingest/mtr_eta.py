@@ -233,6 +233,19 @@ class MtrEtaAnomalyPoller:
         self._consecutive_polls = 0
         self._incident_signaled = False
 
+    def export_state(self) -> dict:
+        return {"candidate": list(self._candidate), "consecutive_polls": self._consecutive_polls,
+                "incident_signaled": self._incident_signaled,
+                "observations": {key: asdict(value) for key, value in self.last_successful_observations.items()}}
+
+    def restore_state(self, state: Mapping) -> None:
+        self._candidate = tuple(state.get("candidate", ()))
+        self._consecutive_polls = int(state.get("consecutive_polls", 0))
+        self._incident_signaled = bool(state.get("incident_signaled", False))
+        self.last_successful_observations = {
+            key: StationObservation(**{**value, "anomaly_reasons": tuple(value["anomaly_reasons"])})
+            for key, value in state.get("observations", {}).items()}
+
     def poll_once(self, *, received_at: datetime | None = None) -> MtrEtaPollResult:
         observations: dict[str, StationObservation] = {}
         failures: list[StationFailure] = []

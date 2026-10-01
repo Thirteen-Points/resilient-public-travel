@@ -155,6 +155,7 @@ class EventAggregator:
             updates,
             actor="system",
             action="merged_conflict" if has_conflict else "merged_signal",
+            expected_version=event.version,
             at=timestamp,
         )
 

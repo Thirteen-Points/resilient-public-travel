@@ -35,11 +35,15 @@ class OpenAiCompatJsonClient:
         api_key: str,
         model: str,
         connect_timeout_s: float = 5.0,
+        opener=None,
+        request_timeout_s: float | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.model = model
         self.connect_timeout_s = connect_timeout_s
+        self.opener = opener or urllib.request.urlopen
+        self.request_timeout_s = request_timeout_s
 
     @classmethod
     def from_env(cls) -> "OpenAiCompatJsonClient | None":
@@ -83,8 +87,8 @@ class OpenAiCompatJsonClient:
             method="POST",
         )
         try:
-            with urllib.request.urlopen(
-                request, timeout=min(timeout_seconds, self.connect_timeout_s + 25)
+            with self.opener(
+                request, timeout=min(timeout_seconds, self.request_timeout_s or (self.connect_timeout_s + 25))
             ) as response:
                 result = json.loads(response.read().decode())
         except urllib.error.URLError as exc:

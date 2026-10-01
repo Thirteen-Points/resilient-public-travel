@@ -37,12 +37,15 @@ class ReviewRequest(BaseModel):
     action: Literal["approve", "edit", "reject", "expire"]
     actor: str = Field(min_length=1, max_length=100)
     edits: ReviewEdits | None = None
+    expected_version: int | None = Field(default=None, ge=1)
 
 
 router = APIRouter(prefix="/api/events", tags=["review"])
 
 
 def require_reviewer(request: Request, supplied: str | None) -> None:
+    if getattr(request.state, "admin_identity", None):
+        return
     expected: str | None = request.app.state.review_token
     if not expected:
         raise HTTPException(status_code=503, detail="Review token is not configured")
@@ -72,12 +75,14 @@ def review_event(
         raise HTTPException(status_code=422, detail="edits are only allowed with edit")
     try:
         if body.action == "approve":
-            return reviews.approve(event_id, actor=body.actor)
+            return reviews.approve(event_id, actor=body.actor, expected_version=body.expected_version)
         if body.action == "edit":
-            return reviews.edit(event_id, changes, actor=body.actor)
+            return reviews.edit(event_id, changes, actor=body.actor, expected_version=body.expected_version)
         if body.action == "reject":
-            return reviews.reject(event_id, actor=body.actor)
-        return reviews.expire(event_id, actor=body.actor)
+            return reviews.reject(event_id, actor=body.actor, expected_version=body.expected_version)
+        return reviews.expire(event_id, actor=body.actor, expected_version=body.expected_version)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
     except EventNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Event not found") from exc
     except InvalidReviewTransitionError as exc:

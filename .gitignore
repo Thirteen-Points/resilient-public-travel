@@ -26,3 +26,6 @@ Thumbs.db
 *.log
 .cache/
 out/
+
+# Durable runtime databases and their journal files
+backend/app/data/*.sqlite3*

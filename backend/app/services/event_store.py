@@ -233,6 +233,7 @@ class EventStore:
         actor: str,
         action: str = "updated",
         at: datetime | None = None,
+        expected_version: int | None = None,
     ) -> Event:
         """Apply a validated partial update and append one audit record.
 
@@ -249,6 +250,8 @@ class EventStore:
             raise ValueError(f"immutable fields cannot be updated: {fields}")
 
         current = self.get_event(event_id)
+        if expected_version is not None and current.version != expected_version:
+            raise RuntimeError("Event changed. Reload before reviewing.")
         timestamp = at or datetime.now(timezone.utc)
         merged = current.model_dump(mode="python")
         merged.update(dict(updates))

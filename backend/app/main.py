@@ -187,6 +187,14 @@ def create_app(
         application.state.event_store = event_store
         application.state.review_token = review_token if review_token is not None else os.getenv("REVIEW_API_TOKEN")
         application.state.llm_client = llm_client if llm_client is not None else build_llm_client()
+        application.state.llm_injected = llm_client is not None
+        from .admin.store import AdminStore
+        admin = AdminStore(Path(db_path).parent / "admin.sqlite3", Path(db_path))
+        try:
+            admin.initialize()
+        except Exception:
+            admin.ready = False
+        application.state.admin_store = admin
         yield
 
     application = FastAPI(title="ResilientRoute API", version="m0-integrated", lifespan=lifespan)
@@ -203,6 +211,31 @@ def create_app(
     application.include_router(events_router)
     application.include_router(review_router)
     application.include_router(stream_router)
+    from .admin.api import router as admin_router
+    from fastapi.staticfiles import StaticFiles
+    from fastapi.exceptions import RequestValidationError
+    from fastapi.exception_handlers import request_validation_exception_handler
+    application.include_router(admin_router)
+    application.mount("/admin", StaticFiles(directory=str(Path(__file__).parent / "admin_static"), html=True, check_dir=False), name="admin")
+
+    @application.middleware("http")
+    async def admin_headers(request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/api/admin") or request.url.path.startswith("/admin"):
+            response.headers["Cache-Control"] = "no-store"
+            response.headers["X-Content-Type-Options"] = "nosniff"
+            response.headers["X-Frame-Options"] = "DENY"
+            response.headers["Referrer-Policy"] = "same-origin"
+            response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        return response
+
+    @application.exception_handler(RequestValidationError)
+    async def safe_validation(request, exc):
+        if request.url.path.startswith("/api/admin"):
+            return JSONResponse(status_code=422, content={"detail": [
+                {"loc": e["loc"], "msg": e["msg"], "type": e["type"]} for e in exc.errors()]})
+        return await request_validation_exception_handler(request, exc)
+
 
     @application.get("/api/health")
     def health() -> JSONResponse:

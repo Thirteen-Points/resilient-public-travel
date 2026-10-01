@@ -22,3 +22,9 @@ services:
         value: https://resilient-public-travel.pages.dev
       - key: REVIEW_API_TOKEN
         generateValue: true
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD_HASH
+        sync: false
+      - key: ADMIN_ENCRYPTION_KEY
+        sync: false

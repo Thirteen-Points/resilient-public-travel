@@ -147,3 +147,10 @@
   .agentHeading h1 { font-size: 27px; } .avatar { width: 80px; height: 80px; } .avatarSmall { width: 54px; height: 54px; }
 }
 @media (max-width: 380px) { .fieldPair { grid-template-columns: 1fr; gap: 0; } .agentHeading h1 { font-size: 24px; } }
+
+/* The backend console scrolls as a document, rather than a map overlay. */
+.adminReview { container-type: inline-size; width: 100%; max-width: 100%; max-height: none; overflow: visible; }
+.adminReview .queue, .adminReview .queueItems { min-width: 0; }
+.adminReview .reviewActions { position: static; }
+.adminReview .recordHeader { overflow-wrap: anywhere; }
+@container (max-width: 820px) { .adminReview .reviewLayout { grid-template-columns: minmax(0, 1fr); } .adminReview .queue { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }

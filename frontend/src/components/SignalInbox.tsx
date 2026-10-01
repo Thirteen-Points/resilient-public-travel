@@ -4,14 +4,16 @@ import type { Network, Signal } from '../api/types'
 import { formatHkt, hktLocalInput } from '../data'
 import css from './Experience.module.css'
 
-export function SignalInbox({ network, onChanged }: { network: Network; onChanged: () => Promise<void> }) {
+export function SignalInbox({ network, onChanged, api = eventApi, onDirty }: { network: Network; onChanged: () => Promise<void>; api?: Pick<typeof eventApi, "getInbox" | "ingestSignal" | "createEvent">; onDirty?: (dirty: boolean) => void }) {
   const [signals, setSignals] = useState<Signal[]>([]), [error, setError] = useState(''), [busy, setBusy] = useState(false)
   const [candidate, setCandidate] = useState<{ signal: Signal; draft: eventApi.EventDraft } | null>(null)
   const [severity, setSeverity] = useState(''), [factors, setFactors] = useState<string[]>([])
   const [start, setStart] = useState(''), [end, setEnd] = useState('')
   const [notice, setNotice] = useState('')
+  const [query, setQuery] = useState('')
+  useEffect(() => { onDirty?.(Boolean(candidate)); return () => onDirty?.(false) }, [candidate, onDirty])
   const refresh = async () => {
-    try { setSignals(await eventApi.getInbox()); setError('') }
+    try { setSignals(await api.getInbox()); setError('') }
     catch (cause) { setError(cause instanceof Error ? cause.message : String(cause)) }
   }
   useEffect(() => { void refresh() }, [])
@@ -19,11 +21,12 @@ export function SignalInbox({ network, onChanged }: { network: Network; onChange
   return <section className={css.reviewPanel} aria-labelledby="inbox-heading">
     <div className={css.sectionTitle}><h2 id="inbox-heading">Unlinked reports</h2><button type="button" className={css.secondary} disabled={busy} onClick={() => void refresh()}>Refresh reports</button></div>
     <p>Receipt is unverified. Extract a draft or merge evidence into an existing card; publication remains a separate review decision.</p>
-    {signals.map(signal => <article className={css.evidence} key={signal.signal_id}><strong>{signal.source_name}</strong><p>{signal.raw_text}</p><small>{formatHkt(signal.received_at)} · {signal.provenance} channel · unverified</small><button type="button" className={css.secondary} disabled={busy} onClick={async () => {
+    <label>Search reports<input value={query} placeholder="Search evidence or source" onChange={e => setQuery(e.target.value)} /></label>
+    {signals.filter(signal => `${signal.raw_text} ${signal.source_name}`.toLowerCase().includes(query.toLowerCase())).map(signal => <article className={css.evidence} key={signal.signal_id}><strong>{signal.source_name}</strong><p>{signal.raw_text}</p><small>{formatHkt(signal.received_at)} · {signal.provenance} channel · unverified</small><button type="button" className={css.secondary} disabled={busy} onClick={async () => {
       setBusy(true); setError(''); setNotice('')
       try {
-        const result = await eventApi.ingestSignal(signal.signal_id)
-        if (result.state === 'merged') { setCandidate(null); setNotice('Evidence merged. The server recalculated confidence; review is still required.'); await refresh(); await onChanged() }
+        const result = await api.ingestSignal(signal.signal_id)
+        if (result.state === 'merged') { setCandidate(null); setNotice('Evidence merged. The server recalculated confidence; review is still required.'); await refresh(); try { await onChanged() } catch { setNotice('Saved successfully. The queue could not refresh; refresh it manually.') } }
         else { setCandidate({ signal, draft: result.draft }); setSeverity(''); setFactors(result.draft.affected_segments.map(() => '')); setStart(hktLocalInput(signal.received_at)); setEnd('') }
       } catch (cause) { setError(cause instanceof Error ? cause.message : String(cause)) }
       finally { setBusy(false) }
@@ -37,7 +40,7 @@ export function SignalInbox({ network, onChanged }: { network: Network; onChange
       setBusy(true); setError('')
       const now = new Date().toISOString()
       try {
-        await eventApi.createEvent({
+        await api.createEvent({
           ...draft, event_id: `evt_${crypto.randomUUID()}`, version: 1, status: 'pending_review',
           created_at: now, updated_at: now, published_at: null, expires_at: null,
           window: { start: `${start}:00+08:00`, end: end ? `${end}:00+08:00` : null, end_confidence: 'reviewer_supplied' },
@@ -45,7 +48,7 @@ export function SignalInbox({ network, onChanged }: { network: Network; onChange
           confidence: 0, confidence_factors: [], signals: [candidate.signal.signal_id], reviewed_by: null, audit_log: [], provenance: candidate.signal.provenance,
         })
         setCandidate(null); setNotice('Pending card created. Add corroborating evidence and review before publication.')
-        await refresh(); await onChanged()
+        await refresh(); try { await onChanged() } catch { setNotice('Saved successfully. The queue could not refresh; refresh it manually.') }
       } catch (cause) { setError(`Creation could not be confirmed. Refresh the queue before retrying. ${cause instanceof Error ? cause.message : String(cause)}`) }
       finally { setBusy(false) }
     }}>
