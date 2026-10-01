@@ -7,7 +7,7 @@
 ## Work Completed
 
 - M1 corrected demo route assertion and recorded local chain evidence in product Round 005; pushed commit `013b0f7` to `XMQM1`, PR #95.
-- M2 registered persona parse API, added expiry integration test, T2.6 provider runner and bilingual disclosures; recorded product Round 006 and pushed five commits ending `508527c` to `XMQM2`, PR #96.
+- M2 registered persona parse API, added expiry integration test, T2.6 provider runner and bilingual disclosures; recorded product Round 006 and pushed six commits ending `43d3911` to `XMQM2`, PR #96.
 
 ## Files Changed
 

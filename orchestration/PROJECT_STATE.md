@@ -14,7 +14,7 @@ Last updated: 2026-10-01. Orchestrator: Codex.
 
 ## Verified GitHub State
 
-2026-10-01 核对：`main` 为 `4e95f25`；`XMQM1` 为 `013b0f7`，PR [#95](https://github.com/Thirteen-Points/resilient-public-travel/pull/95) open、未合并；`XMQM2` 为 `508527c`，PR [#96](https://github.com/Thirteen-Points/resilient-public-travel/pull/96) open、未合并。此前 `XMQM2` 旧记录 `98c8aac` 和本文件 2026-09-29 的“尚未开始真实 round”表述已过期。
+2026-10-01 核对：`main` 为 `4e95f25`；`XMQM1` 为 `013b0f7`，PR [#95](https://github.com/Thirteen-Points/resilient-public-travel/pull/95) open、未合并；`XMQM2` 为 `43d3911`，PR [#96](https://github.com/Thirteen-Points/resilient-public-travel/pull/96) open、未合并。此前 `XMQM2` 旧记录 `98c8aac` 和本文件 2026-09-29 的“尚未开始真实 round”表述已过期。编排副本在 `Mingquan-Xia`，PR [#97](https://github.com/Thirteen-Points/resilient-public-travel/pull/97) 指向 `main`，同样未合并。
 
 ## Completed and Evidence
 
