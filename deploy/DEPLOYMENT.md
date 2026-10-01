@@ -138,9 +138,10 @@ python scripts/preflight.py
 
 The repository now includes a Render Blueprint at `render.yaml`. From the
 Render Dashboard, create a Blueprint instance from this repository and select
-the `ZYC-M2` branch. Review the service before applying it. Render then builds
-the API, runs the seed preflight, and checks `/api/health` before routing
-traffic.
+the `main` branch. Leave Root Directory empty (repository root). Render builds
+with `pip install -r backend/requirements.txt`, starts with
+`uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`, and checks
+`/api/health/deep`. The Blueprint generates a private `REVIEW_API_TOKEN`.
 
 After the first successful deploy:
 
@@ -162,13 +163,18 @@ published-event reads and route queries are separate from protected review
 operations. The review console needs a private/authenticated delivery path
 before it can safely be enabled for public users.
 
-The Blueprint uses Render Free for an interim demo. Free services spin down
-after 15 minutes without inbound traffic and can take about a minute to wake;
-the scheduled ping reduces idle starts but cannot guarantee a 30-second
-cold-start target. Free services also have ephemeral filesystems, so SQLite
-events and reports are not durable across restarts or redeploys. Treat this as
-a demo deployment, not persistent production hosting. A paid always-on service
-and persistent database are needed for stronger availability and persistence.
+The Blueprint uses a paid Starter instance with one 1 GB persistent disk mounted
+at `/opt/render/project/src/backend/app/data`. This contains `events.sqlite3`,
+shared by user reports, Events, and audit history. Initialization runs at startup,
+when the disk is available. Do not remove the disk or switch to Free if reports
+must survive redeploys. Disk-backed services run as one instance and have brief
+downtime on deploys. Use SQLite-native backups for database recovery.
+
+Live acceptance must include `/api/health/deep`, `/docs`, route queries,
+published Events, simulation results, AI fallback, exact Pages CORS preflight,
+and a clearly labelled test report. Read the report with reviewer authorization
+before and after a redeploy to verify actual Render disk persistence.
+Local tests alone do not establish live deployment or disk persistence.
 
 ---
 

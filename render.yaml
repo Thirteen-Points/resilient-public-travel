@@ -2,11 +2,17 @@ services:
   - type: web
     name: resilient-public-travel-api
     runtime: python
-    plan: free
+    branch: main
+    plan: starter
     region: singapore
-    buildCommand: pip install -r backend/requirements.txt && python scripts/preflight.py
-    startCommand: python -m uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /api/health
+    numInstances: 1
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health/deep
+    disk:
+      name: resilient-public-travel-data
+      mountPath: /opt/render/project/src/backend/app/data
+      sizeGB: 1
     envVars:
       - key: OFFLINE_MODE
         value: "true"
@@ -15,4 +21,4 @@ services:
       - key: CORS_ALLOWED_ORIGINS
         value: https://resilient-public-travel.pages.dev
       - key: REVIEW_API_TOKEN
-        sync: false
+        generateValue: true
