@@ -10,6 +10,7 @@ import { ReviewConsole, type ReviewLog } from './components/ReviewConsole'
 import { HowItWorksPage } from './components/HowItWorksPage'
 import { UpdatesPage } from './components/UpdatesPage'
 import { ProvenanceBadge } from './components/ProvenanceBadge'
+import { CardDisclosure, PageDisclosure } from './components/Disclosures'
 import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
 import type { DemoMeta, Event, Network, Preset, RouteCandidate, Signal } from './api/types'
@@ -68,8 +69,8 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
   </div>
 }
 
-function RouteCard({ route, letter, network, selected, onSelect, onDetail }: {
-  route: RouteCandidate; letter: string; network: Network; selected: boolean
+function RouteCard({ route, letter, network, snapshotAt, selected, onSelect, onDetail }: {
+  route: RouteCandidate; letter: string; network: Network; snapshotAt: string; selected: boolean
   onSelect: () => void; onDetail: () => void
 }) {
   const card = useRef<HTMLElement>(null)
@@ -95,9 +96,10 @@ function RouteCard({ route, letter, network, selected, onSelect, onDetail }: {
     })}</div>
     <details className={css.routeEvidence}><summary>Score, preferences & sources</summary>
       {route.score_breakdown?.length ? route.score_breakdown.map(factor => <div className={css.factor} key={factor.criterion}><span>{factor.criterion}</span><span>{Math.round(factor.weight * 100)}% weight · {factor.contribution.toFixed(3)}</span></div>) : <p>No factor breakdown supplied in this seed.</p>}
-      <p>{route.explain}</p><strong>Risks</strong>{route.warnings.length ? route.warnings.map(note => <p key={note}>{note}</p>) : <p>No specific seed warning; verify current service.</p>}<strong>Preference notes</strong>{route.notes.map(note => <p key={note}>{note}</p>)}<p>Source: {SEED_MODE ? 'routes.seed.json' : 'route engine API'} · {route.provenance}. Freshness is measured at query time.</p>
+      <p>{route.explain}</p><strong>Risks</strong>{route.warnings.length ? route.warnings.map(note => <p key={note}>{note}</p>) : <p>No specific seed warning; verify current service.</p>}<strong>Preference notes</strong>{route.notes.map(note => <p key={note}>{note}</p>)}<p>Source: {SEED_MODE ? 'routes.seed.json sample' : 'route engine response'} · {route.provenance}. Source update time unavailable.</p>
     </details>
-    <p className={css.routeDisclaimer}>Academic estimate · not official travel advice.</p>
+    <p className={css.routeDisclaimer}>{SEED_MODE ? 'Source: fixed routes.seed.json sample' : 'Source: route engine response'} · Underlying evidence not supplied · Data type: {route.provenance}. {SEED_MODE ? 'Snapshot' : 'API data generated'}: {snapshotAt}. Source update time unavailable.</p>
+    <CardDisclosure seedMode={SEED_MODE} />
   </article>
 }
 
@@ -273,7 +275,7 @@ export function App() {
           <h1 id="routes-heading">{nodes.get(origin)?.name_en ?? origin} <span>→</span><br />{nodes.get(destination)?.name_en ?? destination}</h1>
           <p className={css.subhead}>{routes.length} alternatives · {PRESETS.find(option => option.id === preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
           <p className={css.queryStamp}>Requested departure: {formatHkt(queriedAt)}<br /><small>Query value: {queriedAt} · {SEED_MODE ? 'seed estimates are not recalculated.' : 'recomputed when the graph or published events change.'}</small></p>
-          {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={'ABC'[index]} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); setScreen('detail') }} />)}</div> : <div className={css.empty}><strong>No route returned for this pair.</strong><p>Try another departure or station pair. No feasible alternative has been supplied.</p></div>}
+          {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={'ABC'[index]} network={network} snapshotAt={meta.snapshotAt} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); setScreen('detail') }} />)}</div> : <div className={css.empty}><strong>No route returned for this pair.</strong><p>Try another departure or station pair. No feasible alternative has been supplied.</p></div>}
           <p className={css.tiny}>{SEED_MODE ? 'Fixed illustrative candidates.' : 'API candidates on the modelled network.'} Published events affect the network overlay. Times, fares and scores are derived estimates.</p>
         </section>
       </>}
@@ -285,9 +287,10 @@ export function App() {
         <h2>Why this route?</h2><p>{selected.explain}</p>
         {selected.warnings.length > 0 && <div className={css.warning}><strong>Check before travel</strong>{selected.warnings.map(warning => <p key={warning}>{warning}</p>)}</div>}
         {selected.score_breakdown && <div className={css.breakdown}><h2>Score factors</h2>{selected.score_breakdown.map(factor => <div key={factor.criterion}><span>{factor.criterion}</span><span>weight {Math.round(factor.weight * 100)}% · contribution {factor.contribution.toFixed(3)}</span></div>)}</div>}
-        <ProvenanceBadge value={selected.provenance} /><p className={css.tiny}>Source: {SEED_MODE ? 'routes.seed.json' : 'route engine API'} · {formatHkt(meta.snapshotAt)} · {meta.disclaimer}</p>
+        <ProvenanceBadge value={selected.provenance} /><p className={css.tiny}>Source: {SEED_MODE ? 'fixed routes.seed.json sample' : 'route engine response'} · Underlying evidence not supplied · Data type: {selected.provenance}. {SEED_MODE ? `Snapshot: ${meta.snapshotAt}` : `API data generated: ${meta.snapshotAt}`}.</p><CardDisclosure seedMode={SEED_MODE} />
       </section>}
     </main>
+    <PageDisclosure seedMode={SEED_MODE} />
     <div ref={toast} role="status" aria-live="polite" className={success.text ? css.successToast : css.hiddenToast}>{success.text && <><span>✓</span><strong>{success.text}</strong></>}</div>
   </div>
 }

@@ -66,6 +66,7 @@ export interface Signal {
   source_name: string
   received_at: string
   raw_text: string
+  raw_url?: string | null
   provenance: Provenance
 }
 

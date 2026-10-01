@@ -1,4 +1,5 @@
 .shell { min-height: 100vh; background: white; }
+.shell { display: flex; flex-direction: column; }
 .state { padding: 40px; }
 .header { height: 80px; display: flex; align-items: center; gap: 32px; padding: 0 32px; background: white; position: relative; z-index: 10; }
 .brand { width: 70px; padding: 0; border: 0; background: none; color: #233c30; text-align: left; font-size: 32px; font-weight: 700; letter-spacing: -3px; line-height: 1; }
@@ -8,7 +9,7 @@
 .header nav button[aria-current=page] { box-shadow: inset 0 -3px #b3e682; }
 .header nav button:hover { color: #2277a1; }
 .demo { margin-left: auto; padding: 9px 13px; border-radius: 30px; background: #f6f8f3; color: #60746b; font-size: 10px; font-weight: 700; letter-spacing: .07em; white-space: nowrap; }
-.stage { position: relative; min-height: calc(100vh - 80px); height: max(820px, calc(100vh - 80px)); overflow: auto; isolation: isolate; }
+.stage { position: relative; flex: 1; min-height: 0; height: max(820px, calc(100vh - 80px)); overflow: auto; isolation: isolate; }
 .panel { position: relative; z-index: 500; width: 425px; max-width: calc(100% - 64px); margin: 28px 0 32px 32px; padding: 32px 28px 25px; border-radius: 28px; background: white; box-shadow: 0 12px 38px #1f5b6d30; color: var(--ink); }
 .panel h1 { margin: 0 0 8px; font-weight: 600; font-size: 39px; line-height: 1.12; letter-spacing: -.05em; }
 .panel h1 span { color: #74a7b9; }
@@ -159,7 +160,7 @@
 .successToast span { display: grid; place-items: center; border-radius: 50%; width: 28px; height: 28px; background: var(--lime); color: #2e4c1b; font-size: 16px; }
 .hiddenToast { position: fixed; width: 1px; height: 1px; overflow: hidden; }
 @media (min-width: 801px) {
-  .stage { height: calc(100dvh - 80px); min-height: 580px; overflow: hidden; }
+  .stage { height: calc(100dvh - 152px); min-height: 500px; overflow: hidden; }
   .panel { max-height: calc(100dvh - 140px); min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #b9c8ac transparent; }
   .results { max-height: calc(100dvh - 242px); }
 }
