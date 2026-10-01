@@ -24,6 +24,7 @@
 - `pnpm install --no-lockfile --ignore-scripts`: completed; generated dependencies were not staged.
 - `tsc --noEmit`: passed.
 - `vite build --configLoader runner`: passed; chunk-size warning only.
+- A later repeat via the shell's `pnpm exec tsc` could not resolve `tsc` in that shell; the explicit `frontend/node_modules/.bin/tsc.CMD --noEmit` and `vite.CMD build --configLoader runner` rerun both passed. This was a command-path issue, not an application test pass from the failed attempt.
 - In-app browser accessibility-tree checks: page, event and route card text present. No deployed browser test was run.
 
 ## Problems, Risks, or Unresolved Questions

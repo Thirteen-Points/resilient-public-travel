@@ -27,6 +27,7 @@
 - `python scripts/run_t2_6_acceptance.py --provider deepseek --samples backend/tests/fixtures/t2_6_acceptance_samples.json`: exited 1 with the expected simulated-corpus rejection, before provider selection or network call.
 - `python -m unittest backend.tests.test_b_replan_handoff -v`: 3 passed, including automatic expiry across the shared app.
 - `python -m unittest discover -s backend/tests`: 193 passed.
+- A later repeat with the lightweight `.venv-readme-b` Python failed with six import errors because that environment lacks the declared `python-dotenv` dependency; rerunning discovery with the project's `.venv` Python passed all 193 tests. The failed environment run is not counted as a code failure or a pass.
 - Local HTTP `GET /api/events`, `/api/events/published`, `/api/graph/snapshot` after expiry: event `expired`, final action `auto_expired`, no affected edges. Browser observation as above.
 
 ## Problems, Risks, or Unresolved Questions
