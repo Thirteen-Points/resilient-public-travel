@@ -1,11 +1,14 @@
 """B's standalone parser and router checks before shared-app wiring."""
 
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from backend.app.api.persona import router
+from backend.app.main import create_app
 from backend.app.services.persona import parse_preference
 
 
@@ -57,6 +60,19 @@ class PersonaPreparseTests(unittest.TestCase):
             response = client.post("/api/persona/parse", json={"free_text": "腿脚不便、别太贵"})
         self.assertEqual(response.status_code, 200)
         self.assertIn("no_stairs", response.json()["patch"]["hard_flags"])
+
+    def test_shared_app_exposes_persona_parse_with_rule_fallback(self):
+        with TemporaryDirectory() as temp_dir:
+            app = create_app(db_path=Path(temp_dir) / "test.db")
+            with TestClient(app) as client:
+                response = client.post("/api/persona/parse", json={"free_text": "腿脚不便、别太贵"})
+                invalid = client.post("/api/persona/parse", json={"free_text": ""})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["method"], "rule_fallback")
+        self.assertEqual(response.json()["patch"]["mobility"], "reduced")
+        self.assertIn("no_stairs", response.json()["patch"]["hard_flags"])
+        self.assertEqual(invalid.status_code, 422)
 
 
 if __name__ == "__main__":
