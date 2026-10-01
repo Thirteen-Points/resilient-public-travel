@@ -24,7 +24,8 @@ describe('buildMapModel', () => {
     for (const circle of model.catchmentCircles) expect(circle.radiusM).toBe(800)
     expect(model.defaultCatchmentM).toBe(800)
     expect(DEFAULT_CATCHMENT_M).toBe(800)
-    expect(model.stations.find(station => station.id === 'TAW')?.position).toEqual({ lat: 22.3731, lng: 114.1789 })
+    const taw = network.nodes.find(node => node.id === 'TAW')!
+    expect(model.stations.find(station => station.id === 'TAW')?.position).toEqual({ lat: taw.lat, lng: taw.lng })
   })
 
   it('falls back to the network default when a station has no explicit catchment', () => {
@@ -40,7 +41,8 @@ describe('buildMapModel', () => {
 
   it('marks only fully accessible MTR stations as access points', () => {
     expect(model.accessPoints.every(station => station.kind === 'mtr_station' && station.accessible === true)).toBe(true)
-    expect(model.accessPoints).toHaveLength(16)
+    expect(model.accessPoints.map(station => station.id)).toEqual(network.nodes.filter(node => node.kind === 'mtr_station' && node.accessible === true).map(node => node.id))
+    expect(model.accessPoints.some(station => station.id === 'TAW')).toBe(false)
     expect(model.accessPoints.some(station => station.id === 'BS_TAW')).toBe(false)
     expect(model.accessPoints.some(station => station.id === 'PIER_TST')).toBe(false)
   })
@@ -54,11 +56,11 @@ describe('buildMapModel', () => {
   })
 
   it('reports unmodelled stops instead of inventing geometry', () => {
-    expect(model.stopIdsWithoutStation).toEqual(['BS_TW'])
-    const gmb = model.lines.find(line => line.id === 'GMB_481B')!
-    expect(gmb.segments[0].points).toBeNull()
+    const partial = buildMapModel({ ...network, lines: [{ ...network.lines[0], stops: ['TAW', 'unmodelled'] }] })
+    expect(partial.stopIdsWithoutStation).toEqual(['unmodelled'])
+    expect(partial.lines[0].segments[0].points).toBeNull()
     expect(model.stationsWithoutPosition).toEqual([])
-    expect(model.labels).toHaveLength(22)
+    expect(model.labels).toHaveLength(network.nodes.length)
     expect(model.labels[0].text).toBe('Tai Wai · 大圍')
   })
 
@@ -96,7 +98,7 @@ describe('buildImpactModel', () => {
     expect(huhExc.impact).toBe('closed')
     expect(huhExc.passable).toBe(false)
     expect(huhExc.published).toBe(true)
-    expect(huhExc.points).toEqual([[22.3034, 114.1817], [22.2816, 114.1754]])
+    expect(huhExc.points).toEqual(['HUH', 'EXC'].map(id => { const node = network.nodes.find(item => item.id === id)!; return [node.lat, node.lng] }))
     const tawKot = impact.segments.find(segment => segment.key === 'TAW->KOT')!
     expect(tawKot.impact).toBe('crowded')
     expect(tawKot.passable).toBe(true)
@@ -141,27 +143,24 @@ describe('buildRouteLayers', () => {
 
   it('interpolates along known line stops and resolves prefixed line ids', () => {
     const all = buildRouteLayers(routes, network)
-    const bus = all.find(layer => layer.routeId === 'r_seed_005')!
-    expect(bus.legs[0].lineId).toBe('BUS_182')
-    expect(bus.legs[0].points).toHaveLength(3) // BS_TAW → BS_HUH_TUNNEL → BS_ADM_E
-    const tml = all.find(layer => layer.routeId === 'r_seed_001')!
-    expect(tml.legs[0].lineId).toBe('TML')
-    expect(tml.legs[0].points).toHaveLength(5) // TAW → DIH → HOM → HUH → ETS
-    expect(tml.legs[1].mode).toBe('WALK')
-    expect(tml.legs[1].points).toHaveLength(2) // ETS → TST schematic walk
+    const bus = all.flatMap(layer => layer.legs).find(leg => leg.lineId === 'BUS_182' && leg.fromId === 'BS_TAW')!
+    expect(bus.points).toHaveLength(3)
+    const tml = all.flatMap(layer => layer.legs).find(leg => leg.lineId === 'TML' && leg.fromId === 'TAW' && leg.toId === 'ETS')!
+    expect(tml.points).toHaveLength(5)
+    const walk = all.flatMap(layer => layer.legs).find(leg => leg.mode === 'WALK' && leg.fromId === 'ETS' && leg.toId === 'TST')!
+    expect(walk.points).toHaveLength(2)
   })
 
   it('flags unmodelled route endpoints instead of drawing them', () => {
-    const all = buildRouteLayers(routes, network)
-    const gmb = all.find(layer => layer.routeId === 'r_seed_008')!
-    expect(gmb.unmodelledStopIds).toEqual(['BS_TW'])
+    const [gmb] = buildRouteLayers([{ ...routes[0], legs: [{ ...routes[0].legs[0], from: 'TAW', to: 'unmodelled' }] }], network)
+    expect(gmb.unmodelledStopIds).toEqual(['unmodelled'])
     expect(gmb.legs[0].points).toBeNull()
   })
 
   it('stays consistent with DataSource-ranked queries', async () => {
     const fastest = await seedDataSource.getRoutes({ origin: 'TAW', destination: 'ADM', departAt: snapshotAt, preset: 'fastest' })
     const layers = buildRouteLayers(fastest.slice(0, 3), network)
-    expect(layers.map(layer => layer.routeId)).toEqual(['r_seed_001', 'r_seed_004', 'r_seed_002'])
+    expect(layers.map(layer => layer.routeId)).toEqual(fastest.slice(0, 3).map(route => route.route_id))
     expect(layers.map(layer => layer.layerId)).toEqual(['route-A', 'route-B', 'route-C'])
   })
 })

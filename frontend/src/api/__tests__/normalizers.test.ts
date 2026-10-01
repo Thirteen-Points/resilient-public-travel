@@ -40,9 +40,9 @@ describe('shipped seeds through the normalizers', () => {
     expect(network.lines.every(line => typeof line.provenance === 'string')).toBe(true)
     expect(events.every(event => typeof event.provenance === 'string')).toBe(true)
     expect(routes.every(route => typeof route.provenance === 'string')).toBe(true)
-    // Simulated data must stay simulated: the demo scenario is simulated, routes are derived.
+    // Engine estimates use simulated fare/capacity policies and remain labelled.
     expect(events.find(event => event.event_id === 'evt_seed_003')?.provenance).toBe('simulated')
-    expect(routes.some(route => route.provenance === 'simulated')).toBe(false)
+    expect(routes.every(route => route.provenance === 'simulated')).toBe(true)
   })
 
   it('returns stable route results for identical queries', async () => {

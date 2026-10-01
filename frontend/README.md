@@ -1,6 +1,6 @@
-# ResilientRoute frontend (Role A · M0)
+# ResilientRoute frontend · M2
 
-React + TypeScript + Vite + Leaflet prototype for the Tai Wai → Admiralty seed scenario.
+React + TypeScript + Vite + Leaflet journey planner for the modelled Tai Wai → Admiralty corridor. See the root README for backend startup.
 
 ```powershell
 cd frontend
@@ -11,12 +11,28 @@ npm run test
 npm run build
 ```
 
-Open the local URL printed by Vite. `src/api/seedDataSource.ts` implements the `TransitDataSource` interface and is the only module importing the four versioned JSON seeds. Components use the adapter; a future HTTP implementation can replace it. The snapshot is fixed at 22 Sep 2026 08:20 HKT; this is **not** a live journey planner. Other station pairs intentionally show an empty state.
+Use Node 20.19+ or 22.12+. The default API is `http://127.0.0.1:8000`; override its public URL with `VITE_API_BASE_URL` in `.env.local` and restart Vite. Never set `VITE_REVIEW_TOKEN` or any service secret in frontend environment variables.
 
-The map shows the six corridor stations, geodesic 800 m access circles, available seed network lines, routes A/B/C and only `published` events that are effective at the snapshot time. An unresolved seed bus stop is omitted rather than assigned invented coordinates. Both the UI and map identify the data as schematic/estimated/simulated.
+## Data modes
 
-Basemap preference: an explicitly configured `VITE_CARTO_TILE_URL` (authorized CARTO tile endpoint) → key-free OpenFreeMap → OpenStreetMap → schematic background. Without a CARTO URL, OpenFreeMap is first. The public CARTO raster endpoint currently produces an API-key watermark in this environment, so the app does not use it by default. Basemap failure never removes the network overlays. OpenStreetMap tiles are requested only for the visible viewport and retain their attribution.
+API mode is the default. Queries use the deterministic engine and last approved event facts. It is a modelled service, not a live timetable. `?data=seed` explicitly switches to fixed, simulated fixture routes for the seed OD; changing departure does not recalculate those routes, and seed review actions are local. Switching mode reloads the page and discards unsaved state.
 
-The full-bleed map workspace follows the five Figma P02 input states and the P03 results overlay. Search has keyboard navigation; map selection snaps to accessible modelled MTR stations within the fixture radius; free text recognizes only the seeded Tai Wai → Admiralty journey and is clearly labelled as deterministic, not AI. Figma's incorrect example interchange and invented fare/time are corrected from the seed legs. Results, update status, source/provenance and route details are explicit states.
+API errors retain loaded data with a stale notice. An initial failure offers retry or an explicit fixed-seed switch. Maps retain their schematic overlays when the external basemap fails. Basemap preference is configured CARTO → OpenFreeMap → OSM → schematic; the current initial raster option is OSM. Map attribution remains visible. Reloading while completely offline is not supported as an installed PWA.
 
-M0 boundaries: no backend query, real-time event stream, review workflow, profile-specific ranking, live geocoding, microphone, AI parser or simulation dashboard yet. Preset sorting only reorders fixed seed candidates; changing departure does not recalculate them.
+## Public and reviewer views
+
+Public users can query routes, see effective approved events, and submit unverified reports without a reviewer credential. Protected reads are independent of the public snapshot: reviewer failures do not hide approved incidents from the map.
+
+For a controlled local demo, enter a temporary server `REVIEW_API_TOKEN` in Review. It stays in memory until disconnect/reload. The SSE client uses streaming fetch with `X-Review-Token`, an abortable lifecycle and durable reconnect cursor. It never sends a token in a URL. Polling every three seconds continues during stream loss. Public deployment requires an identity/session or trusted proxy design.
+
+The reviewer inbox supports extraction, first-card creation with explicit numeric facts and evidence merge. Review supports edit, publish, reject and withdrawal. A saved edit of a published card awaits reapproval; previous approved facts stay effective until replacement or withdrawal. Current time windows and the route departure instant control effects. The server owns confidence and audit history. A successful write remains successful when its following refresh fails; ambiguous writes require refreshing before retrying. Rejection reasons remain local notes.
+
+## Data contract
+
+- `accessible=null` means unknown. General station picking remains possible with a verification notice; verified-access-only picking excludes unknown stations.
+- Route legs accept fixture `travel_s` or engine `in_vehicle_s`; missing values display as unavailable. No numeric duration is fabricated.
+- Provenance is preserved, including simulated engine policy outputs. Approximate geometry uses supplied nodes only.
+- Unknown source freshness is not inferred from response-generation time.
+- The visible Agent panel uses local template replies. Backend AI and simulation endpoints are not evidence of corresponding frontend features.
+
+See [M2-INTEGRATION.md](M2-INTEGRATION.md) for current integration behavior. M1 documents preserve historical implementation records.

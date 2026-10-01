@@ -34,7 +34,7 @@ export function activePublishedEvents(items: Event[], at: string): Event[] {
 
 export function rankSeedRoutes(items: RouteCandidate[], preset: Preset): RouteCandidate[] {
   const usable = items.filter(item =>
-    item.route_id !== 'r_seed_008' && // Explicit unmodelled endpoint.
+    item.legs.every(leg => [leg.from, leg.to].every(id => network.nodes.some(node => node.id === id))) &&
     (preset !== 'least_walking' || item.total.reliability >= 0.7), // Do not elevate unreliable crowded buses solely for 30 m less walking.
   )
   return [...usable].sort((a, b) => {

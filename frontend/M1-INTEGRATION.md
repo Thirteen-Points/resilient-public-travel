@@ -1,5 +1,7 @@
 # Role A · M1 integration handoff
 
+> Historical M1 record. Current endpoint, authorization and approval semantics are documented in [M2-INTEGRATION.md](./M2-INTEGRATION.md).
+
 ## Running modes
 
 - Default: API mode, using `VITE_API_BASE_URL` or `http://127.0.0.1:8000`.

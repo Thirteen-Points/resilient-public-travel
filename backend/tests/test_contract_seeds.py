@@ -15,7 +15,8 @@ from scripts.generate_contract_schemas import schema_documents, write_schemas
 from scripts.validate_contract_seeds import (
     SEED_FILENAMES,
     load_seed_documents,
-    validate_seed_payload,
+    load_contract_schemas,
+    validate_seed_documents,
 )
 
 
@@ -34,6 +35,8 @@ class ContractSeedTestCase(unittest.TestCase):
         cls.signal_schema = json.loads(
             (SCHEMA_DIR / "signal.schema.json").read_text(encoding="utf-8")
         )
+        cls.documents = load_seed_documents()
+        cls.schemas = load_contract_schemas()
 
     def test_seed_has_three_valid_events_and_five_valid_signals(self) -> None:
         self.assertEqual(len(self.seed["events"]), 3)
@@ -43,16 +46,15 @@ class ContractSeedTestCase(unittest.TestCase):
         for signal in self.seed["signals"]:
             Signal.model_validate(signal)
 
-    def test_all_four_shared_seed_files_are_readable_json_objects(self) -> None:
-        documents = load_seed_documents()
-        self.assertEqual(set(documents), set(SEED_FILENAMES))
+    def test_all_four_shared_seed_files_have_the_expected_root_shape(self) -> None:
+        self.assertEqual(set(self.documents), set(SEED_FILENAMES))
         expected_top_level = {
             "network.seed.json": {"meta", "nodes", "lines", "walk_links"},
             "event.seed.json": {"meta", "events", "signals"},
-            "routes.seed.json": {"meta", "routes"},
-            "sim.seed.json": {"meta", "baseline", "guided"},
+            "routes.seed.json": {"meta", "routes", "persona_top_picks", "excluded_route_examples"},
+            "sim.seed.json": {"scenario_id", "meta", "baseline", "guided"},
         }
-        for filename, document in documents.items():
+        for filename, document in self.documents.items():
             with self.subTest(filename=filename):
                 self.assertIsInstance(document, dict)
                 self.assertTrue(expected_top_level[filename].issubset(document))
@@ -67,6 +69,11 @@ class ContractSeedTestCase(unittest.TestCase):
         documents = schema_documents()
         self.assertEqual(documents["event.schema.json"], self.event_schema)
         self.assertEqual(documents["signal.schema.json"], self.signal_schema)
+
+    def test_every_seed_passes_its_committed_schema(self) -> None:
+        for filename in SEED_FILENAMES:
+            with self.subTest(filename=filename):
+                Draft202012Validator(self.schemas[filename]).validate(self.documents[filename])
 
     def test_schema_generation_is_deterministic_and_idempotent(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -125,11 +132,37 @@ class ContractSeedTestCase(unittest.TestCase):
 
     def test_complete_validator_accepts_seed(self) -> None:
         self.assertEqual(
-            validate_seed_payload(
-                self.seed, self.event_schema, self.signal_schema
-            ),
+            validate_seed_documents(self.documents, self.schemas),
             [],
         )
+
+    def test_network_schema_rejects_unknown_fields_and_bad_references(self) -> None:
+        documents = copy.deepcopy(self.documents)
+        documents["network.seed.json"]["nodes"][0]["lat"] = "22.37"
+        documents["network.seed.json"]["lines"][0]["unexpected"] = True
+        documents["network.seed.json"]["lines"][0]["stops"][0] = "UNKNOWN"
+        errors = validate_seed_documents(documents, self.schemas)
+        self.assertTrue(any("nodes.0.lat" in error for error in errors), errors)
+        self.assertTrue(any("unexpected" in error for error in errors), errors)
+        self.assertTrue(any("unknown node IDs UNKNOWN" in error for error in errors), errors)
+
+    def test_route_and_sim_seeds_reject_unknown_cross_file_ids(self) -> None:
+        documents = copy.deepcopy(self.documents)
+        documents["routes.seed.json"]["routes"][0]["legs"][0]["from"] = "UNKNOWN"
+        documents["sim.seed.json"]["guided"]["shares"][0]["route_id"] = "unknown-route"
+        errors = validate_seed_documents(documents, self.schemas)
+        self.assertTrue(any("unknown node ID 'UNKNOWN'" in error for error in errors), errors)
+        self.assertTrue(any("unknown route ID 'unknown-route'" in error for error in errors), errors)
+
+    def test_validator_reports_malformed_nested_shapes_without_crashing(self) -> None:
+        documents = copy.deepcopy(self.documents)
+        documents["network.seed.json"]["meta"] = None
+        documents["routes.seed.json"]["routes"][0]["legs"] = None
+        documents["sim.seed.json"]["guided"] = None
+        errors = validate_seed_documents(documents, self.schemas)
+        self.assertTrue(any("network.seed.json" in error for error in errors), errors)
+        self.assertTrue(any("routes.seed.json" in error for error in errors), errors)
+        self.assertTrue(any("sim.seed.json" in error for error in errors), errors)
 
 
 if __name__ == "__main__":

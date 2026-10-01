@@ -161,8 +161,8 @@ export async function getNetwork(): Promise<Network> {
 }
 
 /** GET /api/graph/snapshot — snapshot id plus currently affected edges. */
-export async function getSnapshot(): Promise<GraphSnapshot> {
-  const body = await requestJson<unknown>('GET', '/api/graph/snapshot')
+export async function getSnapshot(at?: string): Promise<GraphSnapshot> {
+  const body = await requestJson<unknown>('GET', `/api/graph/snapshot${at ? `?at=${encodeURIComponent(at)}` : ''}`)
   try {
     const record = requireObjectKeyArray(body, ['affected_edges'])
     if (typeof record.snapshot_id !== 'string') throw new TypeError('response is missing string field "snapshot_id"')

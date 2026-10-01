@@ -99,7 +99,14 @@ class CRouteAdapterTests(unittest.TestCase):
             routes_from_c_route_output(payload, fixture=True)
         payload = deepcopy(self.output)
         payload["route_parameters"]["unknown"] = payload["route_parameters"].pop("sim_route_bus")
+        payload["route_parameters"]["unknown"]["route_id"] = "unknown"
         with self.assertRaisesRegex(ValueError, "route/supply ids differ"):
+            routes_from_c_route_output(payload, fixture=True)
+
+    def test_route_parameter_id_must_match_its_mapping_key(self) -> None:
+        payload = deepcopy(self.output)
+        payload["route_parameters"]["sim_route_rail"]["route_id"] = "sim_route_bus"
+        with self.assertRaisesRegex(ValueError, "route_id must match its key"):
             routes_from_c_route_output(payload, fixture=True)
 
     def test_fixture_provenance_cannot_be_upgraded(self) -> None:

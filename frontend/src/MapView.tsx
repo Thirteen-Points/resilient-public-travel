@@ -27,6 +27,7 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
   const pickerRef = useRef(onMapPick)
   const [provider, setProvider] = useState('Loading basemap')
   const [zoom, setZoom] = useState(12)
+  const [renderedRevision, setRenderedRevision] = useState('')
   const resetRef = useRef<(animated?: boolean) => void>(() => {})
   pickerRef.current = onMapPick
 
@@ -55,11 +56,14 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     }
     fit()
     resetRef.current = fit
-    fit()
-    resetRef.current = fit
     setZoom(map.getZoom())
     map.on('zoomend', () => setZoom(map.getZoom()))
-    const resize = new ResizeObserver(() => map.invalidateSize({ pan: false }))
+    let resizeTimer: ReturnType<typeof setTimeout> | undefined
+    const resize = new ResizeObserver(() => {
+      map.invalidateSize({ pan: false })
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(() => { if (element.current?.clientWidth && element.current?.clientHeight) fit() }, 200)
+    })
     resize.observe(element.current)
     overlaysRef.current = L.layerGroup().addTo(map)
     map.on('click', event => pickerRef.current({ lat: event.latlng.lat, lng: event.latlng.lng }))
@@ -120,6 +124,7 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
       clearTimeout(deadline)
       motion.removeEventListener('change', updateMotion)
       resize.disconnect()
+      clearTimeout(resizeTimer)
       map.remove()
       mapRef.current = null
       overlaysRef.current = null
@@ -180,6 +185,7 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
         fillColor: '#fff', fillOpacity: 1,
       }).bindTooltip(`${node.name_en} · ${node.name_zh}`, { permanent: true, direction: id === 'ADM' || id === 'MKK' ? 'left' : 'right', offset: [id === 'ADM' || id === 'MKK' ? -9 : 9, 0], className: css.stationLabel }).addTo(group)
     }
+    setRenderedRevision(published.map(event => `${event.event_id}@${event.version}`).join(','))
   }, [network, published, routes, selectedRouteId])
 
   // Re-fit the corridor once the mode transition has settled so it recentres in
@@ -188,12 +194,12 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
   useEffect(() => {
     if (firstMode.current) { firstMode.current = false; return }
     if (mode === 'hidden') return
-    const timer = setTimeout(() => resetRef.current(true), 620)
+    const timer = setTimeout(() => resetRef.current(true), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 620)
     return () => clearTimeout(timer)
   }, [mode])
 
   return <div className={`${css.wrap} ${picking ? css.picking : ''} ${mode === 'docked' ? css.docked : ''} ${mode === 'hidden' ? css.hidden : ''}`}>
-    <div ref={element} className={css.map} tabIndex={0} aria-label="Hong Kong schematic network map. Scroll to zoom around the pointer; use arrow keys to pan and plus or minus to zoom." />
+    <div ref={element} className={css.map} data-event-revisions={renderedRevision} tabIndex={0} aria-label="Hong Kong schematic network map. Scroll to zoom around the pointer; use arrow keys to pan and plus or minus to zoom." />
     <div className={css.tools}><button type="button" onClick={() => resetRef.current(true)} aria-label="Fit corridor on map">◎ Fit corridor</button><span>Zoom {zoom.toFixed(2)}</span></div>
     <details className={css.legend}><summary>Network colours <span>↗</span></summary><div>{network.lines.map(line => { const style = lineStyle(line); return <p key={line.id}><i style={{ background: lineGradient(style.colors) }} /><span>{style.label}</span></p> })}<p><i style={{ background: lineStyle(undefined, 'unmapped').colors[0] }} /><span>Unknown line · assigned colour (example)</span></p><hr /><p>Bold + white outline: selected candidate</p><p>Red dashes: closed · amber dots: affected</p><p>Scroll at your pointer to zoom. Pinch or use + / −. All paths are schematic.</p></div></details>
     <p className={css.caption}>ACADEMIC DEMO · Map &amp; stations schematic · {provider}</p>
