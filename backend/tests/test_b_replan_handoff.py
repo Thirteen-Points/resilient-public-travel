@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -34,6 +35,62 @@ def event_payload():
 
 
 class ReplanHandoffTests(unittest.TestCase):
+    def test_auto_expiry_restores_shared_app_snapshot_routes_and_sse(self):
+        """A public read expires one reviewed card across B, C, and SSE."""
+        now = datetime.now(timezone.utc)
+        hkt = timezone(timedelta(hours=8))
+        departure = (now.astimezone(hkt) + timedelta(days=1)).replace(
+            hour=8, minute=20, second=0, microsecond=0)
+        query = {"origin": "TAW", "destination": "ADM", "depart_at": departure.isoformat()}
+        deadline = departure + timedelta(hours=1)
+
+        with tempfile.TemporaryDirectory() as directory:
+            with TestClient(create_app(db_path=Path(directory) / "api.sqlite3", review_token="test")) as client:
+                baseline = client.post("/api/routes/query", json=query)
+                self.assertEqual(baseline.status_code, 200)
+                baseline_ids = {route["route_id"] for route in baseline.json()}
+                self.assertTrue(baseline_ids)
+
+                payload = event_payload()
+                payload.update(status="published", created_at=now.isoformat(),
+                               updated_at=now.isoformat(), published_at=now.isoformat(),
+                               expires_at=deadline.isoformat())
+                payload["window"]["start"] = now.isoformat()
+                client.app.state.event_store.create_event(payload)
+
+                active = client.get("/api/graph/snapshot").json()
+                self.assertTrue(any(edge["from_node"] == "HUH" and edge["to_node"] == "EXC"
+                                    for edge in active["affected_edges"]))
+                disrupted = client.post("/api/routes/query", json=query)
+                self.assertEqual(disrupted.status_code, 200)
+                self.assertNotEqual(baseline_ids, {route["route_id"] for route in disrupted.json()})
+
+                # The read triggers reconciliation; no real clock wait or scheduler is needed.
+                with patch.object(EventReviewService, "_review_time", return_value=deadline + timedelta(minutes=1)):
+                    self.assertEqual(client.get("/api/events/published").json(), [])
+                    self.assertEqual(client.get("/api/events/published").json(), [])
+                    restored = client.get("/api/graph/snapshot").json()
+                    self.assertFalse(any(edge["from_node"] == "HUH" and edge["to_node"] == "EXC"
+                                         for edge in restored["affected_edges"]))
+                    routes = client.post("/api/routes/query", json=query)
+                    self.assertEqual(routes.status_code, 200)
+                    self.assertEqual({route["route_id"] for route in routes.json()}, baseline_ids)
+
+                    changes = client.app.state.event_store.list_changes(after_id=0)
+                    self.assertEqual([entry.action for _, _, entry in changes], ["created", "auto_expired"])
+
+                    async def replay():
+                        frames = event_frames(client.app.state.event_store, after_id=1)
+                        try:
+                            return await anext(frames)
+                        finally:
+                            await frames.aclose()
+
+                    frame = asyncio.run(replay())
+                    self.assertIn("id: 2\n", frame)
+                    self.assertIn('"action":"auto_expired"', frame)
+                    self.assertIn('"status":"expired"', frame)
+
     def test_published_api_reconciles_due_card_once(self):
         with tempfile.TemporaryDirectory() as directory:
             with TestClient(create_app(db_path=Path(directory) / "api.sqlite3", review_token="test")) as client:
