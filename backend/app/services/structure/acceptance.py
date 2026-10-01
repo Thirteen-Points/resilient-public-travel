@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Sequence
+from typing import Literal, Sequence
 
 from ..signal_models import Signal
 from .llm_structurer import LlmEventStructurer, LlmJsonClient, StructureMethod
@@ -21,6 +21,7 @@ class AcceptanceSample:
     text: str
     lang: str
     source_note: str
+    provenance: Literal["real", "real-derived", "simulated"] = "simulated"
 
 
 @dataclass(frozen=True)
@@ -72,12 +73,12 @@ def run_acceptance(
             signal_id=f"t2-6-acceptance-{sample.sample_id}",
             received_at=received_at,
             source_type="acceptance_sample",
-            source_name="T2.6 anonymised acceptance corpus",
+            source_name="T2.6 acceptance corpus",
             author_hint=None,
             raw_text=sample.text,
             raw_url=None,
             lang=sample.lang,
-            provenance="simulated",
+            provenance=sample.provenance,
         )
         result = structurer.structure(signal)
         cases.append(AcceptanceCaseResult(
