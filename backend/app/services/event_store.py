@@ -67,6 +67,15 @@ class EventStore:
                 CREATE INDEX IF NOT EXISTS idx_events_updated_at
                     ON events(updated_at DESC);
 
+                CREATE TABLE IF NOT EXISTS approved_events (
+                    event_id TEXT PRIMARY KEY,
+                    payload_json TEXT NOT NULL
+                );
+                -- Migrate only cards whose current revision is approved.
+                -- An old 'updated' card has no reconstructible approved payload.
+                INSERT OR IGNORE INTO approved_events(event_id, payload_json)
+                    SELECT event_id, payload_json FROM events WHERE status = 'published';
+
                 CREATE TABLE IF NOT EXISTS audit_log (
                     audit_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     event_id TEXT NOT NULL,
@@ -131,6 +140,7 @@ class EventStore:
                     action="created",
                     confidence_after=validated.confidence,
                 )
+                self._save_approved(connection, validated)
         except sqlite3.IntegrityError as exc:
             if "events.event_id" in str(exc):
                 raise EventAlreadyExistsError(validated.event_id) from exc
@@ -203,6 +213,18 @@ class EventStore:
                     result.append((row["audit_id"], self._event_from_row(connection, event_row), change))
             return result
 
+    def approved_events(self) -> list[Event]:
+        """Last approved facts, preserved across edits until approval or withdrawal.
+
+        Public cards intentionally omit the reviewer-only audit history.
+        The immutable approved payload is updated in the same write transaction.
+        """
+        with self._connection() as connection:
+            rows = connection.execute(
+                "SELECT payload_json FROM approved_events ORDER BY event_id"
+            ).fetchall()
+            return [Event.model_validate_json(row['payload_json']) for row in rows]
+
     def update_event(
         self,
         event_id: str,
@@ -264,8 +286,20 @@ class EventStore:
                 action=action,
                 confidence_after=validated.confidence,
             )
+            self._save_approved(connection, validated)
 
         return self.get_event(event_id)
+
+    @staticmethod
+    def _save_approved(connection: sqlite3.Connection, event: Event) -> None:
+        if event.status == 'published':
+            payload = EventStore._payload_without_audit(event)
+            connection.execute(
+                'INSERT OR REPLACE INTO approved_events(event_id, payload_json) VALUES (?, ?)',
+                (event.event_id, json.dumps(payload, ensure_ascii=False)),
+            )
+        elif event.status in {'expired', 'rejected'}:
+            connection.execute('DELETE FROM approved_events WHERE event_id = ?', (event.event_id,))
 
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.db_path)

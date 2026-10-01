@@ -6,7 +6,7 @@ import asyncio
 import json
 from collections.abc import AsyncIterator
 
-from fastapi import APIRouter, Header, HTTPException, Query, Request
+from fastapi import APIRouter, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
 from .review import require_reviewer
@@ -40,13 +40,10 @@ async def event_frames(store: EventStore, after_id: int, *, poll_seconds: float 
 def stream_events(
     request: Request,
     after_id: int | None = None,
-    token: str | None = Query(default=None),
     last_event_id: str | None = Header(default=None),
     x_review_token: str | None = Header(default=None),
 ) -> StreamingResponse:
-    # EventSource cannot send headers, so the token may arrive as a query
-    # parameter; the header path stays available for fetch-based callers.
-    require_reviewer(request, x_review_token if x_review_token is not None else token)
+    require_reviewer(request, x_review_token)
     if after_id is not None and after_id < 0:
         raise HTTPException(status_code=422, detail="after_id must be non-negative")
     if after_id is None:

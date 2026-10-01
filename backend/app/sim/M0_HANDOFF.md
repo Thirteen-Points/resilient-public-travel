@@ -51,9 +51,37 @@ C-Route `query_details` supplies `routes[]` plus
 `route_parameters[route_id]`. C-Sim consumes stable `route_id`, ETA,
 transfers, walk, fare, reliability, `freshness_s`, leg mode/accessibility,
 headway, capacity, and provenance. A runtime compatibility test calls the
-current C-Route engine directly because no formal JSON Schema exists for the
-private `route_parameters` object. C-Sim does not add it to the public route
-contract.
+current C-Route engine directly. C-Sim does not add these private fields to
+the public route contract.
+
+The private `route_parameters` map is now described by
+`backend/app/sim/route_parameters.schema.json`. Each map key and its value's
+`route_id` identify the same candidate. The current C-Route producer emits
+`headway_s` (seconds), `capacity_per_hour` and
+`service_capacity_per_hour` (passengers/hour), `freshness_s` (seconds), and
+`provenance`; `comfort` and `freshness_score` are optional internal metrics.
+The two capacity fields have different meanings: the first is the target
+allocatable capacity, and the second is service capacity before the target-load
+factor. C-Sim's standard `query_details` path requires positive headway and
+target capacity; missing or non-positive values are rejected rather than
+silently replaced. Every value retains its own provenance classification.
+
+For multi-OD use, the private wrapper is
+`{"provenance": ..., "od_route_sets": [...]}`. Each item contains
+`origin`, `destination`, `demand_weight`, `provenance`, `routes`, and
+`route_parameters`, with the latter two retaining the ordinary per-query
+shape. Empty candidate sets are represented by empty `routes` and an empty
+`route_parameters` object. OD pairs must be unique; every non-empty candidate
+`route_id` must also be globally unique across the wrapper, because the current
+allocator keys supply/capacity records by `route_id`. If route identity should
+represent a shared physical service across OD pairs, that requires a separate
+shared-capacity model and is not implied by this adapter contract.
+
+The schema documents the current engine's producer contract; it does not claim
+that its capacity or provenance values are verified transportation facts.
+Route identifiers are currently generated from the route edge sequence. The
+multi-OD uniqueness requirement therefore remains a runtime check and must be
+addressed explicitly if identical paths can occur in different OD sets.
 
 For multi-OD simulation, `od_route_sets_from_contract` consumes a private
 array whose items add only `origin`, `destination`, demand weight, and

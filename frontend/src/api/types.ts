@@ -9,7 +9,7 @@ export interface NetworkNode {
   lat: number
   lng: number
   lines: string[]
-  accessible: boolean | 'partial'
+  accessible: boolean | 'partial' | null
   provenance: Provenance
   catchment_m?: number
 }
@@ -75,9 +75,12 @@ export interface RouteLeg {
   line?: string
   from: string
   to: string
-  travel_s: number
+  travel_s?: number
+  in_vehicle_s?: number
+  depart?: string
+  arrive?: string
   walk_m: number
-  accessible: boolean | 'partial'
+  accessible: boolean | 'partial' | null
   provenance: Provenance
 }
 

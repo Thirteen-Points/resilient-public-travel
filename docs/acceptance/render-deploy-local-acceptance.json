@@ -1,0 +1,71 @@
+{
+  "scope": "LOCAL ONLY; Render deployment not verified",
+  "results": [
+    {
+      "method": "GET",
+      "path": "/api/health/deep",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/docs",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/openapi.json",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/graph/network",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/graph/snapshot",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/events/published",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/sim/result?scenario_id=scn_huh_exc_closed_am_peak",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/routes/query",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/ai/chat",
+      "status": 200
+    },
+    {
+      "check": "Pages CORS preflight",
+      "status": 200
+    },
+    {
+      "check": "unknown origin rejected",
+      "status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/signals",
+      "status": 202
+    },
+    {
+      "check": "unauthorized reviewer rejected",
+      "status": 401
+    },
+    {
+      "check": "SQLite report retained across application recreation",
+      "status": "passed"
+    }
+  ]
+}

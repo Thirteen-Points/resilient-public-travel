@@ -7,6 +7,8 @@ import { DeparturePicker, hktDeparture } from './components/DeparturePicker'
 import { AgentAvatar } from './components/AgentAvatar'
 import { AgentPanel } from './components/AgentPanel'
 import { ReviewConsole, type ReviewLog } from './components/ReviewConsole'
+import { ReviewAccess } from './components/ReviewAccess'
+import { SignalInbox } from './components/SignalInbox'
 import { HowItWorksPage } from './components/HowItWorksPage'
 import { UpdatesPage } from './components/UpdatesPage'
 import { ProvenanceBadge } from './components/ProvenanceBadge'
@@ -14,7 +16,7 @@ import { CardDisclosure, PageDisclosure } from './components/Disclosures'
 import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
 import type { DemoMeta, Event, Network, Preset, RouteCandidate, Signal } from './api/types'
-import { CORRIDOR_IDS, formatHkt, formatRange, modeSummary, nearestAccessPoint, nodeIndex } from './data'
+import { CORRIDOR_IDS, formatHkt, formatRange, legDuration, modeSummary, nearestAccessPoint, nodeIndex } from './data'
 import css from './App.module.css'
 
 type Screen = 'journey' | 'results' | 'updates' | 'detail' | 'sources' | 'agent' | 'review' | 'report'
@@ -169,14 +171,14 @@ export function App() {
   const { network, events, signals, published, meta } = bundle
   const nodes = nodeIndex(network)
   const celebrate = (text: string) => setSuccess(previous => ({ text, revision: previous.revision + 1 }))
-  const review = async (event: Event, action: 'edit' | 'publish' | 'reject', reason = '') => {
+  const review = async (event: Event, action: 'edit' | 'publish' | 'reject' | 'expire', reason = '') => {
     if (!SEED_MODE) {
       await live.review(event, action, reason)
-      setLogs(previous => [...previous, { id: event.event_id, action, detail: 'API accepted the review. Server audit history is authoritative.' }])
+      setLogs(previous => [...previous, { id: event.event_id, action, detail: `API accepted the review. Server audit history is authoritative.${reason ? ' Session-only note: ' + reason : ''}` }])
       celebrate('Review saved by API · refreshing events and routes')
       return
     }
-    const record = { ...event, updated_at: meta.snapshotAt, status: action === 'publish' ? 'published' as const : action === 'reject' ? 'rejected' as const : 'pending_review' as const, ...(action === 'publish' ? { published_at: meta.snapshotAt } : {}) }
+    const record = { ...event, updated_at: meta.snapshotAt, status: action === 'publish' ? 'published' as const : action === 'reject' ? 'rejected' as const : action === 'expire' ? 'expired' as const : 'pending_review' as const, ...(action === 'publish' ? { published_at: meta.snapshotAt } : {}) }
     setBundle(previous => {
       if (!previous) return previous
       const next = previous.events.map(item => item.event_id === record.event_id ? record : action === 'publish' && item.status === 'published' ? { ...item, status: 'updated' as const } : item)
@@ -219,7 +221,7 @@ export function App() {
     const nearest = nearestAccessPoint(network, point)
     if (!nearest) { setError(`No modelled access point within ${network.meta.catchment_m} m. Search by station instead.`); return }
     setField(picking, nearest.node.id)
-    setPicked(`Closest accessible seed point: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. Confirm access on site.`)
+    setPicked(`Closest modelled station: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. ${nearest.node.accessible === true ? 'Accessibility uses modelled assumptions; verify on site.' : 'Accessibility is unknown or incomplete; verify on site.'}`)
   }
   const activeRoutes = screen === 'results' || screen === 'detail' ? routes : []
   // Map footprint: full behind the floating panels, a right-hand card beside
@@ -240,12 +242,12 @@ export function App() {
       <button type="button" className={css.demo} onClick={switchDataMode}>{SEED_MODE ? 'FIXED SEED · USE API' : 'API MODE · USE SEED'}</button>
     </header>
     <main className={css.stage}>
-      {!SEED_MODE && <div className={css.connectionStatus} role="status"><strong>{live.connected ? 'Event stream connected' : 'Event stream unavailable · polling every 3s'}</strong>{(live.warning || live.routeWarning) && <p>{live.warning} {live.routeWarning}</p>}<button type="button" onClick={() => void live.refresh()}>Refresh</button></div>}
+      {!SEED_MODE && <div className={css.connectionStatus} role="status"><strong>{live.connected ? 'Live updates connected' : 'Checking public updates every 3s'}</strong>{live.revision > 0 && <p>Routes refreshed for the latest approved network state.</p>}{(live.warning || live.routeWarning) && <p>{live.warning} {live.routeWarning}</p>}<button type="button" onClick={() => void live.refresh()}>Refresh</button></div>}
       <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} mode={mapMode} />
       {(mapMode === 'docked' || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
         {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta.sources} onClose={() => setScreen('journey')} />}
         {screen === 'updates' && <UpdatesPage events={events} signals={signals} network={network} seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} onOpenReview={() => setScreen('review')} onBack={() => setScreen('journey')} />}
-        {screen === 'review' && <ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} live={!SEED_MODE} />}
+        {screen === 'review' && (SEED_MODE ? <ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} /> : <ReviewAccess><SignalInbox network={network} onChanged={live.refresh} />{live.reviewWarning && <p role="alert">{live.reviewWarning}</p>}<ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} live /></ReviewAccess>)}
       </div>}
       {screen === 'agent' && <AgentPanel published={published} departAt={hktDeparture(departureDate, departure)} onRoutes={preference => void showRoutes('TAW', 'ADM', preference)} onBack={() => setScreen('journey')} />}
       {screen === 'report' && (SEED_MODE ? <section className={css.panel}><h1>Reports use the API.</h1><p>Switch to API mode to submit an unverified report.</p><button type="button" onClick={switchDataMode}>Use API mode</button></section> : <SignalReportForm onAccepted={() => void live.refresh()} />)}
@@ -283,7 +285,7 @@ export function App() {
         <button type="button" className={css.back} onClick={() => setScreen('results')}>← All routes</button><span className={css.kicker}>ROUTE DETAILS · DERIVED ESTIMATE</span>
         <h1>{nodes.get(origin)?.name_en} <span>→</span><br />{nodes.get(destination)?.name_en}</h1>
         <div className={css.detailStats}><strong>{formatRange(selected.total.time_range_s)}</strong><span>{selected.total.transfers} transfer{selected.total.transfers === 1 ? '' : 's'}</span><span>{selected.total.walk_m} m walk</span><span>HK${selected.total.fare_hkd.toFixed(2)}</span></div>
-        <h2>Step by step</h2><ol className={css.steps}>{selected.legs.map((leg, i) => <li data-enter key={i}><strong><i className={css.lineDot} style={{ background: leg.mode === 'WALK' ? '#6d7e70' : lineGradient(lineStyle(resolveLine(network, leg.line), leg.line).colors) }} />{leg.mode === 'WALK' ? 'Walk' : resolveLine(network, leg.line)?.name_en ?? leg.line ?? leg.mode}</strong><span>{nodes.get(leg.from)?.name_en ?? leg.from} → {nodes.get(leg.to)?.name_en ?? leg.to}</span><small>About {Math.round(leg.travel_s / 60)} min{leg.walk_m ? ` · ${leg.walk_m} m walking` : ''}</small></li>)}</ol>
+        <h2>Step by step</h2><ol className={css.steps}>{selected.legs.map((leg, i) => <li data-enter key={i}><strong><i className={css.lineDot} style={{ background: leg.mode === 'WALK' ? '#6d7e70' : lineGradient(lineStyle(resolveLine(network, leg.line), leg.line).colors) }} />{leg.mode === 'WALK' ? 'Walk' : resolveLine(network, leg.line)?.name_en ?? leg.line ?? leg.mode}</strong><span>{nodes.get(leg.from)?.name_en ?? leg.from} → {nodes.get(leg.to)?.name_en ?? leg.to}</span><small>{legDuration(leg)}{leg.walk_m ? ` · ${leg.walk_m} m walking` : ''}</small></li>)}</ol>
         <h2>Why this route?</h2><p>{selected.explain}</p>
         {selected.warnings.length > 0 && <div className={css.warning}><strong>Check before travel</strong>{selected.warnings.map(warning => <p key={warning}>{warning}</p>)}</div>}
         {selected.score_breakdown && <div className={css.breakdown}><h2>Score factors</h2>{selected.score_breakdown.map(factor => <div key={factor.criterion}><span>{factor.criterion}</span><span>weight {Math.round(factor.weight * 100)}% · contribution {factor.contribution.toFixed(3)}</span></div>)}</div>}

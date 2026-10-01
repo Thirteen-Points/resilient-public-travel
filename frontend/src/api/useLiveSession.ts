@@ -1,29 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import * as transit from './liveTransitApi'
 import * as eventApi from './eventApi'
+import { getReviewToken, reviewerRevision, subscribeReviewer } from './reviewerSession'
 import type { Event, Network, RouteCandidate, RouteQuery, Signal } from './types'
 
 export interface LiveBundle {
-  network: Network
-  events: Event[]
-  published: Event[]
-  signals: Signal[]
-  meta: transit.LiveMeta
+  network: Network; events: Event[]; published: Event[]; signals: Signal[]; meta: transit.LiveMeta
 }
-
 const message = (cause: unknown) => cause instanceof Error ? cause.message : String(cause)
+const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
 export function useLiveSession(enabled: boolean) {
+  const authRevision = useSyncExternalStore(subscribeReviewer, reviewerRevision)
   const [bundle, setBundle] = useState<LiveBundle | null>(null)
-  const [error, setError] = useState('')
-  const [warning, setWarning] = useState('')
-  const [routeWarning, setRouteWarning] = useState('')
-  const [connected, setConnected] = useState(false)
-  const [routes, setRoutes] = useState<RouteCandidate[]>([])
+  const [error, setError] = useState(''), [warning, setWarning] = useState('')
+  const [reviewWarning, setReviewWarning] = useState(''), [routeWarning, setRouteWarning] = useState('')
+  const [connected, setConnected] = useState(false), [routes, setRoutes] = useState<RouteCandidate[]>([])
   const [revision, setRevision] = useState(0)
-  const lastQuery = useRef<RouteQuery | null>(null)
-  const queryVersion = useRef(0)
-  const active = useRef(false)
+  const lastQuery = useRef<RouteQuery | null>(null), queryVersion = useRef(0), active = useRef(false)
   const refreshRef = useRef<() => Promise<void>>(async () => {})
 
   const query = useCallback(async (value: RouteQuery) => {
@@ -31,9 +25,7 @@ export function useLiveSession(enabled: boolean) {
     const version = ++queryVersion.current
     try {
       const result = await transit.queryRoutes(value)
-      if (active.current && version === queryVersion.current) {
-        setRoutes(result.slice(0, 3)); setRouteWarning('')
-      }
+      if (active.current && version === queryVersion.current) { setRoutes(result.slice(0, 3)); setRouteWarning('') }
       return result
     } catch (cause) {
       if (active.current && version === queryVersion.current) setRouteWarning(`Routes may be stale: ${message(cause)}`)
@@ -43,68 +35,58 @@ export function useLiveSession(enabled: boolean) {
 
   useEffect(() => {
     if (!enabled) return
-    let disposed = false
-    let busy = false
-    let queued = false
-    let signature = ''
-    let evidenceVersion = 0
-    let evidenceSignature = ''
-    let evidenceBusy = false
-    let evidenceNotice = ''
-    let routeDirty = false
+    let disposed = false, busy = false, queued = false, privateBusy = false
+    let signature = '', evidenceSignature = '', routeDirty = Boolean(lastQuery.current)
     active.current = true
+    setBundle(previous => previous ? { ...previous, events: previous.published, signals: [] } : previous)
+    setReviewWarning('')
+    async function refreshReviewer() {
+      if (!getReviewToken() || disposed || privateBusy) return
+      privateBusy = true
+      try {
+        const events = await eventApi.getEvents()
+        if (disposed) return
+        setBundle(previous => previous ? { ...previous, events: same(previous.events, events) ? previous.events : events } : previous)
+        const next = JSON.stringify(events.map(event => [event.event_id, event.version, event.signals]))
+        if (next !== evidenceSignature) {
+          const evidence = await Promise.allSettled(events.filter(event => event.signals.length).map(event => eventApi.getEventSignals(event.event_id)))
+          if (disposed) return
+          const signals = [...new Map(evidence.flatMap(result => result.status === 'fulfilled' ? result.value : []).map(signal => [signal.signal_id, signal])).values()]
+          const failed = evidence.some(result => result.status === 'rejected')
+          if (!failed) evidenceSignature = next
+          setBundle(previous => previous ? { ...previous, signals } : previous)
+          setReviewWarning(failed ? 'Some original evidence is unavailable. Missing text has not been inferred.' : '')
+        } else setReviewWarning('')
+      } catch (cause) { if (!disposed) setReviewWarning(`Reviewer data unavailable: ${message(cause)}`) }
+      finally { privateBusy = false }
+    }
     async function refresh() {
       if (disposed) return
       if (busy) { queued = true; return }
       busy = true
       try {
-        const [network, meta, snapshot, eventResult] = await Promise.all([
-          transit.getNetwork(), transit.getMeta(), transit.getSnapshot(),
-          Promise.all([eventApi.getEvents(), eventApi.getPublishedEvents()]).then(value => ({ value, error: '' }), cause => ({ value: null, error: message(cause) })),
+        const at = lastQuery.current?.departAt
+        const [network, meta, snapshot, published] = await Promise.all([
+          transit.getNetwork(), transit.getMeta(), transit.getSnapshot(at), eventApi.getPublishedEvents(at),
         ])
         if (disposed) return
-        const notices: string[] = [evidenceNotice].filter(Boolean)
-        if (eventResult.value) {
-          const nextEvidenceSignature = JSON.stringify(eventResult.value[0].map(event => [event.event_id, event.version, event.updated_at, event.signals]))
-          if (!evidenceBusy && nextEvidenceSignature !== evidenceSignature) {
-          evidenceBusy = true
-          const version = ++evidenceVersion
-          // Evidence loading must not delay map updates or route recalculation.
-          void Promise.allSettled(eventResult.value[0].filter(event => event.signals.length).map(event => eventApi.getEventSignals(event.event_id))).then(evidence => {
-            if (disposed || version !== evidenceVersion) return
-            evidenceBusy = false
-            const signals = [...new Map(evidence.flatMap(result => result.status === 'fulfilled' ? result.value : []).map(signal => [signal.signal_id, signal])).values()]
-            setBundle(previous => previous ? { ...previous, signals } : previous)
-            evidenceNotice = evidence.some(result => result.status === 'rejected') ? 'Some event evidence is unavailable; no missing evidence has been inferred.' : ''
-            if (!evidenceNotice) evidenceSignature = nextEvidenceSignature
-            else setWarning(evidenceNotice)
-          })
-          }
-        } else notices.push(`Event status unavailable; retained overlays may be stale. ${eventResult.error}`)
-        // Reference stability: the map rebuilds its layers whenever network or
-        // published change identity, so identical data must keep old references
-        // and polling alone must not re-render anything.
-        const nextSignature = JSON.stringify([
-          snapshot,
-          network.meta.version,
-          eventResult.value?.[0]?.map(event => [event.event_id, event.version, event.status, event.updated_at]),
-          eventResult.value?.[1],
-        ])
-        const changed = nextSignature !== signature
-        if (changed) { signature = nextSignature; routeDirty = true }
-        if (changed) {
-          setBundle(previous => ({
-            network,
-            meta,
-            events: eventResult.value?.[0] ?? previous?.events ?? [],
-            published: eventResult.value?.[1] ?? previous?.published ?? [],
-            signals: previous?.signals ?? [],
-          }))
-          setRevision(value => value + 1)
-        }
-        setError(''); setWarning(notices.join(' '))
+        if (at !== lastQuery.current?.departAt) { queued = true; return }
+        const nextSignature = JSON.stringify([snapshot, published, at])
+        if (signature && nextSignature !== signature) routeDirty = true
+        signature = nextSignature
+        setBundle(previous => ({
+          network: previous && same(previous.network, network) ? previous.network : network,
+          meta,
+          published: previous && same(previous.published, published) ? previous.published : published,
+          events: getReviewToken() ? previous?.events ?? published : published,
+          signals: previous?.signals ?? [],
+        }))
+        setError(''); setWarning('')
+        // Protected reads never hold up public map updates or route queries.
+        void refreshReviewer()
         if (routeDirty && lastQuery.current) {
-          try { await query(lastQuery.current); routeDirty = false } catch { /* query retains old cards with a stale notice; next poll retries */ }
+          try { await query(lastQuery.current); routeDirty = false; if (!disposed) setRevision(value => value + 1) }
+          catch { /* Keep old cards visibly stale; next poll retries. */ }
         }
       } catch (cause) {
         if (!disposed) { setError(message(cause)); setWarning(`Refresh failed; displayed data may be stale. ${message(cause)}`) }
@@ -118,15 +100,13 @@ export function useLiveSession(enabled: boolean) {
     const timer = window.setInterval(() => void refresh(), 3000)
     const close = eventApi.subscribeEvents(() => void refresh(), value => { if (!disposed) setConnected(value) })
     return () => { disposed = true; active.current = false; ++queryVersion.current; clearInterval(timer); close() }
-  }, [enabled, query])
+  }, [enabled, query, authRevision])
 
-  const review = async (event: Event, action: 'edit' | 'publish' | 'reject', _reason: string) => {
-    // The API contract has no reason field; the caller's note stays in local logs.
+  const review = async (event: Event, action: 'edit' | 'publish' | 'reject' | 'expire', _reason: string) => {
     const saved = await eventApi.reviewEvent(event, action)
     setBundle(previous => previous ? { ...previous, events: previous.events.map(item => item.event_id === saved.event_id ? saved : item) } : previous)
-    // A successful write stays successful even if subsequent reads fail.
-    // Refresh errors are shown separately and never invite a duplicate publication.
+    // A committed write stays successful even if following reads fail.
     await refreshRef.current()
   }
-  return { bundle, error, warning, routeWarning, connected, routes, revision, query, review, refresh: () => refreshRef.current() }
+  return { bundle, error, warning, reviewWarning, routeWarning, connected, routes, revision, query, review, refresh: () => refreshRef.current() }
 }

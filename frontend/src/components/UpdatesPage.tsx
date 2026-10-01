@@ -28,11 +28,12 @@ function EventCard({ event, signals, network, seedMode }: { event: Event; signal
     <div className={css.track}><span style={{ width: `${event.confidence * 100}%` }} /></div>
     <div className={css.eventMeta}><span>{event.signals.length} signals · Severity {event.severity}</span><span>{formatHkt(event.updated_at)}</span></div>
     <ProvenanceBadge value={event.provenance} />
+    <p>Report-channel provenance does not independently verify the incident.</p>
     <EventSources event={event} signals={signals} />
     <p>Confidence is this system's evidence score, not a probability or official confirmation.</p>
     {event.audit_log?.length ? <details><summary>Confidence history</summary><ol>{event.audit_log.map((entry, index) => <li key={index}>{formatHkt(entry.at)} · {entry.action} · {entry.actor}{entry.confidence_after !== undefined ? ` · ${Math.round(entry.confidence_after * 100)}%` : ''}</li>)}</ol></details> : null}
     {event.confidence_factors?.length ? <details><summary>Confidence factors</summary>{event.confidence_factors.map(factor => <p key={factor.factor}>{factor.factor}: {Math.round(factor.score * 100)}% · weight {Math.round(factor.weight * 100)}% · {factor.note}</p>)}</details> : null}
-    <details><summary>Evidence &amp; effect</summary><p>{event.status === 'published' ? 'This published state alone changes the map.' : 'Unreviewed; does not change the map or routing.'}</p><ul>{evidence.map(signal => <li key={signal.signal_id}>{signal.source_type}: {signal.source_name}</li>)}</ul>{evidence.length < event.signals.length && <p>Some referenced signals lack a separate record in this fixture.</p>}</details>
+    <details><summary>Evidence &amp; effect</summary><p>{event.status === 'published' ? 'Approved facts affect the map within their time window.' : event.status === 'updated' ? 'This revision awaits approval; the previous approved facts stay active until reapproval or withdrawal.' : 'This revision does not affect the map or routing.'}</p><ul>{evidence.map(signal => <li key={signal.signal_id}>{signal.source_type}: {signal.source_name}</li>)}</ul>{evidence.length < event.signals.length && <p>Some original evidence is unavailable in this visitor or reviewer session.</p>}</details>
     <CardDisclosure seedMode={seedMode} />
   </article>
 }

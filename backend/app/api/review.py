@@ -6,7 +6,7 @@ from hmac import compare_digest
 from typing import Literal
 
 from fastapi import APIRouter, Header, HTTPException, Request
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from ..services.event_models import AffectedSegment, Event, EventType, EventWindow, TransportMode
 from ..services.event_store import EventNotFoundError
@@ -62,7 +62,10 @@ def review_event(
     if body.action == "edit":
         if body.edits is None:
             raise HTTPException(status_code=422, detail="edit requires edits")
-        changes = body.edits.model_dump(exclude_unset=True, exclude_none=True)
+        # Omit absent outer edits, but retain nested window.end=None. Dropping
+        # it makes an open-ended window invalid and prevents clearing an end.
+        changes = {key: value for key, value in body.edits.model_dump(exclude_unset=True).items()
+                   if value is not None}
         if not changes:
             raise HTTPException(status_code=422, detail="edit requires at least one change")
     elif body.edits is not None:
@@ -81,3 +84,5 @@ def review_event(
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except InvalidReviewUpdateError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ValidationError as exc:
+        raise HTTPException(status_code=422, detail="Edits violate event validation") from exc

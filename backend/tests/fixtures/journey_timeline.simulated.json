@@ -1,0 +1,107 @@
+{
+  "fixture": true,
+  "route_id": "sim_multimodal_timeline",
+  "start_at": "2026-09-30T08:00:30+08:00",
+  "seed": 20260930,
+  "sample_count": 200,
+  "provenance": "simulated",
+  "assumptions": [
+    "All departure times in this offline fixture are synthetic and are not a published timetable.",
+    "Boarding-denial probabilities are explicit uncalibrated simulation assumptions, not observed facts or real-world probabilities.",
+    "MTR Next Train or any other departure feed supplies timing only and does not imply capacity or boarding availability."
+  ],
+  "legs": [
+    {
+      "leg_id": "mtr_1",
+      "mode": "MTR",
+      "from": "SIM_A",
+      "to": "SIM_B",
+      "travel_s": 180,
+      "minimum_transfer_s": 0,
+      "departures": [
+        "2026-09-30T08:01:00+08:00",
+        "2026-09-30T08:04:00+08:00",
+        "2026-09-30T08:07:00+08:00",
+        "2026-09-30T08:10:00+08:00",
+        "2026-09-30T08:13:00+08:00"
+      ],
+      "departure_source": {
+        "kind": "fixture",
+        "provenance": "simulated",
+        "note": "Synthetic offline departures for deterministic testing."
+      },
+      "boarding": {
+        "kind": "assumption",
+        "provenance": "simulated",
+        "denial_probabilities": [0.45, 0.25, 0.1, 0.0, 0.0],
+        "note": "Uncalibrated simulated boarding-denial assumption; not inferred from MTR Next Train."
+      },
+      "provenance": "simulated"
+    },
+    {
+      "leg_id": "walk_1",
+      "mode": "WALK",
+      "from": "SIM_B",
+      "to": "SIM_B_BUS",
+      "travel_s": 120,
+      "minimum_transfer_s": 0,
+      "provenance": "simulated"
+    },
+    {
+      "leg_id": "bus_1",
+      "mode": "BUS",
+      "from": "SIM_B_BUS",
+      "to": "SIM_C_BUS",
+      "travel_s": 300,
+      "minimum_transfer_s": 0,
+      "departures": [
+        "2026-09-30T08:05:30+08:00",
+        "2026-09-30T08:08:00+08:00",
+        "2026-09-30T08:12:00+08:00",
+        "2026-09-30T08:16:00+08:00",
+        "2026-09-30T08:20:00+08:00",
+        "2026-09-30T08:24:00+08:00"
+      ],
+      "departure_source": {
+        "kind": "fixture",
+        "provenance": "simulated",
+        "note": "Synthetic offline departures for deterministic testing."
+      },
+      "boarding": {
+        "kind": "assumption",
+        "provenance": "simulated",
+        "denial_probabilities": [0.35, 0.2, 0.15, 0.05, 0.0, 0.0],
+        "note": "Uncalibrated simulated boarding-denial assumption; no capacity feed is present."
+      },
+      "provenance": "simulated"
+    },
+    {
+      "leg_id": "mtr_2",
+      "mode": "MTR",
+      "from": "SIM_C",
+      "to": "SIM_D",
+      "travel_s": 240,
+      "minimum_transfer_s": 60,
+      "departures": [
+        "2026-09-30T08:14:00+08:00",
+        "2026-09-30T08:18:00+08:00",
+        "2026-09-30T08:22:00+08:00",
+        "2026-09-30T08:26:00+08:00",
+        "2026-09-30T08:30:00+08:00",
+        "2026-09-30T08:34:00+08:00"
+      ],
+      "departure_source": {
+        "kind": "fixture",
+        "provenance": "simulated",
+        "note": "Synthetic offline departures for deterministic testing."
+      },
+      "boarding": {
+        "kind": "assumption",
+        "provenance": "simulated",
+        "denial_probabilities": [0.2, 0.2, 0.1, 0.05, 0.0, 0.0],
+        "note": "Uncalibrated simulated boarding-denial assumption; not inferred from departure timing."
+      },
+      "provenance": "simulated"
+    }
+  ]
+}

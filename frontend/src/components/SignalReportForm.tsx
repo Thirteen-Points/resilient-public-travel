@@ -44,7 +44,7 @@ export function SignalReportForm({ onAccepted }: { onAccepted?: (signalId: strin
   return <section className={css.reportPanel} data-panel aria-labelledby="signal-report-heading" aria-busy={sending}>
     <span className={css.eyebrow}>REPORT A DISRUPTION <span>UNVERIFIED INTAKE</span></span>
     <h1 id="signal-report-heading">Seen something?</h1>
-    <p className={css.subhead}>Send a short field report for human review. No sign-in and no personal details are required or stored.</p>
+    <p className={css.subhead}>Send a short field report for human review. No sign-in or personal details are required. Your original report is stored for review.</p>
     {acceptedId ? <div role="status" className={css.accepted}>
       <strong>Report received — not yet verified.</strong>
       <p>Reference <code>{acceptedId}</code>. A reviewer will assess it before anything changes. This does not confirm an incident, and routes and the map are unchanged.</p>

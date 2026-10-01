@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Resilient Public Travel architecture</title>
+  <desc id="desc">Reviewed event reports update a versioned route graph snapshot. The deterministic route engine recomputes alternatives for the frontend. Simulation and deployment status are shown separately.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#526477"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M1 1 L11 6 L1 11 Z" fill="#147D64"/>
+    </marker>
+    <style>
+      text { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #172B3A; }
+      .title { font-size: 36px; font-weight: 700; }
+      .subtitle { font-size: 18px; fill: #526477; }
+      .section { font-size: 20px; font-weight: 700; }
+      .box-title { font-size: 19px; font-weight: 700; }
+      .body { font-size: 16px; fill: #405668; }
+      .small { font-size: 14px; fill: #526477; }
+      .label { font-size: 13px; font-weight: 700; letter-spacing: 0.4px; }
+      .node { fill: #FFFFFF; stroke: #9AAAB7; stroke-width: 2; rx: 10; }
+      .event { fill: #FFF8E7; stroke: #C38A1B; stroke-width: 2; rx: 10; }
+      .engine { fill: #EAF5F1; stroke: #147D64; stroke-width: 2; rx: 10; }
+      .frontend { fill: #EFF4FA; stroke: #315D85; stroke-width: 2; rx: 10; }
+      .future { fill: #F2F4F6; stroke: #8B98A4; stroke-width: 2; stroke-dasharray: 7 5; rx: 10; }
+      .line { fill: none; stroke: #526477; stroke-width: 3; marker-end: url(#arrow); }
+      .line-green { fill: none; stroke: #147D64; stroke-width: 3; marker-end: url(#arrow-green); }
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="#F7F9FB"/>
+  <text x="64" y="70" class="title">Resilient Public Travel</text>
+  <text x="64" y="104" class="subtitle">M1 event-to-reroute API path · local prototype · cloud deployment not verified</text>
+
+  <rect x="48" y="142" width="1504" height="480" rx="14" fill="#FFFFFF" stroke="#D8E0E6" stroke-width="2"/>
+  <text x="76" y="181" class="section">Reviewed event to updated route</text>
+  <text x="76" y="207" class="small">Solid arrows show the implemented backend path. Frontend refresh is available in API mode.</text>
+
+  <rect x="80" y="258" width="220" height="118" class="node"/>
+  <text x="104" y="292" class="box-title">Signals</text>
+  <text x="104" y="320" class="body">Passenger reports</text>
+  <text x="104" y="346" class="body">HKO / MTR sources*</text>
+  <text x="104" y="365" class="small">Social feed is simulated</text>
+
+  <rect x="366" y="258" width="235" height="118" class="event"/>
+  <text x="390" y="292" class="box-title">Event API (B)</text>
+  <text x="390" y="320" class="body">Ingest · merge · confidence</text>
+  <text x="390" y="346" class="body">Human review · publish</text>
+  <text x="390" y="365" class="small">SQLite record + audit history</text>
+
+  <rect x="670" y="258" width="240" height="118" class="engine"/>
+  <text x="694" y="292" class="box-title">EngineSyncEventStore</text>
+  <text x="694" y="320" class="body">Published event revisions</text>
+  <text x="694" y="346" class="body">synchronized to route engine</text>
+  <text x="694" y="365" class="small">Inactive events restore edges</text>
+
+  <rect x="980" y="258" width="230" height="118" class="engine"/>
+  <text x="1004" y="292" class="box-title">Graph snapshot</text>
+  <text x="1004" y="320" class="body">Versioned affected edges</text>
+  <text x="1004" y="346" class="body">Closed or capacity-reduced</text>
+  <text x="1004" y="365" class="small">Immutable snapshot swap</text>
+
+  <rect x="1280" y="258" width="220" height="118" class="engine"/>
+  <text x="1304" y="292" class="box-title">Route engine (C)</text>
+  <text x="1304" y="320" class="body">POST /api/routes/query</text>
+  <text x="1304" y="346" class="body">Recomputes candidates</text>
+  <text x="1304" y="365" class="small">Uses active graph snapshot</text>
+
+  <path d="M300 317 H356" class="line"/>
+  <path d="M601 317 H660" class="line-green"/>
+  <path d="M910 317 H970" class="line-green"/>
+  <path d="M1210 317 H1270" class="line-green"/>
+
+  <rect x="366" y="430" width="235" height="98" class="future"/>
+  <text x="390" y="464" class="box-title">Optional AI assist</text>
+  <text x="390" y="492" class="body">Text structuring / explanation</text>
+  <text x="390" y="515" class="small">Rules keep deterministic fallback</text>
+  <path d="M483 420 V386" class="line"/>
+
+  <rect x="980" y="430" width="520" height="98" class="frontend"/>
+  <text x="1004" y="464" class="box-title">Frontend (A)</text>
+  <text x="1004" y="492" class="body">Review actions · event stream · refreshed route query · map and cards</text>
+  <text x="1004" y="515" class="small">API mode; fixed seed mode remains illustrative and does not recalculate routes</text>
+  <path d="M1390 386 V420" class="line-green"/>
+
+  <rect x="48" y="650" width="735" height="270" rx="14" fill="#FFFFFF" stroke="#D8E0E6" stroke-width="2"/>
+  <text x="76" y="690" class="section">C-Sim</text>
+  <rect x="80" y="722" width="300" height="108" class="engine"/>
+  <text x="104" y="756" class="box-title">POST /api/sim/load</text>
+  <text x="104" y="784" class="body">Capacity buckets and queue estimate</text>
+  <text x="104" y="810" class="small">Inputs and output provenance: simulated</text>
+  <rect x="432" y="722" width="300" height="108" class="future"/>
+  <text x="456" y="756" class="box-title">P3 / M3 sandbox</text>
+  <text x="456" y="784" class="body">10,000-person strategy comparison</text>
+  <text x="456" y="810" class="small">Not an M2 deliverable or verified outcome</text>
+  <text x="80" y="866" class="body">GET /api/sim/result serves precomputed scenarios; M0 checks establish algorithm consistency only.</text>
+
+  <rect x="817" y="650" width="735" height="270" rx="14" fill="#FFFFFF" stroke="#D8E0E6" stroke-width="2"/>
+  <text x="845" y="690" class="section">Data and operations boundary</text>
+  <rect x="849" y="722" width="306" height="108" class="node"/>
+  <text x="873" y="756" class="box-title">Repository data</text>
+  <text x="873" y="784" class="body">Contracts · network · provenance</text>
+  <text x="873" y="810" class="small">Real / derived / simulated labels</text>
+  <rect x="1190" y="722" width="330" height="108" class="future"/>
+  <text x="1214" y="756" class="box-title">Public deployment</text>
+  <text x="1214" y="784" class="body">Cloudflare Pages + Render planned</text>
+  <text x="1214" y="810" class="small">No public URL or wake-up check verified</text>
+  <text x="849" y="866" class="body">* External source adapters are not a guarantee of continuously running live collection.</text>
+
+  <text x="64" y="964" class="small">Prototype output is informational. It is not an official service bulletin or live passenger-flow measurement.</text>
+</svg>

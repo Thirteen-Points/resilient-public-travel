@@ -12,7 +12,7 @@ from .build import HK, build_graph, freeze, thaw, timestamp
 
 
 def active(event, at):
-    if event.get("status") not in {"published", "updated"}:
+    if event.get("status") != "published":
         return False
     window = event.get("window", {})
     starts = [window.get("start"), event.get("published_at")]

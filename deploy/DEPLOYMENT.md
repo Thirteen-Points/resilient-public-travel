@@ -134,20 +134,47 @@ python scripts/preflight.py
 
 ## 7. Production Deployment
 
-### Cloudflare Pages (Frontend) + Render Free (Backend)
+### Cloudflare Pages (Frontend) + Render (Backend)
 
-1. **Frontend**: Deploy `frontend/` to Cloudflare Pages
-2. **Backend**: Deploy to Render Free with:
-   - Build: `pip install -r backend/requirements.txt`
-   - Start: `python -m uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`
-   - Set `OFFLINE_MODE=false`, `LLM_ENABLED=true` (with API key)
-3. **Keep-alive**: Use UptimeRobot to ping `/api/health` every 10 minutes
+The repository now includes a Render Blueprint at `render.yaml`. From the
+Render Dashboard, create a Blueprint instance from this repository and select
+the `main` branch. Leave Root Directory empty (repository root). Render builds
+with `pip install -r backend/requirements.txt`, starts with
+`uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`, and checks
+`/api/health/deep`. The Blueprint generates a private `REVIEW_API_TOKEN`.
 
-### Keep-alive cron job:
-```bash
-# Add to crontab (Linux) or Task Scheduler (Windows)
-*/10 * * * * curl -s https://your-app.onrender.com/api/health > /dev/null
-```
+After the first successful deploy:
+
+1. Copy the service origin, such as `https://<service>.onrender.com`.
+2. In the Cloudflare Pages project, set the production build variable
+   `VITE_API_BASE_URL` to that origin, then redeploy the frontend.
+3. Add the repository Actions variable `RENDER_API_URL` with the same origin.
+   `.github/workflows/render-health-ping.yml` can then be run manually and,
+   after this branch is merged to the repository's default branch, on a
+   ten-minute schedule.
+4. Check `https://<service>.onrender.com/api/health` and
+   `/api/health/deep`; both should return HTTP 200 before testing the site.
+
+The backend permits only the exact production Pages origin configured by
+`CORS_ALLOWED_ORIGINS`; do not replace it with `*`. The review API is protected
+by `REVIEW_API_TOKEN`. Do not put that secret in `VITE_REVIEW_TOKEN` for a
+public site: Vite embeds `VITE_*` values in downloadable browser code. Public
+published-event reads and route queries are separate from protected review
+operations. The review console needs a private/authenticated delivery path
+before it can safely be enabled for public users.
+
+The Blueprint uses a paid Starter instance with one 1 GB persistent disk mounted
+at `/opt/render/project/src/backend/app/data`. This contains `events.sqlite3`,
+shared by user reports, Events, and audit history. Initialization runs at startup,
+when the disk is available. Do not remove the disk or switch to Free if reports
+must survive redeploys. Disk-backed services run as one instance and have brief
+downtime on deploys. Use SQLite-native backups for database recovery.
+
+Live acceptance must include `/api/health/deep`, `/docs`, route queries,
+published Events, simulation results, AI fallback, exact Pages CORS preflight,
+and a clearly labelled test report. Read the report with reviewer authorization
+before and after a redeploy to verify actual Render disk persistence.
+Local tests alone do not establish live deployment or disk persistence.
 
 ---
 

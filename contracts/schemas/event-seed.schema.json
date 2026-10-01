@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resilient-public-travel.local/contracts/event-seed.schema.json",
+  "title": "ResilientRoute event and signal seed bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "events", "signals"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "built_at", "purpose", "provenance"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "built_at": {"type": "string", "format": "date"},
+        "purpose": {"type": "string", "minLength": 1},
+        "provenance": {"enum": ["real", "real-derived", "simulated"]}
+      }
+    },
+    "events": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "signals": {"type": "array", "minItems": 1, "items": {"type": "object"}}
+  }
+}

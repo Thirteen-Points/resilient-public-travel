@@ -1,4 +1,5 @@
 """Optional FastAPI adapter owned by C-Route; no application-global edits."""
+from datetime import datetime
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
@@ -21,8 +22,10 @@ def create_router(engine):
         return thaw(engine.snapshots.current.network.source)
 
     @router.get('/graph/snapshot')
-    def snapshot():
-        return engine.snapshots.current.describe()
+    def snapshot(at: datetime | None = None):
+        if at is not None and at.tzinfo is None:
+            return error(422, 'INVALID_SNAPSHOT_TIME', 'at must include a timezone')
+        return engine.snapshots.current.describe(at)
 
     @router.post('/routes/query')
     async def query(request: Request):

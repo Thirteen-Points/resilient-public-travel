@@ -1,15 +1,16 @@
 import { API_BASE_URL } from './liveTransitApi'
 import type { Event, Signal } from './types'
+import { getReviewToken } from './reviewerSession'
+import { createEventParser } from './eventStream'
 
-// Demo credential only; the server remains the authority for review access.
-const REVIEW_TOKEN = import.meta.env.VITE_REVIEW_TOKEN as string | undefined
-
-async function request(path: string, body?: unknown): Promise<unknown> {
+async function request(path: string, body?: unknown, protectedRead = true): Promise<unknown> {
+  const token = getReviewToken()
+  if (protectedRead && !token) throw new Error('Connect a reviewer session to access the review queue.')
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: body === undefined ? 'GET' : 'POST',
     headers: {
       Accept: 'application/json',
-      ...(REVIEW_TOKEN ? { 'x-review-token': REVIEW_TOKEN } : {}),
+      ...(protectedRead && token ? { 'x-review-token': token } : {}),
       ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -28,7 +29,20 @@ function events(value: unknown): Event[] {
 }
 
 export const getEvents = async () => events(await request('/api/events'))
-export const getPublishedEvents = async () => events(await request('/api/events/published'))
+export const getPublishedEvents = async (at?: string) => events(await request(`/api/events/published${at ? `?at=${encodeURIComponent(at)}` : ''}`, undefined, false))
+export async function getInbox(): Promise<Signal[]> {
+  const data = await request('/api/signals?unlinked_only=true')
+  if (!Array.isArray(data)) throw new Error('Invalid signal inbox response')
+  return data as Signal[]
+}
+export interface EventDraft {
+  event_type: string; title: string; summary: string; mode: string | null
+  line: string | null; direction: string | null
+  affected_segments: Array<{ from_node: string; to_node: string; impact: string }>
+}
+export interface IngestResult { signal_id: string; state: 'merged' | 'needs_review'; draft: EventDraft; event: Event | null }
+export const ingestSignal = async (id: string) => await request('/api/events/ingest', { signal_id: id }) as IngestResult
+export const createEvent = async (body: unknown) => events([await request('/api/events', body)])[0]
 export async function getEventSignals(id: string): Promise<Signal[]> {
   const data = await request(`/api/events/${encodeURIComponent(id)}/signals`)
   if (!Array.isArray(data) || data.some(item => typeof item?.signal_id !== 'string')) throw new Error('Invalid evidence response')
@@ -37,7 +51,7 @@ export async function getEventSignals(id: string): Promise<Signal[]> {
 
 // Backend review contract: {action: approve|edit|reject, actor, edits?}. The
 // server owns status, confidence and audit history; no reason field exists.
-export async function reviewEvent(event: Event, action: 'edit' | 'publish' | 'reject'): Promise<Event> {
+export async function reviewEvent(event: Event, action: 'edit' | 'publish' | 'reject' | 'expire'): Promise<Event> {
   const edits = action === 'edit'
     ? {
         event_type: event.event_type,
@@ -60,14 +74,41 @@ export async function reviewEvent(event: Event, action: 'edit' | 'publish' | 're
 }
 
 export function subscribeEvents(onChange: () => void, onStatus: (connected: boolean) => void): () => void {
-  // EventSource cannot send headers, so the review token rides as a query param.
-  const url = new URL(`${API_BASE_URL}/api/stream/events`)
-  if (REVIEW_TOKEN) url.searchParams.set('token', REVIEW_TOKEN)
-  const stream = new EventSource(url.toString())
-  stream.onopen = () => onStatus(true)
-  stream.onerror = () => onStatus(false)
-  stream.onmessage = onChange
-  stream.addEventListener('event', onChange)
-  stream.addEventListener('event_updated', onChange)
-  return () => stream.close()
+  const token = getReviewToken()
+  onStatus(false)
+  if (!token) return () => {}
+  let stopped = false, cursor = '', retry: ReturnType<typeof setTimeout> | undefined
+  let controller: AbortController | undefined
+  async function connect() {
+    controller = new AbortController()
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/stream/events`, {
+        headers: { Accept: 'text/event-stream', 'x-review-token': token, ...(cursor ? { 'Last-Event-ID': cursor } : {}) },
+        signal: controller.signal,
+      })
+      if (!response.ok || !response.body || !response.headers.get('content-type')?.includes('text/event-stream')) {
+        await response.body?.cancel()
+        throw new Error('Event stream unavailable')
+      }
+      if (stopped) { await response.body.cancel(); return }
+      onStatus(true)
+      const reader = response.body.getReader(), decoder = new TextDecoder()
+      const parse = createEventParser((id, data) => {
+        if (stopped) return
+        try { JSON.parse(data) } catch { return }
+        if (id) cursor = id
+        onChange()
+      })
+      try {
+        while (!stopped) {
+          const { done, value } = await reader.read()
+          if (done) break
+          parse(decoder.decode(value, { stream: true }))
+        }
+      } finally { reader.releaseLock() }
+    } catch { /* Polling remains active while the stream reconnects. */ }
+    if (!stopped) { onStatus(false); retry = setTimeout(() => void connect(), 3000) }
+  }
+  void connect()
+  return () => { stopped = true; clearTimeout(retry); controller?.abort(); onStatus(false) }
 }
