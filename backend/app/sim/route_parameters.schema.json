@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Private C-Route query_details route_parameters",
+  "description": "Internal C-Route to C-Sim adapter contract. This schema is not part of the public RouteCandidate API.",
+  "type": "object",
+  "minProperties": 1,
+  "propertyNames": {
+    "type": "string",
+    "pattern": "^r_[0-9a-f]{16}$"
+  },
+  "patternProperties": {
+    "^r_[0-9a-f]{16}$": {
+      "$ref": "#/$defs/routeParameters"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "routeParameters": {
+      "type": "object",
+      "required": [
+        "route_id",
+        "freshness_s",
+        "headway_s",
+        "capacity_per_hour",
+        "service_capacity_per_hour",
+        "provenance"
+      ],
+      "properties": {
+        "route_id": {
+          "type": "string",
+          "pattern": "^r_[0-9a-f]{16}$",
+          "description": "Must equal the enclosing route_parameters object key."
+        },
+        "freshness_s": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Age of the route's underlying data in seconds."
+        },
+        "headway_s": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Modelled departure interval in seconds."
+        },
+        "capacity_per_hour": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Target allocatable capacity in passengers per hour, after the configured target-load factor."
+        },
+        "service_capacity_per_hour": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Physical/modelled service capacity in passengers per hour before the target-load factor."
+        },
+        "provenance": {
+          "type": "string",
+          "enum": ["real", "real-derived", "simulated"]
+        },
+        "comfort": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Optional internal comfort metric; no public unit is assigned."
+        },
+        "freshness_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Optional normalized freshness score."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

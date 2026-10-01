@@ -1,0 +1,78 @@
+{
+  "manifest_version": "1.0",
+  "milestone": "M2 simulation integration input baseline",
+  "scenario_id": "scn_huh_exc_closed_am_peak",
+  "source_revision": "0822e57",
+  "input_file": "data/sim/scn_huh_exc_closed_am_peak.input.json",
+  "result_file": "data/sim/scn_huh_exc_closed_am_peak.json",
+  "classification": "simulated_fixture_with_data_references",
+  "policy": "A reference to a data file does not promote a simulation value to real or real-derived. Only values explicitly copied or calculated under a documented method may inherit the source classification.",
+  "inputs": [
+    {
+      "field": "seed",
+      "value": 20260922,
+      "classification": "simulated",
+      "source": "data/sim/scn_huh_exc_closed_am_peak.input.json",
+      "note": "Fixed seed for reproducibility; not an observed value."
+    },
+    {
+      "field": "population",
+      "value": 10000,
+      "classification": "simulated",
+      "source": "data/sim/scn_huh_exc_closed_am_peak.input.json",
+      "note": "Scenario demand assumption."
+    },
+    {
+      "field": "time_range_and_window",
+      "value": ["08:00", "09:00"],
+      "classification": "simulated",
+      "source": "data/sim/scn_huh_exc_closed_am_peak.input.json",
+      "note": "The current simulation input does not resolve this window through data/calendar.json."
+    },
+    {
+      "field": "persona_shares_and_od_weights",
+      "classification": "simulated",
+      "source": "data/sim/scn_huh_exc_closed_am_peak.input.json",
+      "note": "Synthetic profile shares and proxy OD weights; destination is fixed to ADM in this single-OD scenario."
+    },
+    {
+      "field": "route_candidates",
+      "classification": "simulated",
+      "source": "backend/tests/fixtures/c_route_output.simulated.json",
+      "note": "Fixture route candidates are not a claim of complete operational network coverage."
+    },
+    {
+      "field": "route_supply.headway_s",
+      "classification": "simulated",
+      "source": "data/sim/scn_huh_exc_closed_am_peak.input.json",
+      "reference": "data/network/lines.json",
+      "note": "The fixture values happen to match selected line assumptions, but the simulation input is not generated from the C-Data records. In particular, 982X has no single applicable verified headway."
+    },
+    {
+      "field": "route_supply.capacity_per_hour_and_service_capacity_per_hour",
+      "classification": "simulated",
+      "source": "data/sim/scn_huh_exc_closed_am_peak.input.json",
+      "reference": "data/capacity_method.md",
+      "note": "Fixture supply values are not calculated from current line capacity records. Vehicle capacity and residual capacity are not independently linked to C-Data. Published capacity measurements are unavailable; documented capacity values remain estimates or unverified."
+    },
+    {
+      "field": "available_capacity_factor_and_eta_max_factor",
+      "classification": "simulated",
+      "source": "backend/app/sim/adapters.py",
+      "reference": "data/capacity_method.md",
+      "note": "Scenario/model assumptions, not observed residual load or operator-reported occupancy."
+    },
+    {
+      "field": "weather_penalties",
+      "classification": "simulated_when_used",
+      "source": "data/weather_impact.json",
+      "note": "Weather penalty coefficients are estimates; this scenario input does not currently select a weather condition."
+    }
+  ],
+  "known_gaps": [
+    "The current route_supply fixture is not populated from data/network/lines.json or data/capacity_method.md.",
+    "No verified operator vehicle-capacity, residual-capacity, or passenger-demand dataset is connected to the simulation input.",
+    "The current single-OD scenario does not resolve service-day and public-holiday rules from data/calendar.json.",
+    "Results from this input are algorithm demonstrations only and must not be presented as measured passenger flows or verified operational capacity."
+  ]
+}

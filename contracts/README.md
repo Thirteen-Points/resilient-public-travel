@@ -88,7 +88,7 @@ python scripts/generate_contract_schemas.py
 python scripts/validate_contract_seeds.py
 ```
 
-第二条命令会确认四个种子文件都能读取，并使用 JSON Schema 与 Pydantic 双重验证 B 负责的 Event / Signal。Network、Route、Simulation 仍须等待 C 提供对应 Schema，不能把“JSON 可读取”误当成通过契约校验。
+第二条命令会用 JSON Schema 校验四个种子文件，并对 B 负责的 Event / Signal 继续执行 Pydantic 双重验证。校验器也会核对网络声明数量、线路与站点引用、路线端点与线路引用，以及仿真结果引用的路线 ID。Network、Route、Simulation 和 event seed 外壳 schema 按当前冻结字段手工维护；单条 Event / Signal schema 则由 Pydantic 模型生成。
 
 ## 7. 三条不可违反的约定
 
