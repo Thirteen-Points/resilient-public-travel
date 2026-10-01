@@ -110,14 +110,11 @@ class Runtime:
 runtime = Runtime()
 
 
-GRAPH_ACTIVE_STATUSES = frozenset({"published", "updated"})
-
-
 def sync_engine_events(event_store: EventStore) -> str | None:
     """Mirror reviewer-approved Events into the routing engine.
 
-    The engine keeps its own immutable snapshots; only published or re-approval-
-    pending ('updated') events close or degrade graph edges.  A sync failure must
+    The engine keeps its own immutable snapshots of the last approved facts.
+    Unapproved edits never enter it. A sync failure must
     never fail the review write itself, so the previous snapshot stays live.
     """
 
@@ -127,8 +124,7 @@ def sync_engine_events(event_store: EventStore) -> str | None:
     try:
         events = [
             event.model_dump(mode="json")
-            for event in event_store.list_events()
-            if event.status in GRAPH_ACTIVE_STATUSES
+            for event in event_store.approved_events()
         ]
         snapshot = engine.snapshots.replace_events(events)
         return snapshot.snapshot_id
@@ -195,10 +191,12 @@ def create_app(
     application = FastAPI(title="ResilientRoute API", version="m0-integrated", lifespan=lifespan)
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+        allow_origins=[origin.strip() for origin in os.getenv(
+            "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+        ).split(',') if origin.strip()],
         allow_credentials=False,
         allow_methods=["GET", "POST", "OPTIONS"],
-        allow_headers=["Content-Type", "Authorization", "x-review-token"],
+        allow_headers=["Content-Type", "Authorization", "x-review-token", "Last-Event-ID"],
     )
     application.include_router(signals_router)
     application.include_router(events_router)

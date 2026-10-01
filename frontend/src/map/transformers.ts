@@ -214,7 +214,7 @@ function legGeometry(leg: RouteLeg, network: Network, positions: Map<string, Map
     if (a >= 0 && b >= 0) {
       const ids = a <= b ? line.stops.slice(a, b + 1) : line.stops.slice(b, a + 1).reverse()
       const stopPositions = ids.map(id => positions.get(id))
-      if (stopPositions.every(position => position !== null)) {
+      if (stopPositions.every(position => position != null)) {
         return { points: stopPositions.map(position => toPoints(position as MapLatLng)), lineId: line.id }
       }
     }

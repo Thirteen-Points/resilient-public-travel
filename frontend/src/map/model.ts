@@ -14,7 +14,7 @@ export interface MapStation {
   name_zh: string
   kind: string
   position: MapLatLng | null
-  accessible: boolean | 'partial'
+  accessible: boolean | 'partial' | null
   lines: string[]
   provenance: string
   /** Explicit catchment radius in metres from the seed, or null when the station has none. */

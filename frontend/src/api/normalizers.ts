@@ -26,7 +26,7 @@ export class SeedStructureError extends Error {
 const PROVENANCE_VALUES: readonly unknown[] = ['real', 'real-derived', 'simulated']
 const STATUS_VALUES: readonly unknown[] = ['draft', 'pending_review', 'published', 'updated', 'expired', 'rejected']
 const MODE_VALUES: readonly unknown[] = ['MTR', 'BUS', 'MINIBUS', 'WALK', 'FERRY']
-const ACCESSIBLE_VALUES: readonly unknown[] = [true, false, 'partial']
+const ACCESSIBLE_VALUES: readonly unknown[] = [true, false, 'partial', null]
 
 type Issues = NormalizationIssue[]
 
@@ -175,7 +175,10 @@ function validateLeg(raw: unknown, path: string, issues: Issues): void {
   if (raw.line !== undefined) expectString(raw, 'line', path, issues)
   expectString(raw, 'from', path, issues)
   expectString(raw, 'to', path, issues)
-  expectFiniteNumber(raw, 'travel_s', path, issues, value => value >= 0, 'a non-negative travel time in seconds')
+  // Older fixtures use travel_s; engine output uses in_vehicle_s. Keep the
+  // supplied field and its meaning rather than inventing a missing duration.
+  const durationKey = raw.travel_s !== undefined ? 'travel_s' : 'in_vehicle_s'
+  expectFiniteNumber(raw, durationKey, path, issues, value => value >= 0, 'a non-negative travel time in seconds')
   expectFiniteNumber(raw, 'walk_m', path, issues, value => value >= 0, 'a non-negative walking distance in metres')
   expectEnum(raw, 'accessible', path, issues, ACCESSIBLE_VALUES)
   expectEnum(raw, 'provenance', path, issues, PROVENANCE_VALUES)

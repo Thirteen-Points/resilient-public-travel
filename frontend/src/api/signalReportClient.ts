@@ -32,6 +32,7 @@ export async function submitSignalReport(report: { rawText: string; lang: Signal
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ raw_text: report.rawText, lang: report.lang }),
+      signal: AbortSignal.timeout(10000),
     })
   } catch {
     return { ok: false, kind: 'unavailable', message: 'Could not reach the report service. Your text is kept on this page — check the connection and try again.' }

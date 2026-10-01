@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { activePublishedEvents, seedDataSource, snapshotAt } from './seedDataSource'
-import { CORRIDOR_IDS, distanceMetres, legCoordinates, nearestAccessPoint } from '../data'
+import { CORRIDOR_IDS, distanceMetres, legCoordinates, legDuration, nearestAccessPoint } from '../data'
 
 describe('M0 seed boundary', () => {
   it('loads all four versioned seeds through the adapter and reports a fixed snapshot', async () => {
@@ -29,7 +29,7 @@ describe('M0 seed boundary', () => {
     const fastest = await seedDataSource.getRoutes({ ...base, preset: 'fastest' })
     const stable = await seedDataSource.getRoutes({ ...base, preset: 'most_stable' })
     const lessWalking = await seedDataSource.getRoutes({ ...base, preset: 'least_walking' })
-    expect(fastest[0].route_id).toBe('r_seed_001')
+    expect(fastest[0].total.time_s).toBe(Math.min(...fastest.map(route => route.total.time_s)))
     expect(stable[0].total.reliability).toBeGreaterThanOrEqual(stable[1].total.reliability)
     expect(lessWalking[0].total.walk_m).toBeLessThanOrEqual(lessWalking[1].total.walk_m)
     expect(lessWalking[0].total.reliability).toBeGreaterThanOrEqual(0.7)
@@ -44,9 +44,17 @@ describe('M0 seed boundary', () => {
     const network = await seedDataSource.getNetwork()
     const taiWai = network.nodes.find(node => node.id === 'TAW')!
     expect(nearestAccessPoint(network, taiWai)?.node.id).toBe('TAW')
+    expect(taiWai.accessible).toBeNull()
+    expect(nearestAccessPoint(network, taiWai, true)).toBeNull()
     expect(nearestAccessPoint(network, { lat: 0, lng: 0 })).toBeNull()
     expect(distanceMetres(taiWai, taiWai)).toBe(0)
     expect(network.meta.catchment_m).toBe(800)
     expect(legCoordinates({ mode: 'MINIBUS', from: 'BS_TAW', to: 'BS_TW', travel_s: 600, walk_m: 0, accessible: false, provenance: 'real-derived' }, network)).toEqual([])
+  })
+
+  it('reads engine durations without fabricating missing values', () => {
+    const leg = { mode: 'MTR', from: 'TAW', to: 'KOT', walk_m: 0, accessible: true, provenance: 'simulated' } as const
+    expect(legDuration({ ...leg, in_vehicle_s: 270 })).toBe('About 5 min')
+    expect(legDuration(leg)).toBe('Travel time unavailable')
   })
 })
