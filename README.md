@@ -53,7 +53,7 @@ On Windows PowerShell, set the token with `$env:REVIEW_API_TOKEN='dev-demo-token
 |---|---|---|
 | `POST` | `/api/signals` | Submit a passenger report |
 | `POST` | `/api/events/ingest` | Structure or merge a submitted signal into an event |
-| `GET` | `/api/events` / `/api/events/published` | Read review queue or published events |
+| `GET` | `/api/events` / `/api/events/published` | Read review queue (review token required) or public published events |
 | `POST` | `/api/events/{id}/review` | Approve, edit, reject, or expire an event |
 | `GET` | `/api/stream/events` | Receive event changes over SSE |
 | `GET` | `/api/graph/network` / `/api/graph/snapshot` | Read network and active disruption snapshot |
@@ -62,6 +62,11 @@ On Windows PowerShell, set the token with `$env:REVIEW_API_TOKEN='dev-demo-token
 | `GET` | `/api/sim/result?scenario_id=...` | Read a checked-in precomputed simulation result |
 | `GET` | `/api/health` / `/api/health/deep` | Check process health or core local readiness |
 | `GET` | `/api/meta` | Read snapshot and data-source disclaimer |
+
+Review-queue, raw-report, review-action, and event-stream endpoints require the
+server-side `REVIEW_API_TOKEN`. Never place that token in a public frontend
+build; `VITE_*` values are visible to browser users. The live public UI can use
+route and graph APIs without enabling review administration.
 
 ## Architecture
 
@@ -75,7 +80,7 @@ Source: [SVG diagram](docs/architecture/resilient-public-travel.svg). The broade
 
 Some source data comes from public agency feeds or published records. Derived values and synthetic fixtures are labelled separately. Current simulation inputs, passenger demand, route capacities, and residual capacity are simulated or estimated; they are not live measurements. A report or inferred anomaly is not an official service bulletin. Review decisions are required before an event changes the route graph.
 
-The backend and frontend have local startup and container configuration. **No public deployment address or external wake-up check is currently verified.** Cloud hosting instructions are in [deploy/DEPLOYMENT.md](deploy/DEPLOYMENT.md); those instructions are not evidence of a live deployment. For current M2 C-side evidence and gaps, see [docs/acceptance/m2-c-status.md](docs/acceptance/m2-c-status.md).
+The frontend is publicly available at [resilient-public-travel.pages.dev](https://resilient-public-travel.pages.dev/). The Render API deployment and the frontend-to-API connection are not yet verified. A Render Blueprint and scheduled health-ping workflow are prepared, but require an administrator to create the service, configure the Pages API origin and repository variable, and verify the live endpoints. Render Free may sleep and its filesystem is temporary, so this is a demo setup rather than durable production hosting. For current M2 C-side evidence and gaps, see [docs/acceptance/m2-c-status.md](docs/acceptance/m2-c-status.md).
 
 ## Project Layout
 
@@ -92,7 +97,7 @@ scripts/                 Startup, validation, preflight, and M1 demo
 
 ## Deployment
 
-See [deploy/DEPLOYMENT.md](deploy/DEPLOYMENT.md) for local, Docker, and proposed cloud deployment instructions. Cloud deployment remains unverified.
+See [deploy/DEPLOYMENT.md](deploy/DEPLOYMENT.md) for local, Docker, and Cloudflare Pages + Render setup instructions. The frontend is live; the backend deployment remains pending.
 
 ## License
 

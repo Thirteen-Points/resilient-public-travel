@@ -42,12 +42,14 @@
   ],
   "route_parameters": {
     "sim_route_rail": {
+      "route_id": "sim_route_rail",
       "headway_s": 180,
       "capacity_per_hour": 3400,
       "service_capacity_per_hour": 4000,
       "provenance": "simulated"
     },
     "sim_route_bus": {
+      "route_id": "sim_route_bus",
       "headway_s": 900,
       "capacity_per_hour": 460,
       "service_capacity_per_hour": 541.1764705882,

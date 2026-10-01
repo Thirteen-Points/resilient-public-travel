@@ -134,20 +134,41 @@ python scripts/preflight.py
 
 ## 7. Production Deployment
 
-### Cloudflare Pages (Frontend) + Render Free (Backend)
+### Cloudflare Pages (Frontend) + Render (Backend)
 
-1. **Frontend**: Deploy `frontend/` to Cloudflare Pages
-2. **Backend**: Deploy to Render Free with:
-   - Build: `pip install -r backend/requirements.txt`
-   - Start: `python -m uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`
-   - Set `OFFLINE_MODE=false`, `LLM_ENABLED=true` (with API key)
-3. **Keep-alive**: Use UptimeRobot to ping `/api/health` every 10 minutes
+The repository now includes a Render Blueprint at `render.yaml`. From the
+Render Dashboard, create a Blueprint instance from this repository and select
+the `ZYC-M2` branch. Review the service before applying it. Render then builds
+the API, runs the seed preflight, and checks `/api/health` before routing
+traffic.
 
-### Keep-alive cron job:
-```bash
-# Add to crontab (Linux) or Task Scheduler (Windows)
-*/10 * * * * curl -s https://your-app.onrender.com/api/health > /dev/null
-```
+After the first successful deploy:
+
+1. Copy the service origin, such as `https://<service>.onrender.com`.
+2. In the Cloudflare Pages project, set the production build variable
+   `VITE_API_BASE_URL` to that origin, then redeploy the frontend.
+3. Add the repository Actions variable `RENDER_API_URL` with the same origin.
+   `.github/workflows/render-health-ping.yml` can then be run manually and,
+   after this branch is merged to the repository's default branch, on a
+   ten-minute schedule.
+4. Check `https://<service>.onrender.com/api/health` and
+   `/api/health/deep`; both should return HTTP 200 before testing the site.
+
+The backend permits only the exact production Pages origin configured by
+`CORS_ALLOWED_ORIGINS`; do not replace it with `*`. The review API is protected
+by `REVIEW_API_TOKEN`. Do not put that secret in `VITE_REVIEW_TOKEN` for a
+public site: Vite embeds `VITE_*` values in downloadable browser code. Public
+published-event reads and route queries are separate from protected review
+operations. The review console needs a private/authenticated delivery path
+before it can safely be enabled for public users.
+
+The Blueprint uses Render Free for an interim demo. Free services spin down
+after 15 minutes without inbound traffic and can take about a minute to wake;
+the scheduled ping reduces idle starts but cannot guarantee a 30-second
+cold-start target. Free services also have ephemeral filesystems, so SQLite
+events and reports are not durable across restarts or redeploys. Treat this as
+a demo deployment, not persistent production hosting. A paid always-on service
+and persistent database are needed for stronger availability and persistence.
 
 ---
 

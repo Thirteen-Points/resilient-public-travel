@@ -149,7 +149,10 @@ def routes_from_contract(
         raw_supplies = []
         for route_id, value in parameters.items():
             parameter = dict(_mapping(value, f"route_parameters[{route_id!r}]"))
-            parameter["route_id"] = route_id
+            if parameter.get("route_id") != route_id:
+                raise ValueError(
+                    f"route_parameters[{route_id!r}].route_id must match its key"
+                )
             raw_supplies.append(parameter)
     elif isinstance(supply_payload, Mapping):
         raw_supplies = []
@@ -323,6 +326,7 @@ def od_route_sets_from_simulated_fixture(payload: dict) -> tuple[ODRouteSet, ...
             )
             route_id = f"sim_{origin.lower()}_{destination.lower()}_{profile_id}"
             route["route_id"] = route_id
+            parameter["route_id"] = route_id
             routes.append(route)
             route_parameters[route_id] = parameter
         expanded_items.append(

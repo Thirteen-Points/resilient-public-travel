@@ -4,7 +4,7 @@
   "source_revision": "working-tree",
   "data_version": {
     "network_file": "contracts/seed/network.seed.json",
-    "network_sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+    "network_sha256": "a2a925c8d69e75b8c108d7c5e01468815c17349c62b347105f417294596bae86",
     "route_policy_file": "backend/app/engine/fixtures/seed_policy.json",
     "route_policy_sha256": "3020ae10023c811b9c199b19a8c5d6e713e1439b17c047bc65ad1ccc57ea00dc"
   },
@@ -152,10 +152,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -296,10 +296,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -454,10 +454,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -614,10 +614,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -820,10 +820,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -1025,10 +1025,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -1208,10 +1208,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -1402,10 +1402,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -1611,10 +1611,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -1857,10 +1857,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -2020,10 +2020,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -2174,10 +2174,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -2353,10 +2353,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -2555,10 +2555,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -2765,10 +2765,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -2944,10 +2944,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -3174,10 +3174,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -3309,10 +3309,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -3476,10 +3476,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -3651,10 +3651,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -3810,10 +3810,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -4016,10 +4016,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -4230,10 +4230,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -4415,10 +4415,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -4601,10 +4601,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -4817,10 +4817,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 750.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 750.0,
             "capacity_per_hour": 279.48
           }
         }
@@ -5081,10 +5081,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -5235,10 +5235,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -5432,10 +5432,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -5626,10 +5626,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -5813,10 +5813,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -5992,10 +5992,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -6222,10 +6222,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -6401,10 +6401,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -6559,10 +6559,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -6734,10 +6734,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -6922,10 +6922,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -7095,10 +7095,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -7281,10 +7281,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -7472,10 +7472,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -7700,10 +7700,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 180.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 180.0,
             "capacity_per_hour": 2550.0
           }
         },
@@ -7886,10 +7886,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -8136,10 +8136,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -8280,10 +8280,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -8440,10 +8440,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -8598,10 +8598,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -8803,10 +8803,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -8985,10 +8985,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -9189,10 +9189,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -9390,10 +9390,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -9583,10 +9583,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -9787,10 +9787,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -10037,10 +10037,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -10212,10 +10212,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -10399,10 +10399,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -10596,10 +10596,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -10804,10 +10804,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -10971,10 +10971,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -11187,10 +11187,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -11343,10 +11343,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -11491,10 +11491,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -11645,10 +11645,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -11828,10 +11828,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -12021,10 +12021,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -12200,10 +12200,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -12401,10 +12401,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -12641,10 +12641,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -12820,10 +12820,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -12995,10 +12995,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -13211,10 +13211,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -13408,10 +13408,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -13575,10 +13575,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -13799,10 +13799,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -13959,10 +13959,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 60.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 60.0,
             "capacity_per_hour": 63750.0
           }
         },
@@ -14143,10 +14143,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -14322,10 +14322,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -14518,10 +14518,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -14747,10 +14747,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 180.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 180.0,
             "capacity_per_hour": 2550.0
           }
         },
@@ -14929,10 +14929,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -15172,10 +15172,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 180.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 180.0,
             "capacity_per_hour": 2550.0
           }
         },
@@ -15373,10 +15373,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -15555,10 +15555,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -15726,10 +15726,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -15990,10 +15990,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -16153,10 +16153,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -16307,10 +16307,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -16500,10 +16500,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -16702,10 +16702,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -16912,10 +16912,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 150.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 150.0,
             "capacity_per_hour": 25500.0
           }
         },
@@ -17091,10 +17091,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -17282,10 +17282,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -17461,10 +17461,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -17703,10 +17703,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -17878,10 +17878,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -18045,10 +18045,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -18232,10 +18232,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -18429,10 +18429,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -18637,10 +18637,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -18849,10 +18849,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -19024,10 +19024,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -19191,10 +19191,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -19374,10 +19374,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -19579,10 +19579,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -19785,10 +19785,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -19982,10 +19982,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -20181,10 +20181,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -20382,10 +20382,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -20556,10 +20556,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -20766,10 +20766,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -20945,10 +20945,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -21125,10 +21125,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -21340,10 +21340,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -21537,10 +21537,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -21715,10 +21715,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -21950,10 +21950,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 180.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 180.0,
             "capacity_per_hour": 2550.0
           }
         },
@@ -22159,10 +22159,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -22345,10 +22345,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -22584,10 +22584,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -22762,10 +22762,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -23030,10 +23030,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -23165,10 +23165,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -23332,10 +23332,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -23507,10 +23507,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -23667,10 +23667,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -23874,10 +23874,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -24089,10 +24089,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -24276,10 +24276,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -24549,10 +24549,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 750.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 750.0,
             "capacity_per_hour": 279.48
           }
         }
@@ -24795,10 +24795,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -24951,10 +24951,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -25099,10 +25099,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -25253,10 +25253,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -25446,10 +25446,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -25660,10 +25660,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -25839,10 +25839,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -26022,10 +26022,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         }
@@ -26254,10 +26254,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -26429,10 +26429,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -26586,10 +26586,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -26769,10 +26769,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -27002,10 +27002,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -27169,10 +27169,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -27381,10 +27381,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -27562,10 +27562,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -27741,10 +27741,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -27927,10 +27927,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -28089,10 +28089,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -28260,10 +28260,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -28420,10 +28420,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -28603,10 +28603,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -28820,10 +28820,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 180.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 180.0,
             "capacity_per_hour": 2550.0
           }
         },
@@ -29010,10 +29010,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -29201,10 +29201,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -29447,10 +29447,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -29601,10 +29601,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -29794,10 +29794,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -29991,10 +29991,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -30185,10 +30185,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -30364,10 +30364,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -30547,10 +30547,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -30784,10 +30784,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 600.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 600.0,
             "capacity_per_hour": 349.34999999999997
           }
         },
@@ -30971,10 +30971,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -31221,10 +31221,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -31396,10 +31396,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -31575,10 +31575,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -31791,10 +31791,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -31992,10 +31992,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -32189,10 +32189,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -32390,10 +32390,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -32557,10 +32557,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -32793,10 +32793,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -32990,10 +32990,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -33189,10 +33189,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -33386,10 +33386,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -33587,10 +33587,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -33792,10 +33792,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -33966,10 +33966,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -34188,10 +34188,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -34378,10 +34378,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -34559,10 +34559,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -34738,10 +34738,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -34947,10 +34947,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -35149,10 +35149,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -35330,10 +35330,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -35517,10 +35517,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -35696,10 +35696,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -35932,10 +35932,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 180.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 180.0,
             "capacity_per_hour": 2550.0
           }
         },
@@ -36138,10 +36138,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -36332,10 +36332,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -36527,10 +36527,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -36777,10 +36777,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -36956,10 +36956,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -37114,10 +37114,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -37289,10 +37289,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -37477,10 +37477,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -37650,10 +37650,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -37841,10 +37841,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -38023,10 +38023,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -38185,10 +38185,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -38348,10 +38348,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -38610,10 +38610,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -38770,10 +38770,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 60.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 60.0,
             "capacity_per_hour": 63750.0
           }
         },
@@ -38955,10 +38955,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -39134,10 +39134,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -39331,10 +39331,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -39561,10 +39561,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 180.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 180.0,
             "capacity_per_hour": 2550.0
           }
         },
@@ -39762,10 +39762,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -39944,10 +39944,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -40115,10 +40115,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -40365,10 +40365,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -40544,10 +40544,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -40725,10 +40725,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -40923,10 +40923,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -41139,10 +41139,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -41318,10 +41318,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -41523,10 +41523,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -41701,10 +41701,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         }
@@ -41937,10 +41937,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -42099,10 +42099,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -42270,10 +42270,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -42453,10 +42453,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -42613,10 +42613,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -42830,10 +42830,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 180.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 180.0,
             "capacity_per_hour": 2550.0
           }
         },
@@ -43020,10 +43020,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -43210,10 +43210,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }
@@ -43442,10 +43442,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -43623,10 +43623,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -43810,10 +43810,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 48365.0
           }
         },
@@ -43989,10 +43989,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         },
@@ -44195,10 +44195,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 90.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 90.0,
             "capacity_per_hour": 42500.0
           }
         },
@@ -44389,10 +44389,10 @@
           ],
           "provenance": "simulated",
           "load_estimate": {
-            "expected_wait_s": 450.0,
-            "board_refusal_prob": 0,
             "load_factor": 0,
+            "board_refusal_prob": 0,
             "users_on_route": 0,
+            "expected_wait_s": 450.0,
             "capacity_per_hour": 465.8
           }
         }

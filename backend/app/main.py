@@ -22,6 +22,7 @@ from .api.events import router as events_router
 from .api.review import router as review_router
 from .api.signals import router as signals_router
 from .api.stream import router as stream_router
+from .runtime_config import settings
 from .services.event_store import DEFAULT_DB_PATH, EventStore
 from .services.signal_store import SignalStore
 from .services.structure.llm_structurer import LlmJsonClient
@@ -195,7 +196,7 @@ def create_app(
     application = FastAPI(title="ResilientRoute API", version="m0-integrated", lifespan=lifespan)
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+        allow_origins=list(settings.cors_allowed_origins),
         allow_credentials=False,
         allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization", "x-review-token"],
