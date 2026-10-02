@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Check configured Render API health endpoint
         env:
-          RENDER_API_URL: ${{ vars.RENDER_API_URL }}
+          RENDER_API_URL: ${{ vars.RENDER_API_URL || 'https://resilient-public-travel-api.onrender.com' }}
         run: |
           if [ -z "$RENDER_API_URL" ]; then
             echo "Set the repository variable RENDER_API_URL to the Render service origin."
