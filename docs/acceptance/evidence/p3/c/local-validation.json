@@ -43,7 +43,7 @@
       "no-token-url-or-storage"
     ]
   },
-  "docker_recreation": "pending GitHub CI; local Docker unavailable",
+  "docker_recreation": "passed in GitHub CI run 36989191896; see github-ci.json; local Docker unavailable",
   "online_deployment": "unverified",
   "live_deepseek": "unverified; no real key used"
 }

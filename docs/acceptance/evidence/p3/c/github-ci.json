@@ -1,0 +1,240 @@
+{
+  "date": "2026-10-02",
+  "branch": "ZYC-P3",
+  "tested_sha": "8f6d3fd4fc3380b9345c16891290c2213420a5be",
+  "run_id": 36989191896,
+  "run_url": "https://github.com/Thirteen-Points/resilient-public-travel/actions/runs/36989191896",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "id": 110781159472,
+      "name": "Backend, frontend and browser",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 36989191896,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Install backend and test dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Validate seeds and data layer",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Backend and integration regression",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Install frontend dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Frontend regression",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Typecheck and production build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Install isolated browser runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Check committed administrator bundle",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Browser publication, recovery and mobile regression",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Preserve regression evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 26
+        },
+        {
+          "name": "Post Run actions/setup-python@v5",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 27
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 28
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 29
+        }
+      ]
+    },
+    {
+      "id": 110781159792,
+      "name": "Container recreation persistence",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 36989191896,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Build dedicated offline container",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Seed event audit and encrypted administrator settings",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Recreate container and verify retained application data",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Preserve container logs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Remove disposable CI containers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17
+        }
+      ]
+    }
+  ],
+  "backend": {
+    "passed": 487,
+    "subtests_passed": 264,
+    "seconds": 25.7
+  },
+  "frontend": {
+    "passed": 71,
+    "test_files": 9,
+    "production_build": "passed",
+    "committed_admin_bundle": "passed"
+  },
+  "browser": {
+    "passed": true,
+    "timings_ms": [
+      390,
+      148,
+      195
+    ],
+    "polling_withdrawal_ms": 3338
+  },
+  "container": {
+    "seed": "passed",
+    "force_recreate": "passed",
+    "retained_event_audit_admin_settings_model_usage": "passed"
+  },
+  "artifacts": [
+    {
+      "id": 11219305886,
+      "name": "p3-regression-8f6d3fd4fc3380b9345c16891290c2213420a5be",
+      "sha256": "33b45fa40a9ac5fb06402185de59f03c73331432f90ca4d7b8aa8583d517bafb"
+    },
+    {
+      "id": 11218324686,
+      "name": "p3-container-8f6d3fd4fc3380b9345c16891290c2213420a5be",
+      "sha256": "b3965aa055284c47c9bcf0cbe97ca24074079173af67fd6b5b7b03023785168c"
+    }
+  ],
+  "limitations": [
+    "Offline CI uses synthetic fixtures; no live DeepSeek call, source collection or Render deployment.",
+    "Evidence refers to the tested implementation SHA; later documentation commits do not change runtime code.",
+    "Repository required checks remain a platform administrator acceptance item."
+  ]
+}
