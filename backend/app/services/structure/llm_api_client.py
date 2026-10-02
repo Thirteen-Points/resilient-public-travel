@@ -68,7 +68,7 @@ class OpenAiCompatJsonClient:
         payload = {
             "model": self.model,
             "messages": [
-                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": system_prompt + "\nRequired JSON schema:\n" + json.dumps(dict(json_schema), ensure_ascii=False)},
                 {"role": "user", "content": user_prompt},
             ],
             "response_format": {"type": "json_object"},

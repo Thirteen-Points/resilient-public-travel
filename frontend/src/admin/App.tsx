@@ -3,7 +3,8 @@ import type { Event, Network, Signal } from '../api/types'
 import { ReviewConsole } from '../components/ReviewConsole'
 import { SignalInbox } from '../components/SignalInbox'
 import { call, network, reviewApi, saveReview, setSession } from './client'
-import type { Activity, Overview, Session, Settings, SourceConfig, SourceResult, ProviderName } from './client'
+import { LLMSettings } from './LLMSettings'
+import type { Activity, Overview, Session, Settings, SourceConfig, SourceResult } from './client'
 const titles = { overview: 'Overview', review: 'Reports & Review', settings: 'API Settings', activity: 'Activity' }
 type Page = keyof typeof titles
 const errorText = (error: unknown) => error instanceof Error ? error.message : 'The request could not be completed.'
@@ -36,20 +37,17 @@ function SettingsPanel({ onDirty }: { onDirty: (dirty: boolean) => void }) {
   const operate = async (id: string, fn: () => Promise<void>) => { if (busy) return; setBusy(id); setError(''); setNotice(''); try { await fn() } catch (e) { setError(errorText(e)) } finally { setBusy('') } }
   if (!settings) return <section className="card"><p>{error || 'Loading API settings…'}</p><button className="secondary" onClick={() => { setError(''); call<Settings>('/settings').then(accept).catch(e => setError(errorText(e))) }}>Retry</button></section>
   const updateSource = (name: 'mtr' | 'hko', patch: Partial<SourceConfig>) => setSettings({ ...settings, sources: { ...settings.sources, [name]: { ...settings.sources[name], ...patch } } })
-  const names: ProviderName[] = ['deepseek', 'qwen', 'glm']
+  const names = settings.ai.order
   return <form className="settings-layout" onSubmit={e => { e.preventDefault(); void operate('save', async () => {
-    const providers = Object.fromEntries(names.map(name => { const p = settings.ai.providers[name]; return [name, { model: p.model, api_key: p.api_key?.trim() || null, clear_key: Boolean(p.clear_key) }] }))
+    const providers = Object.fromEntries(names.map(name => { const p = settings.ai.providers[name]; return [name, { name:p.name, model:p.model, base_url:p.base_url, enabled:p.enabled, keys:p.keys.map(k=>({id:k.id,label:k.label,value:k.value?.trim() || null})) }] }))
     accept(await call<Settings>('/settings', { ...settings, ai: { ...settings.ai, providers } })); setNotice('Settings saved. New structuring requests use this configuration immediately.')
   }) }}>
     <div className="settings-bar card"><div><strong>{dirty ? 'Unsaved changes' : `Configuration revision ${settings.revision}`}</strong><p className="muted">Saved on the persistent disk. Tests use saved settings.</p></div><button className="primary" disabled={!dirty || Boolean(busy)}>{busy === 'save' ? 'Saving…' : 'Save settings'}</button></div>
     {error && <p className="alert error" role="alert">{error}</p>}{notice && <p className="alert" role="status">{notice}</p>}
-    <fieldset disabled={Boolean(busy)}><section className="card"><span className="eyebrow">AI / REPORT STRUCTURING</span><h2>Turn reports into drafts.</h2><p className="muted">Applies to report extraction only. Route chat stays deterministic. Model failures fall back to the existing rules.</p>
-      <div className="field-grid"><label className="toggle"><input type="checkbox" checked={settings.ai.enabled} onChange={e => setSettings({ ...settings, ai: { ...settings.ai, enabled: e.target.checked } })} />Enable AI structuring</label><label>Active provider<select value={settings.ai.provider} onChange={e => setSettings({ ...settings, ai: { ...settings.ai, provider: e.target.value as ProviderName } })}>{names.map(name => <option key={name} value={name}>{name === 'deepseek' ? 'DeepSeek' : name === 'qwen' ? 'Qwen' : 'GLM'}</option>)}</select></label><label>Request timeout · seconds<input type="number" min="2" max="30" required value={settings.ai.timeout_s} onChange={e => setSettings({ ...settings, ai: { ...settings.ai, timeout_s: Number(e.target.value) } })} /></label></div>
-      <div className="provider-grid">{names.map(name => { const provider = settings.ai.providers[name]; const patch = (values: Partial<typeof provider>) => setSettings({ ...settings, ai: { ...settings.ai, providers: { ...settings.ai.providers, [name]: { ...provider, ...values } } } }); return <section className="provider" key={name}><div className="row"><h3>{name === 'deepseek' ? 'DeepSeek' : name === 'qwen' ? 'Qwen' : 'GLM'}</h3><span className="pill">{provider.key_configured ? 'Key configured' : 'No key'}</span></div><small className="endpoint">{provider.base_url}</small><label>Model<input required maxLength={100} value={provider.model} onChange={e => patch({ model: e.target.value })} /></label><label>Replace API key<input type="password" autoComplete="new-password" placeholder="Leave blank to keep the saved key" disabled={provider.clear_key} value={provider.api_key ?? ''} onChange={e => patch({ api_key: e.target.value })} /></label><label className="toggle"><input type="checkbox" checked={Boolean(provider.clear_key)} onChange={e => patch({ clear_key: e.target.checked, api_key: '' })} />Clear saved key</label><button type="button" className="secondary" disabled={dirty || !provider.key_configured} onClick={() => {
-        if (!window.confirm('Send one request to this AI provider? It may incur a charge. No user reports will be sent.')) return
-        void operate(`test-${name}`, async () => { const result = await call<{ok: boolean; message: string}>('/test/ai', { provider: name, confirm_external_request: true }); if (!result.ok) throw new Error(result.message); setNotice(result.message) })
-      }}>{busy === `test-${name}` ? 'Testing…' : 'Test saved connection'}</button></section> })}</div>
-    </section>
+    <fieldset disabled={Boolean(busy)}><LLMSettings ai={settings.ai} change={ai => setSettings({ ...settings, ai })} dirty={dirty} busy={busy} test={(provider, key_id) => {
+      if (!window.confirm('Send one request with this key? It may incur a charge. No user reports are sent.')) return
+      void operate(`test-${provider}-${key_id}`, async () => { const result = await call<{ok:boolean;message:string;ai:Settings['ai']}>('/test/ai',{provider,key_id,confirm_external_request:true}); accept({...settings,ai:result.ai}); if (result.ok) setNotice(result.message); else setError(result.message) })
+    }} />
     <section className="card"><span className="eyebrow">OFFICIAL DATA SOURCES</span><h2>Collect evidence on demand.</h2><p className="muted">External requests run only when you press Test or Collect. New signals await human review. There are no scheduled jobs.</p>
       <div className="source-grid">{(['mtr', 'hko'] as const).map(name => { const cfg = settings.sources[name]; return <section className="provider" key={name}><div className="row"><h3>{name === 'mtr' ? 'MTR · East Rail' : 'Hong Kong Observatory'}</h3><span className="pill">{cfg.enabled ? 'Enabled' : 'Disabled'}</span></div><p className="muted">{name === 'mtr' ? 'TAW · KOT · MKK · HUH · EXC · ADM. Anomalies are project heuristics, not official delay notices.' : 'Active weather warnings and cleared warnings. Unchanged warning sets produce no new reports.'}</p>
         <label className="toggle"><input type="checkbox" checked={cfg.enabled} onChange={e => updateSource(name, { enabled: e.target.checked })} />Enable manual collection</label>

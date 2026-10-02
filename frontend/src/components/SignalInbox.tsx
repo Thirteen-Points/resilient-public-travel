@@ -26,7 +26,8 @@ export function SignalInbox({ network, onChanged, api = eventApi, onDirty }: { n
       setBusy(true); setError(''); setNotice('')
       try {
         const result = await api.ingestSignal(signal.signal_id)
-        if (result.state === 'merged') { setCandidate(null); setNotice('Evidence merged. The server recalculated confidence; review is still required.'); await refresh(); try { await onChanged() } catch { setNotice('Saved successfully. The queue could not refresh; refresh it manually.') } }
+        setNotice(result.structure_method === "llm" ? `LLM extracted draft: ${result.llm_used?.name || "model"} · ${result.llm_used?.model || ""}` : `Rule extraction used. ${result.structure_errors?.join(" ") || "AI is disabled or no usable key is configured."}`)
+        if (result.state === 'merged') { setCandidate(null); setNotice(`Evidence merged using ${result.structure_method === 'llm' ? `LLM ${result.llm_used?.name || ''}` : 'rule fallback'}. The server recalculated confidence; review is still required.`); await refresh(); try { await onChanged() } catch { setNotice('Saved successfully. The queue could not refresh; refresh it manually.') } }
         else { setCandidate({ signal, draft: result.draft }); setSeverity(''); setFactors(result.draft.affected_segments.map(() => '')); setStart(hktLocalInput(signal.received_at)); setEnd('') }
       } catch (cause) { setError(cause instanceof Error ? cause.message : String(cause)) }
       finally { setBusy(false) }

@@ -77,7 +77,10 @@ class AdminStore:
         with self.connect() as db:
             row = db.execute("SELECT value FROM settings WHERE id=1").fetchone()
         if row:
-            return json.loads(self.cipher.decrypt(row[0].encode()))
+            value = json.loads(self.cipher.decrypt(row[0].encode()))
+            from .config import normalize_ai
+            normalize_ai(value["ai"])
+            return value
         providers = {name: {"model": model, "api_key": os.getenv(f"{name.upper()}_API_KEY", "")} for name, (_, model) in PROVIDERS.items()}
         for name in providers:
             providers[name]["model"] = os.getenv(f"{name.upper()}_MODEL", providers[name]["model"])
@@ -87,11 +90,28 @@ class AdminStore:
                     "hko": {"enabled": False, "timeout_s": 10, "lang": "tc", "poll_interval_seconds": 90}}}
 
     def public_settings(self):
+        from .config import normalize_ai
+        from .llm_runtime import fingerprint
         value = self.settings()
+        normalize_ai(value["ai"])
         for name, provider in value["ai"]["providers"].items():
-            provider["key_configured"] = bool(provider.pop("api_key"))
-            provider["base_url"] = PROVIDERS[name][0]
+            provider.pop("api_key", None)
+            provider["key_configured"] = any(k["value"] for k in provider["keys"])
+            for key in provider["keys"]:
+                state = self.source_state("llm:" + name + ":" + key["id"])
+                key["status"] = state if state.get("fingerprint") == fingerprint(provider, key) else {}
+                key["status"].pop("fingerprint", None)
+                key["configured"] = bool(key.pop("value"))
         return value
+
+    def record_llm(self, name, provider, key, ok, message, operation):
+        from .llm_runtime import fingerprint
+        state = {"fingerprint": fingerprint(provider, key), "ok": ok, "message": message,
+            "operation": operation, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+        with self.connect() as db:
+            db.execute("INSERT OR REPLACE INTO source_state VALUES(?,?)", ("llm:" + name + ":" + key["id"], json.dumps(state)))
+            self.record("administrator" if operation == "connection" else "system", "llm_" + operation,
+                name + ":" + key["id"], "success" if ok else "failed", message, db)
 
     def save_settings(self, value, expected_revision, actor):
         encrypted = self.cipher.encrypt(json.dumps(value).encode()).decode()

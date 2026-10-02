@@ -105,27 +105,42 @@ def save_settings(body: SettingsEdit, request: Request, session=Depends(authenti
     return store.public_settings()
 
 class AiTest(Strict):
-    provider: Literal["deepseek","qwen","glm"]
+    provider: str = Field(min_length=1,max_length=64)
+    key_id: str | None = Field(default=None,max_length=64)
     confirm_external_request: Literal[True]
 
 @router.post("/test/ai")
 def test_ai(body: AiTest, request: Request, session=Depends(authenticated)):
     store=available(request)
     config=store.settings()
-    config["ai"].update(enabled=True,provider=body.provider)
-    client=llm_client(config)
+    client=llm_client(config, store, provider=body.provider, key_id=body.key_id)
     if client is None:
-        raise HTTPException(409,"Save an API key before testing this provider.")
+        raise HTTPException(409,"Save an API key before testing this connection.")
     try:
-        output=client.generate_json(system_prompt='Return only {"ok": true} as JSON.',user_prompt="Connection test. No user reports are included.",json_schema={"type":"object"},timeout_seconds=config["ai"]["timeout_s"])
-        import json
-        if json.loads(output).get("ok") is not True:
-            raise ValueError("Unexpected test response")
+        client.generate_json(system_prompt='Return only {"ok": true} as JSON.',user_prompt="Connection test. No user reports are included.",json_schema={"type":"object","properties":{"ok":{"const":True}}},timeout_seconds=config["ai"]["timeout_s"])
     except Exception:
-        store.record(session["identity"],"ai_tested",body.provider,"failed","Connection, authentication, timeout or response validation failed.")
-        return {"ok":False,"message":"Connection, authentication, timeout or response validation failed. Check the saved key and model."}
-    store.record(session["identity"],"ai_tested",body.provider)
-    return {"ok":True,"message":"Provider returned valid JSON. One external request was sent."}
+        return {"ok":False,"message":client.errors[-1]["message"] if client.errors else "Request timed out.","attempts":client.errors,"ai":store.public_settings()["ai"]}
+    return {"ok":True,"message":"Connected: valid JSON received from the saved model.","used":client.used,"attempts":client.errors,"ai":store.public_settings()["ai"]}
+
+class StructureTest(Strict):
+    raw_text: str = Field(min_length=1,max_length=2000)
+    confirm_external_request: Literal[True]
+
+@router.post("/test/structure")
+def test_structure(body: StructureTest, request: Request, session=Depends(authenticated)):
+    from datetime import datetime, timezone
+    from ..services.signal_models import Signal
+    from ..services.structure.llm_structurer import LlmEventStructurer
+    store = available(request)
+    config = store.settings()
+    client = llm_client(config, store)
+    if client is None: raise HTTPException(409,"Enable and save AI with a usable key before trying extraction.")
+    signal = Signal(signal_id="admin-preview", received_at=datetime.now(timezone.utc), source_type="user_report",
+        source_name="Administrator preview",author_hint=None,raw_text=body.raw_text,raw_url=None,lang="mixed",provenance="simulated")
+    result = LlmEventStructurer(client,timeout_seconds=config["ai"]["timeout_s"]).structure(signal)
+    store.record(session["identity"],"llm_preview","synthetic sample",result.method,"No report or event stored.")
+    return {"structure_method":result.method,"llm_used":client.used if result.method == "llm" else None,
+        "structure_errors":[e["message"] for e in client.errors] or list(result.errors),"draft":result.draft.model_dump()}
 
 @router.post("/sources/{source}/{operation}")
 def source_action(source: Literal["mtr","hko"], operation: Literal["test","collect"], request: Request, session=Depends(authenticated)):
@@ -156,7 +171,7 @@ def evidence(event_id: str,request: Request, session=Depends(authenticated)):
 @router.post("/events/ingest")
 def ingest(body: events.IngestRequest,request: Request,session=Depends(authenticated)):
     result=events.ingest_signal(body,request,None)
-    available(request).record(session["identity"],"report_structured",body.signal_id,detail=result.state)
+    available(request).record(session["identity"],"report_structured",body.signal_id,detail=f"{result.state}; extraction={result.structure_method}; model={result.llm_used or 'none'}")
     return result
 
 @router.post("/events",status_code=201)

@@ -33,7 +33,7 @@ def login(client):
 def writable(client):
     value=client.get("/api/admin/settings").json()
     for provider in value["ai"]["providers"].values():
-        provider.pop("base_url");provider.pop("key_configured")
+        provider.pop("base_url");provider.pop("key_configured");provider.pop("keys", None)
     return value
 
 def test_unconfigured_public_api_keeps_working(tmp_path,monkeypatch):

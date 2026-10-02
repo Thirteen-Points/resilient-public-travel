@@ -4,3 +4,5 @@ body{background:#f7f9f5} .admin-shell{display:grid;grid-template-columns:224px m
 @media(max-width:430px){.field-grid{grid-template-columns:1fr}.metric{padding:16px}.metric strong{font-size:40px}.metrics{gap:10px}.settings-bar{flex-wrap:wrap}.login-card{padding:28px}.docs-link{font-size:10px}}
 
 .admin-main>section:not(.card){max-width:100%;max-height:none;overflow:visible}
+
+.llm-list { display: grid; gap: 18px; margin: 20px 0; }.llm-banner { padding:18px; border:1px solid #efd8b0; background:#fff7e9; border-radius:14px; }.llm-banner.active { background:#eeffd9; border-color:#c5dfac; }.llm-banner p { margin-bottom:0; }.llm-keys { display:grid; gap:14px; margin:16px 0; }.llm-key { padding:18px; background:white; border:1px solid var(--line); border-radius:12px; }.pill.connected { background:#ddf4cf; color:#25512e; border-color:#a9d49b; }.llm-error { color:#8f3930; }.llm-preview { margin-top:28px; border-top:1px solid var(--line); padding-top:24px; }.llm-preview textarea { width:100%; min-height:100px; border:1px solid var(--line); border-radius:10px; padding:12px; resize:vertical; }.llm-settings .row { flex-wrap:wrap; }.llm-settings .actions { margin:8px 0; }

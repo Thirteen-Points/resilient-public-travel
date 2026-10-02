@@ -37,13 +37,32 @@ reload before retrying. Review identity comes from the administrator session.
 Rejection reasons are stored in administrator Activity; event audit records
 continue using the existing contract.
 
-Saved AI settings immediately affect new report-structuring calls only. Chat and
-route calculations remain deterministic. Providers are DeepSeek, Qwen and GLM,
-with fixed official HTTPS endpoints and configurable model, key, enable flag and
-timeout. Keys are encrypted at rest and cannot be retrieved by the browser;
-blank inputs retain a saved key, while Clear key deletes the active value.
-Connection testing requires explicit confirmation and can incur provider charges.
-Tests send a synthetic prompt, never a user's report. Production starts with AI off.
+Saved AI settings immediately affect new report-structuring calls. Route chat and
+route calculations remain deterministic. Add any public HTTPS OpenAI-compatible
+Chat Completions provider with its base URL and model ID. `/chat/completions` is
+appended to the base URL. Configure up to 12 providers and 8 encrypted keys per
+provider. Providers and keys are tried in the displayed priority order; move them
+up/down to change the next request's order. Disabled providers are skipped. Failed
+connections or invalid event schemas try the next key/provider within the request
+budget, then the existing rule fallback. Requests already in progress retain their
+configuration snapshot.
+
+Keys cannot be retrieved by the browser. Blank replacement fields keep stored keys;
+removing a key/connection and saving deletes it. Existing DeepSeek/Qwen/GLM single-key
+configurations migrate automatically without losing their enable flag or secrets.
+Only public HTTPS on port 443 is accepted; private DNS/IP addresses, credentials in
+URLs and redirects are blocked. DNS is pinned to a validated public IP for each
+TLS request; errors are redacted.
+
+Each key displays Not tested, Connected or Connection failed, the latest timestamp
+and whether that result came from a connection test or actual extraction. Changing
+the endpoint, model or key invalidates its old status. Connection testing is distinct
+from the Enable AI extraction switch. Test one key explicitly, then enable/save AI.
+Use Try extraction to verify a real validated event draft from a sample, without
+writing reports/events. Both test actions require confirmation and can incur charges;
+preview fallback can issue multiple requests. Reports & Review shows the actual
+model used or rule fallback reason after Extract / merge. Original reports remain
+unverified and only approved events affect routes.
 
 MTR East Rail and HKO use the existing adapters. Save and enable a source before
 manual collection. Tests may run while a source is disabled, but never mutate

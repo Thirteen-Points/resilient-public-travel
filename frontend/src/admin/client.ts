@@ -1,9 +1,10 @@
 import type { Event, Signal, Network } from '../api/types'
 import type { EventDraft, IngestResult } from '../api/eventApi'
-export type ProviderName = 'deepseek' | 'qwen' | 'glm'
-export interface Provider { model: string; base_url: string; key_configured: boolean; api_key?: string; clear_key?: boolean }
+export type ProviderName = string
+export interface LLMKey { id: string; label: string; configured: boolean; value?: string; status: {ok?: boolean; at?: string; message?: string; operation?: string} }
+export interface Provider { name: string; model: string; base_url: string; enabled: boolean; keys: LLMKey[]; key_configured: boolean }
 export interface SourceConfig { enabled: boolean; timeout_s: number; poll_interval_seconds: number; lang?: 'tc' | 'sc' | 'en'; ttnt_threshold_minutes?: number; min_adjacent_stations?: number; min_consecutive_polls?: number; min_usable_stations?: number }
-export interface Settings { revision: number; ai: { enabled: boolean; provider: ProviderName; timeout_s: number; providers: Record<ProviderName, Provider> }; sources: { mtr: SourceConfig; hko: SourceConfig } }
+export interface Settings { revision: number; ai: { enabled: boolean; provider: ProviderName; order: string[]; timeout_s: number; providers: Record<ProviderName, Provider> }; sources: { mtr: SourceConfig; hko: SourceConfig } }
 export interface SourceResult { status: string; at: string; added: number; duplicate: number; failures: number; details: Record<string, unknown> }
 export interface Overview { health: { ok: boolean; mode: string }; reports: number; unlinked_reports: number; pending_review: number; published: number; ai: Settings['ai']; sources: Record<'mtr' | 'hko', SourceResult | null> }
 export interface Activity { id: number; at: string; actor: string; action: string; target: string; result: string; detail: string }
