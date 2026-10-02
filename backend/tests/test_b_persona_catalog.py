@@ -1,20 +1,15 @@
 """B-owned profile catalog and optional parser wiring checks."""
 
+import os
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
-from fastapi import FastAPI
 
-from backend.app.api.persona import router, catalog_router
+from backend.app.main import build_preference_client, create_app
 from backend.app.services.persona import load_personas, load_presets
-
-
-def create_catalog_app(preference_client=None):
-    app = FastAPI()
-    app.state.preference_client = preference_client
-    app.include_router(router)
-    app.include_router(catalog_router)
-    return app
 
 
 class FakeClient:
@@ -47,8 +42,12 @@ class PersonaCatalogTests(unittest.TestCase):
         self.assertEqual(set(profiles[-1].hard_flags),
                          {"no_stairs", "no_minibus", "no_non_lowfloor_bus"})
 
-    def test_catalog_is_public_and_rules_work_without_model(self):
-        with TestClient(create_catalog_app()) as client:
+    def test_catalog_is_public_and_model_is_off_by_default(self):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {
+            "AI_ENABLED": "true", "PERSONA_PARSE_AI_ENABLED": "false", "DEEPSEEK_API_KEY": "test-only"
+        }):
+            self.assertIsNone(build_preference_client())
+            with TestClient(create_app(db_path=Path(directory) / "catalog.sqlite3", review_token="test")) as client:
                 response = client.get("/api/personas")
                 presets = client.get("/api/personas/presets")
                 parsed = client.post("/api/persona/parse", json={"free_text": "腿脚不便、别太贵"})
@@ -58,8 +57,19 @@ class PersonaCatalogTests(unittest.TestCase):
         self.assertEqual(len(presets.json()), 3)
         self.assertEqual(parsed.json()["method"], "rule_fallback")
 
-    def test_model_preserves_explicit_restrictions(self):
-        with TestClient(create_catalog_app(FakeClient({"mobility": "standard", "hard_flags": []}))) as client:
+    def test_explicit_model_switch_selects_configured_provider_without_calling_it(self):
+        with patch.dict(os.environ, {
+            "AI_ENABLED": "true", "PERSONA_PARSE_AI_ENABLED": "true", "DEEPSEEK_API_KEY": "test-only",
+            "QWEN_API_KEY": "", "GLM_API_KEY": "",
+        }):
+            configured = build_preference_client()
+        self.assertIsNotNone(configured)
+        self.assertEqual(configured.model, "deepseek-chat")
+
+    def test_shared_app_uses_model_and_preserves_explicit_restrictions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with TestClient(create_app(db_path=Path(directory) / "model.sqlite3",
+                                       preference_client=FakeClient({"mobility": "standard", "hard_flags": []}))) as client:
                 response = client.post("/api/persona/parse", json={"free_text": "轮椅，别太贵"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["method"], "llm")
@@ -67,8 +77,10 @@ class PersonaCatalogTests(unittest.TestCase):
         self.assertEqual(response.json()["patch"]["max_walk_m"], 400)
         self.assertIn("no_minibus", response.json()["patch"]["hard_flags"])
 
-    def test_model_failure_falls_back_to_rules(self):
-        with TestClient(create_catalog_app(FakeClient(TimeoutError()))) as client:
+    def test_shared_app_falls_back_when_model_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with TestClient(create_app(db_path=Path(directory) / "failure.sqlite3",
+                                       preference_client=FakeClient(TimeoutError()))) as client:
                 response = client.post("/api/persona/parse", json={"free_text": "腿脚不便、别太贵"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["method"], "rule_fallback")

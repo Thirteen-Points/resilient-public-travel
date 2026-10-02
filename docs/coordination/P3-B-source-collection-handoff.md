@@ -1,7 +1,8 @@
 # P3 B source collection handoff to C and A
 
-Baseline: GitHub `main` `c2934c1` (checked 2026-10-02). B did not edit the
-shared `backend/app/main.py`. C owns this integration:
+The shared `backend/app/main.py` now registers the source router and collector
+with the durable Signal/Event database. Local shared-app tests cover status,
+reviewer protection, and disabled offline polling. The integration uses:
 
 ```python
 from .api.sources import router as sources_router
@@ -13,7 +14,6 @@ application.include_router(sources_router)
 
 # In lifespan after SignalStore/EventStore initialize:
 application.state.source_collection = collector
-collector.initialize()
 collector.start()
 try:
     yield
@@ -21,7 +21,7 @@ finally:
     collector.stop()
 ```
 
-Keep the existing lifespan's other state assignments and cleanup. The collector
+The existing lifespan keeps its other state assignments and cleanup. The collector
 defaults off. It starts only with `SOURCE_COLLECTION_ENABLED=true` and
 `OFFLINE_MODE=false`. Render currently sets `OFFLINE_MODE=true`; enabling live
 polling requires a deliberate deployment setting change by C.

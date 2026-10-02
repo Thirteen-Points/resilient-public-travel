@@ -3,12 +3,15 @@
 import tempfile
 import threading
 import unittest
+import os
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import patch
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from backend.app.api.sources import router as sources_router
+from backend.app.main import create_app
 from backend.app.services.ingest.collection import SourceCollectionService
 from backend.app.services.ingest.hko import HkoFetchError, HkoWarningPoller
 from backend.app.services.ingest.mtr_eta import MtrEtaAnomalyPoller
@@ -159,6 +162,21 @@ class CollectionTests(unittest.TestCase):
             response = client.get("/api/sources/review-queue", headers={"X-Review-Token": "test-reviewer"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()[0]["state"], "pending_review")
+
+    def test_shared_app_exposes_sources_without_starting_offline_pollers(self):
+        with patch.dict(os.environ, {"SOURCE_COLLECTION_ENABLED": "true", "OFFLINE_MODE": "true"}):
+            with TestClient(create_app(db_path=self.db, review_token="test-reviewer")) as client:
+                status = client.get("/api/sources/status")
+                protected = client.get("/api/sources/review-queue")
+                authorized = client.get("/api/sources/review-queue",
+                                        headers={"X-Review-Token": "test-reviewer"})
+                collector = client.app.state.source_collection
+        self.assertEqual(status.status_code, 200)
+        self.assertEqual([item["source"] for item in status.json()], ["hko", "mtr"])
+        self.assertTrue(all(not item["enabled"] for item in status.json()))
+        self.assertEqual(protected.status_code, 401)
+        self.assertEqual(authorized.status_code, 200)
+        self.assertEqual(collector._threads, {})
 
 
 if __name__ == "__main__":

@@ -19,11 +19,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .api.events import router as events_router
+from .api.persona import catalog_router as persona_catalog_router, router as persona_router
 from .api.review import router as review_router
 from .api.signals import router as signals_router
+from .api.sources import router as sources_router
 from .api.stream import router as stream_router
 from .runtime_config import parse_cors_origins
 from .services.event_store import DEFAULT_DB_PATH, EventStore
+from .services.ingest.collection import SourceCollectionService
+from .services.persona import PreferenceClient
 from .services.signal_store import SignalStore
 from .services.structure.llm_structurer import LlmJsonClient
 
@@ -169,14 +173,30 @@ def build_llm_client() -> LlmJsonClient | None:
         return None
 
 
+def build_preference_client() -> PreferenceClient | None:
+    """Send free-text preferences to a model only after explicit opt-in."""
+    if os.getenv("AI_ENABLED", "false").lower() != "true":
+        return None
+    if os.getenv("PERSONA_PARSE_AI_ENABLED", "false").lower() != "true":
+        return None
+    try:
+        from .services.structure.llm_api_client import OpenAiCompatJsonClient
+
+        return OpenAiCompatJsonClient.from_env()
+    except Exception:
+        return None
+
+
 def create_app(
     *, db_path: str | Path = DEFAULT_DB_PATH,
     review_token: str | None = None,
     llm_client: LlmJsonClient | None = None,
+    preference_client: PreferenceClient | None = None,
 ) -> FastAPI:
     """Compose B's reviewed-event APIs and C's deterministic services."""
     store = SignalStore(db_path)
     event_store = EngineSyncEventStore(db_path)
+    collector = SourceCollectionService(db_path, signal_store=store, event_store=event_store)
 
     @asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncIterator[None]:
@@ -188,6 +208,10 @@ def create_app(
         application.state.review_token = review_token if review_token is not None else os.getenv("REVIEW_API_TOKEN")
         application.state.llm_client = llm_client if llm_client is not None else build_llm_client()
         application.state.llm_injected = llm_client is not None
+        application.state.preference_client = (preference_client if preference_client is not None
+                                               else build_preference_client())
+        application.state.source_collection = collector
+        collector.start()
         from .admin.store import AdminStore
         admin = AdminStore(Path(db_path).parent / "admin.sqlite3", Path(db_path))
         try:
@@ -195,7 +219,10 @@ def create_app(
         except Exception:
             admin.ready = False
         application.state.admin_store = admin
-        yield
+        try:
+            yield
+        finally:
+            collector.stop()
 
     application = FastAPI(title="ResilientRoute API", version="m0-integrated", lifespan=lifespan)
     application.add_middleware(
@@ -209,6 +236,9 @@ def create_app(
     )
     application.include_router(signals_router)
     application.include_router(events_router)
+    application.include_router(persona_router)
+    application.include_router(persona_catalog_router)
+    application.include_router(sources_router)
     application.include_router(review_router)
     application.include_router(stream_router)
     from .admin.api import router as admin_router

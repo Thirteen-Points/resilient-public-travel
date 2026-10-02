@@ -1,0 +1,3 @@
+# A dependency task — not executed in Round 007
+
+Owner: A. Permitted writes in A's own branch: `frontend/**` and A's report only. Consume B's `GET /api/personas`, `/api/personas/presets`, and `POST /api/persona/parse`; connect five-profile selection and comparison to live route query; show parser explanation and fallback method; show weather estimate/source labels and event-expiry route/banner recovery. Acceptance: actual browser evidence for two documented different top routes when C's model supports them, wheelchair limits visibly retained, source/disclaimer text present. Round 007 only supplies the B contract; A has not executed this task here.

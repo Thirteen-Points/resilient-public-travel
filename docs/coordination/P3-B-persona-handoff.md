@@ -1,8 +1,8 @@
 # P3 B persona handoff to A and C
 
-Status on `c2934c1` baseline: B owns the catalog router and data. C must register
-`persona_catalog_router` and `persona_router` in the shared app before these URLs
-are available. Catalog defaults are simulated design assumptions.
+Status after P3 integration: the shared app registers the catalog and parser
+routers. Local shared-app tests cover both URLs and the optional parser fallback.
+Catalog defaults are simulated design assumptions.
 
 ## Exact route-query contract
 
@@ -24,10 +24,10 @@ route is guaranteed for an OD without accessible candidates.
 
 ## B-owned API and configuration
 
-- Once C registers the B router, `GET /api/personas` returns five simulated defaults in contract order: `commuter`, `student`, `tourist`, `elderly`, `wheelchair`. No reviewer token is needed. `data/personas.json` is the source; preferences are design assumptions, not observed passenger profiles.
-- Once registered, `GET /api/personas/presets` returns normalized effective weights for `fastest`, `most_stable`, and `fewest_transfers`. `data/presets.json` records them. C's current raw score tuples for the latter two sum to 1.05 and are normalized by the engine. The returned values match the current effective scoring ratios.
-- Once registered, `POST /api/persona/parse` returns `{patch, explanation, method}`. The default is `rule_fallback`. A model client can be injected server-side only after C wires its opt-in provider configuration. No model key belongs in frontend code. Model output is schema-validated; failure falls back to rules. Explicit and existing wheelchair restrictions cannot be relaxed.
-- Only B's isolated catalog and parser tests exercised the model path, using fake clients. No real provider was called, and T2.6 remains paused.
+- `GET /api/personas` returns five simulated defaults in contract order: `commuter`, `student`, `tourist`, `elderly`, `wheelchair`. No reviewer token is needed. `data/personas.json` is the source; preferences are design assumptions, not observed passenger profiles.
+- `GET /api/personas/presets` returns normalized effective weights for `fastest`, `most_stable`, and `fewest_transfers`. `data/presets.json` records them. C's current raw score tuples for the latter two sum to 1.05 and are normalized by the engine. The returned values match the current effective scoring ratios.
+- `POST /api/persona/parse` returns `{patch, explanation, method}`. The default is `rule_fallback`. The model path requires both `AI_ENABLED=true` and `PERSONA_PARSE_AI_ENABLED=true` plus a configured provider key. No model key belongs in frontend code. Model output is schema-validated; failure falls back to rules. Explicit and existing wheelchair restrictions cannot be relaxed.
+- Shared-app tests exercised the model path with fake clients. No real provider was called, and T2.6 remains paused.
 
 ## A handoff
 
