@@ -6,6 +6,8 @@ import { SignalReportForm } from './components/SignalReportForm'
 import { DeparturePicker, hktDeparture } from './components/DeparturePicker'
 import { AgentAvatar } from './components/AgentAvatar'
 import { AgentPanel } from './components/AgentPanel'
+import { ComparePage } from './components/ComparePage'
+import { SimulationPage } from './components/SimulationPage'
 import { ReviewConsole, type ReviewLog } from './components/ReviewConsole'
 import { ReviewAccess } from './components/ReviewAccess'
 import { SignalInbox } from './components/SignalInbox'
@@ -14,11 +16,11 @@ import { UpdatesPage } from './components/UpdatesPage'
 import { ProvenanceBadge } from './components/ProvenanceBadge'
 import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
-import type { DemoMeta, Event, Network, Preset, RouteCandidate, Signal } from './api/types'
+import type { DemoMeta, Event, JourneyContext, Network, Persona, Preset, RouteCandidate, Signal } from './api/types'
 import { CORRIDOR_IDS, formatHkt, formatRange, legDuration, modeSummary, nearestAccessPoint, nodeIndex } from './data'
 import css from './App.module.css'
 
-type Screen = 'journey' | 'results' | 'updates' | 'detail' | 'sources' | 'agent' | 'review' | 'report'
+type Screen = 'journey' | 'results' | 'updates' | 'detail' | 'sources' | 'agent' | 'review' | 'report' | 'compare' | 'simulation'
 const SEED_MODE = new URLSearchParams(window.location.search).get('data') === 'seed'
 function switchDataMode() {
   const url = new URL(window.location.href)
@@ -82,7 +84,7 @@ function RouteCard({ route, letter, network, selected, onSelect, onDetail }: {
     })
     return () => media.revert()
   }, { dependencies: [selected], revertOnUpdate: true })
-  return <article ref={card} data-enter className={`${css.routeCard} ${selected ? css.selectedRoute : ''}`}>
+  return <article ref={card} data-enter data-route-id={route.route_id} className={`${css.routeCard} ${selected ? css.selectedRoute : ''}`}>
     <button type="button" className={css.routeSelect} onClick={onSelect} aria-pressed={selected}>
       <span className={css.routeTop}><span className={css.routeLetter}>{letter}</span><span className={css.routeName}>Option {letter}<small>{modeSummary(route, network)}</small></span><strong>{formatRange(route.total.time_range_s)}</strong></span>
       <span className={css.routeMetrics}><span>{route.total.transfers} transfer{route.total.transfers === 1 ? '' : 's'}</span><span>{route.total.walk_m} m walk</span><span>HK${route.total.fare_hkd.toFixed(2)}</span></span>
@@ -108,7 +110,7 @@ export function App() {
   const live = useLiveSession(!SEED_MODE)
   const bundle: Bundle | null = SEED_MODE ? seedBundle : live.bundle ? {
     ...live.bundle,
-    meta: { snapshotAt: live.bundle.meta.generated_at, od: { origin: '', destination: '' }, provenance: 'real-derived', disclaimer: live.bundle.meta.disclaimer, simulationSeedAvailable: false },
+    meta: { snapshotAt: live.bundle.meta?.generated_at ?? '', od: { origin: '', destination: '' }, provenance: 'simulated', disclaimer: live.bundle.meta?.disclaimer ?? 'Modelled estimates; source metadata unavailable. Follow official travel advice.', simulationSeedAvailable: false },
   } : null
   const [loadError, setLoadError] = useState('')
   const [screen, setScreen] = useState<Screen>('journey')
@@ -119,6 +121,8 @@ export function App() {
   const [picked, setPicked] = useState('')
   const [error, setError] = useState('')
   const [preset, setPreset] = useState<Preset>('fastest')
+  const [persona, setPersona] = useState<Persona>('commuter')
+  const [largeText, setLargeText] = useState(false), [highContrast, setHighContrast] = useState(false)
   const [departure, setDeparture] = useState('08:20')
   const [departureDate, setDepartureDate] = useState('2026-09-22')
   const [searching, setSearching] = useState(false)
@@ -133,6 +137,8 @@ export function App() {
   const routes = SEED_MODE ? seedRoutes : live.routes
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = useMemo(() => routes.find(route => route.route_id === selectedId), [routes, selectedId])
+  const eventRevisions = (SEED_MODE ? seedBundle?.published : live.bundle?.published)?.map(event => `${event.event_id}@${event.version}`).sort().join(',') ?? ''
+  const context = useMemo<JourneyContext>(() => ({ origin, destination, departAt: hktDeparture(departureDate, departure), preset, persona, eventRevisions, eventIds: eventRevisions ? eventRevisions.split(',').map(value => value.slice(0, value.lastIndexOf('@'))) : [] }), [origin, destination, departureDate, departure, preset, persona, eventRevisions])
   usePageMotion(root, screen, Boolean(bundle))
   useSuccessMotion(toast, success.revision)
   useEffect(() => {
@@ -206,7 +212,7 @@ export function App() {
     if (!Number.isFinite(Date.parse(departAt))) { setError('Choose a valid Hong Kong departure date and time.'); return }
     searchingRef.current = true; setSearching(true)
     try {
-      const next = await (SEED_MODE ? seedDataSource.getRoutes : live.query)({ origin: from, destination: to, departAt, preset: preference })
+      const next = await (SEED_MODE ? seedDataSource.getRoutes : live.query)({ origin: from, destination: to, departAt, preset: preference, persona })
       setRoutes(next.slice(0, 3)); setOrigin(from); setDestination(to); setPreset(preference); setQueriedAt(departAt)
       setSelectedId(next[0]?.route_id ?? null)
       setScreen('results'); setError(''); setPicking(null)
@@ -225,8 +231,8 @@ export function App() {
   // Map footprint: full behind the floating panels, a right-hand card beside
   // page content, faded out on the plain How-it-works page.
   const mapMode: 'full' | 'docked' | 'hidden' =
-    screen === 'updates' || screen === 'review' ? 'docked' : screen === 'sources' ? 'hidden' : 'full'
-  return <div ref={root} className={css.shell}>
+    screen === 'updates' || screen === 'review' ? 'docked' : ['sources', 'compare', 'simulation'].includes(screen) ? 'hidden' : 'full'
+  return <div ref={root} className={`${css.shell} ${largeText ? css.largeText : ''} ${highContrast ? css.highContrast : ''}`}>
     <header className={css.header}>
       <button type="button" className={css.brand} onClick={() => setScreen('journey')} aria-label="ResilientRoute home">rr<span>.</span></button>
       <nav aria-label="Main navigation">
@@ -234,20 +240,27 @@ export function App() {
         <button type="button" aria-current={screen === 'agent' ? 'page' : undefined} onClick={() => { setScreen('agent'); setPicking(null) }}>Agent</button>
         <button type="button" aria-current={screen === 'journey' || screen === 'results' || screen === 'detail' ? 'page' : undefined} onClick={() => { setScreen('journey'); setPicking(null) }}>Plan journey</button>
         <button type="button" aria-current={screen === 'updates' ? 'page' : undefined} onClick={() => setScreen('updates')}>Updates</button>
+        <button type="button" aria-current={screen === 'compare' ? 'page' : undefined} onClick={() => { setScreen('compare'); setPicking(null) }}>Compare</button>
+        <button type="button" aria-current={screen === 'simulation' ? 'page' : undefined} onClick={() => { setScreen('simulation'); setPicking(null) }}>Simulation</button>
         <button type="button" aria-current={screen === 'review' ? 'page' : undefined} onClick={() => { setScreen('review'); setPicking(null) }}>Review</button>
         <button type="button" aria-current={screen === 'sources' ? 'page' : undefined} onClick={() => setScreen('sources')}>How it works</button>
       </nav>
       <button type="button" className={css.demo} onClick={switchDataMode}>{SEED_MODE ? 'FIXED SEED · USE API' : 'API MODE · USE SEED'}</button>
     </header>
     <main className={css.stage}>
+      <div className={css.accessControls} aria-label="Display accessibility"><button type="button" aria-pressed={largeText} onClick={() => setLargeText(value => !value)}>Large text</button><button type="button" aria-pressed={highContrast} onClick={() => setHighContrast(value => !value)}>High contrast</button></div>
       {!SEED_MODE && <div className={css.connectionStatus} role="status"><strong>{live.connected ? 'Live updates connected' : 'Checking public updates every 3s'}</strong>{live.revision > 0 && <p>Routes refreshed for the latest approved network state.</p>}{(live.warning || live.routeWarning) && <p>{live.warning} {live.routeWarning}</p>}<button type="button" onClick={() => void live.refresh()}>Refresh</button></div>}
       <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} mode={mapMode} />
       {(mapMode === 'docked' || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
-        {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta.sources} onClose={() => setScreen('journey')} />}
+        {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta?.sources} sourceWarning={live.sourceWarning} onClose={() => setScreen('journey')} />}
         {screen === 'updates' && <UpdatesPage events={events} signals={signals} network={network} seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} onOpenReview={() => setScreen('review')} onBack={() => setScreen('journey')} />}
         {screen === 'review' && (SEED_MODE ? <ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} /> : <ReviewAccess><SignalInbox network={network} onChanged={live.refresh} />{live.reviewWarning && <p role="alert">{live.reviewWarning}</p>}<ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} live /></ReviewAccess>)}
       </div>}
-      {screen === 'agent' && <AgentPanel published={published} departAt={hktDeparture(departureDate, departure)} onRoutes={preference => void showRoutes('TAW', 'ADM', preference)} onBack={() => setScreen('journey')} />}
+      <div hidden={screen !== 'agent'}><AgentPanel active={screen === 'agent'} seedMode={SEED_MODE} published={published} context={context} onRoutes={preference => void showRoutes(SEED_MODE ? meta.od.origin : origin, SEED_MODE ? meta.od.destination : destination, preference)} onBack={() => setScreen('journey')} /></div>
+      <div hidden={screen !== 'compare' && screen !== 'simulation'} className={`${css.pagePane} ${css.full}`}>
+        <div hidden={screen !== 'compare'}><ComparePage active={screen === 'compare'} seedMode={SEED_MODE} context={context} warning={live.warning} onBack={() => setScreen('journey')} /></div>
+        <div hidden={screen !== 'simulation'}><SimulationPage active={screen === 'simulation'} seedMode={SEED_MODE} onBack={() => setScreen('journey')} /></div>
+      </div>
       {screen === 'report' && (SEED_MODE ? <section className={css.panel}><h1>Reports use the API.</h1><p>Switch to API mode to submit an unverified report.</p><button type="button" onClick={switchDataMode}>Use API mode</button></section> : <SignalReportForm onAccepted={() => void live.refresh()} />)}
       {screen === 'journey' && <div data-panel className={css.panel}>
           <h1>Where are you<br />heading?</h1>
@@ -261,7 +274,9 @@ export function App() {
             {picked && <p className={css.confirm}>{picked}</p>}
             {error && <p role="alert" className={css.error}>{error}</p>}
             <DeparturePicker date={departureDate} time={departure} onDate={setDepartureDate} onTime={setDeparture} />
-            <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} className={preset === option.id ? css.activePreset : ''} onClick={() => setPreset(option.id)}>{option.label}</button>)}</fieldset>
+            <fieldset className={css.presets}><legend>TRAVELLER PROFILE</legend><button type="button" aria-pressed={persona === 'commuter'} onClick={() => setPersona('commuter')}>Commuter</button><button type="button" aria-pressed={persona === 'wheelchair'} disabled={SEED_MODE} onClick={() => setPersona('wheelchair')}>Wheelchair</button></fieldset>
+            <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} disabled={!SEED_MODE && option.id === 'least_walking'} title={!SEED_MODE && option.id === 'least_walking' ? 'Backend contract pending — no alternate preset substituted' : undefined} className={preset === option.id ? css.activePreset : ''} onClick={() => setPreset(option.id)}>{option.label}</button>)}</fieldset>
+            {!SEED_MODE && <p className={css.tiny}>Less walking preset awaits backend support. Wheelchair hard walking and accessibility constraints still apply.</p>}
             <button type="submit" disabled={searching} className={css.primary}>{searching ? 'Finding routes…' : 'Find resilient routes'} <span>↗</span></button>
           </form>
 
@@ -269,7 +284,7 @@ export function App() {
       </div>}
       {screen === 'results' && <>
         {published[0] && <div className={css.alert}><span>!</span><strong>{published[0].title}</strong><span className={css.alertDetail}>Published event · {formatHkt(published[0].updated_at)}</span><button type="button" onClick={() => setScreen('updates')}>View update →</button></div>}
-        <section data-panel className={`${css.panel} ${css.results}`} aria-labelledby="routes-heading">
+        <section data-panel data-route-refresh-revision={live.revision} data-route-ids={routes.map(route => route.route_id).join(',')} className={`${css.panel} ${css.results}`} aria-labelledby="routes-heading">
           <button type="button" className={css.back} onClick={() => setScreen('journey')}>← Edit journey</button>
           <span className={css.kicker}>ROUTES FOR YOUR JOURNEY</span>
           <h1 id="routes-heading">{nodes.get(origin)?.name_en ?? origin} <span>→</span><br />{nodes.get(destination)?.name_en ?? destination}</h1>

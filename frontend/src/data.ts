@@ -5,6 +5,7 @@ export const CORRIDOR_IDS = ['TAW', 'KOT', 'MKK', 'HUH', 'EXC', 'ADM'] as const
 export const nodeIndex = (network: Network) => new Map(network.nodes.map(node => [node.id, node]))
 
 export function formatHkt(value: string) {
+  if (!Number.isFinite(Date.parse(value))) return 'Time not supplied'
   return new Intl.DateTimeFormat('en-HK', {
     timeZone: 'Asia/Hong_Kong', day: 'numeric', month: 'short',
     hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
