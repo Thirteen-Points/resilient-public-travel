@@ -14,7 +14,7 @@ from .tools import ToolHandler
 
 
 def build_engine_handlers(engine: Any, diversion_builder: Callable[[dict[str, Any]], dict[str, Any]]) -> dict[str, ToolHandler]:
-    """Return six contract handlers bound to a C-Route engine and C-Sim builder."""
+    """Return nine contract handlers bound to C engines and B preference rules."""
     state: dict[str, Any] = {"routes": {}, "parameters": {}}
 
     def metadata(records: list[dict[str, Any]]) -> tuple[str, float]:
@@ -48,18 +48,40 @@ def build_engine_handlers(engine: Any, diversion_builder: Callable[[dict[str, An
         return {"access_points": points, "provenance": provenance, "freshness_s": freshness_s}
 
     def search_transit_routes(**arguments: Any) -> dict[str, Any]:
+        profile_id = arguments.get("profile_id")
+        profiles = getattr(getattr(engine, "routing_data", None), "profiles", {}) or {}
+        from ..graph.build import thaw
+        profile = thaw(profiles.get(profile_id, {})) if profile_id else {}
+        if profile_id in {"fastest", "most_stable", "fewest_transfers"}:
+            profile["preset"] = profile_id
+        elif profile_id and profile_id not in profiles:
+            raise ValueError("unknown_profile_id")
+        explicit = arguments.get("profile") or {}
+        if not isinstance(explicit, dict):
+            raise ValueError('profile must be an object')
+        original = deepcopy(profile)
+        profile.update(explicit)
+        if original.get('mobility') in {'reduced', 'wheelchair'}:
+            ranks = {'standard': 0, 'reduced': 1, 'wheelchair': 2}
+            profile['mobility'] = max((original['mobility'], profile.get('mobility', 'standard')), key=ranks.__getitem__)
+            profile['hard_flags'] = sorted(set(original.get('hard_flags', [])) | set(profile.get('hard_flags', [])))
+            profile['max_walk_m'] = min(original.get('max_walk_m', 400), profile.get('max_walk_m', 400))
+        pinned = engine.snapshots.current
         details = engine.query_details(arguments["from"], arguments["to"], arguments["depart_at"],
-                                       {"profile_id": arguments.get("profile_id")} if arguments.get("profile_id") else None,
+                                       profile or None,
                                        modes=arguments.get("modes"))
         routes = deepcopy(details["routes"])
         state["routes"] = {route["route_id"]: route for route in routes}
         state["parameters"] = deepcopy(details["route_parameters"])
+        state['details'] = deepcopy(details)
+        state['snapshot'] = pinned
+        state['depart_at'] = arguments['depart_at']
         provenance, freshness_s = metadata(routes)
         return {"routes": routes, "graph_snapshot": details["graph_snapshot"], "provenance": provenance, "freshness_s": freshness_s}
 
     def score_routes(route_ids: list[str], weights: dict[str, float] | None = None) -> dict[str, Any]:
-        from backend.app.engine.constraints import normalize_profile
-        from backend.app.engine.score import score_routes as native_score_routes
+        from ..engine.constraints import normalize_profile
+        from ..engine.score import score_routes as native_score_routes
         routes = [state["routes"][route_id] for route_id in route_ids]
         scored = native_score_routes(routes, normalize_profile({"weights": weights} if weights else {}), baseline_fare=engine.baseline_fare)
         state["routes"] = {route["route_id"]: route for route in scored}
@@ -88,10 +110,39 @@ def build_engine_handlers(engine: Any, diversion_builder: Callable[[dict[str, An
                 raise ValueError("route_supply_unavailable")
             parameters.update({"route_id": route_id, "provenance": route["provenance"]})
             supplies.append(parameters)
-        result = diversion_builder({"event_id": event_id, "demand": demand, "routes": supplies})
+        from dataclasses import asdict
+        from ..sim.shared_capacity import resources_from_snapshot
+        shared = resources_from_snapshot(state['snapshot'], state['details'], state['depart_at'])
+        result = diversion_builder({"event_id": event_id, "demand": demand, "routes": supplies,
+                                    "shared_resources": [asdict(resource) for resource in shared]})
         result["freshness_s"] = 0
         return result
 
+    def get_published_events(at: str | None = None) -> dict[str, Any]:
+        from datetime import datetime, timezone
+        from ..graph.snapshot import active
+        from ..graph.build import timestamp, thaw
+        instant = timestamp(at) if at else datetime.now(timezone.utc)
+        events = [thaw(event) for event in engine.snapshots.current.events if active(event, instant)]
+        provenance, freshness_s = metadata(events)
+        return {"events": events, "graph_snapshot": engine.snapshots.current.snapshot_id,
+                "provenance": provenance, "freshness_s": freshness_s}
+
+    def parse_user_preference(text: str, current_profile: dict[str, Any] | None = None) -> dict[str, Any]:
+        from ..services.persona import parse_preference
+        return {**parse_preference(text, current_profile=current_profile).model_dump(),
+                "provenance": "real-derived", "freshness_s": 0}
+
+    def explain_route(route_id: str) -> dict[str, Any]:
+        route = deepcopy(state["routes"][route_id])
+        return {"route_id": route_id, "message": "此路线由确定性引擎计算；排序依据如下评分，运力和天气假设请查看警告。",
+                "score": route.get("score"), "score_breakdown": route.get("score_breakdown", []),
+                "notes": route.get("notes", []), "total": route["total"], "warnings": route.get("warnings", []),
+                "graph_snapshot": route.get("graph_snapshot"), "provenance": route["provenance"],
+                "freshness_s": route["total"]["freshness_s"]}
+
     return {"geocode_place": geocode_place, "find_access_points": find_access_points,
             "search_transit_routes": search_transit_routes, "score_routes": score_routes,
-            "estimate_load": estimate_load, "get_diversion_plan": get_diversion_plan}
+            "estimate_load": estimate_load, "get_diversion_plan": get_diversion_plan,
+            "get_published_events": get_published_events, "parse_user_preference": parse_user_preference,
+            "explain_route": explain_route}

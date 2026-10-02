@@ -16,6 +16,7 @@ from backend.app.engine.queue import estimate_queue
 
 from .models import Agent, RouteOption
 from .population import DEFAULT_SEED, generate_population, population_summary
+from .shared_capacity import SharedResource
 
 
 def _percentile_95(values: list[float]) -> float:
@@ -132,6 +133,7 @@ def _evaluate_policy(
     rankings: dict[str, list[RouteOption]],
     assignments: dict[str, str],
     window_min: float,
+    shared_resources: tuple[SharedResource, ...] = (),
 ) -> tuple[dict, set[str]]:
     route_by_id = {route.route_id: route for route in routes}
     counts = Counter(assignments.values())
@@ -167,6 +169,41 @@ def _evaluate_policy(
             (agent_id for agent_id, assigned_route in assignments.items() if assigned_route == route.route_id)
         )
         served_ids.update(candidates[:service_capacity])
+
+    if shared_resources:
+        resources_by_route = {
+            route.route_id: tuple(item for item in shared_resources if route.route_id in item.route_ids)
+            for route in routes
+        }
+        # Both policies use the same protected-first boarding rule and the
+        # same physical resources. Choosing a path does not guarantee boarding.
+        route_left = {key: value.service_capacity(window_min) for key, value in supplies.items()}
+        segment_left = {item.resource_id: item.capacity(window_min) for item in shared_resources}
+        segment_counts = {
+            item.resource_id: sum(counts[rid] for rid in item.route_ids) for item in shared_resources
+        }
+        for item in shared_resources:
+            demand = segment_counts[item.resource_id] * 60 / window_min
+            if item.service_capacity_per_hour == 0:
+                wait_min = window_min
+            else:
+                wait_min = estimate_queue(demand_per_hour=demand,
+                                          service_capacity_per_hour=item.service_capacity_per_hour,
+                                          headway_s=item.headway_s).expected_wait_s / 60
+            for rid in item.route_ids:
+                waits_by_route[rid] = max(waits_by_route[rid], wait_min)
+        served_ids.clear()
+        for agent in sorted(agents, key=lambda item: (not item.fairness_priority, item.agent_id)):
+            rid = assignments.get(agent.agent_id)
+            if rid is None or route_left[rid] <= 0:
+                continue
+            segments = resources_by_route[rid]
+            if any(segment_left[item.resource_id] <= 0 for item in segments):
+                continue
+            served_ids.add(agent.agent_id)
+            route_left[rid] -= 1
+            for item in segments:
+                segment_left[item.resource_id] -= 1
 
     waits: list[float] = []
     total_delay = 0.0

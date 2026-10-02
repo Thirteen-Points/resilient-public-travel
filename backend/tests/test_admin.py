@@ -16,6 +16,8 @@ PASSWORD="local-test-password"
 HASH=password_hash(PASSWORD)
 @pytest.fixture
 def admin(tmp_path, monkeypatch):
+    monkeypatch.setenv("OFFLINE_MODE", "false")
+    monkeypatch.delenv("AI_DISABLE_EXTERNAL", raising=False)
     monkeypatch.setenv("ADMIN_USERNAME","operator")
     monkeypatch.setenv("ADMIN_PASSWORD_HASH",HASH)
     monkeypatch.setenv("ADMIN_ENCRYPTION_KEY","test-encryption-key-"*3)

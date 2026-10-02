@@ -48,7 +48,7 @@ def parse_cors_origins(value: str | None) -> tuple[str, ...]:
 class Settings:
     host: str = os.getenv("HOST", "127.0.0.1")
     port: int = int(os.getenv("PORT", "8000"))
-    ai_enabled: bool = _bool("AI_ENABLED", False)
+    ai_enabled: bool = _bool("AI_ENABLED", _bool("LLM_ENABLED", False))
     offline_mode: bool = _bool("OFFLINE_MODE", True)
     seed_network: str = os.getenv("SEED_NETWORK", "contracts/seed/network.seed.json")
     seed_events: str = os.getenv("SEED_EVENTS", "contracts/seed/event.seed.json")

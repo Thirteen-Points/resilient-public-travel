@@ -29,8 +29,10 @@ ENV HOST=0.0.0.0
 ENV PORT=8000
 ENV DEBUG=false
 ENV OFFLINE_MODE=true
-ENV LLM_ENABLED=false
+ENV AI_ENABLED=false
 ENV DEPLOY_ENV=docker
+ARG APP_BUILD_SHA=unknown
+ENV APP_BUILD_SHA=${APP_BUILD_SHA}
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \

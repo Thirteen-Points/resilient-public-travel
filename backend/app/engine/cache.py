@@ -28,3 +28,8 @@ class QueryCache:
             self._values.move_to_end(key)
             while len(self._values) > self.maxsize:
                 self._values.popitem(last=False)
+
+    def clear(self):
+        """Invalidate route rankings when a trusted dynamic provider changes."""
+        with self._lock:
+            self._values.clear()

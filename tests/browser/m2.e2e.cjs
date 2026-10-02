@@ -58,8 +58,14 @@ const networkFailures = []
   await page.getByRole('button', { name: 'Find resilient routes' }).waitFor()
   await page.getByRole('combobox', { name: 'TO', exact: true }).click()
   await page.getByRole('option', { name: /Admiralty/ }).click()
-  const futureTime = new Date(Date.now() + 8 * 3600000 + 10 * 60000).toISOString().slice(11, 16)
-  await page.getByLabel('Departure time HKT', { exact: true }).fill(futureTime)
+  // Tomorrow's morning service stays after real publication regardless of the
+  // runner time, and avoids midnight rollover/no-night-service false failures.
+  const departureDate = new Date(Date.now() + 8 * 3600000 + 24 * 3600000).toISOString().slice(0, 10)
+  await page.locator('[aria-controls="departure-calendar"]').click()
+  const chosenDay = page.locator(`[data-date="${departureDate}"]`)
+  if (!(await chosenDay.isVisible())) await page.getByRole('button', { name: 'Next month', exact: true }).click()
+  await chosenDay.click()
+  await page.getByLabel('Departure time HKT', { exact: true }).fill('08:20')
   await page.getByRole('button', { name: 'Find resilient routes' }).click()
   await page.getByRole('heading', { name: 'Tai Wai → Admiralty' }).waitFor()
   assert.ok(!(await page.locator('body').innerText()).includes('NaN'))
@@ -87,7 +93,7 @@ const networkFailures = []
     await call('/api/signals', { raw_text: '【模拟浏览器测试】东铁线红磡至会展信号故障，暂停服务。', author_hint: author })
     await page.getByRole('button', { name: 'Refresh reports' }).click()
     await page.getByRole('button', { name: 'Extract / merge' }).click()
-    await page.getByText('Evidence merged.', { exact: false }).waitFor()
+    await page.getByText(/^Evidence merged using rule fallback\./).waitFor()
   }
   const reviewPath = `/api/events/${event.event_id}/review`
   await until(async () => (await call('/api/events', undefined, true))[0].confidence === .55)

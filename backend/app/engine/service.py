@@ -30,7 +30,7 @@ class RouteEngine:
     @classmethod
     def from_adapter(cls, adapter, **kwargs):
         data = adapter.load()
-        store = SnapshotStore(build_graph(data.network, holidays=data.holidays))
+        store = SnapshotStore(build_graph(data.network, holidays=data.holidays), weather_policy=data.weather_policy)
         store.replace_events(data.events)
         if data.fixture_load is not None and 'load_provider' not in kwargs:
             kwargs['load_provider'] = FixtureLoadProvider(data.fixture_load)

@@ -45,6 +45,7 @@ class RoutingData:
     holidays: tuple = ()
     fixture_load: object = None
     profiles: object = None
+    weather_policy: object = None
 
 
 class DataAdapter(Protocol):
@@ -87,16 +88,20 @@ class MappingDataAdapter:
     No fallback capacity/headway/fare, no auto-certification, no fixture provider.
     Fare groups are explicit fare-policy input; None charges each new boarding.
     """
-    def __init__(self, network, *, baseline_fare, fares=None, events=(), holidays=(), profiles=None):
+    def __init__(self, network, *, baseline_fare, fares=None, events=(), holidays=(), profiles=None, weather_policy=None):
         self.network = deepcopy(network)
         self.baseline = baseline_fare
         self.fares = deepcopy(fares or {})
         self.events = deepcopy(events)
         self.holidays = tuple(holidays)
         self.profiles = deepcopy(profiles or {})
+        self.weather_policy = deepcopy(weather_policy)
 
     def load(self):
         network = deepcopy(self.network)
+        if self.weather_policy is not None:
+            from ..engine.environment import validate_weather_policy
+            validate_weather_policy(self.weather_policy)
         overrides = deepcopy(self.fares)
         if network.get('meta', {}).get('provenance') == 'simulated':
             network = mark_simulated(network)
@@ -104,17 +109,22 @@ class MappingDataAdapter:
         validate_network(network)
         positive(self.baseline, 'baseline_fare')
         return RoutingData(network, tuple(deepcopy(self.events)), fare_table(network, overrides=overrides),
-                           self.baseline, self.holidays, profiles=freeze(self.profiles))
+                           self.baseline, self.holidays, profiles=freeze(self.profiles), weather_policy=freeze(self.weather_policy))
 
 
 class SeedDataAdapter:
-    def __init__(self, network_path=None, events_path=None, policy_path=None):
+    def __init__(self, network_path=None, events_path=None, policy_path=None, *, calendar_path=None, weather_path=None):
         root = Path(__file__).resolve().parents[3]
         self.network_path = Path(network_path or root / 'contracts/seed/network.seed.json')
         self.events_path = Path(events_path) if events_path else None
         self.policy_path = Path(policy_path or Path(__file__).parent.parent / 'engine/fixtures/seed_policy.json')
+        self.calendar_path = Path(calendar_path or root / 'data/calendar.json')
+        self.weather_path = Path(weather_path or root / 'data/weather_impact.json')
 
     def load(self):
+        from ..engine.environment import calendar_holidays, validate_weather_policy
+        holidays = calendar_holidays(json.loads(self.calendar_path.read_text(encoding='utf-8')))
+        weather = validate_weather_policy(json.loads(self.weather_path.read_text(encoding='utf-8')))
         policy = json.loads(self.policy_path.read_text(encoding='utf-8'))
         if policy['provenance'] != 'simulated':
             raise DataUnavailable('Seed policy must be simulated')
@@ -141,8 +151,8 @@ class SeedDataAdapter:
                 event['provenance'] = 'simulated'
         positive(policy['baseline_fare_hkd'], 'baseline fare')
         return RoutingData(network, tuple(events), fare_table(network, overrides=overrides),
-                           policy['baseline_fare_hkd'], fixture_load=freeze(policy['load']),
-                           profiles=freeze(policy.get('profiles', {})))
+                           policy['baseline_fare_hkd'], holidays=holidays, fixture_load=freeze(policy['load']),
+                           profiles=freeze(policy.get('profiles', {})), weather_policy=freeze(weather))
 
 
 
@@ -167,4 +177,5 @@ class JsonDataAdapter:
             events = content['events'] if isinstance(content, dict) else content
         return MappingDataAdapter(network, baseline_fare=policy['baseline_fare'],
                                   fares=policy.get('fares'), events=events,
-                                  holidays=policy.get('holidays', ()), profiles=policy.get('profiles')).load()
+                                  holidays=policy.get('holidays', ()), profiles=policy.get('profiles'),
+                                  weather_policy=policy.get('weather_policy')).load()

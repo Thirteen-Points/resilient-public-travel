@@ -42,7 +42,12 @@ class ToolRegistry:
 
     async def call(self, name: str, arguments: Mapping[str, Any] | str | None = None) -> dict[str, Any]:
         started = time.monotonic()
-        args = json.loads(arguments) if isinstance(arguments, str) else dict(arguments or {})
+        try:
+            args = json.loads(arguments) if isinstance(arguments, str) else dict(arguments or {})
+            if not isinstance(args, dict):
+                raise ValueError("arguments must be an object")
+        except (ValueError, TypeError):
+            return self._record(name, {}, started, {"ok": False, "error": "invalid_arguments"})
         if name not in self._tools:
             return self._record(name, args, started, {"ok": False, "error": "unknown_tool"})
         spec, handler = self._tools[name]
@@ -64,6 +69,7 @@ class ToolRegistry:
         trace = {"tool": name, "arguments": args, "elapsed_ms": round((time.monotonic() - started) * 1000, 2), "result": result,
                  "provenance": provenance, "freshness_s": freshness_s}
         self.audit_log.append(trace)
+        del self.audit_log[:-512]
         return {**result, "trace": {"tool": name, "freshness_s": freshness_s, "provenance": provenance}}
 
 
@@ -102,8 +108,13 @@ def build_default_registry(handlers: Mapping[str, ToolHandler] | None = None) ->
         ("score_routes", "Return deterministic score breakdowns for existing route ids.", _schema({"route_ids": {"type": "array", "items": {"type": "string"}}, "weights": {"type": "object"}}, ["route_ids"])),
         ("estimate_load", "Return deterministic load estimates for existing route ids.", _schema({"route_ids": {"type": "array", "items": {"type": "string"}}, "horizon_min": {"type": "integer"}}, ["route_ids", "horizon_min"])),
         ("get_diversion_plan", "Return the deterministic diversion plan for an event and demand.", _schema({"event_id": {"type": "string"}, "demand": {"type": "integer"}}, ["event_id", "demand"])),
+        ("get_published_events", "Read only reviewer-approved events active at the requested time.", _schema({"at": {"type": "string", "format": "date-time"}}, [])),
+        ("parse_user_preference", "Extract explicit preferences without relaxing accessibility limits.", _schema({"text": {"type": "string", "maxLength": 500}, "current_profile": {"type": "object"}}, ["text"])),
+        ("explain_route", "Explain an existing computed route using its score and source facts.", _schema({"route_id": {"type": "string"}}, ["route_id"])),
     ]
     for name, description, parameters in definitions:
+        if name == 'search_transit_routes':
+            parameters['properties']['profile'] = {'type': 'object', 'description': 'Explicit routing profile and hard accessibility constraints.'}
         registry.register(ToolSpec(name, description, parameters), handlers.get(name, _unconfigured_tool))
     return registry
 

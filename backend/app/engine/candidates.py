@@ -25,6 +25,7 @@ class Traversal:
     events: tuple
     boarding: bool
     nominal_headway_s: float
+    weather_conditions: tuple = ()
 
 
 @dataclass
@@ -63,7 +64,8 @@ def search_paths(snapshot, origin, destination, depart_at, profile, *, modes=Non
             if (walk_limit is not None and walk > walk_limit) or max(0, next_boardings - 1) > profile["max_transfers"]:
                 continue
             factor, slow, event_ids = snapshot.impact(edge, at)
-            if factor == 0:
+            weather_delay, walk_speed, weather_conditions, weather_ids = snapshot.weather_effect(edge.mode, at)
+            if factor == 0 or weather_delay == 0 or (edge.mode == "WALK" and walk_speed == 0):
                 continue
             departure, headway = at, (path[-1].headway_s if path and not boarding and edge.mode != "WALK" else 0)
             if boarding:
@@ -81,14 +83,22 @@ def search_paths(snapshot, origin, destination, depart_at, profile, *, modes=Non
                         continue
                     departure, headway = schedule
                     factor = new_factor
-            duration = walking_seconds(edge.walk_m, profile["walking_speed_mps"]) if edge.mode == "WALK" else edge.travel_s * slow
+            weather_delay, walk_speed, weather_conditions, weather_ids = snapshot.weather_effect(edge.mode, departure)
+            if weather_delay == 0 or (edge.mode == "WALK" and walk_speed == 0):
+                continue
+            duration = (walking_seconds(edge.walk_m, profile["walking_speed_mps"] * walk_speed)
+                        if edge.mode == "WALK" else edge.travel_s * slow) * weather_delay
             arrival = departure + timedelta(seconds=duration)
             end_factor, _, end_ids = snapshot.impact(edge, departure, arrival)
-            if end_factor == 0:
+            boundaries = [arrival, *[timestamp(value) for event in snapshot.events
+                         for value in (event.get("window", {}).get("start"), event.get("published_at"))
+                         if value and departure < timestamp(value) < arrival]]
+            if end_factor == 0 or any(snapshot.weather_effect(edge.mode, point)[0] == 0 for point in boundaries):
                 continue
             nominal_headway = headway * factor if boarding else (path[-1].nominal_headway_s if path and edge.mode != "WALK" else 0)
             traversal = Traversal(edge, departure, arrival, headway, min(factor, end_factor),
-                                  tuple(sorted(set(event_ids + end_ids))), boarding, nominal_headway)
+                                  tuple(sorted(set(event_ids + end_ids + weather_ids))), boarding, nominal_headway,
+                                  weather_conditions)
             heapq.heappush(queue, ((arrival - depart_at).total_seconds(), next(serial), edge.target,
                                   visited | {edge.target}, path + (traversal,), walk, next_boardings,
                                   edge.line if edge.mode != "WALK" else None))
@@ -161,8 +171,12 @@ def route_from_path(path, snapshot, depart_at, *, fares, profile=None):
         edge, data = step.edge, step.edge.data
         duration = (step.arrive - step.depart).total_seconds()
         length = edge.walk_m if edge.mode == "WALK" else distance_m(network.nodes[edge.source], network.nodes[edge.target])
-        weather = any(e.get("event_type") == "weather" and e["event_id"] in step.events for e in snapshot.events)
-        model = estimates(edge.mode, length, duration, step.factor, weather)
+        weather = bool(step.weather_conditions)
+        cv = snapshot.weather_policy.get("reliability_cv", {}).get("values", {}).get(edge.mode) if snapshot.weather_policy else None
+        model = estimates(edge.mode, length, duration, step.factor, False, cv=cv)
+        if weather:
+            warnings.append("天气影响采用 data/weather_impact.json 模拟系数：" + ", ".join(step.weather_conditions)
+                            + "；已审核区域天气警告用于整个演示网络")
         co2 += model["co2_g"]
         if legs and edge.mode != "WALK" and not step.boarding and legs[-1].get("line") == edge.line:
             leg_sigmas[-1] += model["sigma_s"]
@@ -208,7 +222,7 @@ def route_from_path(path, snapshot, depart_at, *, fares, profile=None):
                "depart": step.depart.isoformat(), "arrive": step.arrive.isoformat(),
                "headway_s": step.headway_s, "in_vehicle_s": duration, "walk_m": edge.walk_m,
                "fare_hkd": amount, "accessible": accessible,
-               "provenance": "simulated" if assumed_fare or data.get("provenance") == "simulated" else "real-derived"}
+               "provenance": "simulated" if weather or assumed_fare or data.get("provenance") == "simulated" else "real-derived"}
         if edge.mode == "WALK":
             leg.pop("headway_s")  # No vehicle service interval or boarding wait.
         if edge.line:
