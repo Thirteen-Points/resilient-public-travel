@@ -57,24 +57,24 @@ class SignalStore:
         )
         try:
             with self._connection() as connection:
-                connection.execute(
-                    """
-                    INSERT INTO signals (
-                        signal_id, received_at, source_type, payload_json
-                    ) VALUES (?, ?, ?, ?)
-                    """,
-                    (
-                        validated.signal_id,
-                        validated.received_at.isoformat(),
-                        validated.source_type,
-                        payload_json,
-                    ),
-                )
+                self._insert_signal(connection, validated, payload_json)
         except sqlite3.IntegrityError as exc:
             if "signals.signal_id" in str(exc):
                 raise SignalAlreadyExistsError(validated.signal_id) from exc
             raise
         return self.get_signal(validated.signal_id)
+
+    @staticmethod
+    def _insert_signal(
+        connection: sqlite3.Connection, signal: Signal, payload_json: str | None = None,
+    ) -> None:
+        """Internal transaction boundary also used by durable source ingestion."""
+        connection.execute(
+            "INSERT INTO signals (signal_id, received_at, source_type, payload_json) "
+            "VALUES (?, ?, ?, ?)",
+            (signal.signal_id, signal.received_at.isoformat(), signal.source_type,
+             payload_json if payload_json is not None else signal.model_dump_json()),
+        )
 
     def get_signal(self, signal_id: str) -> Signal:
         """Read one Signal by id."""

@@ -1,0 +1,176 @@
+{
+  "captured_at": "2026-10-03T00:32:32.297059+08:00",
+  "live_signal_count": 0,
+  "internal_record_count": 2,
+  "records": [
+    {
+      "source": "mtr_mobile",
+      "post_id": "D_328",
+      "revision": "d6aee40097f8e6261cc48db2468fb43cd81c8fccd0397b8a1a38b5d5d83212e6",
+      "published_at": null,
+      "collected_at": "2026-10-02T16:19:04.147392+00:00",
+      "author_hint": "official-mtr-corporation",
+      "disposition": "missing_publication_time",
+      "signal_id": null,
+      "repost_json": "[]",
+      "title": "東盟足球勁旅激戰啟德 ",
+      "source_url": "https://www.mtr.com.hk/alert/alert_simpletxt_title_tc.html#D_328"
+    },
+    {
+      "source": "mtr_mobile",
+      "post_id": "D_332",
+      "revision": "8ccd4abe7a2624cd63d70320129665023e50f910ce3df12dad90ce1e4d2c1110",
+      "published_at": null,
+      "collected_at": "2026-10-02T16:19:04.147392+00:00",
+      "author_hint": "official-mtr-corporation",
+      "disposition": "missing_publication_time",
+      "signal_id": null,
+      "repost_json": "[]",
+      "title": "國慶黃金周加強列車服務 ",
+      "source_url": "https://www.mtr.com.hk/alert/alert_simpletxt_title_tc.html#D_332"
+    }
+  ],
+  "rounds": [
+    {
+      "type": "source_result",
+      "cycle": 1,
+      "source": "mtr_mobile",
+      "status": "success",
+      "error": null,
+      "last_attempt": "2026-10-02T16:19:03.934314+00:00",
+      "next_attempt": 1790958244.155115,
+      "window_start": "2026-10-01T16:19:03.934314+00:00",
+      "cursor": null,
+      "counts": {
+        "processed": 2,
+        "added": 0,
+        "duplicate": 0,
+        "skipped": {
+          "missing_publication_time": 2
+        }
+      },
+      "diagnostics": {
+        "feed_url": "https://www.mtr.com.hk/alert/alert.json",
+        "snapshot_sha256": "b5c6ee74412f9cc20f495d260e7ee5f4208e071530e8c2fdb7aa8c81f9a665bf",
+        "feed_built_at": "2026-10-02 06:15:00",
+        "line_status": {
+          "TWL": "green",
+          "KTL": "green",
+          "ISL": "green",
+          "SIL": "green",
+          "TKL": "green",
+          "TCL": "green",
+          "DRL": "green",
+          "AEL": "green",
+          "EAL": "green",
+          "TML": "green",
+          "LR": "green"
+        },
+        "upstream_refresh_seconds": 180.0,
+        "min_interval_seconds": 300,
+        "publication_time_policy": "skip_missing"
+      },
+      "consecutive_failures": 0,
+      "last_success": "2026-10-02T16:19:04.155115+00:00",
+      "completed_rounds": 1,
+      "minimum_interval": 300
+    },
+    {
+      "type": "source_result",
+      "cycle": 2,
+      "source": "mtr_mobile",
+      "status": "success",
+      "error": null,
+      "last_attempt": "2026-10-02T16:24:04.173225+00:00",
+      "next_attempt": 1790958544.353062,
+      "window_start": "2026-10-01T16:24:04.173225+00:00",
+      "cursor": null,
+      "counts": {
+        "processed": 2,
+        "added": 0,
+        "duplicate": 0,
+        "skipped": {
+          "missing_publication_time": 2
+        }
+      },
+      "diagnostics": {
+        "feed_url": "https://www.mtr.com.hk/alert/alert.json",
+        "snapshot_sha256": "b5c6ee74412f9cc20f495d260e7ee5f4208e071530e8c2fdb7aa8c81f9a665bf",
+        "feed_built_at": "2026-10-02 06:15:00",
+        "line_status": {
+          "TWL": "green",
+          "KTL": "green",
+          "ISL": "green",
+          "SIL": "green",
+          "TKL": "green",
+          "TCL": "green",
+          "DRL": "green",
+          "AEL": "green",
+          "EAL": "green",
+          "TML": "green",
+          "LR": "green"
+        },
+        "upstream_refresh_seconds": 180.0,
+        "min_interval_seconds": 300,
+        "publication_time_policy": "skip_missing"
+      },
+      "consecutive_failures": 0,
+      "last_success": "2026-10-02T16:24:04.353062+00:00",
+      "completed_rounds": 2,
+      "minimum_interval": 300
+    },
+    {
+      "type": "source_result",
+      "cycle": 3,
+      "source": "mtr_mobile",
+      "status": "success",
+      "error": null,
+      "last_attempt": "2026-10-02T16:29:04.387816+00:00",
+      "next_attempt": 1790958844.647512,
+      "window_start": "2026-10-01T16:29:04.387816+00:00",
+      "cursor": null,
+      "counts": {
+        "processed": 2,
+        "added": 0,
+        "duplicate": 0,
+        "skipped": {
+          "missing_publication_time": 2
+        }
+      },
+      "diagnostics": {
+        "feed_url": "https://www.mtr.com.hk/alert/alert.json",
+        "snapshot_sha256": "b5c6ee74412f9cc20f495d260e7ee5f4208e071530e8c2fdb7aa8c81f9a665bf",
+        "feed_built_at": "2026-10-02 06:15:00",
+        "line_status": {
+          "TWL": "green",
+          "KTL": "green",
+          "ISL": "green",
+          "SIL": "green",
+          "TKL": "green",
+          "TCL": "green",
+          "DRL": "green",
+          "AEL": "green",
+          "EAL": "green",
+          "TML": "green",
+          "LR": "green"
+        },
+        "upstream_refresh_seconds": 180.0,
+        "min_interval_seconds": 300,
+        "publication_time_policy": "skip_missing"
+      },
+      "consecutive_failures": 0,
+      "last_success": "2026-10-02T16:29:04.647512+00:00",
+      "completed_rounds": 3,
+      "minimum_interval": 300
+    }
+  ],
+  "continuous_cycle_gaps_seconds": [
+    300.238911,
+    300.214591
+  ],
+  "real_ingestion_verified": false,
+  "actual_incremental_content_change_observed": false,
+  "all_social_sources": "blocked",
+  "poll_exit_code": 1,
+  "exit_reason": "four explicitly selected social sources blocked; MTR succeeded"
+}

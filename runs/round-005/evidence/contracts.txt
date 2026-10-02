@@ -1,0 +1,1 @@
+contract seed validation passed: all four seeds satisfy their JSON Schemas; Event/Signal satisfy Pydantic models; cross-file IDs and counts are consistent
