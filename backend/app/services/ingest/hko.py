@@ -45,6 +45,7 @@ class HkoPollResult:
     stale: bool
     degraded: bool
     error: str | None = None
+    source_time: str | None = None
 
 
 class HkoClient:
@@ -149,6 +150,9 @@ class HkoWarningPoller:
             )
 
         active_codes = frozenset(records)
+        source_times = [str(item.get("updateTime") or item.get("issueTime"))
+                        for item in records.values() if item.get("updateTime") or item.get("issueTime")]
+        source_time = max(source_times) if source_times else None
         previous_codes = self._last_active_codes
         previous_summary = self._last_successful_warnsum
         changed = previous_codes is None or active_codes != previous_codes
@@ -165,6 +169,7 @@ class HkoWarningPoller:
                 changed=False,
                 stale=False,
                 degraded=False,
+                source_time=source_time,
             )
 
         prior_codes = previous_codes or frozenset()
@@ -214,6 +219,7 @@ class HkoWarningPoller:
             stale=False,
             degraded=detail_error is not None,
             error=detail_error,
+            source_time=source_time,
         )
 
 
