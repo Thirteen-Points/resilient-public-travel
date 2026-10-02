@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "version": "1.0",
+    "provenance": "simulated",
+    "note": "Demo preference defaults, not observed passenger behaviour. Route choice requires C's engine verification."
+  },
+  "personas": [
+    {
+      "persona": "commuter",
+      "mobility": "standard",
+      "max_walk_m": 800,
+      "max_transfers": 3,
+      "preset": "fastest",
+      "hard_flags": [],
+      "weights": {"time": 0.45, "transfers": 0.10, "walk": 0.10, "price": 0.10, "comfort": 0.05, "reliability": 0.10, "carbon": 0.05, "freshness": 0.05}
+    },
+    {
+      "persona": "student",
+      "mobility": "standard",
+      "max_walk_m": 800,
+      "max_transfers": 3,
+      "preset": "fastest",
+      "hard_flags": [],
+      "weights": {"time": 0.25, "transfers": 0.10, "walk": 0.10, "price": 0.35, "comfort": 0.05, "reliability": 0.10, "carbon": 0.025, "freshness": 0.025}
+    },
+    {
+      "persona": "tourist",
+      "mobility": "standard",
+      "max_walk_m": 800,
+      "max_transfers": 3,
+      "preset": "fewest_transfers",
+      "hard_flags": [],
+      "weights": {"time": 0.20, "transfers": 0.10, "walk": 0.20, "price": 0.10, "comfort": 0.15, "reliability": 0.10, "carbon": 0.10, "freshness": 0.05}
+    },
+    {
+      "persona": "elderly",
+      "mobility": "reduced",
+      "max_walk_m": 400,
+      "max_transfers": 2,
+      "preset": "most_stable",
+      "hard_flags": ["no_stairs"],
+      "weights": {"time": 0.20, "transfers": 0.10, "walk": 0.20, "price": 0.05, "comfort": 0.15, "reliability": 0.25, "carbon": 0.025, "freshness": 0.025}
+    },
+    {
+      "persona": "wheelchair",
+      "mobility": "wheelchair",
+      "max_walk_m": 400,
+      "max_transfers": 2,
+      "preset": "most_stable",
+      "hard_flags": ["no_stairs", "no_minibus", "no_non_lowfloor_bus"],
+      "weights": {"time": 0.20, "transfers": 0.10, "walk": 0.25, "price": 0.05, "comfort": 0.10, "reliability": 0.25, "carbon": 0.025, "freshness": 0.025}
+    }
+  ]
+}

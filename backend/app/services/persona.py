@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import re
+import json
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Any, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -59,6 +61,60 @@ class PreferenceResult(BaseModel):
 class PreferenceClient(Protocol):
     def generate_json(self, *, system_prompt: str, user_prompt: str,
                       json_schema: Mapping[str, Any], timeout_seconds: float) -> str | Mapping[str, Any]: ...
+
+
+PERSONA_DATA = Path(__file__).resolve().parents[3] / "data" / "personas.json"
+PRESET_DATA = PERSONA_DATA.with_name("presets.json")
+
+
+class PersonaProfile(BaseModel):
+    """Public demo defaults; hard constraints are still enforced by the engine."""
+
+    model_config = ConfigDict(extra="forbid")
+    persona: str
+    mobility: str
+    max_walk_m: int = Field(ge=0, le=800)
+    max_transfers: int = Field(ge=0)
+    preset: str
+    hard_flags: list[str]
+    weights: dict[str, float]
+
+    @field_validator("mobility")
+    @classmethod
+    def known_mobility(cls, value: str) -> str:
+        if value not in MOBILITY_RANK:
+            raise ValueError("unknown mobility")
+        return value
+
+    @field_validator("hard_flags")
+    @classmethod
+    def known_flags(cls, value: list[str]) -> list[str]:
+        return ProfilePatch.known_flags(value)
+
+    @field_validator("weights")
+    @classmethod
+    def valid_weights(cls, value: dict[str, float]) -> dict[str, float]:
+        return ProfilePatch.valid_weights(value)
+
+
+def load_personas() -> list[PersonaProfile]:
+    document = json.loads(PERSONA_DATA.read_text(encoding="utf-8"))
+    profiles = [PersonaProfile.model_validate(item) for item in document["personas"]]
+    if [item.persona for item in profiles] != ["commuter", "student", "tourist", "elderly", "wheelchair"]:
+        raise ValueError("persona catalog does not match the agreed contract")
+    wheelchair = profiles[-1]
+    if (wheelchair.mobility != "wheelchair" or wheelchair.max_walk_m > 400 or
+            not {"no_stairs", "no_minibus", "no_non_lowfloor_bus"}.issubset(wheelchair.hard_flags)):
+        raise ValueError("wheelchair catalog must retain hard accessibility limits")
+    return profiles
+
+
+def load_presets() -> dict[str, dict[str, float]]:
+    document = json.loads(PRESET_DATA.read_text(encoding="utf-8"))
+    presets = document["presets"]
+    if set(presets) != {"fastest", "most_stable", "fewest_transfers"}:
+        raise ValueError("preset catalog does not match the agreed contract")
+    return {name: ProfilePatch.valid_weights(weights) for name, weights in presets.items()}
 
 
 def _rule_patch(text: str) -> ProfilePatch:

@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "version": "1.0",
+    "provenance": "simulated",
+    "note": "Effective normalized weights from backend/app/engine/score.py. The engine's raw most_stable and fewest_transfers tuples sum to 1.05 and are normalized when scoring. Route outcomes require verification."
+  },
+  "presets": {
+    "fastest": {"time": 0.45, "transfers": 0.10, "walk": 0.10, "price": 0.10, "comfort": 0.05, "reliability": 0.10, "carbon": 0.05, "freshness": 0.05},
+    "most_stable": {"time": 0.238095238095, "transfers": 0.095238095238, "walk": 0.095238095238, "price": 0.047619047619, "comfort": 0.095238095238, "reliability": 0.333333333333, "carbon": 0.047619047619, "freshness": 0.047619047619},
+    "fewest_transfers": {"time": 0.238095238095, "transfers": 0.333333333333, "walk": 0.142857142857, "price": 0.047619047619, "comfort": 0.095238095238, "reliability": 0.047619047619, "carbon": 0.047619047619, "freshness": 0.047619047619}
+  }
+}
