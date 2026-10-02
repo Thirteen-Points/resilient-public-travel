@@ -13,7 +13,7 @@ function start(command, args, cwd, env) {
 }
 async function ready(url, child) { for (let i = 0; i < 120; i++) { try { if ((await fetch(url)).ok) return } catch {} if (child.exitCode !== null) throw new Error(child.logs()); await pause(150) } throw new Error('Server unavailable: ' + child.logs()) }
 let browser
-const evidence = { environment: 'isolated local backend + real Edge/Chromium browser', passed: false, assertions: [], blockers: ['personalized chat contract', 'per-query comparison snapshot token', 'public source collection states', 'P3 simulation confirmation and M2 API filename mapping'] }
+const evidence = { environment: 'isolated local backend + real Edge/Chromium browser', passed: false, assertions: [], blockers: ['personalized chat contract', 'per-query comparison snapshot token', 'public source collection states', 'P3 simulation confirmation'] }
 ;(async () => {
   const api = `http://127.0.0.1:${await port()}`, web = `http://127.0.0.1:${await port()}`
   const backend = start(process.env.M2_PYTHON || path.join(root, '.venv/Scripts/python.exe'), ['tests/browser/m2_server.py', api.split(':').at(-1)], root, { CORS_ALLOWED_ORIGINS: web })
@@ -93,11 +93,20 @@ const evidence = { environment: 'isolated local backend + real Edge/Chromium bro
   await page.getByRole('heading', { name: 'Assumptions', exact: true }).scrollIntoViewIfNeeded()
   await page.screenshot({ path: path.join(out, 'simulation-assumptions.png'), fullPage: true })
   await page.getByLabel('Simulation scenario id').fill('m2_six_station_directed_od_am_peak'); await page.getByRole('button', { name: 'Load precomputed result' }).click()
+  await page.locator('[data-simulation-id="m2_six_station_directed_od_am_peak"]').waitFor()
+  const actualM2 = await (await fetch(api + '/api/sim/result?scenario_id=m2_six_station_directed_od_am_peak')).json()
+  assert.equal(actualM2.scenario_id, 'm2_six_station_directed_od_am_peak')
+  for (const strategy of ['baseline', 'guided']) assert.ok((await page.locator('[data-simulation-id]').innerText()).includes(actualM2[strategy].total_delay_person_min.toLocaleString('en-HK')))
+  await page.getByText('Guided delay is higher.', { exact: false }).waitFor()
+  await page.getByText('Capacity gap not supplied', { exact: true }).waitFor()
+  fs.writeFileSync(path.join(out, 'm2-simulation-response.json'), JSON.stringify(actualM2, null, 2))
+  await page.screenshot({ path: path.join(out, 'simulation-m2.png'), fullPage: true })
+  await page.getByLabel('Simulation scenario id').fill('missing-p3-scenario'); await page.getByRole('button', { name: 'Load precomputed result' }).click()
   await page.getByRole('alert').filter({ hasText: 'SIM_RESULT_NOT_FOUND' }).waitFor()
-  assert.equal(await page.locator('[data-simulation-id]').getAttribute('data-simulation-id'), 'scn_huh_exc_closed_am_peak')
+  assert.equal(await page.locator('[data-simulation-id]').getAttribute('data-simulation-id'), 'm2_six_station_directed_od_am_peak')
   await page.getByText('Previous result retained — data may be stale.', { exact: false }).waitFor()
   await page.getByLabel('Simulation scenario id').fill('scn_huh_exc_closed_am_peak')
-  evidence.assertions.push('precomputed-simulation-real-response', 'negative-improvement-visible', 'missing-scenario-error-retains-explicit-old-result')
+  evidence.assertions.push('precomputed-simulation-real-response', 'M2-scenario-resolves-verbatim', 'negative-improvement-visible', 'missing-scenario-error-retains-explicit-old-result')
   await page.getByRole('button', { name: 'How it works', exact: true }).click()
   await page.getByText('Last successful update: not supplied', { exact: true }).first().waitFor()
   await page.screenshot({ path: path.join(out, 'sources-unknown.png'), fullPage: true })

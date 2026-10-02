@@ -29,7 +29,7 @@ export function SimulationPage({ active, seedMode, onBack }: { active: boolean; 
   return <section className={css.page} data-panel aria-labelledby="simulation-heading">
     <button type="button" onClick={onBack}>← Station planner</button><h1 id="simulation-heading">Where the capacity ends.</h1>
     <p>Baseline and guided results, exactly as calculated by the backend. No live passenger measurement is implied.</p>
-    <p className={css.notice}>The default is the repository's older M0 demonstration. A P3 scenario and allocation definitions await C confirmation. The M2 scenario currently has an API filename mismatch; it is never substituted silently.</p>
+    <p className={css.notice}>The default is the repository's older M0 demonstration. The M2 precomputed scenario is m2_six_station_directed_od_am_peak. A P3 scenario and allocation definitions await C confirmation.</p>
     {seedMode ? <p>Simulation API is unavailable in fixed seed mode. Switch to API mode; no placeholder numbers are shown here.</p> : <div className={css.actions}>
       <label>Scenario id supplied by C<input aria-label="Simulation scenario id" value={scenario} maxLength={128} onChange={event => { latest.current.cancel(); setBusy(false); setScenario(event.target.value) }} /></label>
       <button type="button" disabled={busy} onClick={() => void run()}>{busy ? 'Loading result…' : 'Load precomputed result'}</button>

@@ -1,5 +1,7 @@
 # FreddyP3 前端交接与验收
 
+2026-10-02 本地 debug 更新：M2 场景 ID 查询已修复，真实浏览器已验证读取；管理员静态资源已重新构建并同步。完整复验见 [P3-LOCAL-DEBUG.md](P3-LOCAL-DEBUG.md)。下文原交接记录中的 M2 404/文件映射问题为修复前状态；其余接口确认和线上验收缺项仍然保留。
+
 执行日期：2026-10-02（HKT）。从 GitHub main `c2934c1fee124b41227a30f70b8628feb0b109ff` 同步到现有 `FreddyP3`，执行开始时两者一致。修改仅在 `frontend/**` 与 `tests/browser/p3*.cjs`；不改后端、数据或部署配置。
 
 本轮检查结果、原始计时摘要和截图/录屏索引见 [P3-ACCEPTANCE.md](P3-ACCEPTANCE.md)。
