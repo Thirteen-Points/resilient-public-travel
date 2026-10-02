@@ -13,10 +13,14 @@ class NoLLMQueryService:
         self.registry = registry
 
     async def query(self, *, user_input: str, origin: str, destination: str, depart_at: str,
-                    profile_id: str | None = None, event_id: str | None = None, demand: int | None = None) -> dict[str, Any]:
-        routes = await self.registry.call("search_transit_routes", {"from": origin, "to": destination,
-                                          "depart_at": depart_at, "profile_id": profile_id} if profile_id else
-                                         {"from": origin, "to": destination, "depart_at": depart_at})
+                    profile_id: str | None = None, profile: dict | None = None,
+                    event_id: str | None = None, demand: int | None = None) -> dict[str, Any]:
+        arguments = {"from": origin, "to": destination, "depart_at": depart_at}
+        if profile_id:
+            arguments['profile_id'] = profile_id
+        if profile:
+            arguments['profile'] = profile
+        routes = await self.registry.call("search_transit_routes", arguments)
         if not routes["ok"]:
             return {"message": no_ai_message([routes]), "tool_calls": [routes], "fallback": True}
         route_data = routes["data"]

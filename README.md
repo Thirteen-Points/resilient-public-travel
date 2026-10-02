@@ -10,7 +10,9 @@ ResilientRoute is an academic transit-disruption prototype by **Thirteen Points*
 - Header-authenticated event streaming with reconnect cursors, plus three-second polling. Public journey planning and approved-event reads require no reviewer credential.
 - Immutable graph snapshots and route recomputation using **last approved facts**. An edit stays private until approval; the previous approved impact remains active. Rejecting an edited card or withdrawing it removes that impact.
 - Simulation backend and precomputed scenario results. The frontend simulation dashboard and side-by-side persona comparison remain later work.
-- Offline rule extraction and deterministic AI backend replies. The visible Agent panel currently uses local templates; it is not connected to live AI chat.
+- Offline rule extraction and nine deterministic AI tools. The backend can optionally use DeepSeek V4.1 Flash for draft extraction and route wording, with a shared durable budget and fallback. The visible Agent panel currently uses local templates; its backend connection remains A's integration work.
+- Lifecycle-owned HKO/MTR collectors using saved administrator settings, source leases, deduplication and failure backoff. Collection creates unverified Signals for review; it never publishes events automatically.
+- Verified demo-window holidays, simulated weather impacts from approved events, and runtime replan status. Manual load exercises require reviewer authorization and explicit simulated provenance.
 
 ## Run locally
 
@@ -96,7 +98,10 @@ For databases predating approved-revision storage, current `published` cards mig
 | GET | `/api/stream/events` | Reviewer SSE; `X-Review-Token`, `Last-Event-ID` or `after_id`; no URL credentials |
 | POST | `/api/sim/load` | Public modelled diversion plan |
 | GET | `/api/sim/result?scenario_id=...` | Public precomputed simulation |
-| POST | `/api/ai/chat` | Public deterministic backend tool reply; not wired to the visible Agent panel |
+| POST | `/api/ai/chat` | Deterministic routes/tools with optional validated model wording; not wired to the visible Agent panel |
+| POST | `/api/persona/parse` | Conservative preference parsing preserving accessibility constraints |
+| GET | `/api/sources/status`, `/api/replanning/status` | Safe collector and replan status |
+| POST | `/api/replanning/load-observations` | Reviewer-only explicit simulated load exercise |
 
 Route-query example:
 
@@ -122,7 +127,9 @@ flowchart LR
 
 Every record carries `real`, `real-derived` or `simulated` provenance. Unknown station accessibility stays `null`, never `true`. A general map pick may select such a station while explicitly requiring accessibility verification; it does not certify wheelchair access. Route-leg accessibility may still reflect model assumptions, as stated in route warnings.
 
-The event AI adapter is optional (`AI_ENABLED`, provider-specific `DEEPSEEK_`, `QWEN_` or `GLM_` configuration; see `.env.example`). Schema validation and deterministic fallback do not prove factual accuracy. AI extraction is limited to categorical/text fields; routing numbers, confidence, capacity and simulation metrics come from code, traceable data or explicit reviewer inputs. No live model acceptance or HKO/MTR polling verification is claimed here. External-source poller modules exist but are not automatically scheduled by the default application.
+The model adapter is optional; see [DeepSeek setup](deploy/DEEPSEEK.md). `OFFLINE_MODE=true` and `AI_DISABLE_EXTERNAL=true` override both environment keys and saved administrator AI settings. Schema validation and deterministic fallback do not prove factual accuracy. AI extraction is limited to categorical/text fields; routing numbers, confidence, capacity and simulation metrics come from code, traceable data or explicit reviewer inputs. Collectors start only when configured and enabled; live model/source acceptance is still pending. P3 shared-segment simulations preserve explicit assumptions and do not establish real spare transport capacity.
+
+See the [P3 integration report](docs/acceptance/p3-integration-report.md) for completed local checks and outstanding online/UI acceptance.
 
 See [provenance](data/PROVENANCE.md), [data quality](data/DATA_QUALITY.md), [contracts](contracts/README.md), [frontend guide](frontend/README.md) and [current M2 integration notes](frontend/M2-INTEGRATION.md).
 

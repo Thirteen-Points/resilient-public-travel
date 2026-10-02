@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-02",
+  "branch": "ZYC-P3",
+  "base_sha": "6d112ca67b9d36ddaf7680de0bc71b389da34540",
+  "backend": {
+    "seconds": 48.89,
+    "failures": 0,
+    "passed": 487,
+    "subtests_passed": 264
+  },
+  "frontend": {
+    "admin_bundle": "passed, unchanged",
+    "passed": 71,
+    "test_files": 9,
+    "production_build": "passed"
+  },
+  "validators": {
+    "contracts": "passed",
+    "data_layer": "passed with 1 documented source-authenticity warning"
+  },
+  "browser": {
+    "timings_ms": [
+      262,
+      126,
+      239
+    ],
+    "polling_withdrawal_ms": 3452,
+    "errors": [],
+    "assertions": [
+      "public-query",
+      "UI-report-draft-create",
+      "evidence-merge",
+      "UI-approve",
+      "public-without-auth",
+      "wrong-reviewer-public-isolation",
+      "approved-revision-isolation",
+      "three-refresh-timings",
+      "confirmed-write-refresh-failure",
+      "polling-withdrawal",
+      "offline-retention",
+      "recovery",
+      "mobile-overflow",
+      "no-token-url-or-storage"
+    ]
+  },
+  "docker_recreation": "pending GitHub CI; local Docker unavailable",
+  "online_deployment": "unverified",
+  "live_deepseek": "unverified; no real key used"
+}

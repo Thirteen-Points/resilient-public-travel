@@ -75,11 +75,14 @@ cp .env.example .env
 | `HOST` | 0.0.0.0 | Server bind address |
 | `PORT` | 8000 | Server port |
 | `OFFLINE_MODE` | false | If true, no external API calls |
-| `LLM_ENABLED` | false | If true, LLM-based features enabled |
-| `LLM_API_KEY` | (empty) | Your DeepSeek/Qwen/GLM API key |
+| `AI_ENABLED` | false | If true, LLM-based features enabled (`LLM_ENABLED` is a legacy alias) |
+| `DEEPSEEK_API_KEY` | (empty) | Server-side provider API key; Qwen/GLM have their own named keys |
 | `DEBUG` | true | Enable debug logging |
 
 **The system starts without any API key.** LLM is optional and never on the critical path.
+
+See [P3 acceptance](P3-ACCEPTANCE.md) for persistent database migration, CI,
+startup flag verification and the online redeployment acceptance procedure.
 
 ---
 

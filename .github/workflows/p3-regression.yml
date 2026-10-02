@@ -1,0 +1,115 @@
+name: P3 regression
+
+on:
+  pull_request:
+  push:
+    branches: [main, ZYC-P3]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p3-regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    name: Backend, frontend and browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      AI_ENABLED: 'false'
+      OFFLINE_MODE: 'true'
+      PYTHONPATH: .:backend
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install backend and test dependencies
+        run: python -m pip install -r backend/requirements.txt 'pytest>=8,<10' 'pytest-subtests>=0.14,<1'
+      - name: Validate seeds and data layer
+        run: |
+          python scripts/validate_contract_seeds.py
+          python scripts/validate_data_layer.py
+      - name: Backend and integration regression
+        run: python -m pytest --import-mode=importlib backend/tests backend/app/engine/tests tests -q --junitxml=.cache/p3-ci/backend.xml
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+      - name: Frontend regression
+        run: npm test -- --reporter=default --reporter=junit --outputFile.junit=../.cache/p3-ci/frontend.xml
+        working-directory: frontend
+      - name: Typecheck and production build
+        run: npm run build
+        working-directory: frontend
+        env:
+          VITE_BUILD_SHA: ${{ github.sha }}
+      - name: Install isolated browser runtime
+        run: |
+          npm install --prefix .cache/p3-playwright --no-audit --no-fund --package-lock=false playwright@1.56.1
+          .cache/p3-playwright/node_modules/.bin/playwright install --with-deps chromium
+      - name: Check committed administrator bundle
+        run: |
+          npm run build:admin
+          git diff --exit-code -- ../backend/app/admin_static
+          test -z "$(git ls-files --others --exclude-standard ../backend/app/admin_static)"
+        working-directory: frontend
+      - name: Browser publication, recovery and mobile regression
+        env:
+          M2_PYTHON: python
+          M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
+        run: node tests/browser/m2.e2e.cjs
+      - name: Preserve regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p3-regression-${{ github.sha }}
+          include-hidden-files: true
+          path: |
+            .cache/p3-ci/
+            .cache/m2-browser/
+          if-no-files-found: warn
+          retention-days: 14
+
+  container-persistence:
+    name: Container recreation persistence
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      COMPOSE_PROJECT_NAME: p3-ci-persistence
+      APP_BUILD_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build dedicated offline container
+        run: docker compose -f deploy/docker-compose.yml up --build --detach --wait --wait-timeout 120
+      - name: Seed event audit and encrypted administrator settings
+        run: docker compose -f deploy/docker-compose.yml exec -T -e P3_PERSISTENCE_FIXTURE=true resilient-route-api python scripts/verify_container_persistence.py seed
+      - name: Recreate container and verify retained application data
+        run: |
+          docker compose -f deploy/docker-compose.yml up --detach --force-recreate --wait --wait-timeout 120
+          docker compose -f deploy/docker-compose.yml exec -T -e P3_PERSISTENCE_FIXTURE=true resilient-route-api python scripts/verify_container_persistence.py check
+      - name: Preserve container logs
+        if: always()
+        run: |
+          mkdir -p .cache/p3-container
+          docker compose -f deploy/docker-compose.yml logs --no-color > .cache/p3-container/server.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-container-${{ github.sha }}
+          include-hidden-files: true
+          path: .cache/p3-container/
+          retention-days: 14
+      - name: Remove disposable CI containers
+        if: always()
+        run: docker compose -f deploy/docker-compose.yml down

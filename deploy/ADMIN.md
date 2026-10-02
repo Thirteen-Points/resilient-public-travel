@@ -65,14 +65,25 @@ model used or rule fallback reason after Extract / merge. Original reports remai
 unverified and only approved events affect routes.
 
 MTR East Rail and HKO use the existing adapters. Save and enable a source before
-manual collection. Tests may run while a source is disabled, but never mutate
+manual or scheduled collection. Tests may run while a source is disabled, but never mutate
 reports or detection state. Collection persists adapter state and signals in one
 SQLite transaction, obeys the minimum observation interval, and does not publish
 events. MTR reports require the configured consecutive observations; unchanged
 HKO warning sets do not produce more reports. Added, duplicate, failure and
-no-change results are displayed. There are no scheduled jobs. KMB remains
-Not connected. Only explicit administrator Test/Collect actions make external
-source requests; offline seed routes do not become live transit data.
+no-change results are displayed. Application-owned workers read saved settings
+at startup and after each configuration save. The first observation waits one
+configured interval; later observations retain the persisted minimum cadence and
+failure backoff (up to 15 minutes) across restarts. A per-source SQLite lease
+prevents manual and automatic collection from overlapping. KMB remains
+Not connected. `OFFLINE_MODE=true` blocks scheduled collection and administrator
+Test/Collect requests. Disabling a source stops subsequent requests and discards
+an unfinished observation before it can write reports. Shutdown drains in-flight
+workers with bounded response deadlines instead of cancelling their threads.
+Offline seed routes do not become live transit data.
+
+Public `GET /api/sources/status` exposes only enabled/cadence, collection state,
+last/next attempt, stale status and safe result counters. It never exposes source
+configuration secrets, raw upstream exceptions, private report text or API keys.
 
 ## Building and deployment
 

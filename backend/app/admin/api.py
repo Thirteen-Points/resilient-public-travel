@@ -83,7 +83,7 @@ def overview(request: Request, session=Depends(authenticated)):
     event_list=request.app.state.event_store.list_events()
     signal_list=request.app.state.signal_store.list_signals()
     linked={sid for event in event_list for sid in event.signals}
-    return {"health":runtime.health(),"reports":len(signal_list),"unlinked_reports":sum(s.signal_id not in linked for s in signal_list),
+    return {"health":runtime.health(),"model_usage":request.app.state.llm_budget.summary(),"reports":len(signal_list),"unlinked_reports":sum(s.signal_id not in linked for s in signal_list),
             "pending_review":sum(e.status in {"pending_review","updated"} for e in event_list),
             "published":sum(e.status=="published" for e in event_list),"ai":store.public_settings()["ai"],
             "sources":{name:store.source_state(name).get("last_result") for name in ("mtr","hko")}}
@@ -98,6 +98,9 @@ def save_settings(body: SettingsEdit, request: Request, session=Depends(authenti
     try:
         value=merge_settings(store.settings(),body)
         store.save_settings(value,body.revision,session["identity"])
+        scheduler = getattr(request.app.state, "source_scheduler", None)
+        if scheduler is not None:
+            scheduler.notify()
     except ValueError as exc:
         raise HTTPException(422,str(exc)) from exc
     except RuntimeError as exc:

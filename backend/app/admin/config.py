@@ -97,4 +97,5 @@ def llm_client(settings, store=None, *, provider=None, key_id=None):
         for key in p["keys"]:
             if key["value"] and (key_id is None or key["id"] == key_id):
                 candidates.append((name, p, key))
-    return OrderedClient(candidates, ai["timeout_s"], store) if candidates else None
+    budget = getattr(store, "llm_budget", None)
+    return OrderedClient(candidates, ai["timeout_s"], store, budget=budget) if candidates else None

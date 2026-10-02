@@ -2,7 +2,7 @@
 # ============================================================
 # ResilientRoute - One-click startup script (Linux/Mac)
 # ============================================================
-# Usage: ./scripts/start.sh [--offline] [--no-llm]
+# Usage: ./scripts/start.sh [--offline] [--no-llm] [--check-config]
 #
 # This script:
 # 1. Checks Python availability
@@ -24,19 +24,38 @@ PYTHON="${PYTHON:-python3}"
 PORT="${PORT:-8000}"
 
 # Parse arguments
-OFFLINE_FLAG=""
+# Only promote an explicitly configured legacy variable; leave unset values for
+# the backend's dotenv/config loader so saved configuration remains effective.
+if [ -z "${AI_ENABLED+x}" ] && [ -n "${LLM_ENABLED+x}" ]; then
+    export AI_ENABLED="$LLM_ENABLED"
+fi
+CHECK_CONFIG=false
 for arg in "$@"; do
     case $arg in
         --offline)
-            OFFLINE_FLAG="OFFLINE_MODE=true"
+            export OFFLINE_MODE=true
             echo "[INFO] Offline mode enabled - no external API calls"
             ;;
         --no-llm)
+            export AI_ENABLED=false
             export LLM_ENABLED=false
+            export AI_DISABLE_EXTERNAL=true
             echo "[INFO] LLM disabled - using deterministic fallback"
+            ;;
+        --check-config)
+            CHECK_CONFIG=true
+            ;;
+        *)
+            echo "[ERROR] Unknown argument: $arg" >&2
+            exit 2
             ;;
     esac
 done
+
+if [ "$CHECK_CONFIG" = true ]; then
+    printf 'OFFLINE_MODE=%s\nAI_ENABLED=%s\nAI_DISABLE_EXTERNAL=%s\nPORT=%s\n' "${OFFLINE_MODE:-true}" "${AI_ENABLED:-false}" "${AI_DISABLE_EXTERNAL:-false}" "$PORT"
+    exit 0
+fi
 
 echo "============================================================"
 echo "  ResilientRoute - Starting up..."

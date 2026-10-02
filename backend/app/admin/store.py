@@ -12,7 +12,7 @@ from pathlib import Path
 from cryptography.fernet import Fernet
 
 PROVIDERS = {
-    "deepseek": ("https://api.deepseek.com", "deepseek-chat"),
+    "deepseek": ("https://api.deepseek.com", "deepseek-flash"),
     "qwen": ("https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen-turbo"),
     "glm": ("https://open.bigmodel.cn/api/paas/v4", "glm-4-flash"),
 }

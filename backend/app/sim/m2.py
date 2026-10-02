@@ -11,6 +11,7 @@ from backend.app.sim.adapters import ODRouteSet
 from backend.app.sim.models import Agent, RouteOption
 from backend.app.sim.population import generate_population, population_summary
 from backend.app.sim.run import _evaluate_policy
+from backend.app.sim.shared_capacity import SharedResource, resource_load, validate_resources
 
 
 def _guided_multi_od(
@@ -18,9 +19,9 @@ def _guided_multi_od(
     route_sets: tuple[ODRouteSet, ...],
     rankings: dict[str, list[RouteOption]],
     window_min: float,
+    shared_resources: tuple[SharedResource, ...] = (),
 ) -> tuple[dict[str, str], set[str]]:
-    """Allocate OD-local choices against globally shared route-id capacity."""
-    routes_by_od = {item.od: item.routes for item in route_sets}
+    """Keep personal preference while consuming all shared segment buckets."""
     supplies = {
         supply.route_id: supply
         for item in route_sets
@@ -28,50 +29,43 @@ def _guided_multi_od(
     }
     target_left = {key: value.bucket_capacity(window_min) for key, value in supplies.items()}
     physical_left = {key: value.service_capacity(window_min) for key, value in supplies.items()}
+    resources_by_route = {rid: tuple(item for item in shared_resources if rid in item.route_ids) for rid in supplies}
+    resource_physical = {item.resource_id: item.capacity(window_min) for item in shared_resources}
+    resource_target = {item.resource_id: item.capacity(window_min, target=True) for item in shared_resources}
     assigned: dict[str, str] = {}
     protected: set[str] = set()
     ordered_agents = sorted(agents, key=lambda a: (not a.fairness_priority, a.agent_id))
 
-    # Reserve an accessible personal best for protected users when available.
+    def feasible(route_id: str, priority: bool) -> bool:
+        if physical_left[route_id] <= 0 or (not priority and target_left[route_id] <= 0):
+            return False
+        return all(resource_physical[item.resource_id] > 0 and
+                   (priority or resource_target[item.resource_id] > 0)
+                   for item in resources_by_route[route_id])
+
+    def consume(agent: Agent, route_id: str) -> None:
+        assigned[agent.agent_id] = route_id
+        physical_left[route_id] -= 1
+        target_left[route_id] = max(0, target_left[route_id] - 1)
+        for item in resources_by_route[route_id]:
+            resource_physical[item.resource_id] -= 1
+            resource_target[item.resource_id] = max(0, resource_target[item.resource_id] - 1)
+
+    # Protected users consume capacity first. Each person keeps their highest
+    # ranked feasible candidate; a large bucket alone is not a reason to detour.
     for agent in ordered_agents:
         choices = rankings.get(agent.agent_id, [])
-        if not agent.fairness_priority or not choices:
+        if not choices:
             continue
         best = choices[0]
-        if physical_left[best.route_id] <= 0:
-            continue
-        if check_extra_delay(agent, best, best).allowed:
-            assigned[agent.agent_id] = best.route_id
-            physical_left[best.route_id] -= 1
-            target_left[best.route_id] = max(0, target_left[best.route_id] - 1)
-        else:
-            protected.add(agent.agent_id)
-
-    # Fill global buckets in capacity order, but only from the route set for
-    # each passenger's OD. A route_id's supply is consumed exactly once.
-    route_order = sorted(supplies, key=lambda key: (-supplies[key].capacity_per_hour, key))
-    for route_id in route_order:
-        if physical_left[route_id] <= 0:
-            continue
-        eligible_for_route = [
-            agent for agent in ordered_agents
-            if agent.agent_id not in assigned
-            and any(route.route_id == route_id for route in routes_by_od.get((agent.origin, agent.destination), ()))
-        ]
-        for agent in eligible_for_route:
-            if physical_left[route_id] <= 0:
-                break
-            if not agent.fairness_priority and target_left[route_id] <= 0:
-                break
-            route = next(route for route in routes_by_od[(agent.origin, agent.destination)] if route.route_id == route_id)
-            personal_best = rankings[agent.agent_id][0]
-            if not check_extra_delay(agent, route, personal_best).allowed:
+        for route in choices:
+            if not check_extra_delay(agent, route, best).allowed:
                 if agent.fairness_priority:
                     protected.add(agent.agent_id)
                 continue
-            assigned[agent.agent_id] = route_id
-            physical_left[route_id] -= 1
-            target_left[route_id] = max(0, target_left[route_id] - 1)
+            if feasible(route.route_id, agent.fairness_priority):
+                consume(agent, route.route_id)
+                break
     return assigned, protected
 
 
@@ -84,6 +78,7 @@ def run_m2_multi_od(
     window_min: float,
     time_range: tuple[str, str],
     assumptions: list[str],
+    shared_resources: tuple[SharedResource, ...] = (),
 ) -> dict[str, Any]:
     if not isinstance(scenario_id, str) or not scenario_id.strip():
         raise ValueError("scenario_id is required")
@@ -111,7 +106,9 @@ def run_m2_multi_od(
             raise ValueError(
                 f"{route_set.origin}->{route_set.destination} routes and supplies must have matching unique route_ids"
             )
-        for route, supply in zip(route_set.routes, route_set.supplies, strict=True):
+        supplies_by_id = {supply.route_id: supply for supply in route_set.supplies}
+        for route in route_set.routes:
+            supply = supplies_by_id[route.route_id]
             old_route = route_by_id.get(route.route_id)
             if old_route and old_route != route:
                 raise ValueError(f"shared route_id {route.route_id} has conflicting route semantics")
@@ -120,6 +117,8 @@ def run_m2_multi_od(
                 raise ValueError(f"shared route_id {supply.route_id} has conflicting supply inputs; cannot pool safely")
             route_by_id.setdefault(route.route_id, route)
             supply_by_id.setdefault(supply.route_id, supply)
+
+    validate_resources(shared_resources, set(route_by_id))
 
     route_tuple = tuple(route_by_id.values())
     od_weights_raw = {item.od: item.demand_weight for item in route_sets}
@@ -139,21 +138,24 @@ def run_m2_multi_od(
         for agent in agents if rankings.get(agent.agent_id)
     }
     guided_assignments, protected_blocked = _guided_multi_od(
-        agents, route_sets, rankings, window_min
+        agents, route_sets, rankings, window_min, shared_resources
     )
     baseline, baseline_served = _evaluate_policy(
         policy="baseline_selfish", agents=agents, routes=route_tuple,
         supplies=supply_by_id, rankings=rankings, assignments=baseline_assignments,
         window_min=window_min,
+        shared_resources=shared_resources,
     )
     guided, guided_served = _evaluate_policy(
         policy="guided_capacity_fair", agents=agents, routes=route_tuple,
         supplies=supply_by_id, rankings=rankings, assignments=guided_assignments,
         window_min=window_min,
+        shared_resources=shared_resources,
     )
 
     def enrich(metrics: dict, assignments: dict[str, str], served_ids: set[str]) -> dict:
         counts = Counter(assignments.values())
+        shared_load = resource_load(shared_resources, assignments, window_min)
         wheelchair_ids = {agent.agent_id for agent in agents if agent.persona == "wheelchair"}
         protected_ids = {agent.agent_id for agent in agents if agent.fairness_priority}
         return {
@@ -162,10 +164,13 @@ def run_m2_multi_od(
             "served_demand": len(served_ids),
             "unmet_demand": population - len(served_ids),
             "unassigned_demand": population - len(assignments),
+            "unstoppable_demand": population - len(assignments),
             "wheelchair_assigned": len(wheelchair_ids & assignments.keys()),
             "wheelchair_unmet": len(wheelchair_ids - served_ids),
             "protected_assigned": len(protected_ids & assignments.keys()),
             "protected_unmet": len(protected_ids - served_ids),
+            "resource_load": shared_load,
+            "overloaded_shared_resources": sum(row["target_capacity_excess"] > 0 for row in shared_load),
             "route_load": [
                 {
                     **row,
@@ -194,6 +199,7 @@ def run_m2_multi_od(
         "population": population,
         "seed": seed,
         "time_range": list(time_range),
+        "time_step_min": 1,
         "window_min": window_min,
         "od_count": len(route_sets),
         "candidate_count": sum(len(item.routes) for item in route_sets),
@@ -215,6 +221,7 @@ def run_m2_multi_od(
         "guided": guided,
         "delta": {
             "delay_reduction_pct": round((baseline["total_delay_person_min"] - guided["total_delay_person_min"]) / baseline["total_delay_person_min"] * 100, 1) if baseline["total_delay_person_min"] else 0,
+            "p95_wait_reduction_pct": round((baseline["p95_wait_min"] - guided["p95_wait_min"]) / baseline["p95_wait_min"] * 100, 1) if baseline["p95_wait_min"] else 0,
             "served_rate_gain_pp": round((guided["served_rate"] - baseline["served_rate"]) * 100, 1),
             "wheelchair_served_rate_gain_pp": round((guided["wheelchair_served_rate"] - baseline["wheelchair_served_rate"]) * 100, 1),
             "overloaded_routes_delta": guided["overloaded_routes"] - baseline["overloaded_routes"],
@@ -225,13 +232,28 @@ def run_m2_multi_od(
             "protected_population": protected_total,
             "guided_protected_blocked_by_fairness_rule": len(protected_blocked),
             "wheelchair_accessibility_is_hard_filter": True,
+            "guided_accessibility_violations": sum(
+                not route_by_id[guided_assignments[agent.agent_id]].accessible
+                for agent in agents if agent.mobility == "wheelchair" and agent.agent_id in guided_assignments),
+            "guided_fairness_violations": sum(
+                not check_extra_delay(agent, route_by_id[guided_assignments[agent.agent_id]], rankings[agent.agent_id][0]).allowed
+                for agent in agents if agent.agent_id in guided_assignments),
+            "guided_route_capacity_violations": sum(row["physical_capacity_excess"] > 0 for row in guided["route_load"]),
+            "guided_shared_capacity_violations": sum(row["physical_capacity_excess"] > 0 for row in guided["resource_load"]),
         },
         "capacity_model": {
             "shared_route_id_supply_counted_once": True,
             "route_ids_are_capacity_buckets": True,
-            "partial_segment_overlap_modelled": False,
+            "partial_segment_overlap_modelled": bool(shared_resources),
+            "shared_resource_count": len(shared_resources),
+            "capacity_unit": "passengers/hour per directed segment; capacities floored over window_min",
+            "guided_choice": "highest personal-ranked feasible route; protected users first",
             "shared_line_overlap": {},
-            "note": "C-Route exposes route-level bottleneck capacity, not segment-level shared-service identities; distinct route_ids with overlapping legs cannot be safely pooled from current fields alone.",
+            "note": (
+                "Explicit scenario resources pool directed shared segments once; each passenger consumes every segment on their route. Capacities remain simulated, stationary over the window; no verified residual loads, train-by-train boarding, inter-window carryover, or dedicated wheelchair berth capacity is modelled. Queue wait uses the largest route/segment bottleneck wait rather than summing overlapping estimates."
+                if shared_resources else
+                "No explicit shared-resource input supplied: only identical route_ids are pooled; distinct overlapping paths remain a model limitation."
+            ),
         },
         "population_summary": population_summary(agents),
         "capacity_calculations": [item.calculation() for item in supply_by_id.values()],
