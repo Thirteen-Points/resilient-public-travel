@@ -1,5 +1,21 @@
 export type Provenance = 'real' | 'real-derived' | 'simulated'
 export type Preset = 'fastest' | 'most_stable' | 'fewest_transfers' | 'least_walking'
+export type Persona = 'commuter' | 'wheelchair'
+
+/** Fields already accepted by C-Route; no frontend weights or numeric estimates. */
+export interface TravelProfile {
+  mobility: 'standard' | 'wheelchair'
+  preset: Preset
+  max_walk_m?: number
+  max_transfers?: number
+  hard_flags: string[]
+}
+
+export interface JourneyContext extends RouteQuery {
+  persona: Persona
+  eventIds: string[]
+  eventRevisions: string
+}
 
 export interface NetworkNode {
   id: string
@@ -109,6 +125,7 @@ export interface RouteQuery {
   destination: string
   departAt: string
   preset: Preset
+  persona?: Persona
 }
 
 export interface DemoMeta {

@@ -33,4 +33,5 @@
 .stationLabel { padding: 3px 6px; border: 1px solid #dce5d2; border-radius: 6px; background: #fffffff0; box-shadow: none; color: #355038; font-size: 10px; }
 .picking .tools { top: 64px; }
 @media (max-width: 800px) { .wrap { position: relative; height: 340px; border-radius: 0; } .tools { top: 12px; right: 12px; } .legend { bottom: 28px; right: 55px; width: 210px; } .legend > div { max-height: 200px; } }
+@media (max-width: 800px) { .wrap.hidden { position: absolute; height: 0; } }
 @media (max-width: 700px) { .caption { max-width: 70%; } .pickHint { top: 8px; right: 8px; max-width: 52%; } }

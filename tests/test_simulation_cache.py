@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import time
 import unittest
@@ -74,6 +75,42 @@ class SimulationAndCacheTests(unittest.TestCase):
             store = PrecomputedResultStore(Path(directory))
             with self.assertRaises(ValueError):
                 store.read("../secret")
+
+    def test_m2_scenario_api_returns_the_checked_in_result(self) -> None:
+        from fastapi import FastAPI
+        from fastapi.testclient import TestClient
+        from backend.app.sim.api import build_router
+
+        expected = json.loads((ROOT / "data/sim/m2-simulation-result.json").read_text(encoding="utf-8"))
+        app = FastAPI()
+        app.include_router(build_router(ROOT / "data/sim"))
+        client = TestClient(app)
+        response = client.get("/api/sim/result", params={"scenario_id": expected["scenario_id"]})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), expected)
+        self.assertEqual(client.get("/api/sim/result", params={"scenario_id": "m2-simulation-result"}).status_code, 422)
+        # Input and manifest filenames must not become alternate result IDs.
+        self.assertEqual(client.get("/api/sim/result", params={"scenario_id": "m2-route-input"}).status_code, 422)
+        self.assertEqual(client.get("/api/sim/result", params={"scenario_id": "missing-p3-scenario"}).status_code, 404)
+
+    def test_legacy_alias_validates_identity_and_prefers_canonical_result(self) -> None:
+        scenario_id = "m2_six_station_directed_od_am_peak"
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            legacy = output / "m2-simulation-result.json"
+            legacy.write_text(json.dumps({"scenario_id": "different", "assumptions": ["fixture"]}), encoding="utf-8")
+            store = PrecomputedResultStore(output)
+            with self.assertRaises(ValueError):
+                store.read(scenario_id)
+            legacy.write_text(json.dumps({"scenario_id": scenario_id, "assumptions": ["legacy"]}), encoding="utf-8")
+            self.assertEqual(store.read(scenario_id)["assumptions"], ["legacy"])
+            canonical = {"scenario_id": scenario_id, "assumptions": ["canonical"]}
+            canonical_path = write_precomputed(canonical, output)
+            # A canonical file may share the legacy file's timestamp; the cache
+            # must still return the selected file, not the earlier alias value.
+            timestamp = legacy.stat().st_mtime_ns
+            os.utime(canonical_path, ns=(timestamp, timestamp))
+            self.assertEqual(store.read(scenario_id), canonical)
 
 
 if __name__ == "__main__":
