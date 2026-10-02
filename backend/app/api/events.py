@@ -35,6 +35,9 @@ class IngestResult(BaseModel):
     state: Literal["merged", "needs_review"]
     draft: StructuredEventDraft
     event: Event | None
+    structure_method: str = "rule_fallback"
+    llm_used: dict | None = None
+    structure_errors: list[str] = Field(default_factory=list)
 
 
 router = APIRouter(prefix="/api/events", tags=["events"])
@@ -141,12 +144,17 @@ def ingest_signal(
     except SignalNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Signal not found") from exc
     client = request.app.state.llm_client
+    timeout_seconds = 10
     admin = getattr(request.app.state, "admin_store", None)
     if admin and admin.ready and not getattr(request.app.state, "llm_injected", False):
         from ..admin.config import llm_client
-        client = llm_client(admin.settings())
-    structurer = LlmEventStructurer(client)
-    draft = structurer.structure(signal).draft
+        config = admin.settings()
+        client = llm_client(config, admin)
+        timeout_seconds = config["ai"]["timeout_s"]
+    structurer = LlmEventStructurer(client, timeout_seconds=timeout_seconds)
+    extracted = structurer.structure(signal)
+    draft = extracted.draft
+    diagnostics = dict(structure_method=extracted.method, llm_used=getattr(client, "used", None) if extracted.method == "llm" else None, structure_errors=[e["message"] for e in getattr(client, "errors", [])] or list(extracted.errors))
     observation = StructuredObservation(signal=signal, draft=draft)
     aggregator = EventAggregator(events, signals)
     try:
@@ -154,7 +162,7 @@ def ingest_signal(
     except AmbiguousEventMatchError as exc:
         raise HTTPException(status_code=409, detail="Ambiguous event match; reviewer required") from exc
     if match is None:
-        return IngestResult(signal_id=signal.signal_id, state="needs_review", draft=draft, event=None)
+        return IngestResult(signal_id=signal.signal_id, state="needs_review", draft=draft, event=None, **diagnostics)
 
     # Existing signal interpretations are rebuilt with deterministic rules;
     # the inbox keeps originals, while Event stores their ids only.
@@ -174,4 +182,4 @@ def ingest_signal(
         raise HTTPException(status_code=409, detail="Event changed; refresh before merging evidence") from exc
     except (UnrelatedSignalError, ValueError, SignalNotFoundError) as exc:
         raise HTTPException(status_code=409, detail="Signal requires manual review") from exc
-    return IngestResult(signal_id=signal.signal_id, state="merged", draft=draft, event=merged)
+    return IngestResult(signal_id=signal.signal_id, state="merged", draft=draft, event=merged, **diagnostics)

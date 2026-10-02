@@ -14,7 +14,7 @@ async function request(path: string, body?: unknown, protectedRead = true): Prom
       ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.timeout(path === '/api/events/ingest' ? 70000 : 10000),
   })
   const data = await response.json().catch(() => null)
   if (!response.ok) throw new Error(`${path}: HTTP ${response.status} — ${data?.error?.message ?? (typeof data?.detail === 'string' ? data.detail : 'Event service unavailable')}`)
@@ -40,7 +40,7 @@ export interface EventDraft {
   line: string | null; direction: string | null
   affected_segments: Array<{ from_node: string; to_node: string; impact: string }>
 }
-export interface IngestResult { signal_id: string; state: 'merged' | 'needs_review'; draft: EventDraft; event: Event | null }
+export interface IngestResult { signal_id: string; state: 'merged' | 'needs_review'; draft: EventDraft; event: Event | null; structure_method?: string; llm_used?: {name: string; model: string} | null; structure_errors?: string[] }
 export const ingestSignal = async (id: string) => await request('/api/events/ingest', { signal_id: id }) as IngestResult
 export const createEvent = async (body: unknown) => events([await request('/api/events', body)])[0]
 export async function getEventSignals(id: string): Promise<Signal[]> {
