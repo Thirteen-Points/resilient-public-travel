@@ -5,7 +5,7 @@ import { getReviewToken, reviewerRevision, subscribeReviewer } from './reviewerS
 import type { Event, Network, RouteCandidate, RouteQuery, Signal } from './types'
 
 export interface LiveBundle {
-  network: Network; events: Event[]; published: Event[]; signals: Signal[]; meta: transit.LiveMeta
+  network: Network; events: Event[]; published: Event[]; signals: Signal[]; meta: transit.LiveMeta | null
 }
 const message = (cause: unknown) => cause instanceof Error ? cause.message : String(cause)
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
@@ -14,6 +14,7 @@ export function useLiveSession(enabled: boolean) {
   const authRevision = useSyncExternalStore(subscribeReviewer, reviewerRevision)
   const [bundle, setBundle] = useState<LiveBundle | null>(null)
   const [error, setError] = useState(''), [warning, setWarning] = useState('')
+  const [sourceWarning, setSourceWarning] = useState('')
   const [reviewWarning, setReviewWarning] = useState(''), [routeWarning, setRouteWarning] = useState('')
   const [connected, setConnected] = useState(false), [routes, setRoutes] = useState<RouteCandidate[]>([])
   const [revision, setRevision] = useState(0)
@@ -35,11 +36,24 @@ export function useLiveSession(enabled: boolean) {
 
   useEffect(() => {
     if (!enabled) return
-    let disposed = false, busy = false, queued = false, privateBusy = false
+    let disposed = false, busy = false, queued = false, privateBusy = false, metaBusy = false
+    let currentMeta: transit.LiveMeta | null = null
     let signature = '', evidenceSignature = '', routeDirty = Boolean(lastQuery.current)
     active.current = true
     setBundle(previous => previous ? { ...previous, events: previous.published, signals: [] } : previous)
     setReviewWarning('')
+    async function refreshMeta() {
+      if (disposed || metaBusy) return
+      metaBusy = true
+      try {
+        const next = await transit.getMeta()
+        if (disposed) return
+        currentMeta = next
+        setBundle(previous => previous ? { ...previous, meta: next } : previous)
+        setSourceWarning('')
+      } catch (cause) { if (!disposed) setSourceWarning(message(cause)) }
+      finally { metaBusy = false }
+    }
     async function refreshReviewer() {
       if (!getReviewToken() || disposed || privateBusy) return
       privateBusy = true
@@ -62,12 +76,14 @@ export function useLiveSession(enabled: boolean) {
     }
     async function refresh() {
       if (disposed) return
+      // Optional source metadata must never delay graph/route publication.
+      void refreshMeta()
       if (busy) { queued = true; return }
       busy = true
       try {
         const at = lastQuery.current?.departAt
-        const [network, meta, snapshot, published] = await Promise.all([
-          transit.getNetwork(), transit.getMeta(), transit.getSnapshot(at), eventApi.getPublishedEvents(at),
+        const [network, snapshot, published] = await Promise.all([
+          transit.getNetwork(), transit.getSnapshot(at), eventApi.getPublishedEvents(at),
         ])
         if (disposed) return
         if (at !== lastQuery.current?.departAt) { queued = true; return }
@@ -76,7 +92,7 @@ export function useLiveSession(enabled: boolean) {
         signature = nextSignature
         setBundle(previous => ({
           network: previous && same(previous.network, network) ? previous.network : network,
-          meta,
+          meta: currentMeta ?? previous?.meta ?? null,
           published: previous && same(previous.published, published) ? previous.published : published,
           events: getReviewToken() ? previous?.events ?? published : published,
           signals: previous?.signals ?? [],
@@ -85,10 +101,16 @@ export function useLiveSession(enabled: boolean) {
         // Protected reads never hold up public map updates or route queries.
         void refreshReviewer()
         if (routeDirty && lastQuery.current) {
-          try { await query(lastQuery.current); routeDirty = false; if (!disposed) setRevision(value => value + 1) }
+          const requested = lastQuery.current
+          try {
+            await query(requested)
+            if (lastQuery.current === requested) { routeDirty = false; if (!disposed) setRevision(value => value + 1) }
+            else queued = true
+          }
           catch { /* Keep old cards visibly stale; next poll retries. */ }
         }
       } catch (cause) {
+        routeDirty = Boolean(lastQuery.current)
         if (!disposed) { setError(message(cause)); setWarning(`Refresh failed; displayed data may be stale. ${message(cause)}`) }
       } finally {
         busy = false
@@ -98,8 +120,14 @@ export function useLiveSession(enabled: boolean) {
     refreshRef.current = refresh
     void refresh()
     const timer = window.setInterval(() => void refresh(), 3000)
+    const offline = () => {
+      routeDirty = Boolean(lastQuery.current)
+      setWarning('Offline; displayed map and routes may be stale. Previous results retained.')
+    }
+    window.addEventListener('offline', offline)
+    window.addEventListener('online', refresh)
     const close = eventApi.subscribeEvents(() => void refresh(), value => { if (!disposed) setConnected(value) })
-    return () => { disposed = true; active.current = false; ++queryVersion.current; clearInterval(timer); close() }
+    return () => { disposed = true; active.current = false; ++queryVersion.current; clearInterval(timer); window.removeEventListener('offline', offline); window.removeEventListener('online', refresh); close() }
   }, [enabled, query, authRevision])
 
   const review = async (event: Event, action: 'edit' | 'publish' | 'reject' | 'expire', _reason: string) => {
@@ -108,5 +136,5 @@ export function useLiveSession(enabled: boolean) {
     // A committed write stays successful even if following reads fail.
     await refreshRef.current()
   }
-  return { bundle, error, warning, reviewWarning, routeWarning, connected, routes, revision, query, review, refresh: () => refreshRef.current() }
+  return { bundle, error, warning, sourceWarning, reviewWarning, routeWarning, connected, routes, revision, query, review, refresh: () => refreshRef.current() }
 }

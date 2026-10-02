@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import type { LiveMetaSourceStatus } from '../api/liveTransitApi'
 import { formatHkt } from '../data'
+import { SourceStatus } from './SourceStatus'
 import css from './HowItWorksPage.module.css'
 
 /**
@@ -20,11 +21,12 @@ export interface HowItWorksPageProps {
   disclaimer: string
   /** API-mode source statuses; omitted in seed mode. */
   apiSources?: Array<string | LiveMetaSourceStatus>
+  sourceWarning?: string
   onClose: () => void
 }
 
 export function HowItWorksPage({
-  seedMode, snapshotAt, networkVersion, catchmentM, disclaimer, apiSources, onClose,
+  seedMode, snapshotAt, networkVersion, catchmentM, disclaimer, apiSources, sourceWarning, onClose,
 }: HowItWorksPageProps) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
@@ -40,7 +42,7 @@ export function HowItWorksPage({
       <p>Network, event, route and simulation seeds load through a shared data-source boundary. The map displays modelled nodes, schematic links, and only effective published events. Unreviewed reports remain visible on the Updates screen but do not modify routing.</p>
       <p>{seedMode
         ? 'Route choices are fixed Tai Wai → Admiralty seed candidates. Station-search, map selection and departure input are interface demonstrations, not live timetable, geocoding or accessibility verification.'
-        : 'Route queries use the backend engine. Service times, fares and capacities remain modelled estimates. The Agent conversation uses local templates.'}</p>
+        : 'Route queries and Agent answers use the backend engine. Service times, fares and capacities remain modelled estimates. Personalized chat, comparison snapshot verification and public source collection states await confirmed backend contracts.'}</p>
     </section>
 
     <section data-reveal>
@@ -60,14 +62,7 @@ export function HowItWorksPage({
         : <p>Review decisions are saved by the event API. Published-event and graph changes trigger route recalculation. Missing services and stale data are shown explicitly.</p>}
     </section>
 
-    {!seedMode && <section data-reveal>
-      <h2>API sources</h2>
-      <ul className={css.sourceList}>
-        {(apiSources ?? []).map((source, index) => <li key={index}>
-          {typeof source === 'string' ? source : `${source.name}${source.last_ok ? ` · last successful update ${formatHkt(source.last_ok)}` : ' · update time unavailable'}`}
-        </li>)}
-      </ul>
-    </section>}
+    {!seedMode && <SourceStatus sources={apiSources} warning={sourceWarning} />}
 
     <section data-reveal className={css.credits}>
       <h2>Colour &amp; motion credits</h2>

@@ -1,5 +1,7 @@
 # ResilientRoute frontend · M2
 
+P3 extensions, B/C interface requests, acceptance evidence and the five-minute demo: [P3-INTEGRATION.md](P3-INTEGRATION.md). Personalized chat, verified comparison snapshots, public source collection states and production publication timing remain pending their documented dependencies.
+
 React + TypeScript + Vite + Leaflet journey planner for the modelled Tai Wai → Admiralty corridor. See the root README for backend startup.
 
 ```powershell
