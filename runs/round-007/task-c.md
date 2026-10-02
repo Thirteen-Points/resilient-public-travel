@@ -1,3 +1,0 @@
-# C dependency task — not executed in Round 007
-
-Owner: C. Permitted writes in C's own branch: `backend/app/graph/**`, `backend/app/engine/**`, `backend/app/sim/**`, C-owned AI runtime, C tests/reports. Consume B's persona and weather contracts; verify accessibility filtering and route variety, including the currently infeasible elderly example; wire simulated weather coefficients only with correct zero-as-suspension semantics; verify recomputation after event expiry. Acceptance: actual deterministic same-OD route comparison, wheelchair exclusions and walking limit, weather change/restore tests, simulation metrics with shared-capacity assumptions stated. No result may be advertised as measured passenger performance. Round 007 makes no C code changes.

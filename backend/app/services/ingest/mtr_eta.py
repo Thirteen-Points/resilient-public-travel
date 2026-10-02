@@ -89,7 +89,6 @@ class MtrEtaPollResult:
     degraded: bool
     insufficient_data: bool
     used_cached_snapshot: bool
-    source_time: str | None = None
 
 
 class MtrEtaClient:
@@ -250,12 +249,9 @@ class MtrEtaAnomalyPoller:
     def poll_once(self, *, received_at: datetime | None = None) -> MtrEtaPollResult:
         observations: dict[str, StationObservation] = {}
         failures: list[StationFailure] = []
-        source_times: list[str] = []
         for station_code, station_name in CORRIDOR_STATIONS:
             try:
                 payload = self.client.fetch_station(station_code)
-                if isinstance(payload.get("curr_time"), str):
-                    source_times.append(payload["curr_time"])
                 observation = parse_station_observation(
                     payload, station_code, station_name, self.config
                 )
@@ -305,7 +301,6 @@ class MtrEtaAnomalyPoller:
             degraded=bool(failures),
             insufficient_data=insufficient,
             used_cached_snapshot=not observations and bool(self.last_successful_observations),
-            source_time=max(source_times) if source_times else None,
         )
 
     def _build_signal(
