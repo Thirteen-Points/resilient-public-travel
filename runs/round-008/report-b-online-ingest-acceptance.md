@@ -47,3 +47,7 @@
 - Windows 实际 PowerShell **键盘** Ctrl+C 正常退出、当时的租约释放及随后续采仍需现场操作验收。当前测试仅证明：独立 `once` 自然退出后租约为 0；被托管终端强制停止后，同一 DB 可重启读取检查点，未产生额外记录。强制停止不是优雅退出证据。
 - 建议负责人在可交互的本机 PowerShell 按教程运行 `poll`，待出现一轮 `source_result` 后亲自按 Ctrl+C，记录 `type:"stopped", requested:true`、退出码、`status`、租约数与再次启动结果。如键盘信号确实送达而 CLI 未停止，再针对代码修复。
 - 出现带可靠发布时间、符合默认交通主题的真实公告时，继续在隔离 DB 验证 Signal、授权审核 GET 列表、重跑幂等及未审核前 Event/图/路线不变；无内容时继续保留 partial，不放宽时间规则。社媒凭据/审批到位后再逐来源核实现行官方接口、配额、范围和费用。
+
+## 后续上传与 PR
+
+负责人随后明确指示推送并创建 PR。验收提交 `492bdd649e816ab64fa7c4ef0956c3ae04f3c686` 已推送到远端 `online-surfing-bot` 并用 `git ls-remote` 核实。已创建 [草稿 PR #104](https://github.com/Thirteen-Points/resilient-public-travel/pull/104)：目标 `main`、来源 `online-surfing-bot`、状态 open/draft、未设置里程碑；未合并。当前 partial 验收边界仍适用。
