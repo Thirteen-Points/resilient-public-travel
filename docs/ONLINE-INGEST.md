@@ -80,7 +80,7 @@ $LASTEXITCODE
 .\.venv\Scripts\python.exe -m backend.app.services.ingest.online_cli poll
 ```
 
-先采一轮，之后默认每五分钟执行。按 **Ctrl+C** 停止；会输出 `type:"stopped"`。已发出的请求受超时限制，退出可能需要等当前请求结束。再次执行同一命令会读取数据库检查点和退避时间；不删除数据库，不用重新导入 Signal。
+先采一轮，之后默认每五分钟执行。按 **Ctrl+C** 停止；Windows 控制台也监听 **Ctrl+Break**。正常收到停止信号后会输出 `type:"stopped"`。已发出的请求受超时限制，退出可能需要等当前请求结束。再次执行同一命令会读取数据库检查点和退避时间；不删除数据库，不用重新导入 Signal。
 
 要有界验证三轮：
 
@@ -90,7 +90,7 @@ $LASTEXITCODE
 
 正常约十分钟完成，查看 `completed_rounds` 确认真正完成三次采集；busy/waiting 不代表成功周期。首次运行 once 后立即 poll，可能先显示 waiting，不能把 waiting 当作真实验收。
 
-本轮已验证三周期自然退出和 SIGINT 处理器的自动测试。Codex 托管终端的 Ctrl+C 注入没有完成实机退出验证，测试进程已清理；你自己 PowerShell 窗口的键盘退出尚待现场确认。需要有界运行时使用 `--cycles`，无需依赖终端按键。
+交接时已验证三周期自然退出和 SIGINT 处理器的自动测试。本轮新增 Windows SIGBREAK 处理器测试；Codex 托管终端的 Ctrl+C / 控制事件注入仍未完成实机退出验证，测试进程已清理。你自己 PowerShell 窗口的键盘退出尚待现场确认。需要有界运行时使用 `--cycles`，无需依赖终端按键。
 
 ## 6. 查看状态和失败原因
 

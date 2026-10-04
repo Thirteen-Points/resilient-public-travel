@@ -439,6 +439,31 @@ class CliTests(unittest.TestCase):
             stopped = json.loads(output.getvalue().splitlines()[-1])
             self.assertEqual(stopped, {"type": "stopped", "cycles": 1, "requested": True})
 
+    @unittest.skipUnless(hasattr(signal, "SIGBREAK"), "Windows console signal only")
+    def test_sigbreak_requests_stop_and_restores_handler(self):
+        from backend.app.services.ingest import online_cli
+
+        with tempfile.TemporaryDirectory() as temp:
+            before = signal.getsignal(signal.SIGBREAK)
+            output = io.StringIO()
+
+            def build_runner(store, config, adapters, *, stop):
+                class Runner:
+                    def cycle(self):
+                        signal.raise_signal(signal.SIGBREAK)
+                        return [{"source": "mtr_mobile", "status": "success"}]
+                return Runner()
+
+            with patch.dict(os.environ, {"DB_PATH": str(Path(temp) / "cli.sqlite3"),
+                "INGEST_ENABLED": "true", "OFFLINE_MODE": "true", "INGEST_SOURCES": "mtr_mobile"}):
+                with patch.object(online_cli, "IngestRunner", side_effect=build_runner), \
+                     patch.object(online_cli, "PublicHttp") as http, redirect_stdout(output):
+                    self.assertEqual(online_cli.main(["poll"]), 0)
+                    http.return_value.close.assert_called_once()
+            self.assertEqual(signal.getsignal(signal.SIGBREAK), before)
+            stopped = json.loads(output.getvalue().splitlines()[-1])
+            self.assertEqual(stopped, {"type": "stopped", "cycles": 1, "requested": True})
+
 
 if __name__ == "__main__":
     unittest.main()

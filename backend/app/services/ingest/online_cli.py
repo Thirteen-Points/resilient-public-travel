@@ -76,7 +76,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     def request_stop(_signum, _frame):
         stop.set()
     previous = {}
-    for sig in (signal.SIGINT, signal.SIGTERM):
+    stop_signals = (signal.SIGINT, signal.SIGTERM)
+    if hasattr(signal, "SIGBREAK"):
+        stop_signals += (signal.SIGBREAK,)
+    for sig in stop_signals:
         previous[sig] = signal.signal(sig, request_stop)
     http = PublicHttp(timeout=timeout, retries=retries, stop=stop)
     runner = IngestRunner(store, config, {"mtr_mobile": MtrMobileAdapter(http, lang)}, stop=stop)

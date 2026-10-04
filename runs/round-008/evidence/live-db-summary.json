@@ -1,0 +1,16 @@
+{
+  "signal_count": 0,
+  "record_count": 1,
+  "lease_count": 0,
+  "completed_rounds": 2,
+  "records": [
+    {
+      "id": "D_332",
+      "published_at": null,
+      "collected_at": "2026-10-04T04:25:42.184694+00:00",
+      "disposition": "missing_publication_time",
+      "signal_id": null,
+      "source_url": "https://www.mtr.com.hk/alert/alert_simpletxt_title_tc.html#D_332"
+    }
+  ]
+}

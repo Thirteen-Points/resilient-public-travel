@@ -1,0 +1,7 @@
+FIRST {"type":"started","database":"C:\\Users\\xiami\\Documents\\ChatGPT\\GenAI Hackathon 2\\online-surfing-bot-acceptance\\.cache\\online-acceptance\\signal-probe.sqlite3","sources":["mtr_mobile"],"interval_seconds":300,"publishes_events":false}
+SECOND {"type":"source_result","cycle":1,"source":"mtr_mobile","status":"offline","error":null}
+SENT_CTRL_C_EVENT
+CTRL_C_TIMEOUT
+CTRL_BREAK_TIMEOUT
+REST
+EXIT 1

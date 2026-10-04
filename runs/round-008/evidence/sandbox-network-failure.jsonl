@@ -1,0 +1,3 @@
+{"type":"started","database":"C:\\Users\\xiami\\Documents\\ChatGPT\\GenAI Hackathon 2\\online-surfing-bot-acceptance\\.cache\\online-acceptance\\live.sqlite3","sources":["mtr_mobile"],"interval_seconds":300,"publishes_events":false}
+{"type":"source_result","cycle":1,"source":"mtr_mobile","status":"error","error":"network_error","last_attempt":"2026-10-04T04:25:17.764273+00:00","next_attempt":1791088521.085491,"window_start":"2026-10-03T04:25:17.764273+00:00","cursor":null,"counts":{"processed":0,"added":0,"duplicate":0,"skipped":{}},"consecutive_failures":1}
+{"type":"stopped","cycles":1,"requested":false}
