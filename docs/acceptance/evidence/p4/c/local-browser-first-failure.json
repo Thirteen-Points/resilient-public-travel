@@ -1,0 +1,33 @@
+{
+  "environment": "isolated local backend + real Edge/Chromium browser",
+  "passed": false,
+  "assertions": [
+    "chat-response-verbatim",
+    "actual-OD-and-time",
+    "backend-fallback-labelled",
+    "HTTP-error-visible",
+    "cancel-reply",
+    "previous-answer-retained",
+    "no-seed-substitution",
+    "unsupported-personalization-blocked",
+    "less-walking-not-remapped",
+    "same-requested-OD-time-events",
+    "wheelchair-constraints-sent",
+    "snapshot-limit-not-hidden",
+    "precomputed-simulation-real-response",
+    "M2-scenario-resolves-verbatim",
+    "negative-improvement-visible",
+    "missing-scenario-error-retains-explicit-old-result",
+    "source-time-unavailable-honestly",
+    "metadata-failure-does-not-block-routes",
+    "offline-retains-simulation-and-comparison",
+    "online-recovery"
+  ],
+  "blockers": [
+    "personalized chat contract",
+    "per-query comparison snapshot token",
+    "public source collection states",
+    "P3 simulation confirmation"
+  ],
+  "error": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Evidence merged.') to be visible\u001b[22m\n\n    at C:\\Users\\zyc\\Documents\\ChatGPT\\Tecent X Hack4SDG\\tests\\browser\\p3.e2e.cjs:154:214"
+}

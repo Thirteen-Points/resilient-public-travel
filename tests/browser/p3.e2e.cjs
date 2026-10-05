@@ -151,7 +151,12 @@ const evidence = { environment: 'isolated local backend + real Edge/Chromium bro
   const event = (await call('/api/events', undefined, true))[0], reviewPath = `/api/events/${event.event_id}/review`
   for (const author of ['explicit-P3-test-2', 'explicit-P3-test-3']) {
     await call('/api/signals', { raw_text: '【模拟 P3 浏览器测试】东铁线红磡至会展信号故障，暂停服务。', author_hint: author })
-    await reviewer.getByRole('button', { name: 'Refresh reports' }).click(); await reviewer.getByRole('button', { name: 'Extract / merge' }).click(); await reviewer.getByText('Evidence merged.', { exact: false }).waitFor()
+    await reviewer.getByRole('button', { name: 'Refresh reports' }).click()
+    const merged = reviewer.waitForResponse(response => response.url().endsWith('/api/events/ingest') && response.ok())
+    await reviewer.getByRole('button', { name: 'Extract / merge' }).click()
+    const mergeResult = await (await merged).json()
+    assert.equal(mergeResult.state, 'merged')
+    await reviewer.getByRole('status').filter({ hasText: /^Evidence merged using / }).waitFor()
   }
   await page.getByRole('button', { name: 'Plan journey', exact: true }).click()
   // Public active(event, at) requires published_at <= requested departure.

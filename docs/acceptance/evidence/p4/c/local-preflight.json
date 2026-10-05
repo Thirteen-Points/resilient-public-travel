@@ -1,0 +1,92 @@
+{
+  "ok": true,
+  "offline": false,
+  "llm_required": false,
+  "validation": {
+    "ok": true,
+    "output": "WARN event evt_seed_003: published demo event is simulated, not operational evidence\nPASS: four seed files readable; 1 documented warning(s)\n"
+  },
+  "simulations": {
+    "ok": true,
+    "input_sha256": "f50d68f5eaa7cba0cfaabce6e19a3c50de080becd457d8e8533be6e7789247f1",
+    "scenarios": [
+      {
+        "scenario_id": "m2_six_station_directed_od_am_peak_p3_shared_segments",
+        "ok": true,
+        "sha256": "b659a9134627ccad65a54986c56d0c5af8e8142a4bf06376d2de10f150d9052a"
+      },
+      {
+        "scenario_id": "m2_six_station_directed_od_am_peak_p3_shared_segments_residual_10pct",
+        "ok": true,
+        "sha256": "dafee9c2dc244704c125bd6331e6c0c77068ffeeb0080938a83b264920f8a140"
+      }
+    ]
+  },
+  "api": {
+    "ok": true,
+    "checks": [
+      {
+        "path": "/api/health",
+        "ok": true,
+        "build": {
+          "commit_sha": "d952216cd6360c73fc01b17e6e8b4de30865f045",
+          "source": "APP_BUILD_SHA"
+        }
+      },
+      {
+        "path": "/api/health/deep",
+        "ok": true,
+        "build": null
+      },
+      {
+        "path": "/api/meta",
+        "ok": true,
+        "build": {
+          "commit_sha": "d952216cd6360c73fc01b17e6e8b4de30865f045",
+          "source": "APP_BUILD_SHA"
+        }
+      },
+      {
+        "path": "/api/sim/result?scenario_id=m2_six_station_directed_od_am_peak_p3_shared_segments",
+        "ok": true,
+        "build": null
+      },
+      {
+        "path": "/api/sim/result?scenario_id=m2_six_station_directed_od_am_peak_p3_shared_segments_residual_10pct",
+        "ok": true,
+        "build": null
+      }
+    ]
+  },
+  "frontend": {
+    "ok": true,
+    "build": {
+      "commit_sha": "d952216cd6360c73fc01b17e6e8b4de30865f045",
+      "source": "VITE_BUILD_SHA"
+    },
+    "file_count": 4
+  },
+  "media": {
+    "ok": true,
+    "files": {
+      "video": {
+        "path": "deploy/offline/media/demo.webm",
+        "present": true,
+        "format_ok": true
+      },
+      "slides_pdf": {
+        "path": "deploy/offline/media/slides.pdf",
+        "present": true,
+        "format_ok": true
+      }
+    }
+  },
+  "final_offline_media_ready": true,
+  "start_command": "python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000",
+  "health_url": "http://127.0.0.1:8000/api/health",
+  "notes": [
+    "HTTP calls occur only with explicit --api-base-url; defaults check repository files only.",
+    "Use --demo --require-media for the offline package gate; inspect actual media playback and PDF rendering separately.",
+    "When AI_ENABLED=true without a key, the service keeps deterministic fallback mode."
+  ]
+}

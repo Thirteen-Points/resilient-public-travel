@@ -11076,5 +11076,35 @@
     "Wheelchair/elderly are protected first; accessibility/max-walk and 15-minute route extra-delay are hard constraints. Dedicated wheelchair berth/boarding-assistance throughput is unknown and not guaranteed.",
     "Queue delays are the maximum route/segment bottleneck estimate, not a schedule-based network forecast. No train-by-train seat propagation, external passengers or inter-window carryover is modelled."
   ],
-  "provenance": "simulated"
+  "provenance": "simulated",
+  "generated_at": "2026-10-05T16:23:10+00:00",
+  "query_time": "2026-09-22T08:20:00+08:00",
+  "input_version": "m2-six-station-v1",
+  "input_file": "data/sim/m2-route-input.json",
+  "input_sha256": "f50d68f5eaa7cba0cfaabce6e19a3c50de080becd457d8e8533be6e7789247f1",
+  "data_version": {
+    "network_file": "contracts/seed/network.seed.json",
+    "network_sha256": "a2a925c8d69e75b8c108d7c5e01468815c17349c62b347105f417294596bae86",
+    "route_policy_file": "backend/app/engine/fixtures/seed_policy.json",
+    "route_policy_sha256": "3020ae10023c811b9c199b19a8c5d6e713e1439b17c047bc65ad1ccc57ea00dc"
+  },
+  "model_version": "shared-directed-segments-v1",
+  "source_revision": "d952216cd6360c73fc01b17e6e8b4de30865f045",
+  "source_dirty": true,
+  "generator_sha256": "c724eac769e75b11c768f8a734056fb129c6492a6e7bb8b48ab69082fa49997c",
+  "input_hash_semantics": "SHA-256 of UTF-8 source text with CRLF normalized to LF",
+  "metric_units": {
+    "total_delay_person_min": "person-minutes",
+    "avg_delay_min": "minutes/person",
+    "p95_wait_min": "minutes",
+    "served_demand": "people/window",
+    "unmet_demand": "people/window",
+    "unstoppable_demand": "people/window",
+    "unassigned_demand": "people/window",
+    "shares": "fraction of population",
+    "overloaded_routes": "route count",
+    "overloaded_shared_resources": "directed segment count",
+    "service_capacity_per_hour": "people/hour",
+    "window_min": "minutes"
+  }
 }

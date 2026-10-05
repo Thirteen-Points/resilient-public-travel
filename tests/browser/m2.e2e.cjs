@@ -186,4 +186,10 @@ const networkFailures = []
   fs.writeFileSync(path.join(out, 'server.log'), backendProcess?.logs() ?? '')
   if (browser) { const pages = browser.contexts().flatMap(context => context.pages()); for (let i = 0; i < pages.length; i++) { await pages[i].screenshot({ path: path.join(out, `failure-${i}.png`), fullPage: true }).catch(() => {}); fs.writeFileSync(path.join(out, `failure-${i}.txt`), await pages[i].locator('body').innerText().catch(() => '')) } }
   process.exitCode = 1
-}).finally(async () => { await browser?.close(); for (const child of children) child.kill() })
+}).finally(async () => {
+  await browser?.close()
+  for (const child of children) if (child.exitCode === null) {
+    if (process.platform === 'win32') await new Promise(resolve => spawn('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true, stdio: 'ignore' }).on('exit', resolve))
+    else child.kill('SIGTERM')
+  }
+})

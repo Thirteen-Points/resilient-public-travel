@@ -1,0 +1,43 @@
+{
+  "environment": "local isolated; not CI or production",
+  "base_sha": "d952216cd6360c73fc01b17e6e8b4de30865f045",
+  "source_dirty_at_measurement": true,
+  "backend": {
+    "passed": 543,
+    "subtests_passed": 264,
+    "seconds": 30.67,
+    "warning": "existing TestClient dependency deprecation"
+  },
+  "frontend": {
+    "passed": 88,
+    "files": 10,
+    "production_build": "passed",
+    "administrator_bundle_diff": "no change"
+  },
+  "p4_readiness_tests": 54,
+  "M2_browser": "passed",
+  "P3_browser": "passed after stale merge notice test repair",
+  "offline_extraction_start": "passed with preinstalled Python; no downloads",
+  "media": {
+    "video": {
+      "path": "deploy/offline/media/demo.webm",
+      "sha256": "cceff3557d21ed2351413e6f26a9144c4b8336b5c7ba668fa3884c5d231d97a4",
+      "bytes": 26934560,
+      "duration_seconds": 300,
+      "recorded_tour_seconds": 300.003,
+      "tail_static_padding_trimmed": true,
+      "injected_api_results": false
+    },
+    "pdf": {
+      "path": "deploy/offline/media/slides.pdf",
+      "sha256": "1ae391527fe5bfed42e586db73f36f37b9036cab5d9c677e99bfca74f578e488",
+      "bytes": 494869,
+      "pages": 6,
+      "visual_review": "all six rendered pages checked",
+      "team_final_pitch_signoff": "pending A + reviewer"
+    }
+  },
+  "remote_ci": "not_run",
+  "production": "not_run",
+  "admin_protection": "not_verified"
+}
