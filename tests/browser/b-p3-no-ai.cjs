@@ -41,6 +41,7 @@ const evidence = { passed: false, environment: 'clean temporary SQLite, offline 
   await page.getByRole('heading', { name: /Tai Wai.*Admiralty/ }).waitFor()
   assert.ok(await page.locator('[data-route-id]').count() > 0)
   const first = await responses.at(-1).json(); assert.ok(Array.isArray(first) && first.length > 0)
+  fs.writeFileSync(path.join(out, 'query-request.json'), JSON.stringify(responses.at(-1).request().postDataJSON(), null, 2))
   fs.writeFileSync(path.join(out, 'query-response.json'), JSON.stringify(first, null, 2))
   await page.screenshot({ path: path.join(out, 'no-ai-query.png'), fullPage: true })
   evidence.actions.push('no-ai API query and route cards')
@@ -50,6 +51,7 @@ const evidence = { passed: false, environment: 'clean temporary SQLite, offline 
   await page.getByRole('button', { name: 'Find resilient routes' }).click()
   const wheelchairResponse = await wheelchairReply
   assert.equal(wheelchairResponse.request().postDataJSON().profile.mobility, 'wheelchair')
+  fs.writeFileSync(path.join(out, 'wheelchair-request.json'), JSON.stringify(wheelchairResponse.request().postDataJSON(), null, 2))
   const wheelchair = await wheelchairResponse.json()
   fs.writeFileSync(path.join(out, 'wheelchair-response.json'), JSON.stringify(wheelchair, null, 2))
   assert.ok(wheelchair.every(route => route.total.walk_m <= 400 && route.legs.every(leg => leg.mode !== 'MINIBUS' && leg.accessible === true)))

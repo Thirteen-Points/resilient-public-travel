@@ -1,0 +1,16 @@
+{
+  "origin": "TAW",
+  "destination": "ADM",
+  "depart_at": "2026-10-05T23:37:00+08:00",
+  "profile": {
+    "mobility": "wheelchair",
+    "preset": "fastest",
+    "max_walk_m": 400,
+    "max_transfers": 2,
+    "hard_flags": [
+      "no_stairs",
+      "no_minibus",
+      "no_non_lowfloor_bus"
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "origin": "TAW",
+  "destination": "ADM",
+  "depart_at": "2026-10-05T23:37:00+08:00",
+  "profile": {
+    "mobility": "standard",
+    "preset": "fastest",
+    "hard_flags": []
+  }
+}

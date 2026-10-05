@@ -1,0 +1,848 @@
+[
+  {
+    "route_id": "r_d242fe3d797400df",
+    "label": "ERL",
+    "legs": [
+      {
+        "mode": "MTR",
+        "from": "TAW",
+        "to": "ADM",
+        "depart": "2026-10-05T23:42:00+08:00",
+        "arrive": "2026-10-06T00:00:30+08:00",
+        "headway_s": 360,
+        "in_vehicle_s": 1110,
+        "walk_m": 0,
+        "fare_hkd": 12.5,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "ERL"
+      }
+    ],
+    "total": {
+      "time_s": 1410,
+      "time_range_s": [
+        1296.19836,
+        1523.80164
+      ],
+      "transfers": 0,
+      "walk_m": 0,
+      "fare_hkd": 12.5,
+      "co2_g": 407.77431868278626,
+      "reliability": 0.9370212765957446,
+      "freshness_s": 1295865
+    },
+    "score": 0.779110409514791,
+    "score_breakdown": [
+      {
+        "criterion": "time",
+        "raw": 1410,
+        "normalized": 1,
+        "weight": 0.45,
+        "contribution": 0.45
+      },
+      {
+        "criterion": "transfers",
+        "raw": 0,
+        "normalized": 1,
+        "weight": 0.1,
+        "contribution": 0.1
+      },
+      {
+        "criterion": "walk",
+        "raw": 0,
+        "normalized": 1,
+        "weight": 0.1,
+        "contribution": 0.1
+      },
+      {
+        "criterion": "price",
+        "raw": 12.5,
+        "normalized": 0,
+        "weight": 0.1,
+        "contribution": 0
+      },
+      {
+        "criterion": "comfort",
+        "raw": 0.2864363902136476,
+        "normalized": 0.2864363902136476,
+        "weight": 0.05,
+        "contribution": 0.01432181951068238
+      },
+      {
+        "criterion": "reliability",
+        "raw": 0.9370212765957446,
+        "normalized": 0.9370212765957446,
+        "weight": 0.1,
+        "contribution": 0.09370212765957447
+      },
+      {
+        "criterion": "carbon",
+        "raw": 407.77431868278626,
+        "normalized": 0.42172924689068314,
+        "weight": 0.05,
+        "contribution": 0.02108646234453416
+      },
+      {
+        "criterion": "freshness",
+        "raw": 1295865,
+        "normalized": 8.811410337424975e-27,
+        "weight": 0.05,
+        "contribution": 4.405705168712488e-28
+      }
+    ],
+    "warnings": [
+      "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+      "ERL 数据较旧",
+      "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+      "轮椅 M0 演示规则：MTR/大巴默认可用、小巴排除；明确不可达或部分可达标记仍排除",
+      "Only 5 feasible diverse routes; target 10 cannot be guaranteed by this network/profile",
+      "Fewer than two transit modes remain feasible",
+      "负载来自显式模拟场景，不代表真实客流"
+    ],
+    "notes": [
+      "舒适度估算偏低，可能较长时间站立"
+    ],
+    "explain": "ERL：约 22–25 分钟，换乘 0 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+    "evidence": [
+      {
+        "source": "ERL",
+        "freshness_s": 1294920
+      },
+      {
+        "source": "ERL",
+        "freshness_s": 1295190
+      },
+      {
+        "source": "ERL",
+        "freshness_s": 1295355
+      },
+      {
+        "source": "ERL",
+        "freshness_s": 1295565
+      },
+      {
+        "source": "ERL",
+        "freshness_s": 1295865
+      },
+      {
+        "source": "route_model_v1",
+        "freshness_s": 0
+      },
+      {
+        "source": "c_route_zero_demand_fixture",
+        "freshness_s": 0
+      }
+    ],
+    "provenance": "simulated",
+    "load_estimate": {
+      "board_refusal_prob": 0,
+      "load_factor": 0,
+      "expected_wait_s": 180,
+      "capacity_per_hour": 24182.5,
+      "users_on_route": 0
+    }
+  },
+  {
+    "route_id": "r_2b6cd3e3109e43b3",
+    "label": "TML + ERL",
+    "legs": [
+      {
+        "mode": "MTR",
+        "from": "TAW",
+        "to": "HUH",
+        "depart": "2026-10-05T23:40:00+08:00",
+        "arrive": "2026-10-05T23:58:00+08:00",
+        "headway_s": 300,
+        "in_vehicle_s": 1080,
+        "walk_m": 0,
+        "fare_hkd": 12.5,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "TML"
+      },
+      {
+        "mode": "MTR",
+        "from": "HUH",
+        "to": "ADM",
+        "depart": "2026-10-05T23:58:45+08:00",
+        "arrive": "2026-10-06T00:06:30+08:00",
+        "headway_s": 360,
+        "in_vehicle_s": 465,
+        "walk_m": 0,
+        "fare_hkd": 0,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "ERL"
+      }
+    ],
+    "total": {
+      "time_s": 1770,
+      "time_range_s": [
+        1649.447077108674,
+        1890.552922891326
+      ],
+      "transfers": 1,
+      "walk_m": 0,
+      "fare_hkd": 12.5,
+      "co2_g": 441.8933559590958,
+      "reliability": 0.9468542031260583,
+      "freshness_s": 1296225
+    },
+    "score": 0.6157612288927223,
+    "score_breakdown": [
+      {
+        "criterion": "time",
+        "raw": 1770,
+        "normalized": 0.75,
+        "weight": 0.45,
+        "contribution": 0.3375
+      },
+      {
+        "criterion": "transfers",
+        "raw": 1,
+        "normalized": 0.5,
+        "weight": 0.1,
+        "contribution": 0.05
+      },
+      {
+        "criterion": "walk",
+        "raw": 0,
+        "normalized": 1,
+        "weight": 0.1,
+        "contribution": 0.1
+      },
+      {
+        "criterion": "price",
+        "raw": 12.5,
+        "normalized": 0,
+        "weight": 0.1,
+        "contribution": 0
+      },
+      {
+        "criterion": "comfort",
+        "raw": 0.2981716328140824,
+        "normalized": 0.2981716328140824,
+        "weight": 0.05,
+        "contribution": 0.014908581640704119
+      },
+      {
+        "criterion": "reliability",
+        "raw": 0.9468542031260583,
+        "normalized": 0.9468542031260583,
+        "weight": 0.1,
+        "contribution": 0.09468542031260584
+      },
+      {
+        "criterion": "carbon",
+        "raw": 441.8933559590958,
+        "normalized": 0.373344538788247,
+        "weight": 0.05,
+        "contribution": 0.018667226939412352
+      },
+      {
+        "criterion": "freshness",
+        "raw": 1296225,
+        "normalized": 8.665770534766179e-27,
+        "weight": 0.05,
+        "contribution": 4.332885267383089e-28
+      }
+    ],
+    "warnings": [
+      "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+      "TML 数据较旧",
+      "ERL 数据较旧",
+      "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+      "轮椅 M0 演示规则：MTR/大巴默认可用、小巴排除；明确不可达或部分可达标记仍排除",
+      "Only 5 feasible diverse routes; target 10 cannot be guaranteed by this network/profile",
+      "Fewer than two transit modes remain feasible",
+      "负载来自显式模拟场景，不代表真实客流"
+    ],
+    "notes": [
+      "舒适度估算偏低，可能较长时间站立"
+    ],
+    "explain": "TML + ERL：约 27–32 分钟，换乘 1 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+    "evidence": [
+      {
+        "source": "TML",
+        "freshness_s": 1294800
+      },
+      {
+        "source": "TML",
+        "freshness_s": 1295220
+      },
+      {
+        "source": "TML",
+        "freshness_s": 1295700
+      },
+      {
+        "source": "ERL",
+        "freshness_s": 1295925
+      },
+      {
+        "source": "ERL",
+        "freshness_s": 1296225
+      },
+      {
+        "source": "route_model_v1",
+        "freshness_s": 0
+      },
+      {
+        "source": "c_route_zero_demand_fixture",
+        "freshness_s": 0
+      }
+    ],
+    "provenance": "simulated",
+    "load_estimate": {
+      "board_refusal_prob": 0,
+      "load_factor": 0,
+      "expected_wait_s": 180,
+      "capacity_per_hour": 24182.5,
+      "users_on_route": 0
+    }
+  },
+  {
+    "route_id": "r_da67c274e39e0c00",
+    "label": "ERL + KTL + TWL",
+    "legs": [
+      {
+        "mode": "MTR",
+        "from": "TAW",
+        "to": "KOT",
+        "depart": "2026-10-05T23:42:00+08:00",
+        "arrive": "2026-10-05T23:46:30+08:00",
+        "headway_s": 360,
+        "in_vehicle_s": 270,
+        "walk_m": 0,
+        "fare_hkd": 12.5,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "ERL"
+      },
+      {
+        "mode": "MTR",
+        "from": "KOT",
+        "to": "YMT",
+        "depart": "2026-10-05T23:49:00+08:00",
+        "arrive": "2026-10-05T23:58:00+08:00",
+        "headway_s": 240,
+        "in_vehicle_s": 540,
+        "walk_m": 0,
+        "fare_hkd": 0,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "KTL"
+      },
+      {
+        "mode": "MTR",
+        "from": "YMT",
+        "to": "ADM",
+        "depart": "2026-10-06T00:00:00+08:00",
+        "arrive": "2026-10-06T00:10:00+08:00",
+        "headway_s": 240,
+        "in_vehicle_s": 600,
+        "walk_m": 0,
+        "fare_hkd": 0,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "TWL"
+      }
+    ],
+    "total": {
+      "time_s": 1980,
+      "time_range_s": [
+        1892.7340668856855,
+        2067.2659331143145
+      ],
+      "transfers": 2,
+      "walk_m": 0,
+      "fare_hkd": 12.5,
+      "co2_g": 377.6459250773652,
+      "reliability": 0.9656090643415488,
+      "freshness_s": 1296300
+    },
+    "score": 0.540945344279152,
+    "score_breakdown": [
+      {
+        "criterion": "time",
+        "raw": 1980,
+        "normalized": 0.6041666666666667,
+        "weight": 0.45,
+        "contribution": 0.27187500000000003
+      },
+      {
+        "criterion": "transfers",
+        "raw": 2,
+        "normalized": 0.3333333333333333,
+        "weight": 0.1,
+        "contribution": 0.03333333333333333
+      },
+      {
+        "criterion": "walk",
+        "raw": 0,
+        "normalized": 1,
+        "weight": 0.1,
+        "contribution": 0.1
+      },
+      {
+        "criterion": "price",
+        "raw": 12.5,
+        "normalized": 0,
+        "weight": 0.1,
+        "contribution": 0
+      },
+      {
+        "criterion": "comfort",
+        "raw": 0.319067325667864,
+        "normalized": 0.319067325667864,
+        "weight": 0.05,
+        "contribution": 0.0159533662833932
+      },
+      {
+        "criterion": "reliability",
+        "raw": 0.9656090643415488,
+        "normalized": 0.9656090643415488,
+        "weight": 0.1,
+        "contribution": 0.09656090643415488
+      },
+      {
+        "criterion": "carbon",
+        "raw": 377.6459250773652,
+        "normalized": 0.46445476456540924,
+        "weight": 0.05,
+        "contribution": 0.023222738228270465
+      },
+      {
+        "criterion": "freshness",
+        "raw": 1296300,
+        "normalized": 8.635733232016033e-27,
+        "weight": 0.05,
+        "contribution": 4.317866616008017e-28
+      }
+    ],
+    "warnings": [
+      "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+      "ERL 数据较旧",
+      "KTL 数据较旧",
+      "TWL 数据较旧",
+      "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+      "轮椅 M0 演示规则：MTR/大巴默认可用、小巴排除；明确不可达或部分可达标记仍排除",
+      "Only 5 feasible diverse routes; target 10 cannot be guaranteed by this network/profile",
+      "Fewer than two transit modes remain feasible",
+      "负载来自显式模拟场景，不代表真实客流"
+    ],
+    "notes": [],
+    "explain": "ERL + KTL + TWL：约 32–34 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+    "evidence": [
+      {
+        "source": "ERL",
+        "freshness_s": 1294920
+      },
+      {
+        "source": "KTL",
+        "freshness_s": 1295340
+      },
+      {
+        "source": "KTL",
+        "freshness_s": 1295580
+      },
+      {
+        "source": "KTL",
+        "freshness_s": 1295730
+      },
+      {
+        "source": "TWL",
+        "freshness_s": 1296000
+      },
+      {
+        "source": "TWL",
+        "freshness_s": 1296150
+      },
+      {
+        "source": "TWL",
+        "freshness_s": 1296300
+      },
+      {
+        "source": "route_model_v1",
+        "freshness_s": 0
+      },
+      {
+        "source": "c_route_zero_demand_fixture",
+        "freshness_s": 0
+      }
+    ],
+    "provenance": "simulated",
+    "load_estimate": {
+      "board_refusal_prob": 0,
+      "load_factor": 0,
+      "expected_wait_s": 180,
+      "capacity_per_hour": 24182.5,
+      "users_on_route": 0
+    }
+  },
+  {
+    "route_id": "r_8d0ba92684b1d1e2",
+    "label": "TML + KTL + TWL",
+    "legs": [
+      {
+        "mode": "MTR",
+        "from": "TAW",
+        "to": "HOM",
+        "depart": "2026-10-05T23:40:00+08:00",
+        "arrive": "2026-10-05T23:55:00+08:00",
+        "headway_s": 300,
+        "in_vehicle_s": 900,
+        "walk_m": 0,
+        "fare_hkd": 12.5,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "TML"
+      },
+      {
+        "mode": "MTR",
+        "from": "HOM",
+        "to": "YMT",
+        "depart": "2026-10-05T23:56:00+08:00",
+        "arrive": "2026-10-05T23:59:30+08:00",
+        "headway_s": 240,
+        "in_vehicle_s": 210,
+        "walk_m": 0,
+        "fare_hkd": 0,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "KTL"
+      },
+      {
+        "mode": "MTR",
+        "from": "YMT",
+        "to": "ADM",
+        "depart": "2026-10-06T00:00:00+08:00",
+        "arrive": "2026-10-06T00:10:00+08:00",
+        "headway_s": 240,
+        "in_vehicle_s": 600,
+        "walk_m": 0,
+        "fare_hkd": 0,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "TWL"
+      }
+    ],
+    "total": {
+      "time_s": 1980,
+      "time_range_s": [
+        1867.0326941264793,
+        2092.9673058735207
+      ],
+      "transfers": 2,
+      "walk_m": 0,
+      "fare_hkd": 12.5,
+      "co2_g": 470.0858589846166,
+      "reliability": 0.9554803207946498,
+      "freshness_s": 1296300
+    },
+    "score": 0.5328327499967959,
+    "score_breakdown": [
+      {
+        "criterion": "time",
+        "raw": 1980,
+        "normalized": 0.6041666666666667,
+        "weight": 0.45,
+        "contribution": 0.27187500000000003
+      },
+      {
+        "criterion": "transfers",
+        "raw": 2,
+        "normalized": 0.3333333333333333,
+        "weight": 0.1,
+        "contribution": 0.03333333333333333
+      },
+      {
+        "criterion": "walk",
+        "raw": 0,
+        "normalized": 1,
+        "weight": 0.1,
+        "contribution": 0.1
+      },
+      {
+        "criterion": "price",
+        "raw": 12.5,
+        "normalized": 0,
+        "weight": 0.1,
+        "contribution": 0
+      },
+      {
+        "criterion": "comfort",
+        "raw": 0.30816335568933645,
+        "normalized": 0.30816335568933645,
+        "weight": 0.05,
+        "contribution": 0.015408167784466823
+      },
+      {
+        "criterion": "reliability",
+        "raw": 0.9554803207946498,
+        "normalized": 0.9554803207946498,
+        "weight": 0.1,
+        "contribution": 0.095548032079465
+      },
+      {
+        "criterion": "carbon",
+        "raw": 470.0858589846166,
+        "normalized": 0.33336433599061355,
+        "weight": 0.05,
+        "contribution": 0.016668216799530677
+      },
+      {
+        "criterion": "freshness",
+        "raw": 1296300,
+        "normalized": 8.635733232016033e-27,
+        "weight": 0.05,
+        "contribution": 4.317866616008017e-28
+      }
+    ],
+    "warnings": [
+      "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+      "TML 数据较旧",
+      "KTL 数据较旧",
+      "TWL 数据较旧",
+      "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+      "轮椅 M0 演示规则：MTR/大巴默认可用、小巴排除；明确不可达或部分可达标记仍排除",
+      "Only 5 feasible diverse routes; target 10 cannot be guaranteed by this network/profile",
+      "Fewer than two transit modes remain feasible",
+      "负载来自显式模拟场景，不代表真实客流"
+    ],
+    "notes": [],
+    "explain": "TML + KTL + TWL：约 31–35 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+    "evidence": [
+      {
+        "source": "TML",
+        "freshness_s": 1294800
+      },
+      {
+        "source": "TML",
+        "freshness_s": 1295220
+      },
+      {
+        "source": "KTL",
+        "freshness_s": 1295760
+      },
+      {
+        "source": "TWL",
+        "freshness_s": 1296000
+      },
+      {
+        "source": "TWL",
+        "freshness_s": 1296150
+      },
+      {
+        "source": "TWL",
+        "freshness_s": 1296300
+      },
+      {
+        "source": "route_model_v1",
+        "freshness_s": 0
+      },
+      {
+        "source": "c_route_zero_demand_fixture",
+        "freshness_s": 0
+      }
+    ],
+    "provenance": "simulated",
+    "load_estimate": {
+      "board_refusal_prob": 0,
+      "load_factor": 0,
+      "expected_wait_s": 150,
+      "capacity_per_hour": 25500,
+      "users_on_route": 0
+    }
+  },
+  {
+    "route_id": "r_4aa619ab514066d7",
+    "label": "TML + KTL + ERL",
+    "legs": [
+      {
+        "mode": "MTR",
+        "from": "TAW",
+        "to": "HOM",
+        "depart": "2026-10-05T23:40:00+08:00",
+        "arrive": "2026-10-05T23:55:00+08:00",
+        "headway_s": 300,
+        "in_vehicle_s": 900,
+        "walk_m": 0,
+        "fare_hkd": 12.5,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "TML"
+      },
+      {
+        "mode": "MTR",
+        "from": "HOM",
+        "to": "KOT",
+        "depart": "2026-10-05T23:56:00+08:00",
+        "arrive": "2026-10-06T00:08:30+08:00",
+        "headway_s": 240,
+        "in_vehicle_s": 750,
+        "walk_m": 0,
+        "fare_hkd": 0,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "KTL"
+      },
+      {
+        "mode": "MTR",
+        "from": "KOT",
+        "to": "ADM",
+        "depart": "2026-10-06T00:10:30+08:00",
+        "arrive": "2026-10-06T00:24:30+08:00",
+        "headway_s": 360,
+        "in_vehicle_s": 840,
+        "walk_m": 0,
+        "fare_hkd": 0,
+        "accessible": true,
+        "provenance": "simulated",
+        "line": "ERL"
+      }
+    ],
+    "total": {
+      "time_s": 2850,
+      "time_range_s": [
+        2702.2053330664953,
+        2997.7946669335047
+      ],
+      "transfers": 2,
+      "walk_m": 0,
+      "fare_hkd": 12.5,
+      "co2_g": 705.1615813011733,
+      "reliability": 0.9595351114888961,
+      "freshness_s": 1297305
+    },
+    "score": 0.24433979030327715,
+    "score_breakdown": [
+      {
+        "criterion": "time",
+        "raw": 2850,
+        "normalized": 0,
+        "weight": 0.45,
+        "contribution": 0
+      },
+      {
+        "criterion": "transfers",
+        "raw": 2,
+        "normalized": 0.3333333333333333,
+        "weight": 0.1,
+        "contribution": 0.03333333333333333
+      },
+      {
+        "criterion": "walk",
+        "raw": 0,
+        "normalized": 1,
+        "weight": 0.1,
+        "contribution": 0.1
+      },
+      {
+        "criterion": "price",
+        "raw": 12.5,
+        "normalized": 0,
+        "weight": 0.1,
+        "contribution": 0
+      },
+      {
+        "criterion": "comfort",
+        "raw": 0.30105891642108384,
+        "normalized": 0.30105891642108384,
+        "weight": 0.05,
+        "contribution": 0.015052945821054193
+      },
+      {
+        "criterion": "reliability",
+        "raw": 0.9595351114888961,
+        "normalized": 0.9595351114888961,
+        "weight": 0.1,
+        "contribution": 0.09595351114888961
+      },
+      {
+        "criterion": "carbon",
+        "raw": 705.1615813011733,
+        "normalized": 0,
+        "weight": 0.05,
+        "contribution": 0
+      },
+      {
+        "criterion": "freshness",
+        "raw": 1297305,
+        "normalized": 8.243135918640841e-27,
+        "weight": 0.05,
+        "contribution": 4.121567959320421e-28
+      }
+    ],
+    "warnings": [
+      "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
+      "TML 数据较旧",
+      "KTL 数据较旧",
+      "ERL 数据较旧",
+      "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
+      "轮椅 M0 演示规则：MTR/大巴默认可用、小巴排除；明确不可达或部分可达标记仍排除",
+      "Only 5 feasible diverse routes; target 10 cannot be guaranteed by this network/profile",
+      "Fewer than two transit modes remain feasible",
+      "负载来自显式模拟场景，不代表真实客流"
+    ],
+    "notes": [],
+    "explain": "TML + KTL + ERL：约 45–50 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+    "evidence": [
+      {
+        "source": "TML",
+        "freshness_s": 1294800
+      },
+      {
+        "source": "TML",
+        "freshness_s": 1295220
+      },
+      {
+        "source": "KTL",
+        "freshness_s": 1295760
+      },
+      {
+        "source": "KTL",
+        "freshness_s": 1295970
+      },
+      {
+        "source": "KTL",
+        "freshness_s": 1296120
+      },
+      {
+        "source": "KTL",
+        "freshness_s": 1296270
+      },
+      {
+        "source": "ERL",
+        "freshness_s": 1296630
+      },
+      {
+        "source": "ERL",
+        "freshness_s": 1296795
+      },
+      {
+        "source": "ERL",
+        "freshness_s": 1297005
+      },
+      {
+        "source": "ERL",
+        "freshness_s": 1297305
+      },
+      {
+        "source": "route_model_v1",
+        "freshness_s": 0
+      },
+      {
+        "source": "c_route_zero_demand_fixture",
+        "freshness_s": 0
+      }
+    ],
+    "provenance": "simulated",
+    "load_estimate": {
+      "board_refusal_prob": 0,
+      "load_factor": 0,
+      "expected_wait_s": 180,
+      "capacity_per_hour": 24182.5,
+      "users_on_route": 0
+    }
+  }
+]
