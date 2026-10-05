@@ -1,4 +1,4 @@
-"""B-owned router awaiting registration in the shared application entrypoint."""
+"""Public simulated profile defaults and conservative preference parsing."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 
-from ..services.persona import PreferenceResult, parse_preference
+from ..services.persona import PersonaProfile, PreferenceResult, load_personas, load_presets, parse_preference
 
 
 class ParsePreferenceRequest(BaseModel):
@@ -17,6 +17,17 @@ class ParsePreferenceRequest(BaseModel):
 
 
 router = APIRouter(prefix="/api/persona", tags=["persona"])
+catalog_router = APIRouter(prefix="/api/personas", tags=["persona"])
+
+
+@catalog_router.get("", response_model=list[PersonaProfile])
+def list_personas() -> list[PersonaProfile]:
+    return load_personas()
+
+
+@catalog_router.get("/presets", response_model=dict[str, dict[str, float]])
+def list_presets() -> dict[str, dict[str, float]]:
+    return load_presets()
 
 
 @router.post("/parse", response_model=PreferenceResult)

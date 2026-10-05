@@ -27,6 +27,7 @@ from .api.stream import router as stream_router
 from .runtime_config import parse_cors_origins
 from .services.event_store import DEFAULT_DB_PATH, EventStore
 from .services.signal_store import SignalStore
+from .services.persona import PreferenceClient
 from .services.structure.llm_structurer import LlmJsonClient
 from .build_info import get_build_info
 
@@ -168,10 +169,24 @@ class EngineSyncEventStore(EventStore):
         return event
 
 
+def build_preference_client() -> PreferenceClient | None:
+    """Keep preference parsing deterministic unless both AI switches opt in."""
+    from .ai.budget import external_ai_allowed
+    if os.getenv("AI_ENABLED", "false").lower() not in {"true", "1", "yes", "on"}:
+        return None
+    if os.getenv("PERSONA_PARSE_AI_ENABLED", "false").lower() not in {"true", "1", "yes", "on"}:
+        return None
+    if not external_ai_allowed():
+        return None
+    from .services.structure.llm_api_client import OpenAiCompatJsonClient
+    return OpenAiCompatJsonClient.from_env()
+
+
 def create_app(
     *, db_path: str | Path = DEFAULT_DB_PATH,
     review_token: str | None = None,
     llm_client: LlmJsonClient | None = None,
+    preference_client: PreferenceClient | None = None,
 ) -> FastAPI:
     """Compose B's reviewed-event APIs and C's deterministic services."""
     store = SignalStore(db_path)
@@ -196,6 +211,8 @@ def create_app(
         application.state.llm_budget = budget
         application.state.llm_client = llm_client if llm_client is not None else env_client(budget)
         application.state.llm_injected = llm_client is not None
+        application.state.preference_client = (preference_client if preference_client is not None
+                                               else build_preference_client())
         from .admin.store import AdminStore
         admin = AdminStore(Path(db_path).parent / "admin.sqlite3", Path(db_path))
         try:
@@ -203,6 +220,8 @@ def create_app(
         except Exception:
             admin.ready = False
         application.state.admin_store = admin
+        from .services.ingest.online_store import IngestStore
+        application.state.online_source_store = IngestStore(db_path)
         admin.llm_budget = budget
         application.state.replanning = coordinator
         from .admin.scheduler import SourceScheduler
@@ -244,8 +263,9 @@ def create_app(
     application.include_router(events_router)
     application.include_router(review_router)
     application.include_router(stream_router)
-    from .api.persona import router as persona_router
+    from .api.persona import catalog_router as persona_catalog_router, router as persona_router
     application.include_router(persona_router)
+    application.include_router(persona_catalog_router)
     from .admin.scheduler import router as sources_router
     application.include_router(sources_router)
     if coordinator:

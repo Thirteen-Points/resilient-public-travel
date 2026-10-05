@@ -149,7 +149,8 @@ def source_operation(store, source, actor, test=False, *, cancel_check=None):
             store.record(actor,"source_tested",source,status,f"Failures {failures}; no reports written")
             return result
         streak = 0 if status == "success" else old.get("consecutive_failures", 0) + 1
-        state={"last_attempt":now,"config":signature,"poller":poller.export_state(),
+        state={"last_attempt":now,"last_success": result["at"] if status == "success" else old.get("last_success"),
+               "config":signature,"poller":poller.export_state(),
                "consecutive_failures": streak,
                "next_attempt": time.time() + backoff_seconds(cfg["poll_interval_seconds"], streak)}
         return store.finish_collection(source,state,outcome.signals,actor,result)

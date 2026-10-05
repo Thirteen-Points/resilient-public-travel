@@ -54,4 +54,20 @@ def validate_chat_response(value: str | Mapping[str, Any], tool_results: list[An
     produced = set(re.findall(r"(?<![\w.])-?\d+(?:\.\d+)?", result["message"]))
     if produced - allowed:
         raise SchemaValidationError("model introduced a numeric fact not returned by a tool")
+    evidence = json.dumps(tool_results or [], ensure_ascii=False).casefold()
+    route_ids = re.findall(r"(?<![\w])r_[a-z0-9_-]+", result["message"], flags=re.IGNORECASE)
+    line_names = re.findall(r"\b(?:[A-Z][a-z]+\s+){1,2}Line\b|[\u4e00-\u9fff]{2,}(?<!路)(?:线|綫)", result["message"])
+    def grounded_line(token: str) -> bool:
+        if token.casefold() in evidence:
+            return True
+        # Chinese sentences have no word boundary: "乘坐东铁线" may include
+        # a grounded "东铁线" after an ordinary verb.
+        return token.endswith(("线", "綫")) and any(token.endswith(suffix) and suffix in evidence
+                for length in range(3, min(6, len(token)) + 1) for suffix in [token[-length:]])
+
+    if any(token.casefold() not in evidence for token in route_ids) or any(not grounded_line(token) for token in line_names):
+        raise SchemaValidationError("model introduced a route or line absent from tool results")
+    if ('"provenance": "simulated"' in evidence and '"provenance": "real"' not in evidence
+            and re.search(r"(?<!非)(?<!未)(?:实测客流|实时客流|已核实的客流|measured live ridership)", result["message"], re.IGNORECASE)):
+        raise SchemaValidationError("model presented simulated data as measured ridership")
     return result

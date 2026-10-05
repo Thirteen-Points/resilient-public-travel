@@ -9,11 +9,13 @@ from __future__ import annotations
 
 import asyncio
 import time
+from datetime import datetime
 from fastapi import APIRouter, Request
 
 from .collect import offline_mode, source_operation
 
 SOURCES = ("mtr", "hko")
+SOURCE_CLASSIFICATION = {"mtr": "official_public_eta", "hko": "official_public_warning"}
 
 
 class SourceScheduler:
@@ -104,7 +106,7 @@ class SourceScheduler:
         return public_source_status(self.store, self)
 
 
-def public_source_status(store, scheduler=None):
+def public_source_status(store, scheduler=None, online_store=None):
     offline = offline_mode()
     configured = bool(store and store.ready)
     sources = {}
@@ -117,11 +119,14 @@ def public_source_status(store, scheduler=None):
                 result = state.get("last_result", {})
                 interval = cfg["poll_interval_seconds"]
                 sources[name] = {
+                    "classification": SOURCE_CLASSIFICATION[name],
                     "enabled": cfg["enabled"], "interval_seconds": interval,
                     "scheduled": bool(scheduler and scheduler._tasks and not scheduler._stopping
                                       and cfg["enabled"] and not offline),
                     "collecting": bool(scheduler and scheduler._running[name]),
-                    "last_attempt": state.get("last_attempt"), "next_attempt": state.get("next_attempt"),
+                    "last_attempt": state.get("last_attempt"),
+                    "last_success": state.get("last_success") or (result.get("at") if result.get("status") == "success" else None),
+                    "next_attempt": state.get("next_attempt"),
                     "status": "offline" if offline else "disabled" if not cfg["enabled"] else result.get("status", "waiting"),
                     "stale": not state or result.get("status") != "success"
                              or now - state.get("last_attempt", 0) > interval * 2,
@@ -133,9 +138,35 @@ def public_source_status(store, scheduler=None):
         except Exception:
             configured = False
     if not configured:
-        sources = {name: {"enabled": False, "scheduled": False, "collecting": False,
+        sources = {name: {"classification": SOURCE_CLASSIFICATION[name],
+                          "enabled": False, "scheduled": False, "collecting": False,
+                          "last_attempt": None, "last_success": None,
                           "status": "offline" if offline else "unconfigured", "stale": True}
                    for name in SOURCES}
+    online_state = {}
+    if online_store is not None:
+        try:
+            online_state = online_store.state("mtr_mobile")
+        except Exception:
+            # The separate collector has not initialized its tables yet.
+            pass
+    online_status = online_state.get("status", "unconfigured")
+    if online_status not in {"success", "partial_failure", "failed", "disabled", "offline",
+                             "waiting", "unconfigured", "blocked", "error", "running", "stopped"}:
+        online_status = "unconfigured"
+    last_success = online_state.get("last_success")
+    try:
+        online_stale = online_status != "success" or time.time() - datetime.fromisoformat(last_success).timestamp() > 600
+    except (TypeError, ValueError):
+        online_stale = True
+    sources["mtr_mobile"] = {
+        "classification": "official_public_notice",
+        "enabled": online_status not in {"unconfigured", "disabled", "offline", "blocked"},
+        "scheduled": False, "collecting": online_status == "running",
+        "last_attempt": online_state.get("last_attempt"),
+        "last_success": last_success,
+        "status": online_status, "stale": online_stale,
+    }
     return {"offline": offline, "configured": configured, "sources": sources,
             "publishes_events": False}
 
@@ -146,4 +177,5 @@ router = APIRouter(prefix="/api/sources", tags=["source status"])
 @router.get("/status")
 def status(request: Request):
     return public_source_status(getattr(request.app.state, "admin_store", None),
-                                getattr(request.app.state, "source_scheduler", None))
+                                getattr(request.app.state, "source_scheduler", None),
+                                getattr(request.app.state, "online_source_store", None))
