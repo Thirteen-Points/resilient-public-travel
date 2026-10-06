@@ -8,6 +8,8 @@ import { AgentAvatar } from './components/AgentAvatar'
 import { AgentPanel } from './components/AgentPanel'
 import { ComparePage } from './components/ComparePage'
 import { SimulationPage } from './components/SimulationPage'
+import { PreferenceEditor } from './components/PreferenceEditor'
+import { LatestRequest, resolveProfile, profileLabel } from './api/p3Context'
 import { ReviewConsole, type ReviewLog } from './components/ReviewConsole'
 import { ReviewAccess } from './components/ReviewAccess'
 import { SignalInbox } from './components/SignalInbox'
@@ -16,7 +18,7 @@ import { UpdatesPage } from './components/UpdatesPage'
 import { ProvenanceBadge } from './components/ProvenanceBadge'
 import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
-import type { DemoMeta, Event, JourneyContext, Network, Persona, Preset, RouteCandidate, Signal } from './api/types'
+import type { DemoMeta, Event, JourneyContext, Network, Persona, Preset, RouteCandidate, Signal, TravelProfile } from './api/types'
 import { CORRIDOR_IDS, formatHkt, formatRange, legDuration, modeSummary, nearestAccessPoint, nodeIndex } from './data'
 import css from './App.module.css'
 
@@ -122,6 +124,8 @@ export function App() {
   const [error, setError] = useState('')
   const [preset, setPreset] = useState<Preset>('fastest')
   const [persona, setPersona] = useState<Persona>('commuter')
+  const [customProfile, setCustomProfile] = useState<TravelProfile | undefined>()
+  const effectiveProfile = useMemo(() => resolveProfile({ persona, preset, profile: customProfile }), [persona, preset, customProfile])
   const [largeText, setLargeText] = useState(false), [highContrast, setHighContrast] = useState(false)
   const [departure, setDeparture] = useState('08:20')
   const [departureDate, setDepartureDate] = useState('2026-09-22')
@@ -133,12 +137,19 @@ export function App() {
   const toast = useRef<HTMLDivElement>(null)
   const originalEvents = useRef<Event[]>([])
   const searchingRef = useRef(false)
+  const routeRequests = useRef(new LatestRequest()), requestedJourney = useRef('')
+  const requestedScreen = useRef<Screen>('journey')
   const [seedRoutes, setRoutes] = useState<RouteCandidate[]>([])
   const routes = SEED_MODE ? seedRoutes : live.routes
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = useMemo(() => routes.find(route => route.route_id === selectedId), [routes, selectedId])
   const eventRevisions = (SEED_MODE ? seedBundle?.published : live.bundle?.published)?.map(event => `${event.event_id}@${event.version}`).sort().join(',') ?? ''
-  const context = useMemo<JourneyContext>(() => ({ origin, destination, departAt: hktDeparture(departureDate, departure), preset, persona, eventRevisions, eventIds: eventRevisions ? eventRevisions.split(',').map(value => value.slice(0, value.lastIndexOf('@'))) : [] }), [origin, destination, departureDate, departure, preset, persona, eventRevisions])
+  const context = useMemo<JourneyContext>(() => ({ origin, destination, departAt: hktDeparture(departureDate, departure), preset, persona, profile: effectiveProfile, eventRevisions, eventIds: eventRevisions ? eventRevisions.split(',').map(value => value.slice(0, value.lastIndexOf('@'))) : [] }), [origin, destination, departureDate, departure, preset, persona, effectiveProfile, eventRevisions])
+  const plannerKey = JSON.stringify([origin, destination, context.departAt, effectiveProfile])
+  useEffect(() => {
+    if (searchingRef.current && (requestedJourney.current !== plannerKey || requestedScreen.current !== screen)) { routeRequests.current.cancel(); searchingRef.current = false; setSearching(false) }
+  }, [plannerKey, screen])
+  useEffect(() => () => routeRequests.current.cancel(), [])
   usePageMotion(root, screen, Boolean(bundle))
   useSuccessMotion(toast, success.revision)
   useEffect(() => {
@@ -203,22 +214,27 @@ export function App() {
     else setDestination(value)
     setActiveField(null); setPicking(null); setError(''); setPicked('')
   }
-  const showRoutes = async (from = origin, to = destination, preference = preset) => {
-    if (searchingRef.current) return
+  const showRoutes = async (from = origin, to = destination, preference = preset, profile = effectiveProfile) => {
     setActiveField(null)
     if (!to || !from) { setError('Choose a destination and starting point before continuing.'); return }
     if (from === to) { setError('Choose two different stations.'); return }
     const departAt = hktDeparture(departureDate, departure)
     if (!Number.isFinite(Date.parse(departAt))) { setError('Choose a valid Hong Kong departure date and time.'); return }
     searchingRef.current = true; setSearching(true)
+    const request = routeRequests.current.begin()
+    const requestedProfile = resolveProfile({ persona, preset: preference, profile })
+    requestedJourney.current = JSON.stringify([from, to, departAt, requestedProfile])
+    requestedScreen.current = screen
     try {
-      const next = await (SEED_MODE ? seedDataSource.getRoutes : live.query)({ origin: from, destination: to, departAt, preset: preference, persona })
+      const value = { origin: from, destination: to, departAt, preset: preference, persona, ...(!SEED_MODE ? { profile: requestedProfile } : {}) }
+      const next = SEED_MODE ? await seedDataSource.getRoutes(value) : await live.query(value, request.signal)
+      if (!request.current()) return
       setRoutes(next.slice(0, 3)); setOrigin(from); setDestination(to); setPreset(preference); setQueriedAt(departAt)
       setSelectedId(next[0]?.route_id ?? null)
       setScreen('results'); setError(''); setPicking(null)
       if (next.length) celebrate(`${Math.min(next.length, 3)} ${SEED_MODE ? 'seed' : 'API'} alternatives ready`)
-    } catch (cause) { setError(`Route data could not be loaded. ${cause instanceof Error ? cause.message : String(cause)}`) }
-    finally { setSearching(false); searchingRef.current = false }
+    } catch (cause) { if (request.current()) setError(`Route data could not be loaded. ${cause instanceof Error ? cause.message : String(cause)}`) }
+    finally { if (request.current()) { setSearching(false); searchingRef.current = false } }
   }
   const mapPick = (point: { lat: number; lng: number }) => {
     if (!picking) return
@@ -252,7 +268,7 @@ export function App() {
       {!SEED_MODE && <div className={css.connectionStatus} role="status"><strong>{live.connected ? 'Live updates connected' : 'Checking public updates every 3s'}</strong>{live.revision > 0 && <p>Routes refreshed for the latest approved network state.</p>}{(live.warning || live.routeWarning) && <p>{live.warning} {live.routeWarning}</p>}<button type="button" onClick={() => void live.refresh()}>Refresh</button></div>}
       <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} mode={mapMode} />
       {(mapMode === 'docked' || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
-        {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta?.sources} sourceWarning={live.sourceWarning} onClose={() => setScreen('journey')} />}
+        {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta?.sources} sourceWarning={live.sourceWarning} collectorStatus={live.sources} replanningStatus={live.replanning} collectorWarning={live.sourcesWarning || live.warning} replanningWarning={live.replanningWarning} sourcesReadAt={live.sourcesReadAt} onClose={() => setScreen('journey')} />}
         {screen === 'updates' && <UpdatesPage events={events} signals={signals} network={network} seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} onOpenReview={() => setScreen('review')} onBack={() => setScreen('journey')} />}
         {screen === 'review' && (SEED_MODE ? <ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} /> : <ReviewAccess><SignalInbox network={network} onChanged={live.refresh} />{live.reviewWarning && <p role="alert">{live.reviewWarning}</p>}<ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} live /></ReviewAccess>)}
       </div>}
@@ -274,12 +290,12 @@ export function App() {
             {picked && <p className={css.confirm}>{picked}</p>}
             {error && <p role="alert" className={css.error}>{error}</p>}
             <DeparturePicker date={departureDate} time={departure} onDate={setDepartureDate} onTime={setDeparture} />
-            <fieldset className={css.presets}><legend>TRAVELLER PROFILE</legend><button type="button" aria-pressed={persona === 'commuter'} onClick={() => setPersona('commuter')}>Commuter</button><button type="button" aria-pressed={persona === 'wheelchair'} disabled={SEED_MODE} onClick={() => setPersona('wheelchair')}>Wheelchair</button></fieldset>
-            <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} disabled={!SEED_MODE && option.id === 'least_walking'} title={!SEED_MODE && option.id === 'least_walking' ? 'Backend contract pending — no alternate preset substituted' : undefined} className={preset === option.id ? css.activePreset : ''} onClick={() => setPreset(option.id)}>{option.label}</button>)}</fieldset>
+            <fieldset className={css.presets}><legend>TRAVELLER PROFILE</legend><button type="button" aria-pressed={persona === 'commuter'} onClick={() => { setPersona('commuter'); setCustomProfile(undefined) }}>Commuter</button><button type="button" aria-pressed={persona === 'wheelchair'} disabled={SEED_MODE} onClick={() => { setPersona('wheelchair'); setCustomProfile(undefined) }}>Wheelchair</button></fieldset>
+            <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} disabled={!SEED_MODE && option.id === 'least_walking'} title={!SEED_MODE && option.id === 'least_walking' ? 'Use a walking limit in your travel preferences' : undefined} className={preset === option.id ? css.activePreset : ''} onClick={() => { setPreset(option.id); setCustomProfile(previous => previous ? { ...previous, weights: undefined } : undefined) }}>{option.label}</button>)}</fieldset>
             {!SEED_MODE && <p className={css.tiny}>Less walking preset awaits backend support. Wheelchair hard walking and accessibility constraints still apply.</p>}
             <button type="submit" disabled={searching} className={css.primary}>{searching ? 'Finding routes…' : 'Find resilient routes'} <span>↗</span></button>
           </form>
-
+          {!SEED_MODE && <PreferenceEditor active={screen === 'journey'} profile={effectiveProfile} onApply={next => { setCustomProfile(next); setPersona(next.mobility === 'wheelchair' ? 'wheelchair' : 'commuter'); if (origin && destination) void showRoutes(origin, destination, preset, next) }} />}
           <p className={css.tiny}>{SEED_MODE ? 'Only Tai Wai → Admiralty has route candidates in this fixture.' : 'Routes use the modelled network and published events; estimates are not a live timetable.'}</p>
       </div>}
       {screen === 'results' && <>
@@ -289,6 +305,7 @@ export function App() {
           <span className={css.kicker}>ROUTES FOR YOUR JOURNEY</span>
           <h1 id="routes-heading">{nodes.get(origin)?.name_en ?? origin} <span>→</span><br />{nodes.get(destination)?.name_en ?? destination}</h1>
           <p className={css.subhead}>{routes.length} alternatives · {PRESETS.find(option => option.id === preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
+          {!SEED_MODE && <p className={css.queryStamp}>Requested profile: {profileLabel(effectiveProfile)}</p>}
           <p className={css.queryStamp}>Requested departure: {formatHkt(queriedAt)}<br /><small>Query value: {queriedAt} · {SEED_MODE ? 'seed estimates are not recalculated.' : 'recomputed when the graph or published events change.'}</small></p>
           {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={'ABC'[index]} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); setScreen('detail') }} />)}</div> : <div className={css.empty}><strong>No route returned for this pair.</strong><p>Try another departure or station pair. No feasible alternative has been supplied.</p></div>}
           <p className={css.tiny}>{SEED_MODE ? 'Fixed illustrative candidates.' : 'API candidates on the modelled network.'} Published events affect the network overlay. Times, fares and scores are derived estimates.</p>

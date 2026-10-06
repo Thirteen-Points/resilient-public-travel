@@ -1,4 +1,4 @@
-name: P3 regression
+name: P3 and P4 regression
 
 on:
   pull_request:
@@ -69,6 +69,11 @@ jobs:
           M2_PYTHON: python
           M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
         run: node tests/browser/m2.e2e.cjs
+      - name: P4 preferences, comparisons, simulations and accessibility
+        env:
+          M2_PYTHON: python
+          M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
+        run: node tests/browser/p4.e2e.cjs
       - name: Preserve regression evidence
         if: always()
         uses: actions/upload-artifact@v4
