@@ -152,6 +152,12 @@ def source_operation(store, source, actor, test=False, *, cancel_check=None):
         state={"last_attempt":now,"config":signature,"poller":poller.export_state(),
                "consecutive_failures": streak,
                "next_attempt": time.time() + backoff_seconds(cfg["poll_interval_seconds"], streak)}
+        # Only a completed successful collection records last_success_at; later
+        # partial/failed attempts must keep the previous success time.
+        if status == "success":
+            state["last_success_at"] = result["at"]
+        elif old.get("last_success_at"):
+            state["last_success_at"] = old["last_success_at"]
         return store.finish_collection(source,state,outcome.signals,actor,result)
     finally:
         _SOURCE_GUARD.reset(token)

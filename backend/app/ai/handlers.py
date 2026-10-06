@@ -11,6 +11,7 @@ from copy import deepcopy
 from typing import Any, Callable
 
 from .tools import ToolHandler
+from ..engine.constraints import normalize_profile
 
 
 def build_engine_handlers(engine: Any, diversion_builder: Callable[[dict[str, Any]], dict[str, Any]]) -> dict[str, ToolHandler]:
@@ -67,8 +68,9 @@ def build_engine_handlers(engine: Any, diversion_builder: Callable[[dict[str, An
             profile['hard_flags'] = sorted(set(original.get('hard_flags', [])) | set(profile.get('hard_flags', [])))
             profile['max_walk_m'] = min(original.get('max_walk_m', 400), profile.get('max_walk_m', 400))
         pinned = engine.snapshots.current
+        effective = normalize_profile(profile or None)
         details = engine.query_details(arguments["from"], arguments["to"], arguments["depart_at"],
-                                       profile or None,
+                                       effective,
                                        modes=arguments.get("modes"))
         routes = deepcopy(details["routes"])
         state["routes"] = {route["route_id"]: route for route in routes}
@@ -77,7 +79,11 @@ def build_engine_handlers(engine: Any, diversion_builder: Callable[[dict[str, An
         state['snapshot'] = pinned
         state['depart_at'] = arguments['depart_at']
         provenance, freshness_s = metadata(routes)
-        return {"routes": routes, "graph_snapshot": details["graph_snapshot"], "provenance": provenance, "freshness_s": freshness_s}
+        # graph_snapshot/effective_profile describe what the engine actually
+        # used, so chat metadata can never drift from the computation.
+        return {"routes": routes, "graph_snapshot": details["graph_snapshot"],
+                "effective_profile": effective,
+                "provenance": provenance, "freshness_s": freshness_s}
 
     def score_routes(route_ids: list[str], weights: dict[str, float] | None = None) -> dict[str, Any]:
         from ..engine.constraints import normalize_profile

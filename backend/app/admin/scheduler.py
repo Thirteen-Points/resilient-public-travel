@@ -116,6 +116,13 @@ def public_source_status(store, scheduler=None):
                 cfg, state = config[name], store.source_state(name)
                 result = state.get("last_result", {})
                 interval = cfg["poll_interval_seconds"]
+                # last_success_at survives later failures, partial results,
+                # disabling, offline mode and process restarts (persisted state).
+                # Pre-existing state is backfilled only from a stored success
+                # result that carries its own completion time.
+                last_success = state.get("last_success_at")
+                if not last_success and result.get("status") == "success" and result.get("at"):
+                    last_success = result["at"]
                 sources[name] = {
                     "enabled": cfg["enabled"], "interval_seconds": interval,
                     "scheduled": bool(scheduler and scheduler._tasks and not scheduler._stopping
@@ -125,6 +132,7 @@ def public_source_status(store, scheduler=None):
                     "status": "offline" if offline else "disabled" if not cfg["enabled"] else result.get("status", "waiting"),
                     "stale": not state or result.get("status") != "success"
                              or now - state.get("last_attempt", 0) > interval * 2,
+                    "last_success_at": last_success,
                     "last_result": {key: result[key] for key in ("at", "status", "failures", "added", "duplicate") if key in result},
                 }
                 if scheduler and name in scheduler._errors:
@@ -134,7 +142,8 @@ def public_source_status(store, scheduler=None):
             configured = False
     if not configured:
         sources = {name: {"enabled": False, "scheduled": False, "collecting": False,
-                          "status": "offline" if offline else "unconfigured", "stale": True}
+                          "status": "offline" if offline else "unconfigured", "stale": True,
+                          "last_success_at": None}
                    for name in SOURCES}
     return {"offline": offline, "configured": configured, "sources": sources,
             "publishes_events": False}

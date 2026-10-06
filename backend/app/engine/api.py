@@ -44,7 +44,11 @@ def create_router(engine):
             if 'event_ids' in payload and (not isinstance(payload['event_ids'], list) or
                                           any(not isinstance(x, str) for x in payload['event_ids'])):
                 raise ValueError('event_ids must be a string array')
-            return engine.query(**payload)
+            # One query_details call supplies both the body and the snapshot used
+            # for this computation; the global current snapshot is never re-read.
+            details = engine.query_details(**payload)
+            return JSONResponse(content=details['routes'],
+                                headers={'X-Route-Snapshot': details['graph_snapshot']})
         except DataUnavailable as exc:
             return error(503, 'DATA_UNAVAILABLE', str(exc))
         except (ValueError, TypeError, KeyError, AttributeError) as exc:
