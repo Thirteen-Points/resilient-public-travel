@@ -12,7 +12,9 @@ const evidence = { environment: process.env.CI ? 'CI isolated offline browser' :
 async function ready(url) {
   for (let attempt = 0; attempt < 150; attempt++) {
     if (launcher.exitCode !== null) throw new Error('Offline launcher stopped: ' + logs)
-    try { if ((await fetch(url)).ok) return } catch {}
+    if (logs.includes('Offline demo ready:')) {
+      try { if ((await fetch(url)).ok) return } catch {}
+    }
     await pause(100)
   }
   throw new Error('Offline launcher not ready: ' + logs)
@@ -29,6 +31,7 @@ async function ready(url) {
   assert.equal(health.ok, true); assert.equal(health.mode, 'offline')
   evidence.backend_build = health.build
   const build = await (await fetch(web + '/build-info.json')).json()
+  assert.equal(build.commit_sha, JSON.parse(fs.readFileSync(path.join(root, 'frontend/dist/offline-build.json'), 'utf8')).source_revision)
   assert.equal(build.commit_sha, health.build.commit_sha); evidence.frontend_build = build
   browser = await chromium.launch({ headless: true, ...(process.env.M2_BROWSER_CHANNEL ? { channel: process.env.M2_BROWSER_CHANNEL } : {}) })
   context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce',
@@ -66,13 +69,15 @@ async function ready(url) {
     'm2_six_station_directed_od_am_peak_p3_shared_segments_residual_10pct']
   for (let index = 0; index < scenarioIds.length; index++) {
     const id = scenarioIds[index]
-    await page.getByLabel('Simulation scenario id').fill(id)
+    await page.getByLabel('Simulation scenario', { exact: true }).selectOption(id)
     await page.getByRole('button', { name: 'Load precomputed result', exact: true }).click()
     const panel = page.locator(`[data-simulation-id="${id}"]`); await panel.waitFor()
     const result = await (await fetch(api + '/api/sim/result?scenario_id=' + id)).json()
+    await panel.getByText('Legacy capacity-gap field', { exact: true }).click()
     const text = await panel.innerText()
+    assert.ok(text.includes('Backend unstoppable_demand: ' + result.guided.unstoppable_demand.toLocaleString('en-HK')))
     for (const strategy of ['baseline', 'guided']) assert.ok(text.includes(result[strategy].total_delay_person_min.toLocaleString('en-HK')))
-    if (index === 0) { assert.ok(result.delta.delay_reduction_pct < 0); await page.getByText('Guided delay is higher.', { exact: false }).waitFor() }
+    if (index === 0) { assert.ok(result.delta.delay_reduction_pct < 0); await page.getByText('Guided delay is higher in this simulated scenario', { exact: false }).waitFor() }
     else {
       assert.equal(result.population, 10000); assert.equal(result.seed, 20260922)
       assert.equal(result.provenance, 'simulated'); assert.ok(result.generated_at && result.metric_units)
@@ -85,7 +90,7 @@ async function ready(url) {
     fs.writeFileSync(path.join(out, `scenario-${index}.json`), JSON.stringify(result, null, 2))
     await holdUntil((index + 2) * 60)
   }
-  await page.getByRole('heading', { name: 'Capacity gap & allocation', exact: true }).scrollIntoViewIfNeeded()
+  await page.getByRole('heading', { name: 'People the model cannot serve.', exact: true }).scrollIntoViewIfNeeded()
   await page.screenshot({ path: path.join(out, '05-capacity-gap.png') })
   await holdUntil(270)
   await page.getByRole('heading', { name: 'Assumptions', exact: true }).scrollIntoViewIfNeeded()

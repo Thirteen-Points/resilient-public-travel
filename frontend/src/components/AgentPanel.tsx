@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BorderBeam } from 'border-beam'
 import type { Event, JourneyContext, Preset } from '../api/types'
 import { chat, type ChatReply } from '../api/p3Api'
-import { contextKey, LatestRequest } from '../api/p3Context'
+import { contextKey, LatestRequest, profileLabel, resolveProfile } from '../api/p3Context'
 import { LiveApiError } from '../api/liveTransitApi'
 import { formatHktTime } from '../lib/formatters'
 import { BackendRoute } from './BackendRoute'
@@ -38,14 +38,15 @@ function LiveAgentPanel({ context, active, published, onBack }: { context: Journ
   return <section className={css.agentPanel} data-panel aria-labelledby="agent-heading">
     <button type="button" className={css.textButton} onClick={onBack}>← Station planner</button>
     <div className={css.agentHeading}><AgentAvatar issue={published.length > 0} loading={busy} /><div><span className={css.eyebrow}>API JOURNEY COMPANION</span><h1 id="agent-heading">Guidance with evidence.</h1></div></div>
-    <p className={css.micro}>Current journey: {context.origin} → {context.destination || 'choose a destination'} · {formatHktTime(context.departAt)} · {context.persona} · {context.preset.replaceAll('_', ' ')}</p>
-    <p className={css.issueStatus}>Personalized chat pending B/C. The current endpoint accepts OD/time and uses standard mobility / fastest defaults; it does not apply profile ids or free-text preference changes. Other selections are blocked. Event conditions are current backend facts, not a pinned snapshot.</p>
+    <p className={css.micro}>Current journey: {context.origin} → {context.destination || 'choose a destination'} · {formatHktTime(context.departAt)} · {profileLabel(resolveProfile(context))}</p>
+    <p className={css.issueStatus}>The active planner profile is sent to the route tools. Change preferences in the planner and confirm them before asking again. Chat text does not automatically change your profile. Events are current approved backend facts, not a pinned historical snapshot.</p>
     <p className={css.micro}>Answers, routes and numbers come from /api/ai/chat. Backend fallback means deterministic tools; an API failure never loads seed data.</p>
     {!messages.length && <div className={css.promptList}>{['Show the routes for my current journey', 'Explain the returned route estimates', 'What are the limitations of this journey?'].map(prompt => <button key={prompt} type="button" disabled={busy} onClick={() => void send(prompt)}>{prompt}<span>↗</span></button>)}</div>}
     <div className={css.conversation} role="log" aria-label="Agent conversation" aria-live="polite" aria-busy={busy}>{messages.map((item, index) => <div key={index}>
       <div className={css.userMessage}><span className={css.eyebrow}>YOU</span><p>{item.question}</p></div>
       <div className={css.agentMessage}><span className={css.eyebrow}>{item.reply.fallback ? 'BACKEND FALLBACK · DETERMINISTIC' : 'BACKEND ANSWER'}</span><p>{item.reply.message}</p>
         <p className={css.micro}>{item.context.origin} → {item.context.destination} · {formatHktTime(item.context.departAt)} · approved revisions at request: {item.context.eventRevisions || 'none'}</p>
+        <p className={css.micro}>{item.reply.effective_profile ? `Engine profile: ${profileLabel(item.reply.effective_profile)}` : `Requested profile: ${profileLabel(resolveProfile(item.context))}. Effective-profile metadata not supplied.`}<br />Calculation snapshot: {item.reply.graph_snapshot ?? 'not supplied — calculation context unverified'}</p>
         {contextKey(item.context) !== key && <p className={css.issueStatus}>Previous context — this answer may be stale. Ask again for the current journey.</p>}
         {item.reply.tool_calls.filter(call => !call.ok).map((call, i) => <p key={i} className={css.error}>Tool failure: {call.trace?.tool ?? 'backend tool'} · {call.error ?? 'unavailable'} {call.detail ?? ''}</p>)}
         {item.reply.routes.map(route => <BackendRoute key={route.route_id} route={route} />)}

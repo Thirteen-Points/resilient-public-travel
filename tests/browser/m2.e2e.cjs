@@ -5,6 +5,7 @@ const { spawn } = require('node:child_process')
 const assert = require('node:assert/strict')
 const { chromium } = require(process.env.M2_PLAYWRIGHT || 'playwright')
 const root = path.resolve(__dirname, '../..'), out = path.join(root, '.cache/m2-browser')
+const captureMedia = process.env.M2_CAPTURE_MEDIA === '1'
 fs.mkdirSync(out, { recursive: true })
 const children = []
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -113,7 +114,7 @@ const networkFailures = []
   await page.getByRole('button', { name: 'Find resilient routes' }).click()
   await page.getByRole('heading', { name: 'Tai Wai → Admiralty' }).waitFor()
   await page.waitForTimeout(600)
-  await page.screenshot({ path: path.join(out, 'published-desktop.png'), fullPage: true })
+  if (captureMedia) await page.screenshot({ path: path.join(out, 'published-desktop.png'), fullPage: true })
   // Public visitors see impact even with no reviewer credential; changed facts
   // remain out of public maps until the next explicit approval.
   const visitor = await context.newPage()
@@ -166,13 +167,13 @@ const networkFailures = []
   await context.setOffline(true)
   await page.getByText('Refresh failed; displayed data may be stale.', { exact: false }).waitFor({ timeout: 15000 })
   assert.ok(await page.getByRole('heading', { name: 'Tai Wai → Admiralty' }).isVisible())
-  await page.screenshot({ path: path.join(out, 'offline-retained.png'), fullPage: true })
+  if (captureMedia) await page.screenshot({ path: path.join(out, 'offline-retained.png'), fullPage: true })
   await context.setOffline(false)
   await page.getByRole('button', { name: 'Refresh', exact: true }).click()
   await until(async () => !(await page.locator('body').innerText()).includes('Refresh failed; displayed data may be stale.'))
   await page.setViewportSize({ width: 390, height: 844 })
   await page.waitForTimeout(600)
-  await page.screenshot({ path: path.join(out, 'mobile.png'), fullPage: true })
+  if (captureMedia) await page.screenshot({ path: path.join(out, 'mobile.png'), fullPage: true })
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)
   assert.equal(overflow, false, 'Mobile horizontal overflow')
   assert.deepEqual(errors, [])
@@ -184,7 +185,7 @@ const networkFailures = []
   console.error(error.stack)
   console.error(JSON.stringify(networkFailures))
   fs.writeFileSync(path.join(out, 'server.log'), backendProcess?.logs() ?? '')
-  if (browser) { const pages = browser.contexts().flatMap(context => context.pages()); for (let i = 0; i < pages.length; i++) { await pages[i].screenshot({ path: path.join(out, `failure-${i}.png`), fullPage: true }).catch(() => {}); fs.writeFileSync(path.join(out, `failure-${i}.txt`), await pages[i].locator('body').innerText().catch(() => '')) } }
+  if (browser) { const pages = browser.contexts().flatMap(context => context.pages()); for (let i = 0; i < pages.length; i++) { if (captureMedia) await pages[i].screenshot({ path: path.join(out, `failure-${i}.png`), fullPage: true }).catch(() => {}); fs.writeFileSync(path.join(out, `failure-${i}.txt`), await pages[i].locator('body').innerText().catch(() => '')) } }
   process.exitCode = 1
 }).finally(async () => {
   await browser?.close()
