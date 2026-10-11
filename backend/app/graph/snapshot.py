@@ -6,6 +6,8 @@ import json
 import threading
 from dataclasses import dataclass
 from datetime import datetime
+from functools import cached_property
+from bisect import bisect_left, bisect_right
 from pathlib import Path
 
 from .build import HK, build_graph, freeze, thaw, timestamp
@@ -40,13 +42,40 @@ class Snapshot:
     events: tuple
     weather_policy: object = None
 
+    @cached_property
+    def segment_events(self):
+        pairs = {}
+        for event in self.events:
+            for segment in event.get("affected_segments", ()):
+                pair = (segment["from_node"], segment["to_node"])
+                pairs.setdefault(pair, []).append((event, segment))
+                if event.get("direction") == "both" and pair[0] != pair[1]:
+                    pairs.setdefault(pair[::-1], []).append((event, segment))
+        return freeze(pairs)
+
+    @cached_property
+    def weather_events(self):
+        from ..engine.environment import approved_weather_conditions
+        return tuple(event for event in self.events if approved_weather_conditions(event))
+
+    @cached_property
+    def weather_starts(self):
+        return tuple(sorted({timestamp(value) for event in self.weather_events
+                             for value in (event.get("window", {}).get("start"), event.get("published_at"))
+                             if value}))
+
+    def weather_boundaries(self, departure, arrival):
+        return self.weather_starts[bisect_right(self.weather_starts, departure):bisect_left(self.weather_starts, arrival)]
+
     def weather_effect(self, mode, at):
         from ..engine.environment import weather_effect
-        return weather_effect(self.events, self.weather_policy, mode, at, active)
+        return weather_effect(self.weather_events, self.weather_policy, mode, at, active)
 
     def impact(self, edge, at, until=None):
         factor, slow, ids = 1.0, 1.0, []
-        for event in self.events:
+        for event, segment in self.segment_events.get((edge.source, edge.target), ()):
+            if not matches(event, segment, edge):
+                continue
             # A traversal must not cross a closure starting during the ride.
             applies = active(event, at)
             for start in (event.get("window", {}).get("start"), event.get("published_at")):
@@ -54,13 +83,11 @@ class Snapshot:
                     applies = applies or active(event, timestamp(start))
             if not applies:
                 continue
-            for segment in event.get("affected_segments", ()):
-                if matches(event, segment, edge):
-                    value = segment["capacity_factor"]
-                    factor = min(factor, 0.0 if segment["impact"] == "closed" else value)
-                    if segment["impact"] == "slow" and value > 0:
-                        slow = max(slow, 1 / value)
-                    ids.append(event["event_id"])
+            value = segment["capacity_factor"]
+            factor = min(factor, 0.0 if segment["impact"] == "closed" else value)
+            if segment["impact"] == "slow" and value > 0:
+                slow = max(slow, 1 / value)
+            ids.append(event["event_id"])
         return factor, slow, tuple(sorted(set(ids)))
 
     def describe(self, at=None):

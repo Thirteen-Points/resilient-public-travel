@@ -164,6 +164,21 @@ def test_empty_snapshot_initial_persistence_and_unchanged_updates(tmp_path, monk
     assert store.replace_events([]) is pinned
 
 
+def test_unrelated_incidents_do_not_parse_windows_on_bus_edges(monkeypatch):
+    import backend.app.graph.snapshot as snapshots
+    route_engine = engine()
+    event = weather_event()
+    event.update(status="published", mode="MTR", line="MTR")
+    event["affected_segments"] = [{"from_node": "A", "to_node": "B", "impact": "closed", "capacity_factor": 0}]
+    route_engine.snapshots.replace_events([event])
+    snapshot = route_engine.snapshots.current
+    bus = next(edge for edge in snapshot.network.edges if edge.mode == "BUS")
+    def unexpected_timestamp(_):
+        raise AssertionError("An unrelated incident must not parse dates for a bus traversal")
+    monkeypatch.setattr(snapshots, "timestamp", unexpected_timestamp)
+    assert snapshot.impact(bus, AT, AT + timedelta(minutes=20)) == (1.0, 1.0, ())
+
+
 def test_load_trigger_requires_trusted_continuous_observations_and_recomputes_diversion():
     calls = []
     coordinator = RuntimeReplanningCoordinator(engine(), lambda: [],

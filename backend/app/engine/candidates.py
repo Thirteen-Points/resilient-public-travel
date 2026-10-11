@@ -80,11 +80,11 @@ def search_paths(snapshot, origin, destination, depart_at, profile, *, modes=Non
     found, expanded = [], 0
     frontier_pruned = False
     while queue and expanded < max_expansions and len(found) < max_paths:
-        if bounds is not None and len(queue) > 30000:
+        if bounds is not None and len(queue) > 10000:
             # GTFS variants can generate a much larger frontier than the
             # expansion budget. Keep its best optimistic arrivals within the
             # service's memory budget and report the search as bounded.
-            queue = heapq.nsmallest(15000, queue)
+            queue = heapq.nsmallest(5000, queue)
             heapq.heapify(queue)
             frontier_pruned = True
         _, _, elapsed, node, visited, path, walked, boardings, onboard = heapq.heappop(queue)
@@ -136,9 +136,7 @@ def search_paths(snapshot, origin, destination, depart_at, profile, *, modes=Non
                         if edge.mode == "WALK" else edge.travel_s * slow) * weather_delay
             arrival = departure + timedelta(seconds=duration)
             end_factor, _, end_ids = snapshot.impact(edge, departure, arrival)
-            boundaries = [arrival, *[timestamp(value) for event in snapshot.events
-                         for value in (event.get("window", {}).get("start"), event.get("published_at"))
-                         if value and departure < timestamp(value) < arrival]]
+            boundaries = [arrival, *snapshot.weather_boundaries(departure, arrival)]
             if end_factor == 0 or any(snapshot.weather_effect(edge.mode, point)[0] == 0 for point in boundaries):
                 continue
             nominal_headway = headway * factor if boarding else (path[-1].nominal_headway_s if path and edge.mode != "WALK" else 0)

@@ -21,7 +21,11 @@ def create_router(engine):
 
     @router.get('/graph/network')
     def network():
-        return thaw(engine.snapshots.current.network.source)
+        source = engine.snapshots.current.network.source
+        # Full service-day departure tables belong to server routing. The
+        # public map needs stop geometry and ETA identifiers, not calendars.
+        return thaw({**source, 'lines': tuple({key: value for key, value in line.items()
+                    if not key.startswith('gtfs_')} for line in source['lines'])})
 
     @router.get('/graph/snapshot')
     def snapshot(at: datetime | None = None):

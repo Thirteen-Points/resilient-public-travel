@@ -43,7 +43,7 @@ Static GTFS never requires a runtime download. Other deployment hosts should
 set this flag explicitly.
 
 Expanded-graph search guides candidates with optimistic remaining travel times.
-Its frontier is capped at 30,000 pending states, retaining the best 15,000 when
+Its frontier is capped at 10,000 pending states, retaining the best 5,000 when
 that cap is crossed; responses explicitly report a bounded, non-exhaustive search.
 Route calculations run in a worker with one active calculation per API router,
 so large queries do not block arrivals, health or status endpoints or create
@@ -92,3 +92,8 @@ live ETA verification.
 The approved-event monitor reuses an immutable snapshot when event contents
 have not changed. It still checks activation/expiry on every reconciliation;
 unchanged events do not repeatedly copy the larger GTFS graph during queries.
+Route queries also share the read-only graph for fare lookup. The public map
+omits backend-only GTFS calendars while retaining operator arrival identifiers.
+Incident segments and approved weather boundaries are indexed per immutable
+snapshot. GTFS search keeps at most about 10,000 pending states, pruning to
+5,000 best optimistic arrivals when needed; bounded results remain labelled.

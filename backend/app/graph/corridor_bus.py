@@ -16,12 +16,12 @@ def enabled():
 
 class CorridorFareStore:
     def __init__(self,base,base_network,tariffs,catalog):
-        self.base,self.base_network,self.tariffs,self.catalog=base,base_network,tariffs,catalog
+        self.base,self.base_network,self.tariffs,self.catalog_meta=base,base_network,tariffs,catalog['meta']
     def snapshot(self,network,at):
         revision,fares=self.base.snapshot(self.base_network,at)
-        return f"{revision}:gtfs:{self.catalog['meta']['archive_sha256'][:12]}",fare_table(network,overrides={**thaw(fares),**self.tariffs})
+        return f"{revision}:gtfs:{self.catalog_meta['archive_sha256'][:12]}",fare_table(network,overrides={**thaw(fares),**self.tariffs})
     def status(self):
-        return {**self.base.status(),'corridor_gtfs':self.catalog['meta'],'imported_bus_services':len(self.tariffs)}
+        return {**self.base.status(),'corridor_gtfs':self.catalog_meta,'imported_bus_services':len(self.tariffs)}
     def lookup(self,*args,**kwargs): return self.base.lookup(*args,**kwargs)
 
 class CorridorBusAdapter:
