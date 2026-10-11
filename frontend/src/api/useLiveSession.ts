@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 import * as transit from './liveTransitApi'
 import * as eventApi from './eventApi'
 import { getReviewToken, reviewerRevision, subscribeReviewer } from './reviewerSession'
+import { getSourcesStatus, getReplanningStatus, type SourcesStatus, type ReplanningStatus } from './runtimeStatus'
 import type { Event, Network, RouteCandidate, RouteQuery, Signal } from './types'
 
 export interface LiveBundle {
@@ -15,33 +16,54 @@ export function useLiveSession(enabled: boolean) {
   const [bundle, setBundle] = useState<LiveBundle | null>(null)
   const [error, setError] = useState(''), [warning, setWarning] = useState('')
   const [sourceWarning, setSourceWarning] = useState('')
+  const [sources, setSources] = useState<SourcesStatus | null>(null), [sourcesWarning, setSourcesWarning] = useState('')
+  const [replanning, setReplanning] = useState<ReplanningStatus | null>(null), [replanningWarning, setReplanningWarning] = useState('')
+  const [sourcesReadAt, setSourcesReadAt] = useState('')
   const [reviewWarning, setReviewWarning] = useState(''), [routeWarning, setRouteWarning] = useState('')
   const [connected, setConnected] = useState(false), [routes, setRoutes] = useState<RouteCandidate[]>([])
   const [revision, setRevision] = useState(0)
-  const lastQuery = useRef<RouteQuery | null>(null), queryVersion = useRef(0), active = useRef(false)
+  const lastQuery = useRef<RouteQuery | null>(null), committedQuery = useRef<RouteQuery | null>(null), queryVersion = useRef(0), active = useRef(false)
+  const manualQuery = useRef<number | null>(null)
   const refreshRef = useRef<() => Promise<void>>(async () => {})
 
-  const query = useCallback(async (value: RouteQuery) => {
+  const query = useCallback(async (value: RouteQuery, signal?: AbortSignal) => {
     lastQuery.current = value
     const version = ++queryVersion.current
+    if (signal) manualQuery.current = version
     try {
-      const result = await transit.queryRoutes(value)
-      if (active.current && version === queryVersion.current) { setRoutes(result.slice(0, 3)); setRouteWarning('') }
+      const result = await transit.queryRoutes(value, undefined, signal)
+      if (signal?.aborted || version !== queryVersion.current) throw new Error('Route request superseded; current results retained.')
+      if (active.current && version === queryVersion.current) { committedQuery.current = value; setRoutes(result.slice(0, 3)); setRouteWarning('') }
       return result
     } catch (cause) {
+      if (signal?.aborted && version === queryVersion.current) lastQuery.current = committedQuery.current
       if (active.current && version === queryVersion.current) setRouteWarning(`Routes may be stale: ${message(cause)}`)
       throw cause
-    }
+    } finally { if (manualQuery.current === version) manualQuery.current = null }
   }, [])
 
   useEffect(() => {
     if (!enabled) return
-    let disposed = false, busy = false, queued = false, privateBusy = false, metaBusy = false
+    let disposed = false, busy = false, queued = false, privateBusy = false, metaBusy = false, sourcesBusy = false, replanBusy = false
     let currentMeta: transit.LiveMeta | null = null
     let signature = '', evidenceSignature = '', routeDirty = Boolean(lastQuery.current)
     active.current = true
     setBundle(previous => previous ? { ...previous, events: previous.published, signals: [] } : previous)
     setReviewWarning('')
+    async function refreshSources() {
+      if (disposed || sourcesBusy) return
+      sourcesBusy = true
+      try { const next = await getSourcesStatus(); if (!disposed) { setSources(next); setSourcesWarning(''); setSourcesReadAt(new Date().toISOString()) } }
+      catch (cause) { if (!disposed) setSourcesWarning(message(cause)) }
+      finally { sourcesBusy = false }
+    }
+    async function refreshReplanning() {
+      if (disposed || replanBusy) return
+      replanBusy = true
+      try { const next = await getReplanningStatus(); if (!disposed) { setReplanning(next); setReplanningWarning('') } }
+      catch (cause) { if (!disposed) setReplanningWarning(message(cause)) }
+      finally { replanBusy = false }
+    }
     async function refreshMeta() {
       if (disposed || metaBusy) return
       metaBusy = true
@@ -78,6 +100,7 @@ export function useLiveSession(enabled: boolean) {
       if (disposed) return
       // Optional source metadata must never delay graph/route publication.
       void refreshMeta()
+      void refreshReplanning()
       if (busy) { queued = true; return }
       busy = true
       try {
@@ -100,7 +123,7 @@ export function useLiveSession(enabled: boolean) {
         setError(''); setWarning('')
         // Protected reads never hold up public map updates or route queries.
         void refreshReviewer()
-        if (routeDirty && lastQuery.current) {
+        if (routeDirty && lastQuery.current && manualQuery.current === null) {
           const requested = lastQuery.current
           try {
             await query(requested)
@@ -117,17 +140,20 @@ export function useLiveSession(enabled: boolean) {
         if (queued && !disposed) { queued = false; void refresh() }
       }
     }
-    refreshRef.current = refresh
+    refreshRef.current = async () => { void refreshSources(); await refresh() }
     void refresh()
+    void refreshSources()
     const timer = window.setInterval(() => void refresh(), 3000)
+    const sourcesTimer = window.setInterval(() => void refreshSources(), 15000)
     const offline = () => {
       routeDirty = Boolean(lastQuery.current)
       setWarning('Offline; displayed map and routes may be stale. Previous results retained.')
     }
     window.addEventListener('offline', offline)
-    window.addEventListener('online', refresh)
+    const online = () => { void refreshSources(); void refresh() }
+    window.addEventListener('online', online)
     const close = eventApi.subscribeEvents(() => void refresh(), value => { if (!disposed) setConnected(value) })
-    return () => { disposed = true; active.current = false; ++queryVersion.current; clearInterval(timer); window.removeEventListener('offline', offline); window.removeEventListener('online', refresh); close() }
+    return () => { disposed = true; active.current = false; ++queryVersion.current; clearInterval(timer); clearInterval(sourcesTimer); window.removeEventListener('offline', offline); window.removeEventListener('online', online); close() }
   }, [enabled, query, authRevision])
 
   const review = async (event: Event, action: 'edit' | 'publish' | 'reject' | 'expire', _reason: string) => {
@@ -136,5 +162,5 @@ export function useLiveSession(enabled: boolean) {
     // A committed write stays successful even if following reads fail.
     await refreshRef.current()
   }
-  return { bundle, error, warning, sourceWarning, reviewWarning, routeWarning, connected, routes, revision, query, review, refresh: () => refreshRef.current() }
+  return { bundle, error, warning, sourceWarning, sources, sourcesWarning, sourcesReadAt, replanning, replanningWarning, reviewWarning, routeWarning, connected, routes, revision, query, review, refresh: () => refreshRef.current() }
 }

@@ -4,11 +4,13 @@ export type Persona = 'commuter' | 'wheelchair'
 
 /** Fields already accepted by C-Route; no frontend weights or numeric estimates. */
 export interface TravelProfile {
-  mobility: 'standard' | 'wheelchair'
+  mobility: 'standard' | 'reduced' | 'wheelchair'
   preset: Preset
   max_walk_m?: number
   max_transfers?: number
   hard_flags: string[]
+  weights?: Record<string, number>
+  walking_speed_mps?: number
 }
 
 export interface JourneyContext extends RouteQuery {
@@ -126,6 +128,7 @@ export interface RouteQuery {
   departAt: string
   preset: Preset
   persona?: Persona
+  profile?: TravelProfile
 }
 
 export interface DemoMeta {

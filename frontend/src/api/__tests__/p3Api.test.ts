@@ -15,13 +15,14 @@ describe('current confirmed chat contract', () => {
     const fetch = vi.fn().mockResolvedValue(json({ message: 'Actual backend reply', tool_calls: [], routes: [], fallback: true }))
     vi.stubGlobal('fetch', fetch)
     const reply = await chat(context, 'Please explain', new AbortController().signal)
-    expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ message: 'Please explain', origin: 'KOT', destination: 'ADM', depart_at: context.departAt })
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ message: 'Please explain', origin: 'KOT', destination: 'ADM', depart_at: context.departAt, profile: profileFor('commuter', 'fastest') })
     expect(reply).toMatchObject({ message: 'Actual backend reply', fallback: true, routes: [] })
     expect(fetch.mock.calls[0][0]).toContain('/api/ai/chat')
   })
-  it('blocks unsupported personalization before issuing a request rather than inventing profile ids', () => {
-    expect(() => chatPayload({ ...context, persona: 'wheelchair' }, 'route')).toThrow('CONTRACT_PENDING')
-    expect(() => chatPayload({ ...context, preset: 'most_stable' }, 'route')).toThrow('CONTRACT_PENDING')
+  it('sends supported accessibility profiles and blocks the unsupported preset', () => {
+    expect(chatPayload({ ...context, persona: 'wheelchair' }, 'route').profile).toEqual(profileFor('wheelchair', 'fastest'))
+    expect(chatPayload({ ...context, preset: 'most_stable' }, 'route').profile.preset).toBe('most_stable')
+    expect(() => chatPayload({ ...context, preset: 'least_walking' }, 'route')).toThrow('CONTRACT_PENDING')
     expect(() => chatPayload({ ...context, destination: '' }, 'route')).toThrow('different stations')
     expect(() => chatPayload({ ...context, departAt: '2026-10-07T08:20' }, 'route')).toThrow('timezone')
   })
@@ -65,7 +66,7 @@ describe('comparison requests and constraints', () => {
     const bodies = fetch.mock.calls.filter(call => String(call[0]).includes('/routes/query')).map(call => JSON.parse(call[1].body))
     expect(bodies).toHaveLength(2)
     for (const body of bodies) expect(body).toMatchObject({ origin: context.origin, destination: context.destination, depart_at: context.departAt, event_ids: context.eventIds })
-    expect(bodies[1].profile).toEqual(profileFor('wheelchair', 'most_stable'))
+    expect(bodies[1].profile).toEqual({ ...profileFor('wheelchair', 'most_stable'), hard_flags: [...profileFor('wheelchair', 'most_stable').hard_flags].sort() })
     expect(result.verified).toBe(false)
   })
   it('withholds both columns if the network changes during the queries', async () => {

@@ -1,30 +1,66 @@
-.page { max-width: 1160px; margin: 0 auto; color: #21382b; line-height: 1.6; }
+.page { max-width: 1160px; margin: 0 auto; color: var(--ink, #21382b); line-height: 1.65; overflow-wrap: anywhere; }
 .page h1 { font-size: clamp(28px, 4vw, 48px); line-height: 1.1; letter-spacing: -.04em; font-weight: 500; margin: 24px 0 16px; }
 .page h2 { font-size: 22px; font-weight: 600; }
 .page h3 { margin-top: 0; }
-.page button, .page input, .page select { font: inherit; }
-.page button { padding: 9px 16px; border: 1px solid #9dae99; border-radius: 12px; color: #213b2b; background: #f8fbf4; }
+.page button, .page input, .page select, .page textarea { font: inherit; }
+.page button { min-height: 42px; padding: 10px 18px; border: 1px solid #9dae99; border-radius: 24px; color: #213b2b; background: #f8fbf4; font-size: 13px; font-weight: 600; }
+.page button:hover:not(:disabled) { background: #ebf3df; border-color: #476b43; }
 .page button:disabled { opacity: .6; }
-.page input, .page select { border: 1px solid #81917a; border-radius: 8px; padding: 8px; max-width: 100%; background: white; color: #1b3626; }
+.page input, .page select, .page textarea { border: 1px solid #81917a; border-radius: 10px; padding: 10px 12px; min-width: 0; max-width: 100%; background: white; color: #1b3626; }
+.page textarea { width: 100%; resize: vertical; }
 .page label { display: grid; gap: 6px; }
 .context { background: #eaf0e3; padding: 12px 18px; border-radius: 12px; overflow-wrap: anywhere; }
 .notice { border-left: 4px solid #a56827; background: #fff3de; color: #68431c; padding: 12px 18px; margin: 16px 0; }
 .error { border-left: 4px solid #a13b31; background: #fff0ed; color: #852c24; padding: 12px 18px; overflow-wrap: anywhere; }
+.success { border-left: 4px solid #3f6946; background: #edf4e7; color: #244a30; padding: 12px 18px; overflow-wrap: anywhere; }
 .columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 24px 0; }
-.card { background: #fffef8; border: 1px solid #cbd4c0; border-radius: 18px; padding: 24px; min-width: 0; overflow-wrap: anywhere; }
+.card { background: #fffef8; border: 1px solid #cbd4c0; border-radius: 22px; padding: clamp(20px, 3vw, 32px); min-width: 0; overflow-wrap: anywhere; margin-bottom: 24px; }
+.columns > .card { margin-bottom: 0; }
+.card h2 { margin: 10px 0 18px; }
+.cardHeading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.cardHeading h2, .cardHeading h3 { margin: 0; }
+.kicker { display: block; color: #43664a; font-size: 11px; letter-spacing: .1em; font-weight: 700; margin: 20px 0 8px; }
+.card .kicker { margin-top: 0; }
+.lead { max-width: 68ch; font-size: 17px; color: #53634b; }
+.badge { display: inline-block; padding: 4px 9px; border: 1px solid #b6c7aa; border-radius: 8px; font-size: 11px; font-weight: 600; }
+.micro { font-size: 12px; color: #53634b; }
+.timeValue { font-size: 15px !important; line-height: 1.5; }
+.heroNumber { margin: 14px 0 18px; font-size: clamp(28px, 3.5vw, 42px); font-variant-numeric: tabular-nums; letter-spacing: -.04em; line-height: 1.2; }
+.heroNumber span { display: block; margin-top: 7px; font-size: 12px; color: #53634b; letter-spacing: 0; }
+.routeTime { font-size: 26px; letter-spacing: -.03em; }
+.outcome { padding: 20px 0; font-size: 17px; max-width: 80ch; }
+.gapCard { border-color: #c7ab81; background: #fff9ed; }
+.scenarioControls { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin: 26px 0; padding: 22px; border: 1px solid #cbd4c0; border-radius: 18px; }
+.scenarioControls label { flex: 1; min-width: min(270px, 100%); }
+.customScenario { flex-basis: 100%; }
+.customScenario label { margin-top: 12px; }
+.customScenario input { width: 100%; }
+.preference { border-top: 1px solid #dfe8df; margin-top: 24px; padding-top: 6px; }
+.preference h2 { font-size: 22px; }
+.preference label { font-size: 12px; }
+.preference textarea { display: block; margin-top: 6px; }
+.preference .actions { margin: 12px 0; }
+.preference .context { padding: 14px; }
 .metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 16px 0; }
 .metrics dt { font-size: 12px; color: #53634b; }
 .metrics dd { margin: 3px 0 0; font-size: 20px; }
+.metrics dd small { font-size: 12px; color: #53634b; }
+.metrics div { min-width: 0; }
 .actions { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
 .factors { display: grid; gap: 8px; margin: 18px 0; }
-.factor { font-size: 12px; }
+.factor { font-size: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; }
+.factor > div { flex-basis: 100%; }
 .factor div, .barTrack { height: 8px; background: #dde5d5; border-radius: 4px; overflow: hidden; }
 .factor i, .barTrack i { display: block; height: 100%; background: #3f6946; }
 .bar { margin: 12px 0; }
-.bar span { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+.bar > span { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; margin-bottom: 6px; flex-wrap: wrap; }
+.bar b { font-weight: 600; }
 .tableWrap { max-width: 100%; overflow: auto; }
 .page table { border-collapse: collapse; width: 100%; text-align: left; font-size: 13px; }
 .page td, .page th { border-bottom: 1px solid #d2dacb; padding: 10px 8px; }
+.page th { color: #385441; }
+.page summary { cursor: pointer; font-size: 13px; font-weight: 600; padding: 9px 0; }
+.page li { margin: 6px 0; }
 .footer { border-top: 1px solid #c8d2bf; padding-top: 16px; font-size: 12px; color: #4d614a; margin-top: 28px; }
 .sourceList { list-style: none; padding: 0; display: grid; gap: 12px; }
 .sourceList li { padding: 16px; border: 1px solid #ccd6c3; border-radius: 12px; overflow-wrap: anywhere; }
@@ -32,5 +68,5 @@
 .summary { font-size: 13px; margin: 16px 0; }
 .summary p { margin: 6px 0; }
 .summary strong { font-size: 16px; }
-@media (max-width: 700px) { .columns { grid-template-columns: 1fr; gap: 16px; } .card { padding: 18px; } .metrics dd { font-size: 18px; } }
+@media (max-width: 700px) { .columns { grid-template-columns: 1fr; gap: 16px; } .card { padding: 18px; } .metrics dd { font-size: 18px; } .scenarioControls { padding: 16px; } .page h1 { font-size: 34px; } }
 @media (forced-colors: active) { .card, .notice, .context { border: 1px solid CanvasText; } .factor i, .barTrack i { background: Highlight; } }

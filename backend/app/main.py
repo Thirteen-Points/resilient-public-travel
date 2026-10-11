@@ -239,6 +239,7 @@ def create_app(
         allow_credentials=False,
         allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization", "x-review-token", "Last-Event-ID"],
+        expose_headers=["X-Route-Snapshot"],
     )
     application.include_router(signals_router)
     application.include_router(events_router)
@@ -346,7 +347,8 @@ def create_app(
         required = ("origin", "destination", "depart_at")
         if any(not isinstance(payload.get(key), str) or not payload[key].strip() for key in required):
             return {"message": "请提供起点、终点和出发时间，我才能调用确定性路线工具。",
-                    "tool_calls": [], "fallback": True, "user_input": payload["message"]}
+                    "tool_calls": [], "fallback": True, "user_input": payload["message"],
+                    "graph_snapshot": None, "effective_profile": None}
         # Tool handlers keep intermediate routes/parameters. Construct them per
         # request so simultaneous users cannot overwrite each other's context.
         from .ai.handlers import build_engine_handlers

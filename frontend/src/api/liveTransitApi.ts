@@ -12,7 +12,7 @@
 //   broken backend fails loudly instead of handing back mistyped data.
 
 import type { Network, RouteCandidate, RouteQuery } from './types'
-import { profileFor } from './p3Context'
+import { resolveProfile } from './p3Context'
 
 const DEFAULT_BASE_URL = 'http://127.0.0.1:8000'
 
@@ -98,7 +98,13 @@ function errorFields(body: unknown): { code: string | null; message: string | nu
   }
 }
 
-export async function requestJson<T>(method: string, path: string, body?: unknown, options: { signal?: AbortSignal; timeoutMs?: number } = {}): Promise<T> {
+interface RequestOptions { signal?: AbortSignal; timeoutMs?: number }
+
+export async function requestJson<T>(method: string, path: string, body?: unknown, options: RequestOptions = {}): Promise<T> {
+  return (await requestJsonWithMetadata<T>(method, path, body, options)).body
+}
+
+export async function requestJsonWithMetadata<T>(method: string, path: string, body?: unknown, options: RequestOptions = {}): Promise<{ body: T; headers: Headers }> {
   const deadline = AbortSignal.timeout(options.timeoutMs ?? 10000)
   const signal = options.signal ? AbortSignal.any([options.signal, deadline]) : deadline
   let response: Response
@@ -141,7 +147,7 @@ export async function requestJson<T>(method: string, path: string, body?: unknow
   if (parsed === null) {
     throw new LiveApiError(method, path, response.status, null, 'response body is empty')
   }
-  return parsed as T
+  return { body: parsed as T, headers: response.headers }
 }
 
 function requireObjectKeyArray(body: unknown, keys: string[]): Record<string, unknown> {
@@ -166,8 +172,8 @@ export async function getNetwork(): Promise<Network> {
 }
 
 /** GET /api/graph/snapshot — snapshot id plus currently affected edges. */
-export async function getSnapshot(at?: string): Promise<GraphSnapshot> {
-  const body = await requestJson<unknown>('GET', `/api/graph/snapshot${at ? `?at=${encodeURIComponent(at)}` : ''}`)
+export async function getSnapshot(at?: string, signal?: AbortSignal): Promise<GraphSnapshot> {
+  const body = await requestJson<unknown>('GET', `/api/graph/snapshot${at ? `?at=${encodeURIComponent(at)}` : ''}`, undefined, { signal })
   try {
     const record = requireObjectKeyArray(body, ['affected_edges'])
     if (typeof record.snapshot_id !== 'string') throw new TypeError('response is missing string field "snapshot_id"')
@@ -199,17 +205,21 @@ export async function getMeta(): Promise<LiveMeta> {
  * distinguishes "no event filter" from an explicitly empty one.
  */
 export async function queryRoutes(query: RouteQuery, eventIds?: string[], signal?: AbortSignal): Promise<RouteCandidate[]> {
+  return (await queryRoutesWithMetadata(query, eventIds, signal)).routes
+}
+
+export async function queryRoutesWithMetadata(query: RouteQuery, eventIds?: string[], signal?: AbortSignal): Promise<{ routes: RouteCandidate[]; snapshotId: string | null }> {
   if (query.preset === 'least_walking') throw new LiveApiError('POST', '/api/routes/query', 0, 'CONTRACT_PENDING', 'Less walking is not supported by the current backend preset contract; no alternate preset was substituted.')
   const payload: Record<string, unknown> = {
     origin: query.origin,
     destination: query.destination,
     depart_at: query.departAt,
-    profile: profileFor(query.persona ?? 'commuter', query.preset),
+    profile: resolveProfile(query),
   }
   if (eventIds !== undefined) payload.event_ids = eventIds
-  const body = await requestJson<unknown>('POST', '/api/routes/query', payload, { signal })
+  const { body, headers } = await requestJsonWithMetadata<unknown>('POST', '/api/routes/query', payload, { signal })
   if (!Array.isArray(body)) {
     throw new LiveApiError('POST', '/api/routes/query', 200, null, 'malformed route payload: expected a RouteCandidate array')
   }
-  return body as RouteCandidate[]
+  return { routes: body as RouteCandidate[], snapshotId: headers?.get('X-Route-Snapshot')?.trim() || null }
 }
