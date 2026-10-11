@@ -40,6 +40,14 @@ describe('M0 seed boundary', () => {
     expect(await seedDataSource.getRoutes({ ...base, destination: 'HUH', preset: 'fastest' })).toEqual([])
   })
 
+  it('filters fixed seed cards by the selected Hong Kong boarding time', async () => {
+    const query = { origin: 'TAW', destination: 'ADM', preset: 'fastest' } as const
+    const night = await seedDataSource.getRoutes({ ...query, departAt: '2026-10-11T03:00:00+08:00' })
+    const day = await seedDataSource.getRoutes({ ...query, departAt: '2026-10-11T12:00:00+08:00' })
+    expect(night).toEqual([])
+    expect(day.length).toBeGreaterThan(0)
+  })
+
   it('uses seed catchment radius and does not invent geometry for missing stops', async () => {
     const network = await seedDataSource.getNetwork()
     const taiWai = network.nodes.find(node => node.id === 'TAW')!

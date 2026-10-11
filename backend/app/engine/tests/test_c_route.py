@@ -83,6 +83,32 @@ class GraphTests(unittest.TestCase):
             self.assertIsNotNone(graph.boarding(edge, timestamp(f"2026-09-22T{allowed}:00+08:00")))
             self.assertIsNone(graph.boarding(edge, timestamp(f"2026-09-22T{disallowed}:00+08:00")))
 
+    def test_first_last_train_uses_boarding_station_and_direction(self):
+        graph = build_graph(network([line(service_hours="22:00-00:05",
+                                          service_hours_reverse="21:00-23:00")]))
+        outbound = next(edge for edge in graph.edges if edge.source == "A" and edge.target == "B")
+        downstream = next(edge for edge in graph.edges if edge.source == "B" and edge.target == "C")
+        inbound = next(edge for edge in graph.edges if edge.source == "C" and edge.target == "B")
+        self.assertIsNone(graph.boarding(outbound, timestamp("2026-09-22T21:59:59+08:00")))
+        self.assertEqual(graph.boarding(outbound, timestamp("2026-09-23T00:05:00+08:00"))[0],
+                         timestamp("2026-09-23T00:05:00+08:00"))
+        self.assertIsNone(graph.boarding(outbound, timestamp("2026-09-23T00:05:01+08:00")))
+        self.assertEqual(graph.boarding(downstream, timestamp("2026-09-23T00:06:00+08:00"))[0],
+                         timestamp("2026-09-23T00:06:00+08:00"))
+        self.assertIsNone(graph.boarding(downstream, timestamp("2026-09-23T00:06:01+08:00")))
+        self.assertIsNone(graph.boarding(inbound, timestamp("2026-09-23T00:00:00+08:00")))
+        self.assertTrue(make_engine(SnapshotStore(graph)).query("A", "C", "2026-09-23T00:05:00+08:00"))
+
+    def test_transfer_after_last_service_is_rejected_but_overnight_bus_can_run(self):
+        first = line(id="FIRST", stops=["A", "B"], seg_time_s=[600], service_hours="22:00-00:15")
+        second = line(id="SECOND", stops=["B", "C"], seg_time_s=[60], service_hours="22:00-00:05")
+        engine = make_engine(SnapshotStore(build_graph(network([first, second]))))
+        self.assertEqual(engine.query("A", "C", "2026-09-23T00:00:00+08:00"), [])
+        night_bus = line(id="NIGHT", mode="BUS", stops=["A", "C"], seg_time_s=[600],
+                         service_hours="22:00-04:00")
+        engine = make_engine(SnapshotStore(build_graph(network([night_bus]))))
+        self.assertTrue(engine.query("A", "C", "2026-09-23T03:00:00+08:00"))
+
     def test_headway_period_transition(self):
         graph = build_graph(network([line(headway_s={"weekday_peak": 700, "weekday_offpeak": 300})]))
         dep, headway = graph.boarding(graph.edges[0], timestamp("2026-09-22T08:59:59+08:00"))

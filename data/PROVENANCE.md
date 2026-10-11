@@ -249,6 +249,35 @@ contract-freeze change.
 9. TML/KTL/TWL/ISL headway bands not re-verified against a current official
    page in this pass (only EAL was captured, S28).
 
+## 2026-10-11: modelled first/last boarding windows
+
+The earlier gap about MTR first/last trains is now partly addressed. The
+`service_hours` values in `contracts/seed/network.seed.json` and
+`data/network/lines.json` are **boarding windows at the first modelled stop**
+in the listed direction; `service_hours_reverse` is at the last modelled stop
+for the reverse direction. The route engine shifts a window to an intermediate
+boarding stop using the modelled segment times. Those segment times and the
+headway grid remain estimates, so these fields do not constitute an official
+per-station timetable. Special holiday extensions and unplanned changes are
+not modelled. A train already boarded may finish after the last boarding time.
+
+| Line | Forward window / source | Reverse window / source |
+| --- | --- | --- |
+| ERL | Tai Wai toward Admiralty 05:40–00:31, [MTR Tai Wai](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=67) | Admiralty toward Sheung Shui 06:04–00:22, [MTR Admiralty](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=2) |
+| TML | Tai Wai toward Tuen Mun 05:58–00:14, [MTR Tai Wai](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=67); used conservatively for the modelled East Tsim Sha Tsui direction | East Tsim Sha Tsui toward Wu Kai Sha 06:01–00:45, [MTR East Tsim Sha Tsui](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=80) |
+| KTL | Diamond Hill toward Whampoa 05:59–00:37, [MTR Diamond Hill](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=11) | Ho Man Tin 06:15–00:40 is a conservative **modelled estimate** from [MTR Yau Ma Tei](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=5) toward Tiu Keng Leng (06:14–00:44) and the modelled 3.5-minute Ho Man Tin–Yau Ma Tei segment; it needs station-level verification |
+| TWL | Yau Ma Tei toward Central 06:01–00:50, [MTR Yau Ma Tei](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=5) | Central toward Tsuen Wan 06:06–00:54, [MTR Central](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=1) |
+| ISL | Central toward Chai Wan 06:07–00:58, [MTR Central](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=1) | Wan Chai toward Kennedy Town 06:03–00:54, [MTR Wan Chai](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=27) |
+| SIL | Admiralty toward South Horizons 06:11–01:05, [MTR Admiralty](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=2) | South Horizons toward Admiralty 06:00–00:42, [MTR South Horizons](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=89); SIL has only one modelled stop and yields no routing edge |
+
+MTR warns that last-train entry gates may close five minutes before the
+published departure. The model checks whether a passenger can board at the
+computed platform time; it does not model gate-entry or transfer walking time
+beyond the existing graph links. The fixed frontend seed uses the same windows
+to remove cards that would board a closed service, while keeping its journey
+durations explicitly illustrative. Services without a configured window are
+not globally blocked at night; an actual overnight line may still be returned.
+
 ### Fare calculation correction — 2026-10-11
 
 `data/network/fares.json` now supplies executable adult fares rather than the
