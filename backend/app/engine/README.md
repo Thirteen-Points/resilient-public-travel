@@ -204,3 +204,7 @@ routes.seed 采用当前引擎生成的新稳定 route_id，不将旧 r_seed_006
 最新整合状态见 [M0 integration report](../../../docs/acceptance/m0-integration-report.md)。轮椅 MTR/大巴默认规则只用于 M0 demo，explicit false/partial、阶梯、小巴与步行约束仍生效；默认假设不冒充真实无障碍证据。
 
 轮椅不足3时可局部回退换乘点复用和Jaccard两项软多样性规则，结果警告高度重合；所有安全硬约束和普通画像全局规则不变。该回退不能绕过明确不可达、阶梯、小巴或步行上限等硬约束。
+
+## Transport selection
+
+The route query accepts `modes` (allowed transit modes) and `required_modes` (each must occur in the journey). Required modes filter feasible paths before diversity and scoring and form part of cache identity. Walking and other transit modes can provide connections. Supported transit values are MTR, BUS, MINIBUS and FERRY; the curated network currently has no verified minibus service.

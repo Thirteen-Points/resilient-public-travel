@@ -1,5 +1,6 @@
 import networkSeed from '../../../contracts/seed/network.seed.json'
 import eventSeed from '../../../contracts/seed/event.seed.json'
+import { routeMatchesModes } from '../lib/transport'
 import routeSeed from '../../../contracts/seed/routes.seed.json'
 import simSeed from '../../../contracts/seed/sim.seed.json'
 import { normalizeEventFeed, normalizeNetwork, normalizeRoutes, simSeedAvailable } from './normalizers'
@@ -107,7 +108,7 @@ export const seedDataSource: TransitDataSource = {
   async getRoutes(query: RouteQuery) {
     if (query.origin !== seedOd.origin || query.destination !== seedOd.destination) return []
     // Seed travel times stay fixed; discard cards that would board a closed service.
-    return rankSeedRoutes(routes, query.preset).filter(route => seedRouteBoardable(route, query.departAt))
+    return rankSeedRoutes(routes.filter(route => routeMatchesModes(route, query.modes, query.requiredModes)), query.preset).filter(route => seedRouteBoardable(route, query.departAt))
   },
   async getMeta() { return meta },
 }

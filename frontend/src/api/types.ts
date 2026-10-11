@@ -1,6 +1,7 @@
 export type Provenance = 'real' | 'real-derived' | 'simulated'
 export type Preset = 'fastest' | 'most_stable' | 'fewest_transfers' | 'least_walking'
 export type Persona = 'commuter' | 'wheelchair'
+export type TransitMode = 'MTR' | 'BUS' | 'MINIBUS' | 'FERRY'
 
 /** Fields already accepted by C-Route; no frontend weights or numeric estimates. */
 export interface TravelProfile {
@@ -132,6 +133,8 @@ export interface RouteQuery {
   preset: Preset
   persona?: Persona
   profile?: TravelProfile
+  modes?: TransitMode[]
+  requiredModes?: TransitMode[]
 }
 
 export interface DemoMeta {

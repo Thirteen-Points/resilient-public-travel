@@ -17,6 +17,10 @@ Use Node 20.19+ or 22.12+. The default API is `http://127.0.0.1:8000`; override 
 
 ## Data modes
 
+The journey planner offers All modes, MTR, Bus, Minibus and Ferry. Selecting a mode requires every returned journey to use that mode; other modes and walking may supply connections. Route cards show the complete candidate list returned by the API. Search and map picking support all modelled stations, bus stops and ferry piers. The current network excludes unverified minibus endpoints, so selecting Minibus displays an explicit no-route notice. The fixed seed demo applies the same transport filter to its existing candidates.
+
+The transport selector appears before the Agent entry. Narrow windows show the planner before the map, with the transport buttons in the first screen. Plan journey returns to the top of the planner; map picking scrolls to the map and returns to the selected field. The map shows the first three candidates plus the selected candidate, including selections further down the list.
+
 API mode is the default. Queries use the deterministic engine and last approved event facts. It is a modelled service, not a live timetable. `?data=seed` explicitly switches to fixed, simulated fixture routes for the seed OD; changing departure does not recalculate those routes, and seed review actions are local. Switching mode reloads the page and discards unsaved state.
 
 API errors retain loaded data with a stale notice. An initial failure offers retry or an explicit fixed-seed switch. Maps retain their schematic overlays when the external basemap fails. Basemap preference is configured CARTO → OpenFreeMap → OSM → schematic; the current initial raster option is OSM. Map attribution remains visible. Reloading while completely offline is not supported as an installed PWA.
