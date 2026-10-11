@@ -14,8 +14,9 @@ import { UpdatesPage } from './components/UpdatesPage'
 import { ProvenanceBadge } from './components/ProvenanceBadge'
 import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
+import { eastRailStations, findEastRailWalkingAccess, type WalkingAccess } from './lib/eastRailAccess'
 import type { DemoMeta, Event, Network, Preset, RouteCandidate, Signal } from './api/types'
-import { CORRIDOR_IDS, formatHkt, formatRange, legDuration, modeSummary, nearestAccessPoint, nodeIndex } from './data'
+import { formatHkt, formatRange, legDuration, modeSummary, nodeIndex } from './data'
 import css from './App.module.css'
 
 type Screen = 'journey' | 'results' | 'updates' | 'detail' | 'sources' | 'agent' | 'review' | 'report'
@@ -42,7 +43,7 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
   const nodes = nodeIndex(network)
   const [query, setQuery] = useState('')
   const [index, setIndex] = useState(0)
-  const choices = CORRIDOR_IDS.map(id => nodes.get(id)!).filter(node =>
+  const choices = eastRailStations(network).filter(node =>
     node.name_en.toLowerCase().includes(query.toLowerCase()) || node.name_zh.includes(query) || node.id.toLowerCase().includes(query.toLowerCase()),
   )
   return <div className={css.fieldWrap}>
@@ -60,11 +61,11 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
         if (event.key === 'Escape') { onSelect(value); setQuery('') }
       }} />
     {active && <div className={css.suggestions} id={`${id}-options`} role="listbox">
-      <span className={css.suggestionLabel}>STATIONS · SEARCH OR SELECT</span>
+      <span className={css.suggestionLabel}>EAST RAIL STATIONS · SEARCH OR SELECT</span>
       {choices.map((node, i) => <button key={node.id} type="button" role="option" aria-selected={index === i}
         className={`${css.suggestion} ${index === i ? css.highlighted : ''}`} onMouseDown={event => event.preventDefault()}
         onClick={() => { onSelect(node.id); setQuery('') }}>{node.name_en}<small>{node.name_zh}</small></button>)}
-      {!choices.length && <p className={css.small}>No matching seed station. Map selection is available.</p>}
+      {!choices.length && <p className={css.small}>No matching East Rail station. Map selection is available.</p>}
       <button type="button" className={css.mapChoice} onMouseDown={event => event.preventDefault()} onClick={onPickMap}>◎ Select a point on the map</button>
     </div>}
   </div>
@@ -117,6 +118,9 @@ export function App() {
   const [activeField, setActiveField] = useState<Field | null>(null)
   const [picking, setPicking] = useState<Field | null>(null)
   const [picked, setPicked] = useState('')
+  const [access, setAccess] = useState<{ origin: WalkingAccess | null; destination: WalkingAccess | null }>({ origin: null, destination: null })
+  const [checkingWalk, setCheckingWalk] = useState(false)
+  const walkCheck = useRef<AbortController | null>(null)
   const [error, setError] = useState('')
   const [preset, setPreset] = useState<Preset>('fastest')
   const [departure, setDeparture] = useState('08:20')
@@ -193,14 +197,19 @@ export function App() {
     celebrate('Review replay ready · no published disruption')
   }
   const setField = (field: Field, value: string) => {
+    walkCheck.current?.abort()
+    setCheckingWalk(false)
     if (field === 'origin') setOrigin(value)
     else setDestination(value)
+    setAccess(previous => ({ ...previous, [field]: null }))
     setActiveField(null); setPicking(null); setError(''); setPicked('')
   }
   const showRoutes = async (from = origin, to = destination, preference = preset) => {
-    if (searchingRef.current) return
+    if (searchingRef.current || checkingWalk) return
     setActiveField(null)
     if (!to || !from) { setError('Choose a destination and starting point before continuing.'); return }
+    const allowed = new Set(eastRailStations(network).map(station => station.id))
+    if (!allowed.has(from) || !allowed.has(to)) { setError('Choose East Rail stations for both ends.'); return }
     if (from === to) { setError('Choose two different stations.'); return }
     const departAt = hktDeparture(departureDate, departure)
     if (!Number.isFinite(Date.parse(departAt))) { setError('Choose a valid Hong Kong departure date and time.'); return }
@@ -214,12 +223,27 @@ export function App() {
     } catch (cause) { setError(`Route data could not be loaded. ${cause instanceof Error ? cause.message : String(cause)}`) }
     finally { setSearching(false); searchingRef.current = false }
   }
-  const mapPick = (point: { lat: number; lng: number }) => {
+  const mapPick = async (point: { lat: number; lng: number }) => {
     if (!picking) return
-    const nearest = nearestAccessPoint(network, point)
-    if (!nearest) { setError(`No modelled access point within ${network.meta.catchment_m} m. Search by station instead.`); return }
-    setField(picking, nearest.node.id)
-    setPicked(`Closest modelled station: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. ${nearest.node.accessible === true ? 'Accessibility uses modelled assumptions; verify on site.' : 'Accessibility is unknown or incomplete; verify on site.'}`)
+    walkCheck.current?.abort()
+    const controller = new AbortController()
+    walkCheck.current = controller
+    const field = picking
+    setCheckingWalk(true); setError(''); setPicked('')
+    try {
+      const match = await findEastRailWalkingAccess(network, point, controller.signal)
+      if (controller.signal.aborted) return
+      if (!match) { setError('No East Rail station is within 800 m by a modelled walking route. Choose a closer point.'); return }
+      if (field === 'origin') setOrigin(match.station.id)
+      else setDestination(match.station.id)
+      setAccess(previous => ({ ...previous, [field]: match }))
+      setActiveField(null); setPicking(null)
+      setPicked(`${field === 'origin' ? 'Start' : 'End'} point: ${Math.round(match.metres)} m walking to ${match.station.name_en} (OpenStreetMap pedestrian route). Verify the station entrance and path on site.`)
+    } catch (cause) {
+      if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : 'Walking route could not be checked.')
+    } finally {
+      if (walkCheck.current === controller) { walkCheck.current = null; setCheckingWalk(false) }
+    }
   }
   const activeRoutes = screen === 'results' || screen === 'detail' ? routes : []
   // Map footprint: full behind the floating panels, a right-hand card beside
@@ -241,28 +265,31 @@ export function App() {
     </header>
     <main className={css.stage}>
       {!SEED_MODE && <div className={css.connectionStatus} role="status"><strong>{live.connected ? 'Live updates connected' : 'Checking public updates every 3s'}</strong>{live.revision > 0 && <p>Routes refreshed for the latest approved network state.</p>}{(live.warning || live.routeWarning) && <p>{live.warning} {live.routeWarning}</p>}<button type="button" onClick={() => void live.refresh()}>Refresh</button></div>}
-      <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} mode={mapMode} />
+      <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') void mapPick(point) }} mode={mapMode} />
       {(mapMode === 'docked' || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
         {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta.sources} onClose={() => setScreen('journey')} />}
         {screen === 'updates' && <UpdatesPage events={events} signals={signals} network={network} seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} onOpenReview={() => setScreen('review')} onBack={() => setScreen('journey')} />}
         {screen === 'review' && (SEED_MODE ? <ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} /> : <ReviewAccess><SignalInbox network={network} onChanged={live.refresh} />{live.reviewWarning && <p role="alert">{live.reviewWarning}</p>}<ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} live /></ReviewAccess>)}
       </div>}
-      {screen === 'agent' && <AgentPanel published={published} departAt={hktDeparture(departureDate, departure)} onRoutes={preference => void showRoutes('TAW', 'ADM', preference)} onBack={() => setScreen('journey')} />}
+      {screen === 'agent' && <AgentPanel published={published} departAt={hktDeparture(departureDate, departure)} onRoutes={preference => { setAccess({ origin: null, destination: null }); void showRoutes('TAW', 'ADM', preference) }} onBack={() => setScreen('journey')} />}
       {screen === 'report' && (SEED_MODE ? <section className={css.panel}><h1>Reports use the API.</h1><p>Switch to API mode to submit an unverified report.</p><button type="button" onClick={switchDataMode}>Use API mode</button></section> : <SignalReportForm onAccepted={() => void live.refresh()} />)}
       {screen === 'journey' && <div data-panel className={css.panel}>
           <h1>Where are you<br />heading?</h1>
-          <p className={css.subhead}>Search a modelled station or select it on the map.</p>
+          <p className={css.subhead}>Choose East Rail stations, or map points within 800 m walking distance of them.</p>
           <button type="button" className={css.agentEntry} onClick={() => { setScreen('agent'); setActiveField(null); setPicking(null); setError('') }}><AgentAvatar issue={published.length > 0} small /><span><strong>Meet your route companion</strong><small>Ask the Agent · explore this scenario</small></span><b>↗</b></button>
           <form onSubmit={event => { event.preventDefault(); void showRoutes() }}>
             <StationField id="origin" label="FROM" value={origin} network={network} active={activeField === 'origin'} onFocus={() => { setActiveField('origin'); setPicking(null) }} onSelect={value => setField('origin', value)} onPickMap={() => { setActiveField(null); setPicking('origin') }} />
-            <button className={css.swap} type="button" onClick={() => { setOrigin(destination); setDestination(origin); setActiveField(null) }} aria-label="Swap stations">⇅</button>
+            <button className={css.swap} type="button" onClick={() => { walkCheck.current?.abort(); setCheckingWalk(false); setOrigin(destination); setDestination(origin); setAccess(previous => ({ origin: previous.destination, destination: previous.origin })); setActiveField(null); setPicking(null); setPicked('') }} aria-label="Swap stations">⇅</button>
             <StationField id="destination" label="TO" value={destination} network={network} active={activeField === 'destination'} invalid={Boolean(error && !destination)} onFocus={() => { setActiveField('destination'); setPicking(null) }} onSelect={value => setField('destination', value)} onPickMap={() => { setActiveField(null); setPicking('destination') }} />
-            <div className={css.fieldAssist}><button type="button" onClick={() => { setActiveField(null); setPicking('destination') }}>◎ Tap the map</button><span>Within {network.meta.catchment_m} m of a station</span></div>
+            <div className={css.fieldAssist}><button type="button" onClick={() => { setActiveField(null); setPicking('destination') }}>◎ Tap the map</button><span>Up to 800 m walking to East Rail</span></div>
+            {checkingWalk && <p role="status" className={css.confirm}>Checking pedestrian routes…</p>}
+            {access.origin && <p className={css.confirm}>Start point → {nodes.get(origin)?.name_en}: {Math.round(access.origin.metres)} m walking</p>}
+            {access.destination && <p className={css.confirm}>End point → {nodes.get(destination)?.name_en}: {Math.round(access.destination.metres)} m walking</p>}
             {picked && <p className={css.confirm}>{picked}</p>}
             {error && <p role="alert" className={css.error}>{error}</p>}
             <DeparturePicker date={departureDate} time={departure} onDate={setDepartureDate} onTime={setDeparture} />
             <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} className={preset === option.id ? css.activePreset : ''} onClick={() => setPreset(option.id)}>{option.label}</button>)}</fieldset>
-            <button type="submit" disabled={searching} className={css.primary}>{searching ? 'Finding routes…' : 'Find resilient routes'} <span>↗</span></button>
+            <button type="submit" disabled={searching || checkingWalk} className={css.primary}>{searching ? 'Finding routes…' : 'Find resilient routes'} <span>↗</span></button>
           </form>
 
           <p className={css.tiny}>{SEED_MODE ? 'Only Tai Wai → Admiralty has route candidates in this fixture.' : 'Routes use the modelled network and published events; estimates are not a live timetable.'}</p>
@@ -274,6 +301,7 @@ export function App() {
           <span className={css.kicker}>ROUTES FOR YOUR JOURNEY</span>
           <h1 id="routes-heading">{nodes.get(origin)?.name_en ?? origin} <span>→</span><br />{nodes.get(destination)?.name_en ?? destination}</h1>
           <p className={css.subhead}>{routes.length} alternatives · {PRESETS.find(option => option.id === preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
+          {(access.origin || access.destination) && <p className={css.confirm}>Access walks: {access.origin ? `start point → ${nodes.get(origin)?.name_en} ${Math.round(access.origin.metres)} m` : 'start at station'} · {access.destination ? `${nodes.get(destination)?.name_en} → end point ${Math.round(access.destination.metres)} m` : 'end at station'}. These walks are separate from the route times and walking totals below.</p>}
           <p className={css.queryStamp}>Requested departure: {formatHkt(queriedAt)}<br /><small>Query value: {queriedAt} · {SEED_MODE ? 'seed estimates are not recalculated.' : 'recomputed when the graph or published events change.'}</small></p>
           {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={'ABC'[index]} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); setScreen('detail') }} />)}</div> : <div className={css.empty}><strong>No route returned for this pair.</strong><p>Try another departure or station pair. No feasible alternative has been supplied.</p></div>}
           <p className={css.tiny}>{SEED_MODE ? 'Fixed illustrative candidates.' : 'API candidates on the modelled network.'} Published events affect the network overlay. Times, fares and scores are derived estimates.</p>
@@ -282,6 +310,7 @@ export function App() {
       {screen === 'detail' && selected && <section data-panel className={`${css.panel} ${css.detailPanel}`}>
         <button type="button" className={css.back} onClick={() => setScreen('results')}>← All routes</button><span className={css.kicker}>ROUTE DETAILS · DERIVED ESTIMATE</span>
         <h1>{nodes.get(origin)?.name_en} <span>→</span><br />{nodes.get(destination)?.name_en}</h1>
+        {(access.origin || access.destination) && <p className={css.confirm}>Map-point access walks: {access.origin ? `${Math.round(access.origin.metres)} m at start` : 'start at station'} · {access.destination ? `${Math.round(access.destination.metres)} m at end` : 'end at station'}. Add these to the route walking total; time estimates below exclude them.</p>}
         <div className={css.detailStats}><strong>{formatRange(selected.total.time_range_s)}</strong><span>{selected.total.transfers} transfer{selected.total.transfers === 1 ? '' : 's'}</span><span>{selected.total.walk_m} m walk</span><span>HK${selected.total.fare_hkd.toFixed(2)}</span></div>
         <h2>Step by step</h2><ol className={css.steps}>{selected.legs.map((leg, i) => <li data-enter key={i}><strong><i className={css.lineDot} style={{ background: leg.mode === 'WALK' ? '#6d7e70' : lineGradient(lineStyle(resolveLine(network, leg.line), leg.line).colors) }} />{leg.mode === 'WALK' ? 'Walk' : resolveLine(network, leg.line)?.name_en ?? leg.line ?? leg.mode}</strong><span>{nodes.get(leg.from)?.name_en ?? leg.from} → {nodes.get(leg.to)?.name_en ?? leg.to}</span><small>{legDuration(leg)}{leg.walk_m ? ` · ${leg.walk_m} m walking` : ''}</small></li>)}</ol>
         <h2>Why this route?</h2><p>{selected.explain}</p>

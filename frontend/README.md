@@ -17,6 +17,8 @@ Use Node 20.19+ or 22.12+. The default API is `http://127.0.0.1:8000`; override 
 
 API mode is the default. Queries use the deterministic engine and last approved event facts. It is a modelled service, not a live timetable. `?data=seed` explicitly switches to fixed, simulated fixture routes for the seed OD; changing departure does not recalculate those routes, and seed review actions are local. Switching mode reloads the page and discards unsaved state.
 
+Journey endpoints can be East Rail stations or map points whose pedestrian route to a modelled East Rail station is at most 800 m. The map circles are straight-line search bounds; map clicks use Valhalla's OpenStreetMap pedestrian routing demo API and are rejected when distance cannot be verified. Access walks are displayed separately from station-to-station route totals. Station points are not surveyed entrances or step-free path guarantees. The external routing demo API is rate-limited; station-name selection remains available if it is unavailable.
+
 API errors retain loaded data with a stale notice. An initial failure offers retry or an explicit fixed-seed switch. Maps retain their schematic overlays when the external basemap fails. Basemap preference is configured CARTO → OpenFreeMap → OSM → schematic; the current initial raster option is OSM. Map attribution remains visible. Reloading while completely offline is not supported as an installed PWA.
 
 ## Public and reviewer views

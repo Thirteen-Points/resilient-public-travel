@@ -203,6 +203,6 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     <div className={css.tools}><button type="button" onClick={() => resetRef.current(true)} aria-label="Fit corridor on map">◎ Fit corridor</button><span>Zoom {zoom.toFixed(2)}</span></div>
     <details className={css.legend}><summary>Network colours <span>↗</span></summary><div>{network.lines.map(line => { const style = lineStyle(line); return <p key={line.id}><i style={{ background: lineGradient(style.colors) }} /><span>{style.label}</span></p> })}<p><i style={{ background: lineStyle(undefined, 'unmapped').colors[0] }} /><span>Unknown line · assigned colour (example)</span></p><hr /><p>Bold + white outline: selected candidate</p><p>Red dashes: closed · amber dots: affected</p><p>Scroll at your pointer to zoom. Pinch or use + / −. All paths are schematic.</p></div></details>
     <p className={css.caption}>ACADEMIC DEMO · Map &amp; stations schematic · {provider}</p>
-    {picking && <p className={css.pickHint}>Tap near a station, within {network.meta.catchment_m} m. Or search by name.</p>}
+    {picking && <p className={css.pickHint}>Tap near an East Rail station. The circles screen by straight-line distance; pedestrian routing checks the 800 m walking limit.</p>}
   </div>
 }
