@@ -60,7 +60,6 @@ let browser, publicPage
   browser = await chromium.launch({ headless: true, ...(process.env.M2_BROWSER_CHANNEL ? { channel: process.env.M2_BROWSER_CHANNEL } : {}) })
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' })
   await context.route('**/*', route => route.request().url().startsWith(web) || route.request().url().startsWith(api) ? route.continue() : route.abort())
-  await context.route('https://valhalla1.openstreetmap.de/route', route => route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ trip: { summary: { length: 0.2 } } }) }))
   const page = await context.newPage(); publicPage = page; page.setDefaultTimeout(15000)
   page.on('pageerror', error => errors.push(error.message))
   const routeBodies = [], chatBodies = [], preferenceBodies = [], forbiddenHeaders = []
@@ -284,7 +283,7 @@ let browser, publicPage
     const prompt = page.getByLabel('ASK ABOUT THE CURRENT JOURNEY'); await prompt.fill('Keyboard focus check'); await prompt.press('Tab')
     assert.ok(await page.getByRole('button', { name: 'Send message', exact: true }).evaluate(button => button === document.activeElement && getComputedStyle(button).outlineStyle !== 'none'))
   }
-  // Map picking checks a pedestrian route to East Rail and returns to the form.
+  // Map picking checks straight-line distance to East Rail and returns to the form.
   await navigate(page, 'Plan journey'); await page.getByRole('button', { name: '◎ Tap the map', exact: true }).click()
   await page.locator('#journey-map').scrollIntoViewIfNeeded()
   await page.getByRole('button', { name: 'Fit corridor on map', exact: true }).click()
