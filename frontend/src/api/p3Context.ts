@@ -1,4 +1,4 @@
-import type { JourneyContext, Persona, Preset, TravelProfile } from './types'
+import type { JourneyContext, Persona, Preset, RouteQuery, TravelProfile } from './types'
 
 // Existing UserProfile contract + C-Route normalize_profile/allows_edge.
 export function profileFor(persona: Persona, preset: Preset): TravelProfile {
@@ -9,6 +9,10 @@ export function profileFor(persona: Persona, preset: Preset): TravelProfile {
 
 export function contextKey(context: JourneyContext): string {
   return JSON.stringify([context.origin, context.destination, context.departAt, context.persona, context.preset, resolveProfile(context), [...context.modes ?? []].sort(), [...context.requiredModes ?? []].sort(), [...context.eventIds].sort(), context.eventRevisions])
+}
+
+export function routeSelectionKey(query: RouteQuery): string {
+  return JSON.stringify([query.origin, query.destination, query.departAt, resolveProfile(query), [...query.modes ?? []].sort(), [...query.requiredModes ?? []].sort()])
 }
 
 /** Explicit preferences can tighten a selected accessibility preset, never loosen it. */

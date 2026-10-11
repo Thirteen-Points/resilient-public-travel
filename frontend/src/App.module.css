@@ -58,6 +58,7 @@
 .presets { display: flex; gap: 8px; flex-wrap: wrap; padding: 0; border: 0; margin: 24px 0; min-width: 0; }
 .presets button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-pill); background: var(--rr-bg-surface); color: var(--rr-text-primary); font-size: var(--rr-font-label); font-weight: 500; }
 .presets button.activePreset, .presets button[aria-pressed=true] { background: var(--rr-bg-subtle); border-color: var(--rr-text-brand); box-shadow: inset 0 0 0 1px var(--rr-text-brand); }
+.presets button:focus-visible { outline: 2px solid var(--rr-route-a); outline-offset: 2px; }
 .transportChoices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0 0 24px; min-width: 0; padding: 0; border: 0; }
 .transportChoices button { min-width: 0; min-height: 48px; padding: 12px; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-pill); background: var(--rr-bg-surface); color: var(--rr-text-primary); font-size: var(--rr-font-label); line-height: 1.4286; font-weight: 500; white-space: normal; word-break: keep-all; overflow-wrap: normal; }
 .transportChoices button:hover:not(:disabled) { background: var(--rr-bg-page); }

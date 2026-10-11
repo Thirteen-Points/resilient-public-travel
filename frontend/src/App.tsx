@@ -7,7 +7,8 @@ import { DeparturePicker, hktDeparture } from './components/DeparturePicker'
 import { AgentAvatar } from './components/AgentAvatar'
 import { AgentPanel } from './components/AgentPanel'
 import { PreferenceEditor } from './components/PreferenceEditor'
-import { LatestRequest, resolveProfile, profileLabel } from './api/p3Context'
+import { PersonaSelector } from './components/PersonaSelector'
+import { LatestRequest, resolveProfile, profileLabel, routeSelectionKey } from './api/p3Context'
 import { HowItWorksPage } from './components/HowItWorksPage'
 import { UpdatesPage } from './components/UpdatesPage'
 import { ProvenanceBadge } from './components/ProvenanceBadge'
@@ -138,6 +139,7 @@ export function App() {
   const [departureDate, setDepartureDate] = useState('2026-09-22')
   const [searching, setSearching] = useState(false)
   const [queriedAt, setQueriedAt] = useState('')
+  const [submitted, setSubmitted] = useState<{ key: string; persona: Persona; preset: Preset; profile: TravelProfile; transport: 'all' | TransitMode } | null>(null)
   const [success, setSuccess] = useState({ text: '', revision: 0 })
   const root = useRef<HTMLDivElement>(null)
   const toast = useRef<HTMLDivElement>(null)
@@ -150,7 +152,8 @@ export function App() {
   const selected = useMemo(() => routes.find(route => route.route_id === selectedId), [routes, selectedId])
   const eventRevisions = (SEED_MODE ? seedBundle?.published : live.bundle?.published)?.map(event => `${event.event_id}@${event.version}`).sort().join(',') ?? ''
   const context = useMemo<JourneyContext>(() => ({ origin, destination, departAt: hktDeparture(departureDate, departure), preset, persona, profile: effectiveProfile, requiredModes: transport === 'all' ? undefined : [transport], eventRevisions, eventIds: eventRevisions ? eventRevisions.split(',').map(value => value.slice(0, value.lastIndexOf('@'))) : [] }), [origin, destination, departureDate, departure, preset, persona, effectiveProfile, transport, eventRevisions])
-  const plannerKey = JSON.stringify([origin, destination, context.departAt, effectiveProfile, transport])
+  const plannerKey = routeSelectionKey(context)
+  const resultCurrent = submitted?.key === plannerKey
   useEffect(() => {
     if (searchingRef.current && (requestedJourney.current !== plannerKey || requestedScreen.current !== screen)) { routeRequests.current.cancel(); searchingRef.current = false; setSearching(false) }
   }, [plannerKey, screen])
@@ -219,14 +222,25 @@ export function App() {
     walkCheck.current?.abort(); setCheckingWalk(false)
     setActiveField(null); setPicking(field); setError(''); setMobileView('map')
   }
+  const invalidateResults = () => {
+    routeRequests.current.cancel(); searchingRef.current = false; setSearching(false); setSubmitted(null)
+  }
   const setField = (field: Field, value: string) => {
     walkCheck.current?.abort(); setCheckingWalk(false)
+    invalidateResults()
     if (field === 'origin') setOrigin(value)
     else setDestination(value)
     setAccess(previous => ({ ...previous, [field]: null }))
     setActiveField(null); setPicking(null); setError(''); setPicked(''); setMobileView('content')
   }
-  const showRoutes = async (from = origin, to = destination, preference = preset, profile = effectiveProfile) => {
+  const editProfile = (next: Persona) => {
+    invalidateResults(); setError(''); setPersona(next); setCustomProfile(undefined)
+  }
+  const editPreset = (next: Preset) => {
+    invalidateResults(); setError(''); setPreset(next)
+    setCustomProfile(previous => previous ? { ...previous, weights: undefined } : undefined)
+  }
+  const showRoutes = async (from = origin, to = destination, preference = preset, profile = effectiveProfile, traveller = persona) => {
     if (checkingWalk) return
     setActiveField(null)
     if (!to || !from) { setError('Choose a destination and starting point before continuing.'); return }
@@ -237,18 +251,19 @@ export function App() {
     if (!Number.isFinite(Date.parse(departAt))) { setError('Choose a valid Hong Kong departure date and time.'); return }
     searchingRef.current = true; setSearching(true)
     const request = routeRequests.current.begin()
-    const requestedProfile = resolveProfile({ persona, preset: preference, profile })
-    requestedJourney.current = JSON.stringify([from, to, departAt, requestedProfile, transport])
+    const requestedProfile = resolveProfile({ persona: traveller, preset: preference, profile })
+    requestedJourney.current = routeSelectionKey({ origin: from, destination: to, departAt, preset: preference, persona: traveller, profile: requestedProfile, requiredModes: context.requiredModes })
     requestedScreen.current = screen
     try {
-      const value = { origin: from, destination: to, departAt, preset: preference, persona, requiredModes: context.requiredModes, ...(!SEED_MODE ? { profile: requestedProfile } : {}) }
+      const value = { origin: from, destination: to, departAt, preset: preference, persona: traveller, requiredModes: context.requiredModes, profile: requestedProfile }
       const next = SEED_MODE ? await seedDataSource.getRoutes(value) : await live.query(value, request.signal)
       if (!request.current()) return
       setRoutes(next); setOrigin(from); setDestination(to); setPreset(preference); setQueriedAt(departAt)
+      setSubmitted({ key: requestedJourney.current, persona: traveller, preset: preference, profile: requestedProfile, transport })
       setSelectedId(next[0]?.route_id ?? null)
       setScreen('results'); setMobileView('content'); setError(''); setPicking(null)
       if (next.length) celebrate(`${next.length} ${SEED_MODE ? 'seed' : 'API'} alternatives ready`)
-    } catch (cause) { if (request.current()) setError(`Route data could not be loaded. ${cause instanceof Error ? cause.message : String(cause)}`) }
+    } catch (cause) { if (request.current()) { setSubmitted(null); setScreen('journey'); setError(`Route request failed. ${cause instanceof Error ? cause.message : String(cause)}`) } }
     finally { if (request.current()) { setSearching(false); searchingRef.current = false } }
   }
   const mapPick = async (point: { lat: number; lng: number }) => {
@@ -262,6 +277,7 @@ export function App() {
       const match = await findEastRailWalkingAccess(network, point, controller.signal)
       if (controller.signal.aborted) return
       if (!match) { setError('No East Rail station is within 800 m by a modelled walking route. Choose a closer point.'); return }
+      invalidateResults()
       if (field === 'origin') setOrigin(match.station.id)
       else setDestination(match.station.id)
       setAccess(previous => ({ ...previous, [field]: match }))
@@ -277,7 +293,7 @@ export function App() {
       if (walkCheck.current === controller) { walkCheck.current = null; setCheckingWalk(false) }
     }
   }
-  const activeRoutes = screen === 'results' || screen === 'detail' ? routes : []
+  const activeRoutes = resultCurrent && (screen === 'results' || screen === 'detail') ? routes : []
   const journeyScreen = screen === 'journey' || screen === 'results' || screen === 'detail'
   const showViewTabs = compactViewport && journeyScreen
   const mapVisible = screen !== 'sources' && (!compactViewport || (journeyScreen && mobileView === 'map'))
@@ -329,12 +345,12 @@ export function App() {
       {screen === 'journey' && <div id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'content-view-tab' : undefined} className={`${css.panel} ${css.mobilePanel}`}>
           <h1>Where are you<br />heading?</h1>
           <p className={css.subhead}>Choose transport, then select East Rail stations or map points within 800 m walking distance of them.</p>
-          <fieldset className={`${css.presets} ${css.transportChoices}`}><legend>TRANSPORT · 交通方式</legend>{TRANSPORT_OPTIONS.map(option => <button key={option.id} type="button" aria-pressed={transport === option.id} disabled={searching} className={transport === option.id ? css.activePreset : ''} onClick={() => { setTransport(option.id); setActiveField(null); setPicking(null); setError('') }}>{option.label}</button>)}</fieldset>
+          <fieldset className={`${css.presets} ${css.transportChoices}`}><legend>TRANSPORT · 交通方式</legend>{TRANSPORT_OPTIONS.map(option => <button key={option.id} type="button" aria-pressed={transport === option.id} disabled={searching} className={transport === option.id ? css.activePreset : ''} onClick={() => { invalidateResults(); setTransport(option.id); setActiveField(null); setPicking(null); setError('') }}>{option.label}</button>)}</fieldset>
           <p className={css.tiny}>{transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus · 小巴: routes are not available in this modelled network yet. Choose another mode for available routes.' : transport === 'all' ? 'Compare all available modes, including bus and ferry connections.' : `Routes include ${transportLabel([transport])}; other modes and walking may provide connections.`}</p>
           <button type="button" className={css.agentEntry} onClick={() => { navigate('agent'); setError('') }}><AgentAvatar issue={published.length > 0} small /><span><strong>Meet your route companion</strong><small>Ask the Agent · explore this scenario</small></span><b>↗</b></button>
           <form onSubmit={event => { event.preventDefault(); void showRoutes() }}>
             <StationField id="origin" label="FROM" value={origin} network={network} active={activeField === 'origin'} onFocus={() => { setActiveField('origin'); setPicking(null) }} onSelect={value => setField('origin', value)} onPickMap={() => pickOnMap('origin')} />
-            <button className={css.swap} type="button" onClick={() => { walkCheck.current?.abort(); setCheckingWalk(false); setOrigin(destination); setDestination(origin); setAccess(previous => ({ origin: previous.destination, destination: previous.origin })); setActiveField(null); setPicking(null); setPicked('') }} aria-label="Swap stations">⇅</button>
+            <button className={css.swap} type="button" onClick={() => { walkCheck.current?.abort(); setCheckingWalk(false); invalidateResults(); setOrigin(destination); setDestination(origin); setAccess(previous => ({ origin: previous.destination, destination: previous.origin })); setActiveField(null); setPicking(null); setPicked('') }} aria-label="Swap stations">⇅</button>
             <StationField id="destination" label="TO" value={destination} network={network} active={activeField === 'destination'} invalid={Boolean(error && !destination)} onFocus={() => { setActiveField('destination'); setPicking(null) }} onSelect={value => setField('destination', value)} onPickMap={() => pickOnMap('destination')} />
             <div className={css.fieldAssist}><button type="button" onClick={() => pickOnMap('destination')}>◎ Tap the map</button><span>Up to 800 m walking to East Rail</span></div>
             {checkingWalk && <p role="status" className={css.confirm}>Checking pedestrian routes…</p>}
@@ -342,33 +358,34 @@ export function App() {
             {access.destination && <p className={css.confirm}>End point → {nodes.get(destination)?.name_en}: {Math.round(access.destination.metres)} m walking</p>}
             {picked && <p className={css.confirm}>{picked}</p>}
             {error && <p role="alert" className={css.error}>{error}</p>}
-            <DeparturePicker date={departureDate} time={departure} onDate={setDepartureDate} onTime={setDeparture} />
-            <fieldset className={css.presets}><legend>TRAVELLER PROFILE</legend><button type="button" aria-pressed={persona === 'commuter'} onClick={() => { setPersona('commuter'); setCustomProfile(undefined) }}>Commuter</button><button type="button" aria-pressed={persona === 'wheelchair'} disabled={SEED_MODE} onClick={() => { setPersona('wheelchair'); setCustomProfile(undefined) }}>Wheelchair</button></fieldset>
-            <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} disabled={!SEED_MODE && option.id === 'least_walking'} title={!SEED_MODE && option.id === 'least_walking' ? 'Use a walking limit in your travel preferences' : undefined} className={preset === option.id ? css.activePreset : ''} onClick={() => { setPreset(option.id); setCustomProfile(previous => previous ? { ...previous, weights: undefined } : undefined) }}>{option.label}</button>)}</fieldset>
+            <DeparturePicker date={departureDate} time={departure} onDate={value => { invalidateResults(); setDepartureDate(value) }} onTime={value => { invalidateResults(); setDeparture(value) }} />
+            <PersonaSelector value={persona} onSelect={editProfile} />
+            <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} disabled={!SEED_MODE && option.id === 'least_walking'} title={!SEED_MODE && option.id === 'least_walking' ? 'Use a walking limit in your travel preferences' : undefined} className={preset === option.id ? css.activePreset : ''} onClick={() => editPreset(option.id)}>{option.label}</button>)}</fieldset>
             {!SEED_MODE && <p className={css.tiny}>Less walking preset awaits backend support. Wheelchair hard walking and accessibility constraints still apply.</p>}
             <button type="submit" disabled={searching || checkingWalk} className={css.primary}>{searching ? 'Finding routes…' : 'Find resilient routes'} <span>↗</span></button>
           </form>
-          {!SEED_MODE && <PreferenceEditor active={screen === 'journey'} profile={effectiveProfile} onApply={next => { setCustomProfile(next); setPersona(next.mobility === 'wheelchair' ? 'wheelchair' : 'commuter'); if (origin && destination) void showRoutes(origin, destination, preset, next) }} />}
+          {!SEED_MODE && <PreferenceEditor active={screen === 'journey'} profile={effectiveProfile} onApply={next => { invalidateResults(); const traveller = next.mobility === 'wheelchair' ? 'wheelchair' : 'commuter'; setCustomProfile(next); setPersona(traveller); setError(''); if (origin && destination) void showRoutes(origin, destination, preset, next, traveller) }} />}
           <p className={css.tiny}>{SEED_MODE ? 'Only Tai Wai → Admiralty has route candidates in this fixture.' : 'Routes use the modelled network and published events; estimates are not a live timetable.'}</p>
       </div>}
-      {screen === 'results' && <>
+      {screen === 'results' && resultCurrent && submitted && <>
         <section id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} data-route-refresh-revision={live.revision} data-route-ids={routes.map(route => route.route_id).join(',')} className={`${css.panel} ${css.results} ${css.mobilePanel}`} aria-labelledby={showViewTabs ? 'content-view-tab' : 'routes-heading'}>
           <button type="button" className={css.back} onClick={() => navigate('journey')}>← Edit journey</button>
           {published[0] && <div className={css.alert}><span aria-hidden="true">!</span><strong>{published[0].title}</strong><span className={css.alertDetail}>Published event · {formatHkt(published[0].updated_at)}</span><button type="button" onClick={() => navigate('updates')}>View update →</button></div>}
           <span className={css.kicker}>ROUTES FOR YOUR JOURNEY</span>
           <h1 id="routes-heading">{nodes.get(origin)?.name_en ?? origin} <span>→</span><br />{nodes.get(destination)?.name_en ?? destination}</h1>
-          <p className={css.subhead}>{routes.length} alternatives · {transportLabel(context.requiredModes)} · {PRESETS.find(option => option.id === preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
+          <p className={css.subhead}>{routes.length} alternatives · {transportLabel(submitted.transport === 'all' ? undefined : [submitted.transport])} · {PRESETS.find(option => option.id === submitted.preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
           {(access.origin || access.destination) && <p className={css.confirm}>Access walks: {access.origin ? `start point → ${nodes.get(origin)?.name_en} ${Math.round(access.origin.metres)} m` : 'start at station'} · {access.destination ? `${nodes.get(destination)?.name_en} → end point ${Math.round(access.destination.metres)} m` : 'end at station'}. These walks are separate from the route times and walking totals below.</p>}
-          {!SEED_MODE && <p className={css.queryStamp}>Requested profile: {profileLabel(effectiveProfile)}</p>}
+          <p className={css.queryStamp}>Queried persona: {submitted.persona === 'wheelchair' ? 'Wheelchair' : 'Commuter'} · Preset: {PRESETS.find(option => option.id === submitted.preset)?.label}<br />Profile sent: {profileLabel(submitted.profile)}</p>
           <p className={css.queryStamp}>Requested departure: {formatHkt(queriedAt)}<br /><small>Query value: {queriedAt} · {SEED_MODE ? 'fixed seed estimates filtered by modelled service hours; journey times are not recalculated.' : 'recomputed when the graph or published events change.'}</small></p>
-          {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={String.fromCharCode(65 + index)} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); navigate('detail') }} />)}</div> : <div className={css.empty} role="status"><strong>No {transport === 'all' ? '' : `${transportLabel([transport])} `}route returned for this pair.</strong><p>{transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus routes are not available in the current modelled network yet. Choose another transport mode.' : SEED_MODE ? 'The fixed fixture only covers Tai Wai → Admiralty. Switch to API mode to query other stations, stops and piers.' : 'Try All modes, another departure, or another station, bus stop or ferry pier.'}</p><button type="button" className={css.back} onClick={() => navigate('journey')}>Edit transport and journey →</button></div>}
+          {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={String.fromCharCode(65 + index)} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); navigate('detail') }} />)}</div> : <div className={css.empty} role="status"><strong>{submitted.persona === 'wheelchair' && SEED_MODE ? '没有符合轮椅约束的路线' : submitted.persona === 'wheelchair' ? 'No wheelchair-compliant route returned.' : `No ${submitted.transport === 'all' ? '' : `${transportLabel([submitted.transport])} `}route returned for this pair.`}</strong><p>{submitted.persona === 'wheelchair' ? SEED_MODE ? 'The seed lacks affirmative step-free station and leg data or low-floor bus evidence, so ordinary routes cannot be shown as accessible.' : 'The API returned no qualifying candidate. Accessibility data may be incomplete; try another time or station, stop or pier.' : submitted.transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus routes are not available in the current modelled network yet. Choose another transport mode.' : SEED_MODE ? 'The fixed fixture only covers Tai Wai → Admiralty. Switch to API mode to query other stations, stops and piers.' : 'Try All modes, another departure, or another station, bus stop or ferry pier.'}</p><button type="button" className={css.back} onClick={() => navigate('journey')}>Edit transport and journey →</button></div>}
           <p className={css.tiny}>{SEED_MODE ? 'Fixed illustrative candidates.' : 'API candidates on the modelled network.'} Fares use adult Octopus ordinary class, bus section fares and ferry upper deck prices; personal concessions are excluded. Published events affect the network overlay. Times and scores are derived estimates.</p>
         </section>
       </>}
-      {screen === 'detail' && selected && <section id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'content-view-tab' : undefined} className={`${css.panel} ${css.detailPanel} ${css.mobilePanel}`}>
+      {screen === 'detail' && resultCurrent && selected && submitted && <section id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'content-view-tab' : undefined} className={`${css.panel} ${css.detailPanel} ${css.mobilePanel}`}>
         <button type="button" className={css.back} onClick={() => navigate('results')}>← All routes</button><span className={css.kicker}>ROUTE DETAILS · DERIVED ESTIMATE</span>
         <h1>{nodes.get(origin)?.name_en} <span>→</span><br />{nodes.get(destination)?.name_en}</h1>
         {(access.origin || access.destination) && <p className={css.confirm}>Map-point access walks: {access.origin ? `${Math.round(access.origin.metres)} m at start` : 'start at station'} · {access.destination ? `${Math.round(access.destination.metres)} m at end` : 'end at station'}. Add these to the route walking total; time estimates below exclude them.</p>}
+        <p className={css.queryStamp}>Queried persona: {submitted.persona === 'wheelchair' ? 'Wheelchair' : 'Commuter'} · Preset: {PRESETS.find(option => option.id === submitted.preset)?.label}<br />Profile sent: {profileLabel(submitted.profile)}</p>
         <div className={css.detailStats}><strong>{formatRange(selected.total.time_range_s)}</strong><span>{selected.total.transfers} transfer{selected.total.transfers === 1 ? '' : 's'}</span><span>{selected.total.walk_m} m walk</span><span>HK${selected.total.fare_hkd.toFixed(2)}</span></div>
         <p className={css.tiny}>Adult fares · Octopus ordinary class · ferry upper deck (lower deck for wheelchair routes). Each ticket is shown on its first step; connecting MTR lines share the same ticket.</p>
         <h2>Step by step</h2><ol className={css.steps}>{selected.legs.map((leg, i) => <li data-enter key={i}><strong><i className={css.lineDot} style={{ background: leg.mode === 'WALK' ? '#6d7e70' : lineGradient(lineStyle(resolveLine(network, leg.line), leg.line).colors) }} />{leg.mode === 'WALK' ? 'Walk' : resolveLine(network, leg.line)?.name_en ?? leg.line ?? leg.mode}</strong><span>{nodes.get(leg.from)?.name_en ?? leg.from} → {nodes.get(leg.to)?.name_en ?? leg.to}</span><small>{legDuration(leg)}{leg.walk_m ? ` · ${leg.walk_m} m walking` : ''}{leg.mode !== 'WALK' && leg.fare_hkd !== undefined ? ` · ${leg.fare_hkd > 0 ? `HK$${leg.fare_hkd.toFixed(2)}` : 'Included in ticket'}` : ''}</small></li>)}</ol>

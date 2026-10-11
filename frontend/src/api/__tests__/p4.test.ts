@@ -5,7 +5,7 @@ import legacy from '../../../../data/sim/scn_huh_exc_closed_am_peak.json'
 import routes from '../../../../contracts/seed/routes.seed.json'
 import { allocationRows, chatPayload, compare, delayOutcome, parseChat, parseSimulation } from '../p3Api'
 import { applyPreference, parsePreference, preference } from '../preferences'
-import { contextKey, profileFor, resolveProfile } from '../p3Context'
+import { contextKey, LatestRequest, profileFor, resolveProfile, routeSelectionKey } from '../p3Context'
 import { lastSuccessfulCollection, parseReplanningStatus, parseSourcesStatus } from '../runtimeStatus'
 import { queryRoutesWithMetadata } from '../liveTransitApi'
 import type { JourneyContext } from '../types'
@@ -16,6 +16,28 @@ const json = (body: unknown, snapshot?: string) => new Response(JSON.stringify(b
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('explicit preference application', () => {
+  it('ties displayed results to the submitted persona, preset and profile', () => {
+    const commuter = routeSelectionKey(context)
+    const wheelchair = routeSelectionKey({ ...context, persona: 'wheelchair' })
+    expect(wheelchair).not.toBe(commuter)
+    expect(routeSelectionKey({ ...context, persona: 'wheelchair', preset: 'most_stable' })).not.toBe(wheelchair)
+    expect(routeSelectionKey({ ...context, persona: 'wheelchair', profile: { ...profileFor('wheelchair', 'fastest'), max_walk_m: 200 } })).not.toBe(wheelchair)
+    expect(routeSelectionKey({ ...context, requiredModes: ['BUS'] })).not.toBe(commuter)
+    expect(routeSelectionKey({ ...context, persona: 'commuter' })).toBe(commuter)
+  })
+
+  it('ignores a slow previous persona request after a faster new selection', async () => {
+    const latest = new LatestRequest(), accepted: string[] = []
+    let finishOld!: () => void
+    const old = new Promise<void>(resolve => { finishOld = resolve })
+    const first = latest.begin()
+    const stale = old.then(() => { if (first.current()) accepted.push('commuter') })
+    const second = latest.begin()
+    if (second.current()) accepted.push('wheelchair')
+    finishOld(); await stale
+    expect(first.signal.aborted).toBe(true)
+    expect(accepted).toEqual(['wheelchair'])
+  })
   it('tightens reduced mobility and never loosens existing wheelchair restrictions', () => {
     const standard = applyPreference(profileFor('commuter', 'fastest'), { mobility: 'reduced', max_walk_m: 500, hard_flags: [] })
     expect(standard).toMatchObject({ mobility: 'reduced', max_walk_m: 400, hard_flags: ['no_stairs'] })
@@ -35,6 +57,18 @@ describe('explicit preference application', () => {
     expect(result.snapshotId).toBe('calculation-12')
     expect(contextKey(selected)).not.toBe(contextKey(context))
     expect(resolveProfile({ ...selected, preset: 'fewest_transfers' }).preset).toBe('fewest_transfers')
+  })
+  it('sends each selected persona profile and preserves the API route order and empty result', async () => {
+    const fetch = vi.fn().mockResolvedValueOnce(json([{ route_id: 'second' }, { route_id: 'first' }]))
+      .mockResolvedValueOnce(json([]))
+    vi.stubGlobal('fetch', fetch)
+    const commuter = await queryRoutesWithMetadata(context)
+    const wheelchair = await queryRoutesWithMetadata({ ...context, persona: 'wheelchair', preset: 'most_stable', profile: { ...profileFor('wheelchair', 'most_stable'), mobility: 'standard', max_walk_m: 900, max_transfers: 5, hard_flags: [] } })
+    const bodies = fetch.mock.calls.map(call => JSON.parse(call[1].body))
+    expect(bodies[0].profile).toEqual(profileFor('commuter', 'fastest'))
+    expect(bodies[1].profile).toMatchObject({ mobility: 'wheelchair', preset: 'most_stable', max_walk_m: 400, max_transfers: 2, hard_flags: ['no_minibus', 'no_non_lowfloor_bus', 'no_stairs'] })
+    expect(commuter.routes.map(route => route.route_id)).toEqual(['second', 'first'])
+    expect(wheelchair.routes).toEqual([])
   })
   it('rejects unsafe or malformed patches without silently accepting arbitrary keys', () => {
     const valid = { patch: { mobility: null, max_walk_m: null, hard_flags: [], weights }, method: 'rule_fallback', explanation: 'Prefer lower fares.' }
