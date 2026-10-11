@@ -248,3 +248,56 @@ contract-freeze change.
    TAW→ADM end-to-end claim was not re-verified in this pass.
 9. TML/KTL/TWL/ISL headway bands not re-verified against a current official
    page in this pass (only EAL was captured, S28).
+
+### Fare calculation correction — 2026-10-11
+
+`data/network/fares.json` now supplies executable adult fares rather than the
+HK$12.5 simulated flat fare. Source snapshots were downloaded and checked:
+
+- MTR `mtr_lines_fares.csv` and `mtr_lines_and_stations.csv` from
+  `https://opendata.mtr.com.hk/data/`: all 256 directed OD pairs for the 16
+  modelled stations, using `OCT_ADT_FARE` (ordinary class, adult Octopus).
+  Examples: TAW→ADM 17.1, KOT→ADM 13.2, HUH→ADM 12.6, EXC→ADM 4.9.
+  Station transfers form one ticket. The Octopus ETS↔TST interchange rule
+  (within 30 minutes) is documented at
+  `https://www.mtr.com.hk/en/customer/services/ael-air-offer.html`.
+- TD `FARE_BUS.xml`, `ROUTE_BUS.xml` and `RSTOP_BUS.xml` from
+  `https://static.data.gov.hk/td/routes-fares-xml/`: route 1051 (182) and 1336
+  (81C), direction-specific actual stop IDs mapped to modelled nodes before
+  resolving `ON_SEQ`/`OFF_SEQ`/`PRICE`. 182 outbound stop 859→734 costs 20.8;
+  red-tunnel stop 219→734 costs 12.2. Inbound 9015→6042 costs 12.9.
+  81C outbound 859→4024 costs 9.0; inbound 966→6042 costs 10.2.
+  The exact mappings and source SHA-256 hashes are retained in the fare file.
+  This verifies those section fares; historical unverified $16/$6 claims
+  above are not used. Abstract node geometry remains a modelling approximation.
+- Star Ferry `https://www.starferry.com.hk/en/service`: Central↔TST adult
+  upper deck 5.0 weekday / 6.5 weekends and public holidays, lower deck
+  4.0 / 5.6. Standard routes use the upper deck; wheelchair routes use the
+  lower deck. The boarding date and existing holiday calendar choose the rate.
+
+No personal concessions, first class, passes or temporary promotions are
+assumed. Overall route provenance stays simulated because journey times,
+accessibility and load remain modelled. Offline route IDs are preserved;
+fare totals, ticket charges and price scores can be refreshed with
+`python -m scripts.update_seed_fares`.
+
+### Persistent fare catalogue — 2026-10-11
+
+The backend now uses SQLite `fares.sqlite3` as its authoritative fare database.
+`data/network/fares.json` is only an empty-database bootstrap; changing it does
+not overwrite an existing database. The official import command is
+`python -m scripts.refresh_fares --download`. The completed local import has
+9,216 adult Octopus MTR OD records (96 × 96), 777,319 directional bus section
+records, 1,622 bus full-fare records and four Central–TST adult ferry day/deck
+rates. All source rows are retained beyond the current planning graph.
+Racecourse is present in the fare CSV but absent from the station-code CSV;
+its official station ID 70 is stored as `mtr_station:70`, without inventing
+a station code or adding an operational graph node.
+
+Ferry rates are parsed from the operator's labelled XLSX at
+`https://www.starferry.com.hk/sites/default/files/upload/open_data/excel/ferry_sf_central_tsimshatsui_faretable_eng.xlsx`,
+SHA-256 `c510af5973f154879fde2f7d88e80bdce0d674e36d6bc0885d5d4e41318d6e1d`.
+The database stores all six source URLs/checksums/import timestamps. Failed
+imports roll back atomically. Runtime queries read a consistent price/revision
+snapshot; direct SQL changes and successful imports invalidate cached prices.
+See `deploy/FARES.md` for lookup endpoints, effective dates and scope.

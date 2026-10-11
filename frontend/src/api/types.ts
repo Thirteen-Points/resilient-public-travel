@@ -97,6 +97,7 @@ export interface RouteLeg {
   depart?: string
   arrive?: string
   walk_m: number
+  fare_hkd?: number
   accessible: boolean | 'partial' | null
   provenance: Provenance
 }
