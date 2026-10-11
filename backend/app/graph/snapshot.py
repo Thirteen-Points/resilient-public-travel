@@ -23,6 +23,8 @@ def active(event, at):
 def matches(event, segment, edge):
     line = event.get("line")
     aliases = {edge.line, edge.line.removeprefix("BUS_").removeprefix("GMB_").removeprefix("FERRY_")}
+    if edge.data.get('route_number'):
+        aliases.update({edge.data['route_number'], 'BUS_' + edge.data['route_number']})
     if line and line not in aliases:
         return False
     if event.get("mode") and event["mode"] != edge.mode:

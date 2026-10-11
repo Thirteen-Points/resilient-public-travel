@@ -43,6 +43,8 @@ export interface NetworkLine {
   seg_time_s?: number[]
   service_hours?: string
   service_hours_reverse?: string
+  route_number?: string
+  eta_stops?: Record<string, { td_stop_id: string; sequence: number; lat: number; lng: number; name: string }>
   provenance: Provenance
 }
 

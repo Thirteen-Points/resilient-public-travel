@@ -65,7 +65,12 @@ class Runtime:
             "sim": {"path": str(simulation), "present": simulation.is_file()},
         }
         try:
-            self.engine = RouteEngine.from_seed(network_path=network, events_path=events)
+            from .graph.corridor_bus import CorridorBusAdapter, enabled as bus_network_enabled
+            if bus_network_enabled():
+                from .graph.adapter import SeedDataAdapter
+                self.engine = RouteEngine.from_adapter(CorridorBusAdapter(SeedDataAdapter(network, events)))
+            else:
+                self.engine = RouteEngine.from_seed(network_path=network, events_path=events)
             self.error = None
             self.seed_status["loaded"] = True
             try:
@@ -247,6 +252,8 @@ def create_app(
     application.include_router(stream_router)
     from .api.persona import router as persona_router
     application.include_router(persona_router)
+    from .api.buses import router as buses_router
+    application.include_router(buses_router)
     from .admin.scheduler import router as sources_router
     application.include_router(sources_router)
     if coordinator:
@@ -286,12 +293,13 @@ def create_app(
     @application.get("/api/meta")
     def meta() -> dict[str, Any]:
         snapshot = runtime.engine.snapshots.current.snapshot_id if runtime.engine else None
+        bus_meta = runtime.engine.snapshots.network.source.get('meta', {}).get('corridor_bus') if runtime.engine else None
         return {
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "build": get_build_info(),
             "graph_snapshot": snapshot,
-            "sources": ["contracts/seed/network.seed.json", "contracts/seed/event.seed.json"],
-            "disclaimer": "Seed values may be simulated and do not represent live transit conditions.",
+            "sources": ["contracts/seed/network.seed.json", "contracts/seed/event.seed.json"] + (["Transport Department corridor GTFS buses", "KMB/LWB and Citybus official arrival APIs"] if bus_meta else []),
+            "disclaimer": "Route durations, capacities and walking connections include model estimates. Official bus calendars/fares are imported when enabled; current operator arrivals are shown separately.",
         }
 
     @application.get("/api/health/deep")

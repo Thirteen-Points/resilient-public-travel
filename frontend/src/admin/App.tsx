@@ -56,7 +56,7 @@ function SettingsPanel({ onDirty }: { onDirty: (dirty: boolean) => void }) {
         <div className="actions">{(['test','collect'] as const).map(operation => <button key={operation} type="button" className={operation === 'collect' ? 'primary' : 'secondary'} disabled={dirty || (operation === 'collect' && !cfg.enabled)} onClick={() => void operate(`${name}-${operation}`, async () => { const result = await call<SourceResult>(`/sources/${name}/${operation}`, {}); setResults(previous => ({ ...previous, [name]: result })); setNotice(operation === 'test' ? 'Connection test complete. Reports and detection state were not changed.' : `Collection complete: ${result.added} new reports. Review remains required.`) })}>{busy === `${name}-${operation}` ? 'Running…' : operation === 'test' ? 'Test connection' : 'Collect now'}</button>)}</div>
         <Result value={results[name] ?? null} />
       </section> })}</div>
-      <div className="not-connected"><strong>KMB & other sources</strong><span className="pill">Not connected</span><p className="muted">No runtime adapter is integrated. Configuration will be available after integration.</p></div>
+      <div className="not-connected"><strong>KMB/LWB & Citybus arrivals</strong><span className="pill">Connected</span><p className="muted">Official arrivals are available on public bus journey pages. Arrival observations do not automatically publish disruption reports.</p><a href="/api/buses/status" target="_blank" rel="noreferrer">Bus data coverage →</a></div>
     </section></fieldset>
   </form>
 }

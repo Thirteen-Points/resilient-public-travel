@@ -51,12 +51,16 @@ def search_paths(snapshot, origin, destination, depart_at, profile, *, modes=Non
     while queue and expanded < max_expansions and len(found) < max_paths:
         elapsed, _, node, visited, path, walked, boardings, onboard = heapq.heappop(queue)
         if node == destination:
+            if path and not path[-1].edge.data.get('gtfs_drop_off', {}).get(node, True):
+                continue
             if set(required_modes or ()) <= {step.edge.mode for step in path}:
                 found.append(path)
             continue
         expanded += 1
         at = depart_at + timedelta(seconds=elapsed)
         for edge in network.adjacency[node]:
+            if onboard and edge.line != onboard and path and not path[-1].edge.data.get('gtfs_drop_off', {}).get(node, True):
+                continue
             if edge.target in visited or edge.mode not in allowed_modes or not allows_edge(edge, network, profile):
                 continue
             walk = walked + edge.walk_m

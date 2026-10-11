@@ -91,6 +91,11 @@ class Network:
             return None
         if edge.mode == "WALK":
             return at, 0.0
+        if edge.data.get('gtfs_services') is not None:
+            from .bus_schedule import boarding
+            if not edge.data.get('gtfs_pickup', {}).get(edge.source, True):
+                return None
+            return boarding(edge, at, factor)
         key = service_key(at, self.holidays)
         if edge.data.get("service_calendar") == "weekday_peak_only" and key != "weekday_peak":
             return None
