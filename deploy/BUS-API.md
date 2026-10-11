@@ -97,3 +97,7 @@ omits backend-only GTFS calendars while retaining operator arrival identifiers.
 Incident segments and approved weather boundaries are indexed per immutable
 snapshot. GTFS search keeps at most about 10,000 pending states, pruning to
 5,000 best optimistic arrivals when needed; bounded results remain labelled.
+The browser continues polling small event/snapshot responses every three
+seconds, but downloads the full network only initially or when its graph
+revision changes. A failed new network read retains the prior revision and
+is retried on the next poll.

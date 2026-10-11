@@ -3,12 +3,13 @@ import * as transit from './liveTransitApi'
 import * as eventApi from './eventApi'
 import { getSourcesStatus, getReplanningStatus, type SourcesStatus, type ReplanningStatus } from './runtimeStatus'
 import type { Event, Network, RouteCandidate, RouteQuery, Signal } from './types'
+import { NetworkRevisionCache } from './networkRevisionCache'
 
 export interface LiveBundle {
   network: Network; events: Event[]; published: Event[]; signals: Signal[]; meta: transit.LiveMeta | null
 }
 const message = (cause: unknown) => cause instanceof Error ? cause.message : String(cause)
-const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
+const same = (a: unknown, b: unknown) => a === b || JSON.stringify(a) === JSON.stringify(b)
 
 export function useLiveSession(enabled: boolean) {
   const [bundle, setBundle] = useState<LiveBundle | null>(null)
@@ -46,6 +47,7 @@ export function useLiveSession(enabled: boolean) {
     let disposed = false, busy = false, queued = false, metaBusy = false, sourcesBusy = false, replanBusy = false
     let currentMeta: transit.LiveMeta | null = null
     let signature = '', routeDirty = Boolean(lastQuery.current)
+    const networks = new NetworkRevisionCache(transit.getNetwork)
     active.current = true
     async function refreshSources() {
       if (disposed || sourcesBusy) return
@@ -82,9 +84,10 @@ export function useLiveSession(enabled: boolean) {
       busy = true
       try {
         const at = lastQuery.current?.departAt
-        const [network, snapshot, published] = await Promise.all([
-          transit.getNetwork(), transit.getSnapshot(at), eventApi.getPublishedEvents(at),
+        const [snapshot, published] = await Promise.all([
+          transit.getSnapshot(at), eventApi.getPublishedEvents(at),
         ])
+        const network = await networks.get(snapshot.snapshot_id)
         if (disposed) return
         if (at !== lastQuery.current?.departAt) { queued = true; return }
         const nextSignature = JSON.stringify([snapshot, published, at])
