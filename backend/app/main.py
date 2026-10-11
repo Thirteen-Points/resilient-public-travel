@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import asyncio
+from time import monotonic
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -43,6 +44,8 @@ class Runtime:
     """Load C's deterministic offline services without blocking B's API."""
 
     def __init__(self) -> None:
+        self.started_at = datetime.now(timezone.utc).isoformat()
+        self.started_monotonic = monotonic()
         self.engine = None
         self.error: str | None = None
         self.seed_status: dict[str, Any] = {}
@@ -92,6 +95,7 @@ class Runtime:
 
     def health(self) -> dict[str, Any]:
         from .runtime_config import settings
+        from .runtime_metrics import memory_usage
 
         problems = settings.missing_runtime_config()
         if self.error:
@@ -102,6 +106,8 @@ class Runtime:
             "ok": self.engine is not None and not self.error,
             "service": "up",
             "build": get_build_info(),
+            "runtime": {"started_at": self.started_at,
+                        "uptime_s": round(monotonic() - self.started_monotonic, 1), **memory_usage()},
             "mode": "offline" if settings.offline_mode else "online-optional",
             "llm": {"enabled": settings.ai_enabled, "required_for_startup": False},
             "database": {"configured": True, "status": "available"},

@@ -101,3 +101,5 @@ The browser continues polling small event/snapshot responses every three
 seconds, but downloads the full network only initially or when its graph
 revision changes. A failed new network read retains the prior revision and
 is retried on the next poll.
+`GET /api/health` reports process start time, uptime and available Linux memory
+metrics to distinguish deployment restarts from an unavailable bus timetable.
