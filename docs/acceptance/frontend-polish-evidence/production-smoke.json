@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "errors": [],
+  "workers": [
+    {
+      "url": "http://127.0.0.1:5176/assets/maplibre-gl-worker-Bn3N37MR.js",
+      "status": 200
+    }
+  ]
+}

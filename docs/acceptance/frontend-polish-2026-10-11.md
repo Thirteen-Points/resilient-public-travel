@@ -1,8 +1,9 @@
 # Frontend polish · local acceptance · 2026-10-11
 
 Implemented on `codex/frontend-polish`, based on fetched `origin/main`
-`7d658237e432d1a2a38ae95fc300b9331db216a4`. This work was verified locally;
-no production deployment or external publication was performed.
+`7d658237e432d1a2a38ae95fc300b9331db216a4`, then synchronized with
+`d07730d84df9f9db11b0a439680e4b503997781d` before opening the PR. This work
+was verified locally; the frontend has not been deployed to production.
 
 ## Delivered behavior
 
@@ -40,7 +41,7 @@ no production deployment or external publication was performed.
 | Check | Result |
 | --- | --- |
 | TypeScript | Passed |
-| Frontend unit suites | 12 files, 117 tests passed; includes 15 geometry tests |
+| Frontend unit suites | 12 files, 118 tests passed after latest-main sync; includes 15 geometry tests |
 | Public production build | Passed; bundled worker emitted |
 | Administrator production assets | Rebuilt into `backend/app/admin_static` |
 | Geometry regeneration `--check` | Passed: 63 segments, 19 sources, 8,111 vertices, 3 missing directions |
@@ -84,18 +85,19 @@ the vector renderer loads as a separate chunk and its worker is bundled locally.
 
 ## Local visual evidence
 
-Screenshots are stored locally under `.cache/frontend-polish/`, rather than
-embedded in source or committed administrator assets. `before/` contains the
-latest-main baseline; `after/` contains the retained pages at the five viewport
-widths, including map/list, large text and high contrast variants.
+Selected before/after screenshots and the production smoke record are committed
+in `frontend-polish-evidence/` for PR review. The full local capture remains in
+`.cache/frontend-polish/`, including all five viewport widths, map/list, large
+text and high contrast variants. Baseline captures precede the service-hours
+update in `d07730d`.
 
-- [Before · desktop results](../../.cache/frontend-polish/before/routes-1440.png)
-- [After · desktop results](../../.cache/frontend-polish/after/routes-1440.png)
-- [Before · mobile planner](../../.cache/frontend-polish/before/planner-390.png)
-- [After · mobile planner](../../.cache/frontend-polish/after/planner-390.png)
-- [After · mobile map](../../.cache/frontend-polish/after/routes-map-390.png)
-- [After · 1024 px Updates](../../.cache/frontend-polish/after/updates-1024-rechecked.png)
-- [Production smoke record](../../.cache/frontend-polish/production-smoke.json)
+- [Before · desktop results](frontend-polish-evidence/before-routes-1440.png)
+- [After · desktop results](frontend-polish-evidence/after-routes-1440.png)
+- [Before · mobile planner](frontend-polish-evidence/before-planner-390.png)
+- [After · mobile planner](frontend-polish-evidence/after-planner-390.png)
+- [After · mobile map](frontend-polish-evidence/after-routes-map-390.png)
+- [After · 1024 px Updates](frontend-polish-evidence/after-updates-1024.png)
+- [Production smoke record](frontend-polish-evidence/production-smoke.json)
 
 Reproduce with `npm run typecheck`, `npm test`, `npm run build`,
 `npm run build:admin`, `python scripts/precompute_map_geometry.py --check`, and
