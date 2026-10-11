@@ -60,12 +60,13 @@ def test_catalogue_offline_lookup_has_no_external_access(monkeypatch):
 @pytest.fixture(scope='module')
 def imported_engine(): return RouteEngine.from_adapter(CorridorBusAdapter(SeedDataAdapter()))
 
-def test_imported_bus_routes_have_real_stop_pair_fares_and_direction(imported_engine):
+@pytest.mark.parametrize('origin,destination',[('TAW','ADM'),('ADM','TAW')])
+def test_imported_bus_routes_have_real_stop_pair_fares_and_direction(imported_engine,origin,destination):
     engine=imported_engine
     network=engine.snapshots.network.source
     assert network['meta']['corridor_bus']['routing_patterns']>400
     assert not any(l['mode']=='BUS' and l['id'].startswith('BUS_') for l in network['lines'])
-    result=engine.query_details('TAW','ADM','2026-10-12T08:20:00+08:00',modes=['BUS'],required_modes=['BUS'])
+    result=engine.query_details(origin,destination,'2026-10-12T08:20:00+08:00',modes=['BUS'],required_modes=['BUS'])
     assert result['routes']
     assert all(set(l['mode'] for l in r['legs'])<={'WALK','BUS'} for r in result['routes'])
     assert all(r['total']['fare_hkd']>0 for r in result['routes'])
