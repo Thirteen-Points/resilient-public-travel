@@ -90,6 +90,7 @@
           "tunnel": {"type": ["string", "null"]},
           "operator": {"type": "string", "minLength": 1},
           "service_hours": {"type": "string", "minLength": 1},
+          "service_hours_reverse": {"type": "string", "minLength": 1},
           "service_calendar": {"type": "string", "minLength": 1},
           "weather_sensitive": {"type": "boolean"},
           "note": {"type": "string"}
