@@ -144,3 +144,15 @@ ZIP 全部 manifest 哈希与文件一致；没有 `.env*` 或 SQLite。
 未验证。完整操作见 [部署验收 runbook](../../deploy/P4-ACCEPTANCE.md)，使用
 [线上记录模板](evidence/p4/c/online-template.json) 单独记录环境、部署 SHA、时间、操作人、
 Signal/Event/audit 与媒体证据；未知计时保留 null，不用本地数据补生产记录。
+
+## 2026-10-11 merge reconciliation
+
+Merged main through `d07730d84df9f9db11b0a439680e4b503997781d`, including the
+first/last boarding-window corrections. Historical network input is now stored
+at `data/sim/frozen-network.seed.json`; its original content hash is preserved.
+Only the manifest network path changes. P3 caches and capacity evidence are
+regenerated with current generation metadata and the new manifest hash, and
+all simulation core fields are checked against the previous recorded results.
+The earlier dated evidence and media above retain their original build/input
+identity; they are historical local checks, not evidence of this merged build.
+CI uses the current P4 browser suite, plus offline production and media checks.

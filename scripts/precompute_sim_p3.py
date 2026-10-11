@@ -38,10 +38,11 @@ def simulation_inputs():
     raw_input = (ROOT / "data/sim/m2-route-input.json").read_bytes().replace(b"\r\n", b"\n")
     payload = json.loads(raw_input)
     route_sets = od_route_sets_from_contract(payload, fixture=True)
-    network_bytes = (ROOT / "contracts/seed/network.seed.json").read_bytes().replace(b"\r\n", b"\n")
+    network = ROOT / payload["data_version"]["network_file"]
+    network_bytes = network.read_bytes().replace(b"\r\n", b"\n")
     expected_hash = payload["data_version"]["network_sha256"]
-    if not frozen_text_matches(ROOT / "contracts/seed/network.seed.json", expected_hash):
-        raise ValueError("Frozen route input network hash differs from current seed; regenerate input before comparing")
+    if not frozen_text_matches(network, expected_hash):
+        raise ValueError("Frozen route input network hash differs from recorded snapshot")
     policy = ROOT / payload["data_version"]["route_policy_file"]
     if not frozen_text_matches(policy, payload["data_version"]["route_policy_sha256"]):
         raise ValueError("Frozen route policy hash differs; do not silently compare different weight inputs")

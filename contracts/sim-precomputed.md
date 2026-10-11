@@ -42,3 +42,10 @@ Fixed seed reproduces simulation output, excluding generation metadata.
 field; it does not tune the frozen policy. Normal delay improvement is 0%, and
 older negative-benefit results remain available. The 10% capacity factor is
 invented for stress testing, not measured residual capacity.
+
+The frozen M2 route input references `data/sim/frozen-network.seed.json`.
+This snapshot preserves the network bytes used to build the historical route
+candidates, independently of later operational seed updates such as first/last
+boarding windows. Both preflight and the generator validate the manifest's
+network path and hash. Moving the reference changes the input manifest hash;
+route candidates, policy weights and simulation metrics remain unchanged.

@@ -337,3 +337,29 @@ def test_final_package_refuses_missing_media(prepared_simulation, prepared_front
     assert report["checks"]["simulation"]["ok"] is True
     assert report["checks"]["frontend"]["ok"] is True
     assert report["checks"]["media"]["ok"] is False
+
+
+def test_generator_uses_frozen_network_after_live_seed_changes(tmp_path, monkeypatch):
+    from scripts import precompute_sim_p3
+
+    source = Path(__file__).resolve().parents[1]
+    payload = json.loads((source / "data/sim/m2-route-input.json").read_text(encoding="utf-8"))
+    write_json(tmp_path / "data/sim/m2-route-input.json", payload)
+    for field in ("network_file", "route_policy_file"):
+        relative = payload["data_version"][field]
+        target = tmp_path / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((source / relative).read_bytes())
+    # The live network is intentionally unusable. Historical simulations must
+    # resolve the manifest snapshot and still enforce its exact content hash.
+    write_json(tmp_path / "contracts/seed/network.seed.json", {})
+    monkeypatch.setattr(precompute_sim_p3, "ROOT", tmp_path)
+    actual, _, resources, _ = precompute_sim_p3.simulation_inputs()
+    assert actual["data_version"] == payload["data_version"]
+    assert len(resources) == 44
+    snapshot = tmp_path / payload["data_version"]["network_file"]
+    changed = json.loads(snapshot.read_text(encoding="utf-8"))
+    changed["meta"]["note"] = "tampered frozen snapshot"
+    write_json(snapshot, changed)
+    with pytest.raises(ValueError, match="network hash differs"):
+        precompute_sim_p3.simulation_inputs()

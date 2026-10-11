@@ -68,6 +68,7 @@ class Edge:
     walk_m: float
     offset_s: float
     data: Mapping
+    reverse: bool = False
 
 
 @dataclass(frozen=True)
@@ -100,30 +101,44 @@ class Network:
         h = h / factor
         midnight = at.replace(hour=0, minute=0, second=0, microsecond=0)
         seconds = (at - midnight).total_seconds()
-        hours = edge.data.get("service_hours")
-        start, end = (0, 86400)
+        hours = edge.data.get("service_hours_reverse") if edge.reverse else None
+        hours = hours or edge.data.get("service_hours")
+        last = None
+        first_departure = None
         if hours:
             start, end = map(clock_seconds, hours.split("-"))
+            # The published/estimated window is at the first modelled stop in
+            # this direction. Segment times shift it to the boarding station.
             if end < start:
-                if seconds <= end:
-                    start -= 86400
-                else:
-                    end += 86400
-            if not start <= seconds <= end:
+                end += 86400
+            for day in (-1, 0):
+                first = midnight + timedelta(days=day, seconds=start + edge.offset_s)
+                candidate_last = midnight + timedelta(days=day, seconds=end + edge.offset_s)
+                if first <= at <= candidate_last:
+                    first_departure = first
+                    last = candidate_last
+                    break
+            if last is None:
                 return None
-        departure_s = next_departure(seconds, h, edge.offset_s + start)
+        # Keep the established modelled headway phase; the published first and
+        # last departures are additional exact boundary trains.
+        departure_s = next_departure(seconds, h, edge.offset_s)
         departure = midnight + timedelta(seconds=departure_s)
+        if first_departure == at:
+            departure = at
         # Recompute at a headway boundary instead of discarding an all-day line
         # or using the old headway beyond its period. Null peak-only service
         # still terminates here, and passengers already onboard may continue.
         boundaries = [midnight + timedelta(hours=hour) for hour in (7, 9, 17, 19, 24)]
         boundary = next(b for b in boundaries if b > at)
         if departure >= boundary and service_key(boundary, self.holidays) != key:
-            if (boundary - midnight).total_seconds() > end:
-                return None
+            if last is not None and last < boundary:
+                return last, h
             return self.boarding(edge, boundary, factor, _transitions + 1)
-        if departure_s > end:
-            return None
+        # A published last departure need not coincide with the modelled
+        # headway grid. It is still boardable at the stated time.
+        if last is not None and departure > last:
+            departure = last
         return departure, h
 
 
@@ -163,7 +178,7 @@ def build_graph(source, *, holidays=()) -> Network:
             durations = list(reversed(times)) if reverse else times
             offset = 0
             for a, b, duration in zip(order, order[1:], durations):
-                edges.append(Edge(f"{lid}:{a}>{b}", a, b, mode, lid, duration, 0, offset, line))
+                edges.append(Edge(f"{lid}:{a}>{b}", a, b, mode, lid, duration, 0, offset, line, bool(reverse)))
                 offset += duration
     for i, link in enumerate(source.get("walk_links", ())):
         a, b = link["from"], link["to"]
