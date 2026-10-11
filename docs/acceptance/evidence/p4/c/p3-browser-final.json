@@ -1,0 +1,42 @@
+{
+  "environment": "isolated local backend + real Edge/Chromium browser",
+  "passed": true,
+  "assertions": [
+    "chat-response-verbatim",
+    "actual-OD-and-time",
+    "backend-fallback-labelled",
+    "HTTP-error-visible",
+    "cancel-reply",
+    "previous-answer-retained",
+    "no-seed-substitution",
+    "unsupported-personalization-blocked",
+    "less-walking-not-remapped",
+    "same-requested-OD-time-events",
+    "wheelchair-constraints-sent",
+    "snapshot-limit-not-hidden",
+    "precomputed-simulation-real-response",
+    "M2-scenario-resolves-verbatim",
+    "negative-improvement-visible",
+    "missing-scenario-error-retains-explicit-old-result",
+    "source-time-unavailable-honestly",
+    "metadata-failure-does-not-block-routes",
+    "offline-retains-simulation-and-comparison",
+    "online-recovery",
+    "three-confirm-clicks-local-map-and-card-render",
+    "credential-free-public-visitor",
+    "pending-edit-excluded",
+    "withdrawal",
+    "keyboard-composer",
+    "display-accessibility-switches",
+    "mobile-no-overflow",
+    "no-page-errors",
+    "explicit-seed-demo-preserved-without-chat-API"
+  ],
+  "blockers": [
+    "personalized chat contract",
+    "per-query comparison snapshot token",
+    "public source collection states",
+    "P3 simulation confirmation"
+  ],
+  "publication_departure_hkt": "2026-10-06T01:12:00+08:00"
+}

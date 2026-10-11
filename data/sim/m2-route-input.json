@@ -3,9 +3,9 @@
   "scenario_id": "m2_six_station_directed_od_am_peak",
   "source_revision": "working-tree",
   "data_version": {
-    "network_file": "contracts/seed/network.seed.json",
+    "network_file": "data/sim/frozen-network.seed.json",
     "network_sha256": "a2a925c8d69e75b8c108d7c5e01468815c17349c62b347105f417294596bae86",
-    "route_policy_file": "backend/app/engine/fixtures/seed_policy.json",
+    "route_policy_file": "data/sim/frozen-route-policy.json",
     "route_policy_sha256": "3020ae10023c811b9c199b19a8c5d6e713e1439b17c047bc65ad1ccc57ea00dc"
   },
   "route_engine": "backend.app.engine.service.RouteEngine.from_seed().query_details",
