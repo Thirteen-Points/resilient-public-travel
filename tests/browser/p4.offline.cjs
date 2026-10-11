@@ -48,7 +48,7 @@ async function ready(url) {
   const holdUntil = async seconds => { if (tour) await pause(Math.max(0, seconds * 1000 - (Date.now() - started))) }
   await page.goto(web)
   await page.getByRole('combobox', { name: 'TO', exact: true }).click()
-  await page.getByRole('option', { name: /^Admiralty MTR/ }).click()
+  await page.getByRole('option', { name: /^Admiralty East Rail/ }).click()
   await page.locator('[aria-controls="departure-calendar"]').click()
   const day = page.getByRole('button', { name: '2026-09-22', exact: true })
   for (let month = 0; !(await day.count()) && month < 3; month++) await page.getByRole('button', { name: 'Previous month', exact: true }).click()

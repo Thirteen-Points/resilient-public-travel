@@ -28,13 +28,12 @@ The planner offers All modes, MTR, Bus, Minibus and Ferry before the Agent entry
 so transport choices remain in the first planner screen. Selecting a mode
 requires every returned journey to include that mode; other modes and walking
 may provide connections. Route cards show all candidates supplied by the API.
-Journey endpoints use modelled East Rail stations. Map points are accepted only
-when a Valhalla OpenStreetMap pedestrian route to an East Rail station point is
-at most 800 m. Map circles are straight-line screening bounds, not walking
-coverage. Access walks are displayed separately from station-to-station route
-totals; station points are not surveyed entrances or step-free path guarantees.
-The external pedestrian routing demo API is rate-limited, so station-name
-selection remains available if it is unavailable.
+Journey endpoints use the six modelled East Rail stations. Map points are
+accepted when their straight-line distance to one of these station points is
+at most 800 m. Map circles show that boundary. Access distances are displayed
+separately from station-to-station route totals; actual walking distance may
+be longer, and station points are not surveyed entrances or step-free path
+guarantees.
 Unverified minibus endpoints are excluded from the current network; selecting
 Minibus therefore shows an explicit no-route notice. Fixed seed mode applies
 the same transport filter to its existing candidates.

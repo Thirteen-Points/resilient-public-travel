@@ -1,37 +1,36 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { Network } from '../api/types'
-import { eastRailStations, findEastRailWalkingAccess } from './eastRailAccess'
+import { describe, expect, it } from 'vitest'
+import type { Network, NetworkNode } from '../api/types'
+import { CORRIDOR_IDS } from '../data'
+import { eastRailStations, findEastRailAccess } from './eastRailAccess'
 
+const station = (id: string, lat: number, lines = ['ERL']): NetworkNode => ({
+  id, name_en: id, name_zh: id, kind: 'mtr_station', lat, lng: 114.1,
+  lines, accessible: true, provenance: 'real',
+})
 const network: Network = {
   meta: { version: 'test', built_at: '2026-09-22', catchment_m: 800, note: '' },
   nodes: [
-    { id: 'ERL', name_en: 'East Rail', name_zh: '東鐵', kind: 'mtr_station', lat: 22.3, lng: 114.1, lines: ['ERL'], accessible: true, provenance: 'real' },
-    { id: 'OTHER', name_en: 'Other', name_zh: '其他', kind: 'mtr_station', lat: 22.3, lng: 114.1001, lines: ['KTL'], accessible: true, provenance: 'real' },
+    ...CORRIDOR_IDS.map((id, index) => station(id, 22.3 + index * 0.03)),
+    station('EXTRA_ERL', 22.301), station('OTHER_LINE', 22.302, ['KTL']),
   ],
   lines: [],
 }
+const northOfTaiWai = (metres: number) => ({ lat: 22.3 + metres / 6371000 * 180 / Math.PI, lng: 114.1 })
 
-afterEach(() => vi.unstubAllGlobals())
-
-describe('East Rail walking access', () => {
-  it('only considers East Rail stations and checks routed walking distance', async () => {
-    const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ trip: { summary: { length: 0.799 } } }) })
-    vi.stubGlobal('fetch', fetcher)
-    const result = await findEastRailWalkingAccess(network, { lat: 22.3, lng: 114.1002 })
-    expect(eastRailStations(network).map(station => station.id)).toEqual(['ERL'])
-    expect(result?.station.id).toBe('ERL')
-    expect(result?.metres).toBe(799)
-    expect(fetcher).toHaveBeenCalledTimes(1)
-    expect(JSON.parse(fetcher.mock.calls[0][1].body).costing).toBe('pedestrian')
+describe('six East Rail station access circles', () => {
+  it('uses only the six corridor East Rail stations', () => {
+    expect(eastRailStations(network).map(node => node.id)).toEqual([...CORRIDOR_IDS])
+    expect(findEastRailAccess(network, { lat: 22.301, lng: 114.1 })?.station.id).toBe('TAW')
   })
 
-  it('rejects a point whose walking route exceeds 800 m despite being close on the map', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ trip: { summary: { length: 0.801 } } }) }))
-    expect(await findEastRailWalkingAccess(network, { lat: 22.3, lng: 114.1002 })).toBeNull()
+  it('accepts points 799 m away and rejects points 801 m away by straight-line distance', () => {
+    const inside = findEastRailAccess(network, northOfTaiWai(799))
+    expect(inside?.station.id).toBe('TAW')
+    expect(inside?.metres).toBeCloseTo(799, 4)
+    expect(findEastRailAccess(network, northOfTaiWai(801))).toBeNull()
   })
 
-  it('does not accept a map point when walking distance could not be verified', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')))
-    await expect(findEastRailWalkingAccess(network, { lat: 22.3, lng: 114.1002 })).rejects.toThrow('unavailable')
+  it('rejects invalid map coordinates', () => {
+    expect(findEastRailAccess(network, { lat: Number.NaN, lng: 114.1 })).toBeNull()
   })
 })

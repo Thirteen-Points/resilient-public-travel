@@ -19,7 +19,6 @@ export interface HowItWorksPageProps {
   seedMode: boolean
   snapshotAt: string
   networkVersion: string
-  catchmentM: number
   disclaimer: string
   /** API-mode source statuses; omitted in seed mode. */
   apiSources?: Array<string | LiveMetaSourceStatus>
@@ -34,7 +33,7 @@ export interface HowItWorksPageProps {
 }
 
 export function HowItWorksPage({
-  seedMode, snapshotAt, networkVersion, catchmentM, disclaimer, apiSources, sourceWarning, collectorStatus, replanningStatus, collectorWarning, replanningWarning, sourcesReadAt, onRefresh, onClose,
+  seedMode, snapshotAt, networkVersion, disclaimer, apiSources, sourceWarning, collectorStatus, replanningStatus, collectorWarning, replanningWarning, sourcesReadAt, onRefresh, onClose,
 }: HowItWorksPageProps) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
@@ -58,9 +57,9 @@ export function HowItWorksPage({
       <div className={css.facts}>
         <div><strong>{seedMode ? 'Seed snapshot' : 'API generated at'}</strong>{formatHkt(snapshotAt)}</div>
         <div><strong>Network</strong>{networkVersion}</div>
-        <div><strong>Map-point access</strong>Up to {Math.min(catchmentM, 800)} m walking to East Rail</div>
+        <div><strong>Map-point access</strong>Within 800 m straight-line of six East Rail stations</div>
       </div>
-      <p>Map selection checks OpenStreetMap pedestrian routes to modelled East Rail station points. Blue map circles show straight-line search bounds, not walking coverage. A point is accepted only when a pedestrian route measures 800 m or less. The station point may differ from a usable entrance; confirm access on site. Map-point access walks are shown separately and are excluded from station-to-station route times and walking totals. If pedestrian routing is unavailable, choose a station by name.</p>
+      <p>Map selection measures straight-line distance to the six modelled East Rail station points. A point is accepted when it is within 800 m of one of them. Blue circles show this limit. The station point may differ from a usable entrance, and actual walking distance may be longer. Map-point distances are displayed separately and are excluded from station-to-station route times and walking totals.</p>
       <p className={css.disclaimer}>{disclaimer}</p>
     </section>
 

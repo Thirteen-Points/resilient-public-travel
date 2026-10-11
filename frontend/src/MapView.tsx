@@ -168,7 +168,7 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     for (const node of picking ? eastRailStations(network) : []) {
       if (!node || !Number.isFinite(node.lat) || !Number.isFinite(node.lng)) continue
       L.circle([node.lat, node.lng], {
-        radius: Math.min(node.catchment_m ?? network.meta.catchment_m, 800),
+        radius: 800,
         color: '#1565C0', weight: 1, opacity: .3, fillColor: '#1565C0', fillOpacity: .05, interactive: false,
       }).addTo(group)
     }
@@ -243,6 +243,6 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
       <p>Verified paths use CSDI geographic snapshots. Connections without a verified path are schematic.</p>
     </div></details>
     <p className={css.caption}>{provider}{hasSchematic ? ' · includes schematic connections' : ' · sourced path geometry'}</p>
-    {picking && <p className={css.pickHint}>Tap near an East Rail station. The circles screen by straight-line distance; pedestrian routing checks the 800 m walking limit.</p>}
+    {picking && <p className={css.pickHint}>Tap within an 800 m circle around one of the six East Rail stations. Distance is measured straight-line from the station point.</p>}
   </div>
 }
