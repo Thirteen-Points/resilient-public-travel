@@ -91,9 +91,11 @@ class M2ReviewRoutingTests(unittest.TestCase):
 
     def test_public_window_and_route_snapshot_agree_without_reviewer_auth(self):
         approved = self.act('approve')
-        instant = datetime.now(timezone.utc)
-        future = (instant + timedelta(hours=1)).isoformat()
-        later = (instant + timedelta(hours=2)).isoformat()
+        # Query during East Rail service hours regardless of when CI runs.
+        next_morning = (datetime.now(timezone.utc) + timedelta(days=1)).replace(
+            hour=0, minute=0, second=0, microsecond=0)  # 08:00 HKT
+        future = next_morning.isoformat()
+        later = (next_morning + timedelta(hours=2)).isoformat()
         self.act('edit', {'window': {'start': future, 'end': later, 'end_confidence': 'test'}})
         self.act('approve')
         for at, expected in [(self.at, False), (future, True), (later, False)]:
