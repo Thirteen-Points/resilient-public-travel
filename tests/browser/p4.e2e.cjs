@@ -168,14 +168,18 @@ let browser, publicPage
   assert.deepEqual(pair[0].event_ids, pair[1].event_ids); assert.equal(pair[1].profile.mobility, 'wheelchair')
   const actualVerified = await page.locator('[data-comparison-verified]').getAttribute('data-comparison-verified')
   if (actualVerified === 'false') await page.getByText('Pair consistency: unverified.', { exact: false }).waitFor()
-  await page.route(api + '/api/routes/query', async route => { const response = await route.fetch(); await route.fulfill({ response, headers: { ...response.headers(), 'X-Route-Snapshot': 'injected-p4-matching', 'Access-Control-Expose-Headers': 'X-Route-Snapshot' } }) })
+  await page.route(api + '/api/routes/query', async route => { if (!Array.isArray(route.request().postDataJSON().event_ids)) return route.continue(); const response = await route.fetch(); await route.fulfill({ response, headers: { ...response.headers(), 'X-Route-Snapshot': 'injected-p4-matching', 'Access-Control-Expose-Headers': 'X-Route-Snapshot' } }) })
   await page.getByRole('button', { name: 'Refresh both profiles', exact: true }).click(); await page.locator('[data-comparison-verified="true"]').waitFor()
   await page.getByText('calculation snapshot injected-p4-matching', { exact: false }).waitFor()
   await page.unroute(api + '/api/routes/query')
+  // Comparison sends an explicit event filter; planner refreshes omit it.
   let snapshotCalls = 0
-  await page.route(api + '/api/routes/query', async route => { const response = await route.fetch(); await route.fulfill({ response, headers: { ...response.headers(), 'X-Route-Snapshot': `injected-p4-mismatch-${++snapshotCalls}`, 'Access-Control-Expose-Headers': 'X-Route-Snapshot' } }) })
+  await page.route(api + '/api/routes/query', async route => { if (!Array.isArray(route.request().postDataJSON().event_ids)) return route.continue(); const response = await route.fetch(); await route.fulfill({ response, headers: { ...response.headers(), 'X-Route-Snapshot': `injected-p4-mismatch-${++snapshotCalls}`, 'Access-Control-Expose-Headers': 'X-Route-Snapshot' } }) })
   await page.getByRole('button', { name: 'Refresh both profiles', exact: true }).click()
   await page.getByRole('alert').filter({ hasText: 'Both profiles were retried' }).waitFor()
+  const backgroundQuery = { ...pair[0] }; delete backgroundQuery.event_ids
+  const backgroundStatus = await page.evaluate(async ({ url, body }) => (await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).status, { url: api + '/api/routes/query', body: backgroundQuery })
+  assert.equal(backgroundStatus, 200)
   assert.equal(snapshotCalls, 4); await page.getByText('Previous comparison retained', { exact: false }).waitFor()
   await page.unroute(api + '/api/routes/query'); pass('comparison: actual pair plus injected matching/mismatched snapshot headers')
   // Actual precomputed scenarios: unchanged results, modest improvement and gap.
