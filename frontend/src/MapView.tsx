@@ -159,13 +159,13 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
         draw([[a.lat, a.lng], [b.lat, b.lng]], lineStyle(line).colors, line.mode === 'MTR' ? 3 : 3.5, .48, line.mode !== 'MTR')
       }
     }
-    routes.slice(0, 3).map((route, index) => ({ route, index })).sort((a, b) => Number(a.route.route_id === selectedRouteId) - Number(b.route.route_id === selectedRouteId)).forEach(({ route, index }) => {
+    routes.map((route, index) => ({ route, index })).filter(({ route, index }) => index < 3 || route.route_id === selectedRouteId).sort((a, b) => Number(a.route.route_id === selectedRouteId) - Number(b.route.route_id === selectedRouteId)).forEach(({ route, index }) => {
       for (const leg of route.legs) {
         const points = legCoordinates(leg, network)
         if (points.length < 2) continue
         const selected = route.route_id === selectedRouteId
         const style = lineStyle(resolveLine(network, leg.line), leg.line ?? leg.mode)
-        draw(points, leg.mode === 'WALK' ? ['#67796B'] : style.colors, selected ? 8 : 4.5, selected ? 1 : .55, leg.mode === 'WALK', selected, `Option ${'ABC'[index]} · ${leg.mode === 'WALK' ? 'Walk' : style.label}`)
+        draw(points, leg.mode === 'WALK' ? ['#67796B'] : style.colors, selected ? 8 : 4.5, selected ? 1 : .55, leg.mode === 'WALK', selected, `Option ${String.fromCharCode(65 + index)} · ${leg.mode === 'WALK' ? 'Walk' : style.label}`)
       }
     })
     for (const event of published) for (const segment of event.affected_segments) {
@@ -177,13 +177,13 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
         dashArray: segment.impact === 'closed' ? '9 6' : '2 8', interactive: false,
       }).addTo(group)
     }
-    for (const id of CORRIDOR_IDS) {
-      const node = nodes.get(id)
-      if (!node) continue
+    for (const node of network.nodes) {
+      const id = node.id
+      const corridor = CORRIDOR_IDS.some(stationId => stationId === id)
       L.circleMarker([node.lat, node.lng], {
-        radius: id === 'TAW' || id === 'ADM' ? 7 : 5, color: '#264455', weight: 2,
+        radius: id === 'TAW' || id === 'ADM' ? 7 : corridor ? 5 : 4, color: node.kind === 'bus_stop' ? '#b14336' : node.kind === 'pier' ? '#287857' : '#264455', weight: 2,
         fillColor: '#fff', fillOpacity: 1,
-      }).bindTooltip(`${node.name_en} · ${node.name_zh}`, { permanent: true, direction: id === 'ADM' || id === 'MKK' ? 'left' : 'right', offset: [id === 'ADM' || id === 'MKK' ? -9 : 9, 0], className: css.stationLabel }).addTo(group)
+      }).bindTooltip(`${node.name_en} · ${node.name_zh}`, { permanent: corridor, direction: id === 'ADM' || id === 'MKK' ? 'left' : 'right', offset: [id === 'ADM' || id === 'MKK' ? -9 : 9, 0], className: css.stationLabel }).addTo(group)
     }
     setRenderedRevision(published.map(event => `${event.event_id}@${event.version}`).join(','))
   }, [network, published, routes, selectedRouteId])
@@ -198,11 +198,17 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     return () => clearTimeout(timer)
   }, [mode])
 
+  useEffect(() => {
+    if (picking && window.matchMedia('(max-width: 800px)').matches) {
+      element.current?.scrollIntoView({ block: 'center', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+    }
+  }, [picking])
+
   return <div className={`${css.wrap} ${picking ? css.picking : ''} ${mode === 'docked' ? css.docked : ''} ${mode === 'hidden' ? css.hidden : ''}`}>
     <div ref={element} className={css.map} data-event-revisions={renderedRevision} tabIndex={0} aria-label="Hong Kong schematic network map. Scroll to zoom around the pointer; use arrow keys to pan and plus or minus to zoom." />
     <div className={css.tools}><button type="button" onClick={() => resetRef.current(true)} aria-label="Fit corridor on map">◎ Fit corridor</button><span>Zoom {zoom.toFixed(2)}</span></div>
     <details className={css.legend}><summary>Network colours <span>↗</span></summary><div>{network.lines.map(line => { const style = lineStyle(line); return <p key={line.id}><i style={{ background: lineGradient(style.colors) }} /><span>{style.label}</span></p> })}<p><i style={{ background: lineStyle(undefined, 'unmapped').colors[0] }} /><span>Unknown line · assigned colour (example)</span></p><hr /><p>Bold + white outline: selected candidate</p><p>Red dashes: closed · amber dots: affected</p><p>Scroll at your pointer to zoom. Pinch or use + / −. All paths are schematic.</p></div></details>
     <p className={css.caption}>ACADEMIC DEMO · Map &amp; stations schematic · {provider}</p>
-    {picking && <p className={css.pickHint}>Tap near a station, within {network.meta.catchment_m} m. Or search by name.</p>}
+    {picking && <p className={css.pickHint}>Tap near a station, bus stop or ferry pier, within {network.meta.catchment_m} m. Or search by name.</p>}
   </div>
 }

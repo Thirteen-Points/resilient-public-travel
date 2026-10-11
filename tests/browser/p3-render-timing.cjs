@@ -52,7 +52,7 @@ async function publication(visitor, administrator, eventId) {
       (async () => {
         const routeReply = await (await routesResponse).json()
         await until(async () => Number(await marker.getAttribute('data-route-refresh-revision')) > previous)
-        const expected = routeReply.slice(0, 3)
+        const expected = routeReply
         await until(async () => JSON.stringify(await visitor.locator('[data-route-id]').evaluateAll(elements => elements.map(element => element.getAttribute('data-route-id')))) === JSON.stringify(expected.map(route => route.route_id)))
         // Check every visible card against its returned numbers, not a counter alone.
         for (const route of expected) {

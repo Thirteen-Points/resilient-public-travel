@@ -59,6 +59,19 @@ describe('transport failures and obsolete requests', () => {
 })
 
 describe('comparison requests and constraints', () => {
+  it('sends ferry selection to the engine and preserves it for both compared profiles', async () => {
+    const fetch = vi.fn().mockImplementation((url: string) => Promise.resolve(json(url.includes('/snapshot') ? { snapshot_id: 'fixed', affected_edges: [] } : [])))
+    vi.stubGlobal('fetch', fetch)
+    const selected: JourneyContext = { ...context, requiredModes: ['FERRY'] }
+    await queryRoutes(selected)
+    await compare(selected, new AbortController().signal)
+    const bodies = fetch.mock.calls.filter(call => String(call[0]).includes('/routes/query')).map(call => JSON.parse(call[1].body))
+    expect(bodies).toHaveLength(3)
+    expect(bodies.every(body => body.required_modes.length === 1 && body.required_modes[0] === 'FERRY')).toBe(true)
+    expect(contextKey(context)).not.toEqual(contextKey(selected))
+    expect(() => chatPayload(selected, 'Find a ferry')).toThrow('transport filters')
+  })
+
   it('uses one shared OD/time/events but preserves unverified snapshot status', async () => {
     const fetch = vi.fn().mockImplementation((url: string) => Promise.resolve(json(url.includes('/snapshot') ? { snapshot_id: 'existing-snapshot', affected_edges: [] } : [])))
     vi.stubGlobal('fetch', fetch)

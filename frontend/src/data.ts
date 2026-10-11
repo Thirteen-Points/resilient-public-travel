@@ -46,7 +46,7 @@ export function distanceMetres(a: { lat: number; lng: number }, b: { lat: number
 }
 
 export function nearestAccessPoint(network: Network, point: { lat: number; lng: number }, requireAccessible = false) {
-  const ordered = network.nodes.filter(node => node.kind === 'mtr_station' &&
+  const ordered = network.nodes.filter(node => ['mtr_station', 'bus_stop', 'pier'].includes(node.kind) &&
     (!requireAccessible || node.accessible === true) && Number.isFinite(node.lat) && Number.isFinite(node.lng))
     .map(node => ({ node, metres: distanceMetres(node, point) }))
     .sort((a, b) => a.metres - b.metres)
