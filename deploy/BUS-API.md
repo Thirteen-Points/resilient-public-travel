@@ -103,3 +103,6 @@ revision changes. A failed new network read retains the prior revision and
 is retried on the next poll.
 `GET /api/health` reports process start time, uptime and available Linux memory
 metrics to distinguish deployment restarts from an unavailable bus timetable.
+Compiled SQL fare tables cache for at most four revision/date/network keys.
+Every lookup still checks the database revision and schema inside its read
+transaction, so SQL updates and validity-date changes invalidate the cache.

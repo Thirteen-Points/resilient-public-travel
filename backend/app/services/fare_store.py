@@ -6,6 +6,8 @@ import json
 import os
 from pathlib import Path
 import sqlite3
+from collections import OrderedDict
+from threading import RLock
 
 
 def default_fare_path():
@@ -74,6 +76,8 @@ CREATE INDEX IF NOT EXISTS fare_lookup ON fare_prices(service_id, passenger, pay
 class FareStore:
     def __init__(self, path=None):
         self.path = Path(path) if path is not None else default_fare_path()
+        self._snapshot_cache = OrderedDict()
+        self._cache_lock = RLock()
 
     @contextmanager
     def connection(self):
@@ -179,6 +183,13 @@ class FareStore:
         with self.connection() as connection:
             connection.execute('BEGIN')
             revision = connection.execute('SELECT revision FROM fare_meta WHERE id=1').fetchone()[0]
+            schema = connection.execute('PRAGMA schema_version').fetchone()[0]
+            key = (revision, schema, at_date, tuple(sorted(node_ids)), tuple(line['id'] for line in network['lines']))
+            with self._cache_lock:
+                cached = self._snapshot_cache.get(key)
+                if cached is not None:
+                    self._snapshot_cache.move_to_end(key)
+                    return revision, cached
             for line in network['lines']:
                 binding = connection.execute('SELECT * FROM fare_services WHERE line_id=?',(line['id'],)).fetchone()
                 if not binding:
@@ -221,7 +232,13 @@ class FareStore:
                     raise DataUnavailable(f"No applicable fare in database for {line['id']} on {at_date}")
                 tariff['fare_hkd'] = max(amounts)
                 overrides[line['id']] = tariff
-        return revision, fare_table(network, overrides=overrides)
+        fares = fare_table(network, overrides=overrides)
+        with self._cache_lock:
+            self._snapshot_cache[key] = fares
+            self._snapshot_cache.move_to_end(key)
+            while len(self._snapshot_cache) > 4:
+                self._snapshot_cache.popitem(last=False)
+        return revision, fares
 
     def status(self):
         with self.connection() as connection:
