@@ -12,6 +12,7 @@ from ..graph.build import timestamp
 from ..graph.snapshot import active
 from .constraints import allows_edge, edge_accessible
 from .eco import estimates
+from .fares import path_fares
 from .walk import distance_m, walking_seconds
 
 
@@ -166,8 +167,8 @@ def route_from_path(path, snapshot, depart_at, *, fares, profile=None):
     leg_sigmas, leg_factors = [], []
     freshness_scores, capacities, event_ids = [], [], set()
     boardings = 0
-    previous_fare_group = None
-    for step in path:
+    amounts = path_fares(path, fares, network, profile)
+    for step, amount in zip(path, amounts):
         edge, data = step.edge, step.edge.data
         duration = (step.arrive - step.depart).total_seconds()
         length = edge.walk_m if edge.mode == "WALK" else distance_m(network.nodes[edge.source], network.nodes[edge.target])
@@ -186,15 +187,13 @@ def route_from_path(path, snapshot, depart_at, *, fares, profile=None):
             leg_factors.append(step.factor)
         moving_time += duration
         event_ids.update(step.events)
-        amount = 0.
         if step.boarding:
             boardings += 1
             tariff = fares[edge.line]
-            group = tariff['group']
-            amount = tariff['fare_hkd'] if group is None or group != previous_fare_group else 0
-            previous_fare_group = group
             if tariff['note']:
                 warnings.append(tariff['note'])
+            if tariff.get('source_url'):
+                evidence.append({'source': tariff['source_url'], 'freshness_s': 0})
         fare += amount
         built_at = data.get("updated_at") or network.source.get("meta", {}).get("built_at")
         if built_at:
@@ -256,7 +255,7 @@ def route_from_path(path, snapshot, depart_at, *, fares, profile=None):
         "label": " + ".join(leg.get("line", "步行") for leg in legs), "legs": legs,
         "total": {"time_s": elapsed, "time_range_s": [max(0, elapsed - 1.28155 * sigma), elapsed + 1.28155 * sigma],
                   "transfers": max(0, boardings - 1), "walk_m": sum(t.edge.walk_m for t in path),
-                  "fare_hkd": fare, "co2_g": co2, "reliability": max(0, 1 - sigma / elapsed) if elapsed else 1,
+                  "fare_hkd": round(fare, 2), "co2_g": co2, "reliability": max(0, 1 - sigma / elapsed) if elapsed else 1,
                   "freshness_s": freshness},
         "score": 0, "score_breakdown": [], "load_estimate": None,
         "warnings": list(dict.fromkeys(warnings)), "notes": notes, "explain": "", "evidence": evidence,
