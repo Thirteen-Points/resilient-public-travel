@@ -3,6 +3,7 @@ from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
+from contextlib import contextmanager
 
 from fastapi.testclient import TestClient
 from backend.app.engine import RouteEngine
@@ -36,6 +37,31 @@ class FareStoreTests(unittest.TestCase):
         self.assertEqual(self.engine.cache.hits,1)
         self.assertEqual(next(row['raw'] for row in updated[0]['score_breakdown'] if row['criterion']=='price'),18.)
         self.assertNotEqual(first[0]['evidence'],updated[0]['evidence'])
+
+    def test_unchanged_fare_revision_avoids_rescanning_prices_but_reads_updates(self):
+        statements=[]
+        original=self.store.connection
+        @contextmanager
+        def traced():
+            with original() as connection:
+                connection.set_trace_callback(statements.append)
+                yield connection
+        self.store.connection=traced
+        graph=self.engine.snapshots.network.source
+        first_revision,first=self.store.snapshot(graph,AT)
+        statements.clear()
+        revision,cached=self.store.snapshot(graph,AT)
+        self.assertEqual(revision,first_revision)
+        self.assertIs(cached,first)
+        self.assertTrue(any('SELECT revision' in query for query in statements))
+        self.assertFalse(any('SELECT p.*' in query for query in statements))
+        with original() as connection:
+            connection.execute('UPDATE fare_prices SET amount_cents=1800 WHERE service_id=? AND origin=? AND destination=?',('mtr:octopus','TAW','ADM'))
+        statements.clear()
+        revision,changed=self.store.snapshot(graph,AT)
+        self.assertGreater(revision,first_revision)
+        self.assertTrue(any('SELECT p.*' in query for query in statements))
+        self.assertEqual(changed['ERL']['od_fares']['TAW']['ADM'],18)
 
     def test_restart_does_not_overwrite_persisted_fare_changes_with_bootstrap(self):
         with self.store.connection() as connection:

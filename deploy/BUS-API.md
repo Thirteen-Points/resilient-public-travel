@@ -97,3 +97,12 @@ omits backend-only GTFS calendars while retaining operator arrival identifiers.
 Incident segments and approved weather boundaries are indexed per immutable
 snapshot. GTFS search keeps at most about 10,000 pending states, pruning to
 5,000 best optimistic arrivals when needed; bounded results remain labelled.
+The browser continues polling small event/snapshot responses every three
+seconds, but downloads the full network only initially or when its graph
+revision changes. A failed new network read retains the prior revision and
+is retried on the next poll.
+`GET /api/health` reports process start time, uptime and available Linux memory
+metrics to distinguish deployment restarts from an unavailable bus timetable.
+Compiled SQL fare tables cache for at most four revision/date/network keys.
+Every lookup still checks the database revision and schema inside its read
+transaction, so SQL updates and validity-date changes invalidate the cache.
