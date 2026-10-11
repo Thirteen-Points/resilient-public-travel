@@ -1,4 +1,5 @@
 """Optional FastAPI adapter owned by C-Route; no application-global edits."""
+import asyncio
 from datetime import datetime
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -16,6 +17,7 @@ def error(status, code, message):
 
 def create_router(engine):
     router = APIRouter(prefix='/api')
+    route_slot = asyncio.Semaphore(1)
 
     @router.get('/graph/network')
     def network():
@@ -68,7 +70,8 @@ def create_router(engine):
                     raise ValueError(f'{key} must be a nonempty string array')
             # One query_details call supplies both the body and the snapshot used
             # for this computation; the global current snapshot is never re-read.
-            details = engine.query_details(**payload)
+            async with route_slot:
+                details = await asyncio.to_thread(engine.query_details, **payload)
             return JSONResponse(content=details['routes'],
                                 headers={'X-Route-Snapshot': details['graph_snapshot']})
         except DataUnavailable as exc:

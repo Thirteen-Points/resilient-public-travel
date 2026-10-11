@@ -42,6 +42,14 @@ in the frozen offline demo/test package. Explicit `false` overrides that default
 Static GTFS never requires a runtime download. Other deployment hosts should
 set this flag explicitly.
 
+Expanded-graph search guides candidates with optimistic remaining travel times.
+Its frontier is capped at 30,000 pending states, retaining the best 15,000 when
+that cap is crossed; responses explicitly report a bounded, non-exhaustive search.
+Route calculations run in a worker with one active calculation per API router,
+so large queries do not block arrivals, health or status endpoints or create
+multiple large search frontiers concurrently. The browser allows 30 seconds for
+a route response and can cancel its pending request when the journey changes.
+
 - `GET /api/buses/status`: source/coverage and server/browser ETA availability.
 - `GET /api/buses/services?station=TAW&q=182&offset=0&limit=30`: paginated
   official services and nearby stops; all six corridor station codes work.
