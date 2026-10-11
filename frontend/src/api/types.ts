@@ -28,6 +28,7 @@ export interface NetworkNode {
   lng: number
   lines: string[]
   accessible: boolean | 'partial' | null
+  stairs?: boolean
   provenance: Provenance
   catchment_m?: number
 }
@@ -101,6 +102,7 @@ export interface RouteLeg {
   arrive?: string
   walk_m: number
   accessible: boolean | 'partial' | null
+  stairs?: boolean
   provenance: Provenance
 }
 

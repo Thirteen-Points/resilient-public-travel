@@ -3,7 +3,8 @@ import eventSeed from '../../../contracts/seed/event.seed.json'
 import routeSeed from '../../../contracts/seed/routes.seed.json'
 import simSeed from '../../../contracts/seed/sim.seed.json'
 import { normalizeEventFeed, normalizeNetwork, normalizeRoutes, simSeedAvailable } from './normalizers'
-import type { DemoMeta, Event, Preset, RouteCandidate, RouteQuery, TransitDataSource } from './types'
+import { resolveProfile } from './p3Context'
+import type { DemoMeta, Event, Network, Preset, RouteCandidate, RouteQuery, TransitDataSource } from './types'
 
 const networkResult = normalizeNetwork(networkSeed)
 const feedResult = normalizeEventFeed(eventSeed)
@@ -43,6 +44,19 @@ export function rankSeedRoutes(items: RouteCandidate[], preset: Preset): RouteCa
     if (preset === 'least_walking') return a.total.walk_m - b.total.walk_m || b.total.reliability - a.total.reliability || a.total.time_s - b.total.time_s
     return a.total.time_s - b.total.time_s
   })
+}
+
+/** Seed accessibility is unknown at several stations. Only affirmative evidence can qualify a wheelchair demo card. */
+export function verifiedWheelchairSeedRoute(route: RouteCandidate, sourceNetwork: Network = network): boolean {
+  if (route.total.walk_m > 400 || route.legs.reduce((sum, leg) => sum + leg.walk_m, 0) > 400 || route.total.transfers > 2 || !route.legs.length) return false
+  const nodes = new Map(sourceNetwork.nodes.map(node => [node.id, node]))
+  return route.legs.every(leg =>
+    leg.accessible === true && leg.stairs === false &&
+    // The seed has no affirmative low-floor evidence for bus legs.
+    (leg.mode === 'MTR' || leg.mode === 'WALK') &&
+    nodes.get(leg.from)?.accessible === true && nodes.get(leg.from)?.stairs === false &&
+    nodes.get(leg.to)?.accessible === true && nodes.get(leg.to)?.stairs === false,
+  )
 }
 
 const HKT_OFFSET_MS = 8 * 60 * 60 * 1000
@@ -106,8 +120,14 @@ export const seedDataSource: TransitDataSource = {
   async getPublishedEvents(at) { return activePublishedEvents(events, at) },
   async getRoutes(query: RouteQuery) {
     if (query.origin !== seedOd.origin || query.destination !== seedOd.destination) return []
+    const profile = resolveProfile(query)
     // Seed travel times stay fixed; discard cards that would board a closed service.
-    return rankSeedRoutes(routes, query.preset).filter(route => seedRouteBoardable(route, query.departAt))
+    return rankSeedRoutes(routes, query.preset).filter(route =>
+      seedRouteBoardable(route, query.departAt) &&
+      (profile.mobility !== 'wheelchair' || verifiedWheelchairSeedRoute(route) &&
+        route.total.walk_m <= (profile.max_walk_m ?? 400) &&
+        route.total.transfers <= (profile.max_transfers ?? 2)),
+    )
   },
   async getMeta() { return meta },
 }

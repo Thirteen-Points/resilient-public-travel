@@ -9,7 +9,8 @@ import { AgentPanel } from './components/AgentPanel'
 import { ComparePage } from './components/ComparePage'
 import { SimulationPage } from './components/SimulationPage'
 import { PreferenceEditor } from './components/PreferenceEditor'
-import { LatestRequest, resolveProfile, profileLabel } from './api/p3Context'
+import { PersonaSelector } from './components/PersonaSelector'
+import { LatestRequest, resolveProfile, profileLabel, routeSelectionKey } from './api/p3Context'
 import { ReviewConsole, type ReviewLog } from './components/ReviewConsole'
 import { ReviewAccess } from './components/ReviewAccess'
 import { SignalInbox } from './components/SignalInbox'
@@ -131,6 +132,7 @@ export function App() {
   const [departureDate, setDepartureDate] = useState('2026-09-22')
   const [searching, setSearching] = useState(false)
   const [queriedAt, setQueriedAt] = useState('')
+  const [submitted, setSubmitted] = useState<{ key: string; persona: Persona; preset: Preset; profile: TravelProfile } | null>(null)
   const [logs, setLogs] = useState<ReviewLog[]>([])
   const [success, setSuccess] = useState({ text: '', revision: 0 })
   const root = useRef<HTMLDivElement>(null)
@@ -145,7 +147,8 @@ export function App() {
   const selected = useMemo(() => routes.find(route => route.route_id === selectedId), [routes, selectedId])
   const eventRevisions = (SEED_MODE ? seedBundle?.published : live.bundle?.published)?.map(event => `${event.event_id}@${event.version}`).sort().join(',') ?? ''
   const context = useMemo<JourneyContext>(() => ({ origin, destination, departAt: hktDeparture(departureDate, departure), preset, persona, profile: effectiveProfile, eventRevisions, eventIds: eventRevisions ? eventRevisions.split(',').map(value => value.slice(0, value.lastIndexOf('@'))) : [] }), [origin, destination, departureDate, departure, preset, persona, effectiveProfile, eventRevisions])
-  const plannerKey = JSON.stringify([origin, destination, context.departAt, effectiveProfile])
+  const plannerKey = routeSelectionKey(context)
+  const resultCurrent = submitted?.key === plannerKey
   useEffect(() => {
     if (searchingRef.current && (requestedJourney.current !== plannerKey || requestedScreen.current !== screen)) { routeRequests.current.cancel(); searchingRef.current = false; setSearching(false) }
   }, [plannerKey, screen])
@@ -209,10 +212,22 @@ export function App() {
     setLogs([{ id: 'scenario', action: 'replay', detail: 'Restored seed fields and confidence values; all stages now await review. Fixed route candidates are unchanged.' }])
     celebrate('Review replay ready · no published disruption')
   }
+  const invalidateResults = () => {
+    routeRequests.current.cancel(); searchingRef.current = false; setSearching(false); setSubmitted(null)
+  }
   const setField = (field: Field, value: string) => {
+    invalidateResults()
     if (field === 'origin') setOrigin(value)
     else setDestination(value)
     setActiveField(null); setPicking(null); setError(''); setPicked('')
+  }
+  const editProfile = (next: Persona) => {
+    invalidateResults(); setError('')
+    setPersona(next); setCustomProfile(undefined)
+  }
+  const editPreset = (next: Preset) => {
+    invalidateResults(); setError('')
+    setPreset(next); setCustomProfile(previous => previous ? { ...previous, weights: undefined } : undefined)
   }
   const showRoutes = async (from = origin, to = destination, preference = preset, profile = effectiveProfile) => {
     setActiveField(null)
@@ -223,17 +238,18 @@ export function App() {
     searchingRef.current = true; setSearching(true)
     const request = routeRequests.current.begin()
     const requestedProfile = resolveProfile({ persona, preset: preference, profile })
-    requestedJourney.current = JSON.stringify([from, to, departAt, requestedProfile])
+    requestedJourney.current = routeSelectionKey({ origin: from, destination: to, departAt, preset: preference, persona, profile: requestedProfile })
     requestedScreen.current = screen
     try {
-      const value = { origin: from, destination: to, departAt, preset: preference, persona, ...(!SEED_MODE ? { profile: requestedProfile } : {}) }
+      const value = { origin: from, destination: to, departAt, preset: preference, persona, profile: requestedProfile }
       const next = SEED_MODE ? await seedDataSource.getRoutes(value) : await live.query(value, request.signal)
       if (!request.current()) return
       setRoutes(next.slice(0, 3)); setOrigin(from); setDestination(to); setPreset(preference); setQueriedAt(departAt)
+      setSubmitted({ key: requestedJourney.current, persona, preset: preference, profile: requestedProfile })
       setSelectedId(next[0]?.route_id ?? null)
       setScreen('results'); setError(''); setPicking(null)
       if (next.length) celebrate(`${Math.min(next.length, 3)} ${SEED_MODE ? 'seed' : 'API'} alternatives ready`)
-    } catch (cause) { if (request.current()) setError(`Route data could not be loaded. ${cause instanceof Error ? cause.message : String(cause)}`) }
+    } catch (cause) { if (request.current()) { setSubmitted(null); setScreen('journey'); setError(`Route request failed. ${cause instanceof Error ? cause.message : String(cause)}`) } }
     finally { if (request.current()) { setSearching(false); searchingRef.current = false } }
   }
   const mapPick = (point: { lat: number; lng: number }) => {
@@ -243,7 +259,7 @@ export function App() {
     setField(picking, nearest.node.id)
     setPicked(`Closest modelled station: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. ${nearest.node.accessible === true ? 'Accessibility uses modelled assumptions; verify on site.' : 'Accessibility is unknown or incomplete; verify on site.'}`)
   }
-  const activeRoutes = screen === 'results' || screen === 'detail' ? routes : []
+  const activeRoutes = resultCurrent && (screen === 'results' || screen === 'detail') ? routes : []
   // Map footprint: full behind the floating panels, a right-hand card beside
   // page content, faded out on the plain How-it-works page.
   const mapMode: 'full' | 'docked' | 'hidden' =
@@ -284,36 +300,37 @@ export function App() {
           <button type="button" className={css.agentEntry} onClick={() => { setScreen('agent'); setActiveField(null); setPicking(null); setError('') }}><AgentAvatar issue={published.length > 0} small /><span><strong>Meet your route companion</strong><small>Ask the Agent · explore this scenario</small></span><b>↗</b></button>
           <form onSubmit={event => { event.preventDefault(); void showRoutes() }}>
             <StationField id="origin" label="FROM" value={origin} network={network} active={activeField === 'origin'} onFocus={() => { setActiveField('origin'); setPicking(null) }} onSelect={value => setField('origin', value)} onPickMap={() => { setActiveField(null); setPicking('origin') }} />
-            <button className={css.swap} type="button" onClick={() => { setOrigin(destination); setDestination(origin); setActiveField(null) }} aria-label="Swap stations">⇅</button>
+            <button className={css.swap} type="button" onClick={() => { invalidateResults(); setOrigin(destination); setDestination(origin); setActiveField(null) }} aria-label="Swap stations">⇅</button>
             <StationField id="destination" label="TO" value={destination} network={network} active={activeField === 'destination'} invalid={Boolean(error && !destination)} onFocus={() => { setActiveField('destination'); setPicking(null) }} onSelect={value => setField('destination', value)} onPickMap={() => { setActiveField(null); setPicking('destination') }} />
             <div className={css.fieldAssist}><button type="button" onClick={() => { setActiveField(null); setPicking('destination') }}>◎ Tap the map</button><span>Within {network.meta.catchment_m} m of a station</span></div>
             {picked && <p className={css.confirm}>{picked}</p>}
             {error && <p role="alert" className={css.error}>{error}</p>}
-            <DeparturePicker date={departureDate} time={departure} onDate={setDepartureDate} onTime={setDeparture} />
-            <fieldset className={css.presets}><legend>TRAVELLER PROFILE</legend><button type="button" aria-pressed={persona === 'commuter'} onClick={() => { setPersona('commuter'); setCustomProfile(undefined) }}>Commuter</button><button type="button" aria-pressed={persona === 'wheelchair'} disabled={SEED_MODE} onClick={() => { setPersona('wheelchair'); setCustomProfile(undefined) }}>Wheelchair</button></fieldset>
-            <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} disabled={!SEED_MODE && option.id === 'least_walking'} title={!SEED_MODE && option.id === 'least_walking' ? 'Use a walking limit in your travel preferences' : undefined} className={preset === option.id ? css.activePreset : ''} onClick={() => { setPreset(option.id); setCustomProfile(previous => previous ? { ...previous, weights: undefined } : undefined) }}>{option.label}</button>)}</fieldset>
+            <DeparturePicker date={departureDate} time={departure} onDate={value => { invalidateResults(); setDepartureDate(value) }} onTime={value => { invalidateResults(); setDeparture(value) }} />
+            <PersonaSelector value={persona} onSelect={editProfile} />
+            <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} disabled={!SEED_MODE && option.id === 'least_walking'} title={!SEED_MODE && option.id === 'least_walking' ? 'Use a walking limit in your travel preferences' : undefined} className={preset === option.id ? css.activePreset : ''} onClick={() => editPreset(option.id)}>{option.label}</button>)}</fieldset>
             {!SEED_MODE && <p className={css.tiny}>Less walking preset awaits backend support. Wheelchair hard walking and accessibility constraints still apply.</p>}
             <button type="submit" disabled={searching} className={css.primary}>{searching ? 'Finding routes…' : 'Find resilient routes'} <span>↗</span></button>
           </form>
-          {!SEED_MODE && <PreferenceEditor active={screen === 'journey'} profile={effectiveProfile} onApply={next => { setCustomProfile(next); setPersona(next.mobility === 'wheelchair' ? 'wheelchair' : 'commuter'); if (origin && destination) void showRoutes(origin, destination, preset, next) }} />}
+          {!SEED_MODE && <PreferenceEditor active={screen === 'journey'} profile={effectiveProfile} onApply={next => { invalidateResults(); setCustomProfile(next); setPersona(next.mobility === 'wheelchair' ? 'wheelchair' : 'commuter'); setError('') }} />}
           <p className={css.tiny}>{SEED_MODE ? 'Only Tai Wai → Admiralty has route candidates in this fixture.' : 'Routes use the modelled network and published events; estimates are not a live timetable.'}</p>
       </div>}
-      {screen === 'results' && <>
+      {screen === 'results' && resultCurrent && submitted && <>
         {published[0] && <div className={css.alert}><span>!</span><strong>{published[0].title}</strong><span className={css.alertDetail}>Published event · {formatHkt(published[0].updated_at)}</span><button type="button" onClick={() => setScreen('updates')}>View update →</button></div>}
         <section data-panel data-route-refresh-revision={live.revision} data-route-ids={routes.map(route => route.route_id).join(',')} className={`${css.panel} ${css.results}`} aria-labelledby="routes-heading">
           <button type="button" className={css.back} onClick={() => setScreen('journey')}>← Edit journey</button>
           <span className={css.kicker}>ROUTES FOR YOUR JOURNEY</span>
           <h1 id="routes-heading">{nodes.get(origin)?.name_en ?? origin} <span>→</span><br />{nodes.get(destination)?.name_en ?? destination}</h1>
-          <p className={css.subhead}>{routes.length} alternatives · {PRESETS.find(option => option.id === preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
-          {!SEED_MODE && <p className={css.queryStamp}>Requested profile: {profileLabel(effectiveProfile)}</p>}
+          <p className={css.subhead}>{routes.length} alternatives · {PRESETS.find(option => option.id === submitted.preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
+          <p className={css.queryStamp}>Queried persona: {submitted.persona === 'wheelchair' ? 'Wheelchair' : 'Commuter'} · Preset: {PRESETS.find(option => option.id === submitted.preset)?.label}<br />Profile sent: {profileLabel(submitted.profile)}</p>
           <p className={css.queryStamp}>Requested departure: {formatHkt(queriedAt)}<br /><small>Query value: {queriedAt} · {SEED_MODE ? 'fixed seed estimates filtered by modelled service hours; journey times are not recalculated.' : 'recomputed when the graph or published events change.'}</small></p>
-          {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={'ABC'[index]} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); setScreen('detail') }} />)}</div> : <div className={css.empty} role="status"><strong>No feasible route at the selected departure time.</strong><p>Try another time or station pair. Check operator schedules before travel.</p></div>}
+          {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={'ABC'[index]} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); setScreen('detail') }} />)}</div> : <div className={css.empty} role="status"><strong>{submitted.persona === 'wheelchair' && SEED_MODE ? '没有符合轮椅约束的路线' : submitted.persona === 'wheelchair' ? 'No wheelchair-compliant route returned.' : 'No feasible route at the selected departure time.'}</strong><p>{submitted.persona === 'wheelchair' ? SEED_MODE ? 'The seed lacks affirmative step-free station and leg data or low-floor bus evidence, so ordinary routes cannot be shown as accessible.' : 'The API returned no qualifying candidate. Accessibility data may be incomplete; try another time or station pair.' : 'Try another time or station pair. Check operator schedules before travel.'}</p></div>}
           <p className={css.tiny}>{SEED_MODE ? 'Fixed illustrative candidates.' : 'API candidates on the modelled network.'} Published events affect the network overlay. Times, fares and scores are derived estimates.</p>
         </section>
       </>}
-      {screen === 'detail' && selected && <section data-panel className={`${css.panel} ${css.detailPanel}`}>
+      {screen === 'detail' && resultCurrent && selected && submitted && <section data-panel className={`${css.panel} ${css.detailPanel}`}>
         <button type="button" className={css.back} onClick={() => setScreen('results')}>← All routes</button><span className={css.kicker}>ROUTE DETAILS · DERIVED ESTIMATE</span>
         <h1>{nodes.get(origin)?.name_en} <span>→</span><br />{nodes.get(destination)?.name_en}</h1>
+        <p className={css.queryStamp}>Queried persona: {submitted.persona === 'wheelchair' ? 'Wheelchair' : 'Commuter'} · Preset: {PRESETS.find(option => option.id === submitted.preset)?.label}<br />Profile sent: {profileLabel(submitted.profile)}</p>
         <div className={css.detailStats}><strong>{formatRange(selected.total.time_range_s)}</strong><span>{selected.total.transfers} transfer{selected.total.transfers === 1 ? '' : 's'}</span><span>{selected.total.walk_m} m walk</span><span>HK${selected.total.fare_hkd.toFixed(2)}</span></div>
         <h2>Step by step</h2><ol className={css.steps}>{selected.legs.map((leg, i) => <li data-enter key={i}><strong><i className={css.lineDot} style={{ background: leg.mode === 'WALK' ? '#6d7e70' : lineGradient(lineStyle(resolveLine(network, leg.line), leg.line).colors) }} />{leg.mode === 'WALK' ? 'Walk' : resolveLine(network, leg.line)?.name_en ?? leg.line ?? leg.mode}</strong><span>{nodes.get(leg.from)?.name_en ?? leg.from} → {nodes.get(leg.to)?.name_en ?? leg.to}</span><small>{legDuration(leg)}{leg.walk_m ? ` · ${leg.walk_m} m walking` : ''}</small></li>)}</ol>
         <h2>Why this route?</h2><p>{selected.explain}</p>

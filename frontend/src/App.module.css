@@ -37,6 +37,7 @@
 .presets legend { margin-bottom: 8px; }
 .presets button { min-height: 30px; padding: 4px 11px; border: 0; border-radius: 99px; background: #eff3e9; color: #415648; font-size: 10px; font-weight: 600; }
 .presets button.activePreset { background: var(--lime); color: #263f13; }
+.presets button:focus-visible { outline: 2px solid #35779f; outline-offset: 2px; }
 .primary { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 44px; padding: 0 15px; border: 0; border-radius: 99px; background: var(--lime); color: #274011; text-align: left; font-size: 12px; font-weight: 700; }
 .primary:hover { background: #a6f034; }
 .primary span { font-size: 18px; }

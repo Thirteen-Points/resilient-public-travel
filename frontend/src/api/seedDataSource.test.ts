@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { activePublishedEvents, seedDataSource, snapshotAt } from './seedDataSource'
+import { activePublishedEvents, seedDataSource, snapshotAt, verifiedWheelchairSeedRoute } from './seedDataSource'
+import { profileFor } from './p3Context'
 import { CORRIDOR_IDS, distanceMetres, legCoordinates, legDuration, nearestAccessPoint } from '../data'
 
 describe('M0 seed boundary', () => {
@@ -46,6 +47,30 @@ describe('M0 seed boundary', () => {
     const day = await seedDataSource.getRoutes({ ...query, departAt: '2026-10-11T12:00:00+08:00' })
     expect(night).toEqual([])
     expect(day.length).toBeGreaterThan(0)
+  })
+
+  it('keeps commuter cards while withholding wheelchair cards without affirmative access evidence', async () => {
+    const base = { origin: 'TAW', destination: 'ADM', departAt: snapshotAt, preset: 'fastest' } as const
+    const commuter = await seedDataSource.getRoutes({ ...base, persona: 'commuter', profile: profileFor('commuter', 'fastest') })
+    const wheelchair = await seedDataSource.getRoutes({ ...base, persona: 'wheelchair', profile: profileFor('wheelchair', 'fastest') })
+    expect(commuter.length).toBeGreaterThan(0)
+    expect(wheelchair).toEqual([])
+    expect(await seedDataSource.getRoutes({ ...base, persona: 'commuter', profile: profileFor('wheelchair', 'fastest') })).toEqual([])
+    expect(commuter.every(route => !verifiedWheelchairSeedRoute(route))).toBe(true)
+  })
+
+  it('requires confirmed step-free nodes and legs, no bus, and both wheelchair limits', async () => {
+    const network = structuredClone(await seedDataSource.getNetwork())
+    const route = structuredClone((await seedDataSource.getRoutes({ origin: 'TAW', destination: 'ADM', departAt: snapshotAt, preset: 'fastest' }))[0])
+    for (const node of network.nodes) { node.accessible = true; node.stairs = false }
+    for (const leg of route.legs) { leg.accessible = true; leg.stairs = false }
+    expect(verifiedWheelchairSeedRoute(route, network)).toBe(true)
+    route.total.walk_m = 401; expect(verifiedWheelchairSeedRoute(route, network)).toBe(false)
+    route.total.walk_m = 0; route.total.transfers = 3; expect(verifiedWheelchairSeedRoute(route, network)).toBe(false)
+    route.total.transfers = 2; route.legs[0].mode = 'BUS'; expect(verifiedWheelchairSeedRoute(route, network)).toBe(false)
+    route.legs[0].mode = 'MTR'; route.legs[0].stairs = undefined; expect(verifiedWheelchairSeedRoute(route, network)).toBe(false)
+    route.legs[0].stairs = false; network.nodes.find(node => node.id === route.legs[0].from)!.accessible = null
+    expect(verifiedWheelchairSeedRoute(route, network)).toBe(false)
   })
 
   it('uses seed catchment radius and does not invent geometry for missing stops', async () => {
