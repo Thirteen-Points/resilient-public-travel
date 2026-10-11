@@ -12,7 +12,7 @@ export function contextKey(context: JourneyContext): string {
 }
 
 export function routeSelectionKey(query: RouteQuery): string {
-  return JSON.stringify([query.origin, query.destination, query.departAt, resolveProfile(query)])
+  return JSON.stringify([query.origin, query.destination, query.departAt, resolveProfile(query), [...query.modes ?? []].sort(), [...query.requiredModes ?? []].sort()])
 }
 
 /** Explicit preferences can tighten a selected accessibility preset, never loosen it. */
