@@ -1,2 +1,9 @@
-.badge { display: inline-block; border-radius: 5px; background: #eaf3f7; color: #42687d; padding: 4px 7px; font-size: 10px; font-weight: 700; }
-.compact { flex: none; font-size: 8px; padding: 2px 4px; }
+.badge { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 4px 8px; border: 1px solid var(--rr-border-default); border-radius: var(--rr-radius-small); background: var(--rr-bg-surface); color: var(--rr-text-primary); font-size: var(--rr-font-caption); line-height: 1.5; font-weight: 500; overflow-wrap: anywhere; }
+.badge::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--rr-source-simulated); }
+.badge[data-provenance=real] { background: var(--rr-bg-subtle); }
+.badge[data-provenance=real]::before { background: var(--rr-status-normal); }
+.badge[data-provenance=real-derived] { background: var(--rr-bg-warning); }
+.badge[data-provenance=real-derived]::before { background: var(--rr-status-degraded); }
+.badge[data-provenance=simulated] { background: var(--rr-bg-info); }
+.badge[data-provenance=unknown]::before { background: var(--rr-text-secondary); }
+.compact { flex: none; padding: 4px 8px; }

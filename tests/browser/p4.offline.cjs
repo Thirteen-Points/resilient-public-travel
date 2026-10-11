@@ -2,6 +2,7 @@
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict')
 const { spawn } = require('node:child_process')
 const { chromium } = require(process.env.M2_PLAYWRIGHT || 'playwright')
+const { navigate, assertRemovedPages } = require('./public-ui.cjs')
 const root = path.resolve(__dirname, '../..'), out = path.join(root, '.cache/p4-browser')
 const tour = process.env.P4_RECORD_TOUR === 'true'
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -47,7 +48,7 @@ async function ready(url) {
   const holdUntil = async seconds => { if (tour) await pause(Math.max(0, seconds * 1000 - (Date.now() - started))) }
   await page.goto(web)
   await page.getByRole('combobox', { name: 'TO', exact: true }).click()
-  await page.getByRole('option', { name: /Admiralty/ }).click()
+  await page.getByRole('option', { name: /^Admiralty MTR/ }).click()
   await page.locator('[aria-controls="departure-calendar"]').click()
   const day = page.getByRole('button', { name: '2026-09-22', exact: true })
   for (let month = 0; !(await day.count()) && month < 3; month++) await page.getByRole('button', { name: 'Previous month', exact: true }).click()
@@ -63,43 +64,44 @@ async function ready(url) {
   await page.screenshot({ path: path.join(out, '01-offline-routes.png') })
   evidence.assertions.push('production-frontend-local-route-query', 'matching-backend-frontend-SHA', 'offline-health')
   await holdUntil(60)
-  await page.getByRole('button', { name: 'Simulation', exact: true }).click()
+  await assertRemovedPages(page)
+  // Simulation remains a backend/offline data contract. Its retired public
+  // screen must not be reintroduced just to exercise the frozen fixtures.
   const scenarioIds = ['scn_huh_exc_closed_am_peak',
     'm2_six_station_directed_od_am_peak_p3_shared_segments',
     'm2_six_station_directed_od_am_peak_p3_shared_segments_residual_10pct']
   for (let index = 0; index < scenarioIds.length; index++) {
     const id = scenarioIds[index]
-    await page.getByLabel('Simulation scenario', { exact: true }).selectOption(id)
-    await page.getByRole('button', { name: 'Load precomputed result', exact: true }).click()
-    const panel = page.locator(`[data-simulation-id="${id}"]`); await panel.waitFor()
-    const result = await (await fetch(api + '/api/sim/result?scenario_id=' + id)).json()
-    const legacyGap = panel.getByText('Legacy capacity-gap field', { exact: true })
-    if (!await legacyGap.evaluate(summary => summary.parentElement.open)) await legacyGap.click()
-    const text = await panel.innerText()
-    assert.ok(text.includes('Backend unstoppable_demand: ' + result.guided.unstoppable_demand.toLocaleString('en-HK')))
-    for (const strategy of ['baseline', 'guided']) assert.ok(text.includes(result[strategy].total_delay_person_min.toLocaleString('en-HK')))
-    if (index === 0) { assert.ok(result.delta.delay_reduction_pct < 0); await page.getByText('Guided delay is higher. This scenario shows no delay improvement.', { exact: false }).waitFor() }
+    const response = await fetch(api + '/api/sim/result?scenario_id=' + id)
+    assert.equal(response.ok, true)
+    const result = await response.json()
+    const frozen = JSON.parse(fs.readFileSync(path.join(root, 'data/sim', id + '.json'), 'utf8'))
+    assert.deepEqual(result, frozen, 'Offline API must preserve every frozen metric and assumption')
+    assert.ok(result.assumptions.length)
+    if (index === 0) assert.ok(result.delta.delay_reduction_pct < 0)
     else {
       assert.equal(result.population, 10000); assert.equal(result.seed, 20260922)
       assert.equal(result.provenance, 'simulated'); assert.ok(result.generated_at && result.metric_units)
-      assert.ok(text.includes(result.guided.unstoppable_demand.toLocaleString('en-HK')))
+      if (index === 1) assert.equal(result.delta.delay_reduction_pct, 0)
+      else assert.ok(result.guided.unstoppable_demand > 0)
     }
-    await page.screenshot({ path: path.join(out, `0${index + 2}-simulation.png`) })
     evidence.scenarios.push({ scenario_id: id, delay_reduction_pct: result.delta.delay_reduction_pct,
       baseline_delay: result.baseline.total_delay_person_min, guided_delay: result.guided.total_delay_person_min,
       guided_capacity_gap: result.guided.unstoppable_demand })
     fs.writeFileSync(path.join(out, `scenario-${index}.json`), JSON.stringify(result, null, 2))
-    await holdUntil((index + 2) * 60)
   }
-  await page.getByRole('heading', { name: 'People the model cannot serve.', exact: true }).scrollIntoViewIfNeeded()
-  await page.screenshot({ path: path.join(out, '05-capacity-gap.png') })
-  await holdUntil(270)
-  await page.getByRole('heading', { name: 'Assumptions', exact: true }).scrollIntoViewIfNeeded()
-  await page.screenshot({ path: path.join(out, '06-assumptions.png') })
+  await navigate(page, 'How it works')
+  await page.getByRole('heading', { name: 'Source freshness & collection', exact: true }).waitFor()
+  await page.getByText('External collection is offline.', { exact: false }).waitFor()
+  await page.getByRole('heading', { name: 'Paths on the map', exact: true }).scrollIntoViewIfNeeded()
+  await page.getByText('Connections without a verified path remain dotted and schematic', { exact: false }).waitFor()
+  await page.getByText('Path data references', { exact: true }).click()
+  assert.ok(await page.locator('a[href*="csdi.gov.hk"]').count())
+  await page.screenshot({ path: path.join(out, '02-offline-sources.png') })
   await holdUntil(300)
   assert.deepEqual(errors, [])
-  evidence.assertions.push('negative-benefit-visible', 'P3-normal-zero-benefit-preserved', 'P3-stress-gap-visible',
-    'verbatim-backend-delay-and-gap', 'non-loopback-requests-aborted', 'assumptions-visible', 'no-page-errors')
+  evidence.assertions.push('retired-public-pages-absent', 'negative-benefit-API-preserved', 'P3-normal-zero-benefit-preserved', 'P3-stress-gap-API-preserved',
+    'verbatim-frozen-results-and-assumptions', 'non-loopback-requests-aborted', 'offline-source-status-visible', 'schematic-path-limits-visible', 'no-page-errors')
   evidence.wan_blocked = [...new Set(evidence.wan_blocked)]
   evidence.tour_elapsed_seconds = (Date.now() - started) / 1000
   await context.close(); context = null

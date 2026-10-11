@@ -71,7 +71,7 @@ jobs:
           M2_PYTHON: python
           M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
         run: node tests/browser/m2.e2e.cjs
-      - name: P4 preferences, comparisons, simulations and accessibility
+      - name: P4 preferences, transport modes and accessibility
         env:
           M2_PYTHON: python
           M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright

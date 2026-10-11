@@ -14,11 +14,23 @@
     "m2_six_station_directed_od_am_peak_p3_shared_segments",
     "m2_six_station_directed_od_am_peak_p3_shared_segments_residual_10pct"
   ],
-  "backup": {"video": "deploy/offline/media/demo.webm", "slides": "deploy/offline/media/slides.pdf"},
+  "backup": {
+    "video": "deploy/offline/media/demo.webm",
+    "slides": "deploy/offline/media/slides.pdf",
+    "status": "Historical main PR #110 technical media; former Simulation UI is not current public navigation."
+  },
+  "current_tour": {
+    "first_minute": "Actual public route query",
+    "remaining_four_minutes": "How it works source/path UI with narration of captured frozen simulation API data",
+    "captures": ["01-offline-routes.png", "02-offline-sources.png", "scenario-0.json", "scenario-1.json", "scenario-2.json", "result.json"],
+    "simulation_api": "GET /api/sim/result?scenario_id=ID"
+  },
   "notes": [
     "Launch performs no pip/npm installation; runtime and dependencies are prepared separately.",
     "No live feeds, live LLM or live basemap are required; tile/font failures are tolerated.",
     "Normal P3 delay reduction is 0%; do not adjust weights to manufacture improvement.",
+    "Public Compare, Simulation and Review pages are removed; simulation API and frozen JSON evidence remain.",
+    "A regenerated PDF uses current route/source screenshots and captured API values, without claiming a Simulation UI.",
     "The C technical PDF still needs team acceptance or replacement by the team's final PPT export.",
     "Check package manifest hashes, actual video playback and PDF rendering before sign-off."
   ]
