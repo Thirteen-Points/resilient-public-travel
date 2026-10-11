@@ -8,6 +8,8 @@ import { AgentAvatar } from './components/AgentAvatar'
 import { AgentPanel } from './components/AgentPanel'
 import { PreferenceEditor } from './components/PreferenceEditor'
 import { PersonaSelector } from './components/PersonaSelector'
+import { BusArrivals } from './components/BusArrivals'
+import { CorridorBuses } from './components/CorridorBuses'
 import { LatestRequest, resolveProfile, profileLabel, routeSelectionKey } from './api/p3Context'
 import { HowItWorksPage } from './components/HowItWorksPage'
 import { UpdatesPage } from './components/UpdatesPage'
@@ -99,6 +101,11 @@ function RouteCard({ route, letter, network, selected, onSelect, onDetail }: {
       const style = lineStyle(line, id)
       return <span key={id} title={style.label}><i style={{ background: lineGradient(style.colors) }} />{line?.name_en ?? id}{style.colors.length > 1 ? ' · joint' : ''}</span>
     })}</div>
+    {selected && !SEED_MODE && route.legs.filter(leg => leg.mode === 'BUS').map((leg, index) => {
+      const line = resolveLine(network, leg.line)
+      const stop = line?.eta_stops?.[leg.from]
+      return stop && line ? <BusArrivals key={`${line.id}:${index}`} serviceId={line.id} stopId={stop.td_stop_id} routeNumber={line.route_number ?? line.name_en} /> : null
+    })}
     <details className={css.routeEvidence}><summary>Score, preferences & sources</summary>
       {route.score_breakdown?.length ? route.score_breakdown.map(factor => <div className={css.factor} key={factor.criterion}><span>{factor.criterion}</span><span>{Math.round(factor.weight * 100)}% weight · {factor.contribution.toFixed(3)}</span></div>) : <p>No factor breakdown supplied in this seed.</p>}
       <p>{route.explain}</p><strong>Risks</strong>{route.warnings.length ? route.warnings.map(note => <p key={note}>{note}</p>) : <p>No specific seed warning; verify current service.</p>}<strong>Preference notes</strong>{route.notes.map(note => <p key={note}>{note}</p>)}<p>Source: {SEED_MODE ? 'routes.seed.json' : 'route engine API'} · {route.provenance}. Freshness is measured at query time.</p>
@@ -345,6 +352,7 @@ export function App() {
             {!SEED_MODE && <p className={css.tiny}>Less walking preset awaits backend support. Wheelchair hard walking and accessibility constraints still apply.</p>}
             <button type="submit" disabled={searching} className={css.primary}>{searching ? 'Finding routes…' : 'Find resilient routes'} <span>↗</span></button>
           </form>
+          {!SEED_MODE && transport === 'BUS' && origin && <CorridorBuses station={origin} />}
           {!SEED_MODE && <PreferenceEditor active={screen === 'journey'} profile={effectiveProfile} onApply={next => { invalidateResults(); const traveller = next.mobility === 'wheelchair' ? 'wheelchair' : 'commuter'; setCustomProfile(next); setPersona(traveller); setError(''); if (origin && destination) void showRoutes(origin, destination, preset, next, traveller) }} />}
           <p className={css.tiny}>{SEED_MODE ? 'Only Tai Wai → Admiralty has route candidates in this fixture.' : 'Routes use the modelled network and published events; estimates are not a live timetable.'}</p>
       </div>}
@@ -370,6 +378,10 @@ export function App() {
         <div className={css.detailStats}><strong>{formatRange(selected.total.time_range_s)}</strong><span>{selected.total.transfers} transfer{selected.total.transfers === 1 ? '' : 's'}</span><span>{selected.total.walk_m} m walk</span><span>HK${selected.total.fare_hkd.toFixed(2)}</span></div>
         <p className={css.tiny}>Adult fares · Octopus ordinary class · ferry upper deck (lower deck for wheelchair routes). Each ticket is shown on its first step; connecting MTR lines share the same ticket.</p>
         <h2>Step by step</h2><ol className={css.steps}>{selected.legs.map((leg, i) => <li data-enter key={i}><strong><i className={css.lineDot} style={{ background: leg.mode === 'WALK' ? '#6d7e70' : lineGradient(lineStyle(resolveLine(network, leg.line), leg.line).colors) }} />{leg.mode === 'WALK' ? 'Walk' : resolveLine(network, leg.line)?.name_en ?? leg.line ?? leg.mode}</strong><span>{nodes.get(leg.from)?.name_en ?? leg.from} → {nodes.get(leg.to)?.name_en ?? leg.to}</span><small>{legDuration(leg)}{leg.walk_m ? ` · ${leg.walk_m} m walking` : ''}{leg.mode !== 'WALK' && leg.fare_hkd !== undefined ? ` · ${leg.fare_hkd > 0 ? `HK$${leg.fare_hkd.toFixed(2)}` : 'Included in ticket'}` : ''}</small></li>)}</ol>
+        {!SEED_MODE && selected.legs.filter(leg => leg.mode === 'BUS').map((leg, index) => {
+          const line = resolveLine(network, leg.line), stop = line?.eta_stops?.[leg.from]
+          return line && stop ? <BusArrivals key={`${line.id}:${index}`} serviceId={line.id} stopId={stop.td_stop_id} routeNumber={line.route_number ?? line.name_en} /> : null
+        })}
         <h2>Why this route?</h2><p>{selected.explain}</p>
         {selected.warnings.length > 0 && <div className={css.warning}><strong>Check before travel</strong>{selected.warnings.map(warning => <p key={warning}>{warning}</p>)}</div>}
         {selected.score_breakdown && <div className={css.breakdown}><h2>Score factors</h2>{selected.score_breakdown.map(factor => <div key={factor.criterion}><span>{factor.criterion}</span><span>weight {Math.round(factor.weight * 100)}% · contribution {factor.contribution.toFixed(3)}</span></div>)}</div>}

@@ -330,3 +330,21 @@ The database stores all six source URLs/checksums/import timestamps. Failed
 imports roll back atomically. Runtime queries read a consistent price/revision
 snapshot; direct SQL changes and successful imports invalidate cached prices.
 See `deploy/FARES.md` for lookup endpoints, effective dates and scope.
+
+### Official corridor bus schedules and current arrivals — 2026-10-12
+
+`data/network/corridor_bus.json` compiles the official TD GTFS archive referenced
+by Mobility Database mdb-1924, retrieved 2026-10-11T09:03:13Z; SHA-256
+`4316a8d9e3a82b326603bcba18ce60406eb861e8adb0c045973f4063d6b0fbbe`.
+The 800 m catchments around the six corridor stations select 1,129 KMB/LWB/CTB
+direction/variant records (544 operator/route combinations); 507 patterns
+connect multiple catchments and have complete directional fare pairs.
+Calendars, exceptions, departures, frequency bands and boarding/alighting adult
+fare pairs are source-derived. Intermediate travel times, 137-person capacity,
+walking connections and accessibility remain estimates or unverified.
+
+The API-mode frontend displays current KMB/LWB and Citybus ETA observations
+after verifying operator stop coordinates, termini and direction. These are
+separate from selected-date journey estimates and do not automatically confirm
+disruptions. Missing or stale arrivals remain explicit. See `deploy/BUS-API.md`
+for reproducible import, deployment flags, endpoints and verification.

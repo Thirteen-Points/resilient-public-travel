@@ -172,7 +172,11 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
         color: '#1565C0', weight: 1, opacity: .3, fillColor: '#1565C0', fillOpacity: .05, interactive: false,
       }).addTo(group)
     }
+    const drawnPatterns = new Set<string>()
     for (const line of network.lines) {
+      const pattern = `${line.mode}:${line.stops.join(',')}`
+      if (drawnPatterns.has(pattern)) continue
+      drawnPatterns.add(pattern)
       for (const geometry of resolveNetworkLineGeometry(line, network)) {
         schematic ||= geometry.quality === 'schematic' || geometry.quality === 'mixed'
         geometry.parts.forEach((part, index) => draw(part, lineStyle(line).colors, 2, routes.length ? .2 : .4, geometry.partQualities[index] === 'schematic'))

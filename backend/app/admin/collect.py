@@ -13,7 +13,7 @@ from fastapi import HTTPException
 from ..services.ingest.mtr_eta import MtrEtaClient, MtrEtaAnomalyPoller, MtrDetectionConfig, CORRIDOR_STATIONS
 from ..services.ingest.hko import HkoClient, HkoWarningPoller
 
-ALLOWED_HOSTS = {"api.deepseek.com", "dashscope.aliyuncs.com", "open.bigmodel.cn", "rt.data.gov.hk", "data.weather.gov.hk"}
+ALLOWED_HOSTS = {"api.deepseek.com", "dashscope.aliyuncs.com", "open.bigmodel.cn", "rt.data.gov.hk", "data.weather.gov.hk", "data.etabus.gov.hk"}
 _SOURCE_GUARD = contextvars.ContextVar("source_collection_guard", default=None)
 
 

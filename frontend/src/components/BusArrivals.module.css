@@ -1,0 +1,13 @@
+.box { margin: 12px 0; padding: 12px 14px; border: 1px solid #c4d0bd; border-radius: 12px; background: #f4f8ee; color: #26372b; font-size: .82rem; }
+.box strong { font-size: .86rem; }
+.box p { margin: 5px 0; line-height: 1.45; }
+.box small { display: block; color: #50624f; line-height: 1.45; }
+.operator { margin: 8px 0; }
+.operator > span { font-weight: 600; }
+.search { display: block; width: 100%; box-sizing: border-box; margin: 6px 0; padding: 10px; border: 1px solid #b8c5b1; border-radius: 8px; color: inherit; background: #fff; font: inherit; }
+.services { display: grid; gap: 6px; max-height: 300px; overflow-y: auto; margin: 8px 0; }
+.services button { display: grid; gap: 4px; text-align: left; font: inherit; color: inherit; background: #fff; border: 1px solid #cad5c3; border-radius: 8px; padding: 10px; cursor: pointer; }
+.services button[aria-pressed=true] { border-color: #496739; background: #eaf2dc; }
+.pagination { display: flex; gap: 8px; margin: 8px 0; }
+.pagination button { padding: 8px; background: #fff; color: inherit; border: 1px solid #b8c5b1; border-radius: 8px; cursor: pointer; }
+:global(.high-contrast) .box { background: #fff; border-color: #000; color: #000; }

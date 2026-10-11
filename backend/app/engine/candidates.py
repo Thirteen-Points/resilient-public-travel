@@ -36,6 +36,33 @@ class SearchResult:
     truncated: bool
 
 
+def remaining_time_bounds(network, destination, modes, walking_speed):
+    """Admissible reverse distances: ignore waits, closures and weather delay.
+
+    The larger GTFS graph has many short interchange variants. Guiding search
+    toward the destination prevents those variants exhausting the path budget
+    before a longer direct bus reaches its destination. Actual traversal still
+    enforces every calendar, event and profile constraint below.
+    """
+    incoming = {node: [] for node in network.nodes}
+    for edge in network.edges:
+        if edge.mode in modes:
+            cost = edge.walk_m / walking_speed if edge.mode == 'WALK' else edge.travel_s
+            incoming[edge.target].append((edge.source, cost))
+    distances = {destination: 0.0}
+    queue = [(0.0, destination)]
+    while queue:
+        cost, node = heapq.heappop(queue)
+        if cost != distances[node]:
+            continue
+        for previous, duration in incoming[node]:
+            candidate = cost + duration
+            if candidate < distances.get(previous, math.inf):
+                distances[previous] = candidate
+                heapq.heappush(queue, (candidate, previous))
+    return distances
+
+
 def search_paths(snapshot, origin, destination, depart_at, profile, *, modes=None, required_modes=None,
                  max_expansions=30000, max_paths=500):
     network, depart_at = snapshot.network, timestamp(depart_at)
@@ -44,20 +71,29 @@ def search_paths(snapshot, origin, destination, depart_at, profile, *, modes=Non
     if origin == destination:
         return SearchResult([], 0, False)
     allowed_modes = set(modes or {"MTR", "BUS", "MINIBUS", "FERRY", "WALK"}) | {"WALK"}
+    bounds = remaining_time_bounds(network, destination, allowed_modes, profile['walking_speed_mps']) if network.source.get('meta', {}).get('corridor_bus') else None
+    def remaining(node):
+        return bounds.get(node, math.inf) if bounds is not None else 0.0
     serial = itertools.count()
-    # elapsed, deterministic tie-breaker, node, visited, path, walk, boardings, onboard
-    queue = [(0.0, next(serial), origin, frozenset({origin}), (), 0.0, 0, None)]
+    # lower-bound priority, tie-breaker, elapsed, node, visited, path, walk, boardings, onboard
+    queue = [(remaining(origin), next(serial), 0.0, origin, frozenset({origin}), (), 0.0, 0, None)]
     found, expanded = [], 0
     while queue and expanded < max_expansions and len(found) < max_paths:
-        elapsed, _, node, visited, path, walked, boardings, onboard = heapq.heappop(queue)
+        _, _, elapsed, node, visited, path, walked, boardings, onboard = heapq.heappop(queue)
         if node == destination:
+            if path and not path[-1].edge.data.get('gtfs_drop_off', {}).get(node, True):
+                continue
             if set(required_modes or ()) <= {step.edge.mode for step in path}:
                 found.append(path)
             continue
         expanded += 1
         at = depart_at + timedelta(seconds=elapsed)
         for edge in network.adjacency[node]:
+            if onboard and edge.line != onboard and path and not path[-1].edge.data.get('gtfs_drop_off', {}).get(node, True):
+                continue
             if edge.target in visited or edge.mode not in allowed_modes or not allows_edge(edge, network, profile):
+                continue
+            if not math.isfinite(remaining(edge.target)):
                 continue
             walk = walked + edge.walk_m
             boarding = edge.mode != "WALK" and onboard != edge.line
@@ -101,7 +137,8 @@ def search_paths(snapshot, origin, destination, depart_at, profile, *, modes=Non
             traversal = Traversal(edge, departure, arrival, headway, min(factor, end_factor),
                                   tuple(sorted(set(event_ids + end_ids + weather_ids))), boarding, nominal_headway,
                                   weather_conditions)
-            heapq.heappush(queue, ((arrival - depart_at).total_seconds(), next(serial), edge.target,
+            next_elapsed = (arrival - depart_at).total_seconds()
+            heapq.heappush(queue, (next_elapsed + remaining(edge.target), next(serial), next_elapsed, edge.target,
                                   visited | {edge.target}, path + (traversal,), walk, next_boardings,
                                   edge.line if edge.mode != "WALK" else None))
     return SearchResult(found, expanded, bool(queue))
