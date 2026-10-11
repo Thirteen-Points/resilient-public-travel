@@ -8,6 +8,7 @@ export function BackendRoute({ route }: { route: RouteCandidate }) {
     <strong>{route.label}</strong>
     <p className={css.routeTime}>{formatRange(route.total.time_range_s)}</p>
     <dl className={css.metrics}><div><dt>Walking</dt><dd>{route.total.walk_m} <small>m</small></dd></div><div><dt>Transfers</dt><dd>{route.total.transfers}</dd></div><div><dt>Fare estimate</dt><dd>HK${route.total.fare_hkd.toFixed(2)}</dd></div><div><dt>Engine score</dt><dd>{Math.round(route.score * 100)}<small> /100</small></dd></div></dl>
+    <p>Adult Octopus ordinary class · bus section fares · ferry upper deck (lower deck for wheelchair routes). Personal concessions excluded.</p>
     <ProvenanceBadge value={route.provenance} />
     <details open><summary>What shapes this recommendation</summary><div className={css.factors}>{route.score_breakdown?.length ? route.score_breakdown.map(row => <div className={css.factor} key={row.criterion}><span>{row.criterion}</span><span>{(row.weight * 100).toFixed(0)}% weight · {row.contribution.toFixed(3)} contribution</span><div><i style={{ width: `${Math.max(0, Math.min(100, row.weight * 100))}%` }} /></div></div>) : <p>Score factors not supplied.</p>}</div></details>
     <p>{route.explain}</p>

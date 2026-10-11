@@ -2,12 +2,27 @@
 const assert = require('node:assert/strict')
 
 async function navigate(page, name) {
+  // CSS responds to viewport changes before React commits its matchMedia state.
+  // Wait for both to agree before opening a folded menu so the pending resize
+  // handler cannot immediately close a menu we have just opened.
+  await page.waitForFunction(() => {
+    const menu = document.getElementById('navigation-toggle')
+    const navigation = document.getElementById('main-navigation')
+    if (!menu || !navigation) return false
+    const compact = window.matchMedia('(max-width: 1023px)').matches
+    const expanded = menu.getAttribute('aria-expanded') === 'true'
+    const menuVisible = menu.getBoundingClientRect().width > 0
+    return compact ? menuVisible && navigation.hidden === !expanded : !menuVisible && !navigation.hidden
+  })
   const navigation = page.getByRole('navigation', { name: 'Main navigation', exact: true })
   const target = navigation.getByRole('button', { name, exact: true })
   if (!await target.isVisible()) {
     const toggle = page.locator('#navigation-toggle')
-    if (await toggle.isVisible()) await toggle.click()
+    await toggle.waitFor({ state: 'visible' })
+    if (await toggle.getAttribute('aria-expanded') !== 'true') await toggle.click()
+    await page.waitForFunction(() => document.getElementById('navigation-toggle')?.getAttribute('aria-expanded') === 'true' && !document.getElementById('main-navigation')?.hidden)
   }
+  await target.waitFor({ state: 'visible' })
   await target.click()
 }
 

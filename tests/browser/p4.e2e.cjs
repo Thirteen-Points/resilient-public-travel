@@ -81,6 +81,8 @@ let browser, publicPage
     for (const route of routes) {
       assert.ok(Number.isFinite(route.score) && Number.isFinite(route.total.time_s))
       assert.equal(route.legs[0].from, origin); assert.equal(route.legs.at(-1).to, destination)
+      assert.ok(route.legs.every(leg => Number.isFinite(leg.fare_hkd) && leg.fare_hkd >= 0))
+      assert.ok(Math.abs(route.legs.reduce((sum, leg) => sum + leg.fare_hkd, 0) - route.total.fare_hkd) < 0.005, 'Each ticket charge must reconcile with the displayed journey fare')
       if (mobility === 'wheelchair') assert.ok(route.total.walk_m <= 400 && route.total.transfers <= 2 && route.legs.every(leg => leg.accessible === true && leg.mode !== 'MINIBUS'))
     }
   }
@@ -103,6 +105,7 @@ let browser, publicPage
   assert.equal(applied.mobility, 'wheelchair'); assert.ok(applied.max_walk_m <= 400)
   assert.ok(applied.hard_flags.includes('no_stairs') && applied.hard_flags.includes('no_minibus'))
   assert.deepEqual(await page.locator('[data-route-id]').evaluateAll(elements => elements.map(el => el.getAttribute('data-route-id'))), actualRoutes.slice(0, 3).map(route => route.route_id))
+  for (const route of actualRoutes.slice(0, 3)) assert.ok((await page.locator(`[data-route-id="${route.route_id}"]`).innerText()).includes(`HK$${route.total.fare_hkd.toFixed(2)}`))
   pass('real preferences: preview, confirmation, accessible routing')
   await navigate(page, 'Agent')
   const actualChatResponse = page.waitForResponse(response => response.url() === api + '/api/ai/chat' && response.ok())

@@ -2,8 +2,10 @@
 
 Implemented on `codex/frontend-polish`, based on fetched `origin/main`
 `7d658237e432d1a2a38ae95fc300b9331db216a4`, then synchronized with
-`d07730d84df9f9db11b0a439680e4b503997781d` before opening the PR. This work
-was verified locally; the frontend has not been deployed to production.
+`d07730d84df9f9db11b0a439680e4b503997781d` before opening the PR, and updated
+through fare PR #108 at `e393fb3a3617ba12107b1f8c49e89fe7395ac3ca` before
+the latest regression. This work was verified locally; the frontend has not
+been deployed to production.
 
 ## Delivered behavior
 
@@ -31,6 +33,10 @@ was verified locally; the frontend has not been deployed to production.
   Verified bends, directional bus variants, omitted intermediate rail stops and
   multipart boundaries are retained. Routing contracts, ranking, times, fares,
   walking distances and accessibility assumptions were not changed.
+- The main-branch fare update is retained: official adult ticket amounts,
+  per-step ticket charges and price explanations remain in results/details
+  and Agent routes. Connecting MTR lines share one ticket; zero additional
+  charges read "Included in ticket". Retired public pages remain removed.
 - Healthy 3-second public polling stays quiet; source status polling remains
   15 seconds. Offline/failed/stale state retains results with an inline retry
   notice; recovery clears it. Actual route updates use a 4.2-second notification.
@@ -41,11 +47,11 @@ was verified locally; the frontend has not been deployed to production.
 | Check | Result |
 | --- | --- |
 | TypeScript | Passed |
-| Frontend unit suites | 12 files, 118 tests passed after latest-main sync; includes 15 geometry tests |
+| Frontend unit suites | 12 files, 119 tests passed after fare-main sync; includes official seed fares and 15 geometry tests |
 | Public production build | Passed; bundled worker emitted |
 | Administrator production assets | Rebuilt into `backend/app/admin_static` |
 | Geometry regeneration `--check` | Passed: 63 segments, 19 sources, 8,111 vertices, 3 missing directions |
-| Browser integration | 13 groups passed with isolated backend/database and Edge; no page errors |
+| Browser integration | 13 groups passed with isolated backend/database and Edge; after fare-main sync, sequential M2 and P4 runs also passed in headless Chromium without page errors |
 | Production browser smoke | Positron displayed, worker HTTP 200, resize/mobile labels passed; no page errors |
 | Viewports | 320, 390, 768, 1024 and 1440 px checked |
 | Accessibility | Station keyboard search, mobile navigation/Escape, map/list keyboard tabs, large text, high contrast and reduced motion checked |
@@ -59,9 +65,15 @@ pending revisions do not replace approved public facts, a confirmed write is not
 repeated after queue-refresh failure, withdrawal updates routes and public pages
 do not send or store reviewer credentials.
 
+After fare-main synchronization, the suite also verifies that every returned
+ticket charge is finite and nonnegative, step charges reconcile with journey
+totals, and displayed cards match API fares. The navigation helper waits for
+CSS and React breakpoint state to agree before explicitly opening the mobile
+menu, preventing the pending resize handler from closing a newly opened menu.
+
 Three actual administrator approvals in the final regression produced the
-following rendered-map / rendered-route-card timings: **1,374 / 1,253 ms**,
-**3,432 / 3,020 ms**, and **2,940 / 2,944 ms**. All meet the 5-second local
+following rendered-map / rendered-route-card timings: **2,943 / 2,611 ms**,
+**3,104 / 2,961 ms**, and **2,965 / 2,977 ms**. All meet the 5-second local
 acceptance budget. Measurements use a warm local backend, unthrottled browser
 and real DOM/SVG paint, and do not establish hosted-network timing.
 
