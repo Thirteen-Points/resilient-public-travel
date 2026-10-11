@@ -77,7 +77,7 @@ async function ready(url) {
     const text = await panel.innerText()
     assert.ok(text.includes('Backend unstoppable_demand: ' + result.guided.unstoppable_demand.toLocaleString('en-HK')))
     for (const strategy of ['baseline', 'guided']) assert.ok(text.includes(result[strategy].total_delay_person_min.toLocaleString('en-HK')))
-    if (index === 0) { assert.ok(result.delta.delay_reduction_pct < 0); await page.getByText('Guided delay is higher in this simulated scenario', { exact: false }).waitFor() }
+    if (index === 0) { assert.ok(result.delta.delay_reduction_pct < 0); await page.getByText('Guided delay is higher. This scenario shows no delay improvement.', { exact: false }).waitFor() }
     else {
       assert.equal(result.population, 10000); assert.equal(result.seed, 20260922)
       assert.equal(result.provenance, 'simulated'); assert.ok(result.generated_at && result.metric_units)
