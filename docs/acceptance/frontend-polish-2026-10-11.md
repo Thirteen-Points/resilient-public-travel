@@ -3,8 +3,9 @@
 Implemented on `codex/frontend-polish`, based on fetched `origin/main`
 `7d658237e432d1a2a38ae95fc300b9331db216a4`, then synchronized with
 `d07730d84df9f9db11b0a439680e4b503997781d` before opening the PR, and updated
-through fare PR #108 at `e393fb3a3617ba12107b1f8c49e89fe7395ac3ca` before
-the latest regression. This work was verified locally; the frontend has not
+through fare PR #108, transport PR #109 and offline acceptance PR #110 at
+`fe99a6c9abde1e1dba8c8e8e67b13732cb6033d8` before the latest regression.
+This work was verified locally; the frontend has not
 been deployed to production.
 
 ## Delivered behavior
@@ -41,17 +42,23 @@ been deployed to production.
   15 seconds. Offline/failed/stale state retains results with an inline retry
   notice; recovery clears it. Actual route updates use a 4.2-second notification.
   Request cancellation and stale-response protection remain.
+- Main's transport selector and complete modelled station, bus-stop and pier
+  search/map selection remain. BUS/FERRY constraints reach the API; missing
+  minibus service gives an explicit empty result. All returned candidates are
+  available in cards and on the map, with letters and cycling option colours.
 
 ## Recorded validation
 
 | Check | Result |
 | --- | --- |
 | TypeScript | Passed |
-| Frontend unit suites | 12 files, 119 tests passed after fare-main sync; includes official seed fares and 15 geometry tests |
+| Frontend unit suites | 12 files, 122 tests passed after latest-main sync; includes official fares, transport selection and 15 geometry tests |
 | Public production build | Passed; bundled worker emitted |
 | Administrator production assets | Rebuilt into `backend/app/admin_static` |
 | Geometry regeneration `--check` | Passed: 63 segments, 19 sources, 8,111 vertices, 3 missing directions |
-| Browser integration | 13 groups passed with isolated backend/database and Edge; after fare-main sync, sequential M2 and P4 runs also passed in headless Chromium without page errors |
+| Browser integration | 14 groups passed after transport-main sync, using isolated backend/database and headless Chromium; M2 and P4 cover independent administrator review without public retired pages |
+| Offline production build/browser | Package build passed with required media; non-loopback requests blocked, local journey query and source/geometry limits visible, all three simulation API results exactly match frozen files |
+| Existing fallback media | 300-second WebM decoded and sought successfully at five timestamps; inherited media is historical technical evidence |
 | Production browser smoke | Positron displayed, worker HTTP 200, resize/mobile labels passed; no page errors |
 | Viewports | 320, 390, 768, 1024 and 1440 px checked |
 | Accessibility | Station keyboard search, mobile navigation/Escape, map/list keyboard tabs, large text, high contrast and reduced motion checked |
@@ -71,11 +78,18 @@ totals, and displayed cards match API fares. The navigation helper waits for
 CSS and React breakpoint state to agree before explicitly opening the mobile
 menu, preventing the pending resize handler from closing a newly opened menu.
 
-Three actual administrator approvals in the final regression produced the
-following rendered-map / rendered-route-card timings: **2,943 / 2,611 ms**,
-**3,104 / 2,961 ms**, and **2,965 / 2,977 ms**. All meet the 5-second local
+Three actual administrator approvals after transport-main sync produced the
+following rendered-map / rendered-route-card timings: **2,412 / 2,242 ms**,
+**2,988 / 3,029 ms**, and **2,974 / 3,008 ms**. All meet the 5-second local
 acceptance budget. Measurements use a warm local backend, unthrottled browser
 and real DOM/SVG paint, and do not establish hosted-network timing.
+
+The new main-branch offline browser test now chooses Admiralty MTR unambiguously,
+checks retained journey/How it works screens, and verifies frozen simulation
+data directly through the local API. Negative benefit (-8.8%), normal zero
+benefit and stress unmet demand (199) remain unchanged. It no longer navigates
+to the removed Simulation page. Offline screenshots and API records are saved
+in `.cache/p4-browser/`; video playback evidence is in `.cache/p4-media/`.
 
 ## Geometry limits
 
@@ -103,10 +117,12 @@ in `frontend-polish-evidence/` for PR review. The full local capture remains in
 text and high contrast variants. Baseline captures precede the service-hours
 update in `d07730d`.
 
-`after-routes-1440.png` and `after-planner-390.png` were refreshed after the
-fare merge using code commit `d1167a3`. The desktop result now shows the
-official seed rail fare **HK$17.10**; the timestamp and commits are recorded
-in [fare-sync capture metadata](frontend-polish-evidence/fare-sync-capture.json).
+`after-routes-1440.png` and `after-planner-390.png` were refreshed after syncing
+the latest main, including the transport selector. The capture used the working
+tree with the resolved `fe99a6c` merge before its final commit; the prior HEAD
+was `766a876`. The desktop result shows the official seed rail fare **HK$17.10**;
+timestamps, working-tree state and viewport measurements are recorded in
+[capture metadata](frontend-polish-evidence/fare-sync-capture.json).
 All other screenshots and the original production smoke record were captured
 before the fare merge. Older images may show **HK$12.50** and document the
 visual baseline, rather than the current ticket calculation.

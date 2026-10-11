@@ -100,7 +100,8 @@ describe('multi-OD simulation accounting', () => {
     expect(congested.delta?.delay_reduction_pct).toBe(1.6)
     expect(congested.guided.unmet_demand).toBe(199)
     expect(congested.guided.unassigned_demand).toBe(199)
-    expect(congested.generated_at).toBeUndefined()
+    expect(normal.generated_at).toBe(baseline.generated_at)
+    expect(congested.generated_at).toBe(stress.generated_at)
   })
   it('keeps every person in the chart denominator, including unassigned demand', () => {
     const value = parseSimulation(stress), rows = allocationRows(value)!

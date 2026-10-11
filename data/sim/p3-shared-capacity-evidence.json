@@ -1,10 +1,37 @@
 {
   "input_file": "data/sim/m2-route-input.json",
-  "input_sha256": "2dd88817730f7f7c620123a81de9e434b63ac09530d0517f63e3ff7e06ca5bec",
-  "source_revision": "working-tree",
+  "input_sha256": "29895450e2d8bd27e0e176546eb40bb4ff66e17a8692808b5c20c0760100635d",
+  "generated_at": "2026-10-11T09:57:51+00:00",
+  "query_time": "2026-09-22T08:20:00+08:00",
+  "input_version": "m2-six-station-v1",
+  "data_version": {
+    "network_file": "data/sim/frozen-network.seed.json",
+    "network_sha256": "a2a925c8d69e75b8c108d7c5e01468815c17349c62b347105f417294596bae86",
+    "route_policy_file": "data/sim/frozen-route-policy.json",
+    "route_policy_sha256": "3020ae10023c811b9c199b19a8c5d6e713e1439b17c047bc65ad1ccc57ea00dc"
+  },
+  "model_version": "shared-directed-segments-v1",
+  "source_revision": "7ddb778d90bdadcfa8ae3dcb1ca0476de2ac5130",
+  "source_dirty": true,
+  "generator_sha256": "f7d6411d009fb3f7b869b6c2ed3a1dba236ae798419857bbd3bb3f756814db2a",
+  "input_hash_semantics": "SHA-256 of UTF-8 source text with CRLF normalized to LF",
+  "metric_units": {
+    "total_delay_person_min": "person-minutes",
+    "avg_delay_min": "minutes/person",
+    "p95_wait_min": "minutes",
+    "served_demand": "people/window",
+    "unmet_demand": "people/window",
+    "unstoppable_demand": "people/window",
+    "unassigned_demand": "people/window",
+    "shares": "fraction of population",
+    "overloaded_routes": "route count",
+    "overloaded_shared_resources": "directed segment count",
+    "service_capacity_per_hour": "people/hour",
+    "window_min": "minutes"
+  },
   "provenance": "simulated",
   "reproducible_equal": true,
-  "two_runs_elapsed_s": 0.878,
+  "two_runs_elapsed_s": 1.329,
   "previous_model": {
     "source": "data/sim/m2-simulation-result.json",
     "baseline": {
@@ -17881,7 +17908,37 @@
       "Wheelchair/elderly are protected first; accessibility/max-walk and 15-minute route extra-delay are hard constraints. Dedicated wheelchair berth/boarding-assistance throughput is unknown and not guaranteed.",
       "Queue delays are the maximum route/segment bottleneck estimate, not a schedule-based network forecast. No train-by-train seat propagation, external passengers or inter-window carryover is modelled."
     ],
-    "provenance": "simulated"
+    "provenance": "simulated",
+    "generated_at": "2026-10-11T09:57:51+00:00",
+    "query_time": "2026-09-22T08:20:00+08:00",
+    "input_version": "m2-six-station-v1",
+    "input_file": "data/sim/m2-route-input.json",
+    "input_sha256": "29895450e2d8bd27e0e176546eb40bb4ff66e17a8692808b5c20c0760100635d",
+    "data_version": {
+      "network_file": "data/sim/frozen-network.seed.json",
+      "network_sha256": "a2a925c8d69e75b8c108d7c5e01468815c17349c62b347105f417294596bae86",
+      "route_policy_file": "data/sim/frozen-route-policy.json",
+      "route_policy_sha256": "3020ae10023c811b9c199b19a8c5d6e713e1439b17c047bc65ad1ccc57ea00dc"
+    },
+    "model_version": "shared-directed-segments-v1",
+    "source_revision": "7ddb778d90bdadcfa8ae3dcb1ca0476de2ac5130",
+    "source_dirty": true,
+    "generator_sha256": "f7d6411d009fb3f7b869b6c2ed3a1dba236ae798419857bbd3bb3f756814db2a",
+    "input_hash_semantics": "SHA-256 of UTF-8 source text with CRLF normalized to LF",
+    "metric_units": {
+      "total_delay_person_min": "person-minutes",
+      "avg_delay_min": "minutes/person",
+      "p95_wait_min": "minutes",
+      "served_demand": "people/window",
+      "unmet_demand": "people/window",
+      "unstoppable_demand": "people/window",
+      "unassigned_demand": "people/window",
+      "shares": "fraction of population",
+      "overloaded_routes": "route count",
+      "overloaded_shared_resources": "directed segment count",
+      "service_capacity_per_hour": "people/hour",
+      "window_min": "minutes"
+    }
   },
   "stress_10pct_residual": {
     "scenario_id": "m2_six_station_directed_od_am_peak_p3_shared_segments_residual_10pct",
@@ -28962,6 +29019,36 @@
       "Queue delays are the maximum route/segment bottleneck estimate, not a schedule-based network forecast. No train-by-train seat propagation, external passengers or inter-window carryover is modelled.",
       "Stress-only sensitivity: every segment has 10% of simulated capacity available; factor is invented for testing, not measured."
     ],
-    "provenance": "simulated"
+    "provenance": "simulated",
+    "generated_at": "2026-10-11T09:57:51+00:00",
+    "query_time": "2026-09-22T08:20:00+08:00",
+    "input_version": "m2-six-station-v1",
+    "input_file": "data/sim/m2-route-input.json",
+    "input_sha256": "29895450e2d8bd27e0e176546eb40bb4ff66e17a8692808b5c20c0760100635d",
+    "data_version": {
+      "network_file": "data/sim/frozen-network.seed.json",
+      "network_sha256": "a2a925c8d69e75b8c108d7c5e01468815c17349c62b347105f417294596bae86",
+      "route_policy_file": "data/sim/frozen-route-policy.json",
+      "route_policy_sha256": "3020ae10023c811b9c199b19a8c5d6e713e1439b17c047bc65ad1ccc57ea00dc"
+    },
+    "model_version": "shared-directed-segments-v1",
+    "source_revision": "7ddb778d90bdadcfa8ae3dcb1ca0476de2ac5130",
+    "source_dirty": true,
+    "generator_sha256": "f7d6411d009fb3f7b869b6c2ed3a1dba236ae798419857bbd3bb3f756814db2a",
+    "input_hash_semantics": "SHA-256 of UTF-8 source text with CRLF normalized to LF",
+    "metric_units": {
+      "total_delay_person_min": "person-minutes",
+      "avg_delay_min": "minutes/person",
+      "p95_wait_min": "minutes",
+      "served_demand": "people/window",
+      "unmet_demand": "people/window",
+      "unstoppable_demand": "people/window",
+      "unassigned_demand": "people/window",
+      "shares": "fraction of population",
+      "overloaded_routes": "route count",
+      "overloaded_shared_resources": "directed segment count",
+      "service_capacity_per_hour": "people/hour",
+      "window_min": "minutes"
+    }
   }
 }

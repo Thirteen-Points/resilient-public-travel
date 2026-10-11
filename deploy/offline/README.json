@@ -1,46 +1,37 @@
 {
   "meta": {
-    "version": "offline-1.0",
-    "built_at": "2026-09-22",
-    "description": "Minimal offline data package for ResilientRoute. Contains enough data to run the demo without any network connection.",
-    "data_version": "1.0",
-    "source": "See data/PROVENANCE.md for full source tracking",
-    "provenance": "mixed (real + real-derived + simulated)"
+    "version": "p4-offline-v1",
+    "description": "Prepared C technical demo; preinstalled Python and backend dependencies required.",
+    "source": "data/PROVENANCE.md; contracts/sim-precomputed.md",
+    "provenance": "mixed repository data; all passenger simulation results simulated"
   },
-  "includes": {
-    "network": "Minimal transit network: 16 MTR stations, 4 bus stops, 2 piers, 13 lines, 7 walk links",
-    "calendar": "Service calendar with 3 schedule types and 2026 public holidays",
-    "events": "3 seed events (low/medium/high confidence) for demo",
-    "routes": "8 seed candidate routes for TAW->ADM with 2 persona picks",
-    "sim": "1 placeholder SimResult (10k population, guided vs unguided)"
-  },
-  "files": [
-    "data/network/stations.json",
-    "data/network/lines.json",
-    "data/network/walk_links.json",
-    "data/network/bus_routes.json",
-    "data/access/access_points.json",
-    "data/calendar.json",
-    "data/weather_impact.json",
-    "data/capacity_method.md",
-    "data/PROVENANCE.md",
-    "data/DATA_QUALITY.md",
-    "contracts/seed/network.seed.json",
-    "contracts/seed/event.seed.json",
-    "contracts/seed/routes.seed.json",
-    "contracts/seed/sim.seed.json"
+  "ports": {"frontend": 5173, "backend": 8000, "bind": "127.0.0.1"},
+  "prepare": "python scripts/package_offline.py --build --require-media",
+  "windows": "deploy/offline/start.ps1 (P4_PYTHON points to prepared interpreter)",
+  "linux_mac": "bash deploy/offline/start.sh (P4_PYTHON points to prepared interpreter)",
+  "preflight": "python scripts/preflight.py --demo --require-media",
+  "simulation_ids": [
+    "m2_six_station_directed_od_am_peak_p3_shared_segments",
+    "m2_six_station_directed_od_am_peak_p3_shared_segments_residual_10pct"
   ],
-  "startup_instructions": {
-    "windows": "scripts\\start.bat --offline",
-    "linux_mac": "./scripts/start.sh --offline",
-    "docker": "docker-compose -f deploy/docker-compose.yml up",
-    "python_direct": "python -m uvicorn backend.app.main:app (with OFFLINE_MODE=true in .env)"
+  "backup": {
+    "video": "deploy/offline/media/demo.webm",
+    "slides": "deploy/offline/media/slides.pdf",
+    "status": "Historical main PR #110 technical media; former Simulation UI is not current public navigation."
+  },
+  "current_tour": {
+    "first_minute": "Actual public route query",
+    "remaining_four_minutes": "How it works source/path UI with narration of captured frozen simulation API data",
+    "captures": ["01-offline-routes.png", "02-offline-sources.png", "scenario-0.json", "scenario-1.json", "scenario-2.json", "result.json"],
+    "simulation_api": "GET /api/sim/result?scenario_id=ID"
   },
   "notes": [
-    "All data in this package is labelled with provenance (real/real-derived/simulated).",
-    "No external API calls are made in offline mode.",
-    "LLM is disabled by default. Route queries use deterministic logic.",
-    "The demo scenario (TAW->ADM, ERL cross-harbour closed) works fully offline.",
-    "For full functionality, set OFFLINE_MODE=false and configure LLM in .env."
+    "Launch performs no pip/npm installation; runtime and dependencies are prepared separately.",
+    "No live feeds, live LLM or live basemap are required; tile/font failures are tolerated.",
+    "Normal P3 delay reduction is 0%; do not adjust weights to manufacture improvement.",
+    "Public Compare, Simulation and Review pages are removed; simulation API and frozen JSON evidence remain.",
+    "A regenerated PDF uses current route/source screenshots and captured API values, without claiming a Simulation UI.",
+    "The C technical PDF still needs team acceptance or replacement by the team's final PPT export.",
+    "Check package manifest hashes, actual video playback and PDF rendering before sign-off."
   ]
 }

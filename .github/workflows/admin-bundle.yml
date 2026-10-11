@@ -2,7 +2,7 @@ name: Administrator bundle
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, ZYC-P4]
 jobs:
   verify:
     runs-on: ubuntu-latest

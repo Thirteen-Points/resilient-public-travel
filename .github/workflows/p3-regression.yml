@@ -3,7 +3,7 @@ name: P3 and P4 regression
 on:
   pull_request:
   push:
-    branches: [main, ZYC-P3]
+    branches: [main, ZYC-P3, ZYC-P4]
   workflow_dispatch:
 
 permissions:
@@ -41,6 +41,11 @@ jobs:
         run: |
           python scripts/validate_contract_seeds.py
           python scripts/validate_data_layer.py
+      - name: P4 frozen scenarios and performance gates
+        run: |
+          mkdir -p .cache/p4-ci
+          python scripts/preflight.py > .cache/p4-ci/preflight.json
+          python scripts/verify_p4.py --output .cache/p4-ci/performance.json
       - name: Backend and integration regression
         run: python -m pytest --import-mode=importlib backend/tests backend/app/engine/tests tests -q --junitxml=.cache/p3-ci/backend.xml
       - name: Install frontend dependencies
@@ -49,11 +54,8 @@ jobs:
       - name: Frontend regression
         run: npm test -- --reporter=default --reporter=junit --outputFile.junit=../.cache/p3-ci/frontend.xml
         working-directory: frontend
-      - name: Typecheck and production build
-        run: npm run build
-        working-directory: frontend
-        env:
-          VITE_BUILD_SHA: ${{ github.sha }}
+      - name: Typecheck and prepare offline production build
+        run: python scripts/package_offline.py --build --require-media --output .cache/p4-ci/offline.zip
       - name: Install isolated browser runtime
         run: |
           npm install --prefix .cache/p3-playwright --no-audit --no-fund --package-lock=false playwright@1.56.1
@@ -69,11 +71,18 @@ jobs:
           M2_PYTHON: python
           M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
         run: node tests/browser/m2.e2e.cjs
-      - name: P4 preferences, comparisons, simulations and accessibility
+      - name: P4 preferences, transport modes and accessibility
         env:
           M2_PYTHON: python
           M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
         run: node tests/browser/p4.e2e.cjs
+      - name: Offline production browser regression
+        env:
+          M2_PYTHON: python
+          M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
+        run: |
+          node tests/browser/p4.offline.cjs
+          node tests/browser/p4.media.cjs
       - name: Preserve regression evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -83,6 +92,11 @@ jobs:
           path: |
             .cache/p3-ci/
             .cache/m2-browser/
+            .cache/p3-browser/
+            .cache/p4-ci/
+            .cache/p4-browser/
+            .cache/p4-media/
+            .cache/offline-demo/backend.log
           if-no-files-found: warn
           retention-days: 14
 

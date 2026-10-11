@@ -173,6 +173,7 @@ let browser, publicPage
   assert.ok(pair.every(routes => Array.isArray(routes) && routes.length > 0))
   const normal = await call(`/api/sim/result?scenario_id=${normalId}`)
   const stress = await call(`/api/sim/result?scenario_id=${stressId}`)
+  assert.ok(normal.generated_at && normal.query_time && stress.generated_at && stress.query_time)
   assert.equal(normal.baseline.total_delay_person_min, normal.guided.total_delay_person_min)
   assert.equal(stress.guided.unassigned_demand, 199)
   assert.ok(stress.guided.total_delay_person_min < stress.baseline.total_delay_person_min)
