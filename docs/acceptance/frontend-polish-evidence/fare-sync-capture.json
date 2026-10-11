@@ -1,0 +1,12 @@
+{
+  "captured_at": "2026-10-11T10:03:23.202Z",
+  "code_commit": "d1167a3d5d8b9417f46f72506337c7515a14fbd4",
+  "main_commit": "e393fb3a3617ba12107b1f8c49e89fe7395ac3ca",
+  "mode": "fixed seed; local production preview",
+  "updated_images": [
+    "after-routes-1440.png",
+    "after-planner-390.png"
+  ],
+  "visible_first_route_fare_hkd": 17.1,
+  "errors": []
+}

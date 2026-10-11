@@ -103,6 +103,14 @@ in `frontend-polish-evidence/` for PR review. The full local capture remains in
 text and high contrast variants. Baseline captures precede the service-hours
 update in `d07730d`.
 
+`after-routes-1440.png` and `after-planner-390.png` were refreshed after the
+fare merge using code commit `d1167a3`. The desktop result now shows the
+official seed rail fare **HK$17.10**; the timestamp and commits are recorded
+in [fare-sync capture metadata](frontend-polish-evidence/fare-sync-capture.json).
+All other screenshots and the original production smoke record were captured
+before the fare merge. Older images may show **HK$12.50** and document the
+visual baseline, rather than the current ticket calculation.
+
 - [Before · desktop results](frontend-polish-evidence/before-routes-1440.png)
 - [After · desktop results](frontend-polish-evidence/after-routes-1440.png)
 - [Before · mobile planner](frontend-polish-evidence/before-planner-390.png)
