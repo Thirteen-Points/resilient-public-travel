@@ -125,6 +125,45 @@ def test_snapshot_restore_keeps_weather_policy_and_expired_event_does_not_apply(
         assert restored.current.weather_effect("BUS", AT + timedelta(minutes=2))[0] == 1
 
 
+def test_unchanged_reconciliation_reuses_snapshot_but_replans_at_expiry(monkeypatch):
+    route_engine = engine()
+    event = weather_event("WRAINR")
+    event.update(status="published", confidence=.9, reviewed_by="reviewer",
+                 published_at=AT.isoformat(), expires_at=(AT + timedelta(minutes=2)).isoformat())
+    coordinator = RuntimeReplanningCoordinator(route_engine, lambda: [event])
+    coordinator.register_query("watched", query())
+    coordinator.sync_approved_events(observed_at=AT)
+    pinned = route_engine.snapshots.current
+    rainy_time = route_engine.query("A", "B", AT + timedelta(seconds=30), modes=["BUS"])[0]["total"]["time_s"]
+
+    def unexpected_rebuild(_):
+        raise AssertionError("Unchanged events must not rebuild the network snapshot")
+
+    monkeypatch.setattr(route_engine.snapshots, "_make", unexpected_rebuild)
+    for second in range(1, 5):
+        assert not coordinator.sync_approved_events(observed_at=AT + timedelta(seconds=second))["should_replan"]
+        assert route_engine.snapshots.current is pinned
+    expired = coordinator.sync_approved_events(observed_at=AT + timedelta(minutes=3))
+    assert expired["should_replan"]
+    assert route_engine.snapshots.current is pinned
+    assert route_engine.query("A", "B", AT + timedelta(minutes=3), modes=["BUS"])[0]["total"]["time_s"] < rainy_time
+
+
+def test_empty_snapshot_initial_persistence_and_unchanged_updates(tmp_path, monkeypatch):
+    path = tmp_path / "snapshot.json"
+    store = SnapshotStore(engine().snapshots.network, path=path)
+    store.replace_events([])
+    assert path.is_file()
+    assert SnapshotStore.restore(path).current.snapshot_id == store.current.snapshot_id
+    pinned = store.current
+
+    def unexpected_write(*args, **kwargs):
+        raise AssertionError("Unchanged events must not rewrite persisted snapshots")
+
+    monkeypatch.setattr(Path, "write_text", unexpected_write)
+    assert store.replace_events([]) is pinned
+
+
 def test_load_trigger_requires_trusted_continuous_observations_and_recomputes_diversion():
     calls = []
     coordinator = RuntimeReplanningCoordinator(engine(), lambda: [],
