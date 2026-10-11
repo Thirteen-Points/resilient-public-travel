@@ -232,7 +232,7 @@ export function App() {
     invalidateResults(); setError(''); setPreset(next)
     setCustomProfile(previous => previous ? { ...previous, weights: undefined } : undefined)
   }
-  const showRoutes = async (from = origin, to = destination, preference = preset, profile = effectiveProfile) => {
+  const showRoutes = async (from = origin, to = destination, preference = preset, profile = effectiveProfile, traveller = persona) => {
     setActiveField(null)
     if (!to || !from) { setError('Choose a destination and starting point before continuing.'); return }
     if (from === to) { setError('Choose two different stations, stops or piers.'); return }
@@ -240,15 +240,15 @@ export function App() {
     if (!Number.isFinite(Date.parse(departAt))) { setError('Choose a valid Hong Kong departure date and time.'); return }
     searchingRef.current = true; setSearching(true)
     const request = routeRequests.current.begin()
-    const requestedProfile = resolveProfile({ persona, preset: preference, profile })
-    requestedJourney.current = routeSelectionKey({ origin: from, destination: to, departAt, preset: preference, persona, profile: requestedProfile, requiredModes: context.requiredModes })
+    const requestedProfile = resolveProfile({ persona: traveller, preset: preference, profile })
+    requestedJourney.current = routeSelectionKey({ origin: from, destination: to, departAt, preset: preference, persona: traveller, profile: requestedProfile, requiredModes: context.requiredModes })
     requestedScreen.current = screen
     try {
-      const value = { origin: from, destination: to, departAt, preset: preference, persona, requiredModes: context.requiredModes, profile: requestedProfile }
+      const value = { origin: from, destination: to, departAt, preset: preference, persona: traveller, requiredModes: context.requiredModes, profile: requestedProfile }
       const next = SEED_MODE ? await seedDataSource.getRoutes(value) : await live.query(value, request.signal)
       if (!request.current()) return
       setRoutes(next); setOrigin(from); setDestination(to); setPreset(preference); setQueriedAt(departAt)
-      setSubmitted({ key: requestedJourney.current, persona, preset: preference, profile: requestedProfile, transport })
+      setSubmitted({ key: requestedJourney.current, persona: traveller, preset: preference, profile: requestedProfile, transport })
       setSelectedId(next[0]?.route_id ?? null)
       setScreen('results'); setMobileView('content'); setError(''); setPicking(null)
       if (next.length) celebrate(`${next.length} ${SEED_MODE ? 'seed' : 'API'} alternatives ready`)
@@ -332,7 +332,7 @@ export function App() {
             {!SEED_MODE && <p className={css.tiny}>Less walking preset awaits backend support. Wheelchair hard walking and accessibility constraints still apply.</p>}
             <button type="submit" disabled={searching} className={css.primary}>{searching ? 'Finding routes…' : 'Find resilient routes'} <span>↗</span></button>
           </form>
-          {!SEED_MODE && <PreferenceEditor active={screen === 'journey'} profile={effectiveProfile} onApply={next => { invalidateResults(); setCustomProfile(next); setPersona(next.mobility === 'wheelchair' ? 'wheelchair' : 'commuter'); setError('') }} />}
+          {!SEED_MODE && <PreferenceEditor active={screen === 'journey'} profile={effectiveProfile} onApply={next => { invalidateResults(); const traveller = next.mobility === 'wheelchair' ? 'wheelchair' : 'commuter'; setCustomProfile(next); setPersona(traveller); setError(''); if (origin && destination) void showRoutes(origin, destination, preset, next, traveller) }} />}
           <p className={css.tiny}>{SEED_MODE ? 'Only Tai Wai → Admiralty has route candidates in this fixture.' : 'Routes use the modelled network and published events; estimates are not a live timetable.'}</p>
       </div>}
       {screen === 'results' && resultCurrent && submitted && <>
