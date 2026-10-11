@@ -24,6 +24,20 @@ Updates and How it works, including the preference preview/editor. Public
 Compare, Simulation and Review pages have been removed. The simulation APIs and
 shared review components remain available to their backend/administrator clients.
 
+The planner offers All modes, MTR, Bus, Minibus and Ferry before the Agent entry,
+so transport choices remain in the first planner screen. Selecting a mode
+requires every returned journey to include that mode; other modes and walking
+may provide connections. Route cards show all candidates supplied by the API.
+Search and map picking include every modelled station, bus stop and ferry pier.
+Unverified minibus endpoints are excluded from the current network; selecting
+Minibus therefore shows an explicit no-route notice. Fixed seed mode applies
+the same transport filter to its existing candidates.
+
+Below 1024 px, journey, results and details retain the map/list tabs. Plan journey
+opens the planner at the top; map picking opens the map tab and returns to the
+selected field. The map shows the first three candidates and the selected
+candidate, including one selected further down the list.
+
 Review takes place in the separate `/admin/` console using a server-side session.
 It supports evidence extraction/merge, event creation/editing, approval,
 rejection and withdrawal. Previous approved facts remain active while a revised

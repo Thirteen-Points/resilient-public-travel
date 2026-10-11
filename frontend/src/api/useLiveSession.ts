@@ -32,7 +32,7 @@ export function useLiveSession(enabled: boolean) {
     try {
       const result = await transit.queryRoutes(value, undefined, signal)
       if (signal?.aborted || version !== queryVersion.current) throw new Error('Route request superseded; current results retained.')
-      if (active.current && version === queryVersion.current) { committedQuery.current = value; retryRoutes.current = false; setRoutes(result.slice(0, 3)); setRouteWarning('') }
+      if (active.current && version === queryVersion.current) { committedQuery.current = value; retryRoutes.current = false; setRoutes(result); setRouteWarning('') }
       return result
     } catch (cause) {
       if (signal?.aborted && version === queryVersion.current) lastQuery.current = committedQuery.current

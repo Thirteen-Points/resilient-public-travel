@@ -13,8 +13,9 @@ import { UpdatesPage } from './components/UpdatesPage'
 import { ProvenanceBadge } from './components/ProvenanceBadge'
 import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
-import type { DemoMeta, Event, JourneyContext, Network, Persona, Preset, RouteCandidate, Signal, TravelProfile } from './api/types'
-import { CORRIDOR_IDS, formatHkt, formatRange, legDuration, modeSummary, nearestAccessPoint, nodeIndex } from './data'
+import { TRANSPORT_OPTIONS, transportLabel } from './lib/transport'
+import type { DemoMeta, Event, JourneyContext, Network, Persona, Preset, RouteCandidate, Signal, TravelProfile, TransitMode } from './api/types'
+import { formatHkt, formatRange, legDuration, modeSummary, nearestAccessPoint, nodeIndex } from './data'
 import css from './App.module.css'
 
 type Screen = 'journey' | 'results' | 'updates' | 'detail' | 'sources' | 'agent' | 'report'
@@ -41,7 +42,7 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
   const nodes = nodeIndex(network)
   const [query, setQuery] = useState('')
   const [index, setIndex] = useState(0)
-  const choices = CORRIDOR_IDS.map(id => nodes.get(id)!).filter(node =>
+  const choices = network.nodes.filter(node =>
     node.name_en.toLowerCase().includes(query.toLowerCase()) || node.name_zh.includes(query) || node.id.toLowerCase().includes(query.toLowerCase()),
   )
   return <div className={css.fieldWrap}>
@@ -49,7 +50,7 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
     <input id={id} className={`${css.input} ${invalid ? css.invalid : ''}`} role="combobox"
       aria-expanded={active} aria-controls={`${id}-options`} aria-autocomplete="list" aria-invalid={Boolean(invalid)}
       aria-activedescendant={active && choices[index] ? `${id}-option-${choices[index].id}` : undefined}
-      placeholder={label === 'TO' ? 'Choose a destination' : 'Search a station'}
+      placeholder={label === 'TO' ? 'Choose a destination' : 'Search a station, stop or pier'}
       value={active ? query : nodes.get(value)?.name_en ?? ''}
       onFocus={() => { setQuery(''); setIndex(0); onFocus() }}
       onChange={event => { setQuery(event.target.value); setIndex(0) }}
@@ -60,11 +61,11 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
         if (event.key === 'Escape') { onSelect(value); setQuery('') }
       }} />
     {active && <div className={css.suggestions} id={`${id}-options`} role="listbox">
-      <span className={css.suggestionLabel}>STATIONS · SEARCH OR SELECT</span>
+      <span className={css.suggestionLabel}>STATIONS, BUS STOPS & PIERS</span>
       {choices.map((node, i) => <button key={node.id} id={`${id}-option-${node.id}`} type="button" role="option" aria-selected={index === i}
         className={`${css.suggestion} ${index === i ? css.highlighted : ''}`} onMouseDown={event => event.preventDefault()}
-        onClick={() => { onSelect(node.id); setQuery('') }}>{node.name_en}<small>{node.name_zh}</small></button>)}
-      {!choices.length && <p className={css.small}>No matching seed station. Map selection is available.</p>}
+        onClick={() => { onSelect(node.id); setQuery('') }}>{node.name_en}<small>{node.kind === 'bus_stop' ? 'Bus stop' : node.kind === 'pier' ? 'Ferry pier' : 'MTR'} · {node.name_zh}</small></button>)}
+      {!choices.length && <p className={css.small}>No matching modelled station, stop or pier. Map selection is available.</p>}
       <button type="button" className={css.mapChoice} onMouseDown={event => event.preventDefault()} onClick={onPickMap}>◎ Select a point on the map</button>
     </div>}
   </div>
@@ -92,8 +93,9 @@ function RouteCard({ route, letter, network, selected, onSelect, onDetail }: {
     <div className={css.routeCaveat}><ProvenanceBadge value={route.provenance} compact /><span>{route.warnings[0] ?? 'No specific warning in fixture; verify service.'}</span></div>
     <p className={css.routeFreshness}>{route.notes[0] ?? 'Illustrative candidate'} · {SEED_MODE ? 'Seed age at snapshot' : 'Source age at query'} {route.total.freshness_s}s</p>
     <div className={css.lineChips}>{Array.from(new Set(route.legs.filter(leg => leg.line).map(leg => leg.line!))).map(id => {
-      const style = lineStyle(resolveLine(network, id), id)
-      return <span key={id} title={style.label}><i style={{ background: lineGradient(style.colors) }} />{id.replace('BUS_', '')}{style.colors.length > 1 ? ' · joint' : ''}</span>
+      const line = resolveLine(network, id)
+      const style = lineStyle(line, id)
+      return <span key={id} title={style.label}><i style={{ background: lineGradient(style.colors) }} />{line?.name_en ?? id}{style.colors.length > 1 ? ' · joint' : ''}</span>
     })}</div>
     <details className={css.routeEvidence}><summary>Score, preferences & sources</summary>
       {route.score_breakdown?.length ? route.score_breakdown.map(factor => <div className={css.factor} key={factor.criterion}><span>{factor.criterion}</span><span>{Math.round(factor.weight * 100)}% weight · {factor.contribution.toFixed(3)}</span></div>) : <p>No factor breakdown supplied in this seed.</p>}
@@ -124,6 +126,7 @@ export function App() {
   const [error, setError] = useState('')
   const [preset, setPreset] = useState<Preset>('fastest')
   const [persona, setPersona] = useState<Persona>('commuter')
+  const [transport, setTransport] = useState<'all' | TransitMode>('all')
   const [customProfile, setCustomProfile] = useState<TravelProfile | undefined>()
   const effectiveProfile = useMemo(() => resolveProfile({ persona, preset, profile: customProfile }), [persona, preset, customProfile])
   const [largeText, setLargeText] = useState(false), [highContrast, setHighContrast] = useState(false)
@@ -142,8 +145,8 @@ export function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = useMemo(() => routes.find(route => route.route_id === selectedId), [routes, selectedId])
   const eventRevisions = (SEED_MODE ? seedBundle?.published : live.bundle?.published)?.map(event => `${event.event_id}@${event.version}`).sort().join(',') ?? ''
-  const context = useMemo<JourneyContext>(() => ({ origin, destination, departAt: hktDeparture(departureDate, departure), preset, persona, profile: effectiveProfile, eventRevisions, eventIds: eventRevisions ? eventRevisions.split(',').map(value => value.slice(0, value.lastIndexOf('@'))) : [] }), [origin, destination, departureDate, departure, preset, persona, effectiveProfile, eventRevisions])
-  const plannerKey = JSON.stringify([origin, destination, context.departAt, effectiveProfile])
+  const context = useMemo<JourneyContext>(() => ({ origin, destination, departAt: hktDeparture(departureDate, departure), preset, persona, profile: effectiveProfile, requiredModes: transport === 'all' ? undefined : [transport], eventRevisions, eventIds: eventRevisions ? eventRevisions.split(',').map(value => value.slice(0, value.lastIndexOf('@'))) : [] }), [origin, destination, departureDate, departure, preset, persona, effectiveProfile, transport, eventRevisions])
+  const plannerKey = JSON.stringify([origin, destination, context.departAt, effectiveProfile, transport])
   useEffect(() => {
     if (searchingRef.current && (requestedJourney.current !== plannerKey || requestedScreen.current !== screen)) { routeRequests.current.cancel(); searchingRef.current = false; setSearching(false) }
   }, [plannerKey, screen])
@@ -204,6 +207,7 @@ export function App() {
   const nodes = nodeIndex(network)
   const celebrate = (text: string) => setSuccess(previous => ({ text, revision: previous.revision + 1 }))
   const navigate = (next: Screen) => {
+    if (next === 'journey') window.scrollTo({ top: 0, behavior: 'instant' })
     setScreen(next); setMenuOpen(false); setMobileView('content'); setActiveField(null); setPicking(null)
   }
   const pickOnMap = (field: Field) => {
@@ -217,32 +221,35 @@ export function App() {
   const showRoutes = async (from = origin, to = destination, preference = preset, profile = effectiveProfile) => {
     setActiveField(null)
     if (!to || !from) { setError('Choose a destination and starting point before continuing.'); return }
-    if (from === to) { setError('Choose two different stations.'); return }
+    if (from === to) { setError('Choose two different stations, stops or piers.'); return }
     const departAt = hktDeparture(departureDate, departure)
     if (!Number.isFinite(Date.parse(departAt))) { setError('Choose a valid Hong Kong departure date and time.'); return }
     searchingRef.current = true; setSearching(true)
     const request = routeRequests.current.begin()
     const requestedProfile = resolveProfile({ persona, preset: preference, profile })
-    requestedJourney.current = JSON.stringify([from, to, departAt, requestedProfile])
+    requestedJourney.current = JSON.stringify([from, to, departAt, requestedProfile, transport])
     requestedScreen.current = screen
     try {
-      const value = { origin: from, destination: to, departAt, preset: preference, persona, ...(!SEED_MODE ? { profile: requestedProfile } : {}) }
+      const value = { origin: from, destination: to, departAt, preset: preference, persona, requiredModes: context.requiredModes, ...(!SEED_MODE ? { profile: requestedProfile } : {}) }
       const next = SEED_MODE ? await seedDataSource.getRoutes(value) : await live.query(value, request.signal)
       if (!request.current()) return
-      setRoutes(next.slice(0, 3)); setOrigin(from); setDestination(to); setPreset(preference); setQueriedAt(departAt)
+      setRoutes(next); setOrigin(from); setDestination(to); setPreset(preference); setQueriedAt(departAt)
       setSelectedId(next[0]?.route_id ?? null)
       setScreen('results'); setMobileView('content'); setError(''); setPicking(null)
-      if (next.length) celebrate(`${Math.min(next.length, 3)} ${SEED_MODE ? 'seed' : 'API'} alternatives ready`)
+      if (next.length) celebrate(`${next.length} ${SEED_MODE ? 'seed' : 'API'} alternatives ready`)
     } catch (cause) { if (request.current()) setError(`Route data could not be loaded. ${cause instanceof Error ? cause.message : String(cause)}`) }
     finally { if (request.current()) { setSearching(false); searchingRef.current = false } }
   }
   const mapPick = (point: { lat: number; lng: number }) => {
     if (!picking) return
     const nearest = nearestAccessPoint(network, point)
-    if (!nearest) { setError(`No modelled access point within ${network.meta.catchment_m} m. Search by station instead.`); return }
+    if (!nearest) { setError(`No modelled access point within ${network.meta.catchment_m} m. Search for a station, stop or pier instead.`); return }
     setField(picking, nearest.node.id)
-    setPicked(`Closest modelled station: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. ${nearest.node.accessible === true ? 'Accessibility uses modelled assumptions; verify on site.' : 'Accessibility is unknown or incomplete; verify on site.'}`)
-    if (compactViewport) requestAnimationFrame(() => document.getElementById('content-view-tab')?.focus())
+    setPicked(`Closest modelled stop: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. ${nearest.node.accessible === true ? 'Accessibility uses modelled assumptions; verify on site.' : 'Accessibility is unknown or incomplete; verify on site.'}`)
+    if (compactViewport) requestAnimationFrame(() => {
+      document.getElementById(picking)?.scrollIntoView({ block: 'center' })
+      document.getElementById('content-view-tab')?.focus({ preventScroll: true })
+    })
   }
   const activeRoutes = screen === 'results' || screen === 'detail' ? routes : []
   const journeyScreen = screen === 'journey' || screen === 'results' || screen === 'detail'
@@ -293,13 +300,15 @@ export function App() {
       {screen === 'report' && (SEED_MODE ? <section className={css.panel}><h1>Reports use the API.</h1><p>Switch to API mode to submit an unverified report.</p><button type="button" onClick={switchDataMode}>Use API mode</button></section> : <SignalReportForm onAccepted={() => void live.refresh()} />)}
       {screen === 'journey' && <div id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'content-view-tab' : undefined} className={`${css.panel} ${css.mobilePanel}`}>
           <h1>Where are you<br />heading?</h1>
-          <p className={css.subhead}>Search a modelled station or select it on the map.</p>
+          <p className={css.subhead}>Choose transport, then search a station, bus stop or ferry pier.</p>
+          <fieldset className={`${css.presets} ${css.transportChoices}`}><legend>TRANSPORT · 交通方式</legend>{TRANSPORT_OPTIONS.map(option => <button key={option.id} type="button" aria-pressed={transport === option.id} disabled={searching} className={transport === option.id ? css.activePreset : ''} onClick={() => { setTransport(option.id); setActiveField(null); setPicking(null); setError('') }}>{option.label}</button>)}</fieldset>
+          <p className={css.tiny}>{transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus · 小巴: routes are not available in this modelled network yet. Choose another mode for available routes.' : transport === 'all' ? 'Compare all available modes, including bus and ferry connections.' : `Routes include ${transportLabel([transport])}; other modes and walking may provide connections.`}</p>
           <button type="button" className={css.agentEntry} onClick={() => { navigate('agent'); setError('') }}><AgentAvatar issue={published.length > 0} small /><span><strong>Meet your route companion</strong><small>Ask the Agent · explore this scenario</small></span><b>↗</b></button>
           <form onSubmit={event => { event.preventDefault(); void showRoutes() }}>
             <StationField id="origin" label="FROM" value={origin} network={network} active={activeField === 'origin'} onFocus={() => { setActiveField('origin'); setPicking(null) }} onSelect={value => setField('origin', value)} onPickMap={() => pickOnMap('origin')} />
             <button className={css.swap} type="button" onClick={() => { setOrigin(destination); setDestination(origin); setActiveField(null) }} aria-label="Swap stations">⇅</button>
             <StationField id="destination" label="TO" value={destination} network={network} active={activeField === 'destination'} invalid={Boolean(error && !destination)} onFocus={() => { setActiveField('destination'); setPicking(null) }} onSelect={value => setField('destination', value)} onPickMap={() => pickOnMap('destination')} />
-            <div className={css.fieldAssist}><button type="button" onClick={() => pickOnMap('destination')}>◎ Tap the map</button><span>Within {network.meta.catchment_m} m of a station</span></div>
+            <div className={css.fieldAssist}><button type="button" onClick={() => pickOnMap('destination')}>◎ Tap the map</button><span>Within {network.meta.catchment_m} m of a stop</span></div>
             {picked && <p className={css.confirm}>{picked}</p>}
             {error && <p role="alert" className={css.error}>{error}</p>}
             <DeparturePicker date={departureDate} time={departure} onDate={setDepartureDate} onTime={setDeparture} />
@@ -317,10 +326,10 @@ export function App() {
           {published[0] && <div className={css.alert}><span aria-hidden="true">!</span><strong>{published[0].title}</strong><span className={css.alertDetail}>Published event · {formatHkt(published[0].updated_at)}</span><button type="button" onClick={() => navigate('updates')}>View update →</button></div>}
           <span className={css.kicker}>ROUTES FOR YOUR JOURNEY</span>
           <h1 id="routes-heading">{nodes.get(origin)?.name_en ?? origin} <span>→</span><br />{nodes.get(destination)?.name_en ?? destination}</h1>
-          <p className={css.subhead}>{routes.length} alternatives · {PRESETS.find(option => option.id === preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
+          <p className={css.subhead}>{routes.length} alternatives · {transportLabel(context.requiredModes)} · {PRESETS.find(option => option.id === preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
           {!SEED_MODE && <p className={css.queryStamp}>Requested profile: {profileLabel(effectiveProfile)}</p>}
           <p className={css.queryStamp}>Requested departure: {formatHkt(queriedAt)}<br /><small>Query value: {queriedAt} · {SEED_MODE ? 'fixed seed estimates filtered by modelled service hours; journey times are not recalculated.' : 'recomputed when the graph or published events change.'}</small></p>
-          {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={'ABC'[index]} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); navigate('detail') }} />)}</div> : <div className={css.empty} role="status"><strong>No feasible route at the selected departure time.</strong><p>Try another time or station pair. Check operator schedules before travel.</p></div>}
+          {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={String.fromCharCode(65 + index)} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); navigate('detail') }} />)}</div> : <div className={css.empty} role="status"><strong>No {transport === 'all' ? '' : `${transportLabel([transport])} `}route returned for this pair.</strong><p>{transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus routes are not available in the current modelled network yet. Choose another transport mode.' : SEED_MODE ? 'The fixed fixture only covers Tai Wai → Admiralty. Switch to API mode to query other stations, stops and piers.' : 'Try All modes, another departure, or another station, bus stop or ferry pier.'}</p><button type="button" className={css.back} onClick={() => navigate('journey')}>Edit transport and journey →</button></div>}
           <p className={css.tiny}>{SEED_MODE ? 'Fixed illustrative candidates.' : 'API candidates on the modelled network.'} Fares use adult Octopus ordinary class, bus section fares and ferry upper deck prices; personal concessions are excluded. Published events affect the network overlay. Times and scores are derived estimates.</p>
         </section>
       </>}

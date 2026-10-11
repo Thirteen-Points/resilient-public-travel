@@ -39,23 +39,25 @@ class RouteEngine:
         engine.routing_data = data
         return engine
 
-    def query(self, origin, destination, depart_at, profile=None, *, event_ids=None, modes=None, limit=10):
+    def query(self, origin, destination, depart_at, profile=None, *, event_ids=None, modes=None, required_modes=None, limit=10):
         """RouteCandidate[]; already personalized and score sorted (UI may take [:3])."""
         return self.query_details(origin, destination, depart_at, profile, event_ids=event_ids,
-                                  modes=modes, limit=limit)["routes"]
+                                  modes=modes, required_modes=required_modes, limit=limit)["routes"]
 
-    def query_details(self, origin, destination, depart_at, profile=None, *, event_ids=None, modes=None, limit=10):
+    def query_details(self, origin, destination, depart_at, profile=None, *, event_ids=None, modes=None, required_modes=None, limit=10):
         fares, fare_revision = self.fares, None
         if self.fare_store is not None:
             fare_revision, fares = self.fare_store.snapshot(thaw(self.snapshots.network.source), depart_at)
         return self._query_details(origin, destination, depart_at, profile, event_ids=event_ids, modes=modes,
-                                   limit=limit, fares=fares, fare_revision=fare_revision)
+                                   required_modes=required_modes, limit=limit, fares=fares, fare_revision=fare_revision)
 
-    def _query_details(self, origin, destination, depart_at, profile=None, *, event_ids=None, modes=None, limit=10, fares, fare_revision):
+    def _query_details(self, origin, destination, depart_at, profile=None, *, event_ids=None, modes=None, required_modes=None, limit=10, fares, fare_revision):
         if not isinstance(limit, int) or not 1 <= limit <= 50:
             raise ValueError("limit must be an integer in [1,50]")
         if modes is not None and (not modes or set(modes) - MODES):
             raise ValueError("modes must contain known transit modes")
+        if required_modes is not None and (not required_modes or set(required_modes) - (MODES - {'WALK'})):
+            raise ValueError("required_modes must contain known transit modes excluding WALK")
         at, profile = timestamp(depart_at), normalize_profile(profile)
         snapshot = self.snapshots.current
         # event_ids identifies the disruption context; it cannot disable other published closures.
@@ -63,11 +65,11 @@ class RouteEngine:
         if unknown:
             raise ValueError(f"Unknown event_ids: {sorted(unknown)}")
         key = json.dumps([snapshot.snapshot_id, origin, destination, at.isoformat(), profile,
-                          sorted(event_ids or ()), sorted(modes or ()), limit, self.baseline_fare, fare_revision], sort_keys=True)
+                          sorted(event_ids or ()), sorted(modes or ()), sorted(required_modes or ()), limit, self.baseline_fare, fare_revision], sort_keys=True)
         cached = self.cache.get(key)
         if cached is not None:
             return attach_load(cached, self.load_provider)
-        found = search_paths(snapshot, origin, destination, at, profile, modes=modes,
+        found = search_paths(snapshot, origin, destination, at, profile, modes=modes, required_modes=required_modes,
                              max_expansions=self.max_expansions)
         paths = select_diverse(found.paths, limit)
         fallback = {}

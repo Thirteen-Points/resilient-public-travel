@@ -36,7 +36,7 @@
 .subhead { margin: 0 0 24px; color: var(--rr-text-secondary); font-size: var(--rr-font-body); line-height: 1.5; }
 .panel form { position: relative; }
 .fieldWrap { position: relative; margin-bottom: 16px; }
-.fieldLabel, .presets legend { display: block; margin: 0 0 8px; color: var(--rr-text-primary); font-size: var(--rr-font-label); line-height: 1.4286; font-weight: 500; letter-spacing: normal; }
+.fieldLabel, .presets legend, .transportChoices legend { display: block; margin: 0 0 8px; color: var(--rr-text-primary); font-size: var(--rr-font-label); line-height: 1.4286; font-weight: 500; letter-spacing: normal; }
 .input, .textarea { width: 100%; min-height: 56px; padding: 12px 16px; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-input); color: var(--rr-text-primary); background: var(--rr-bg-surface); font-size: var(--rr-font-body); line-height: 1.5; }
 .input:focus, .textarea:focus { border-color: var(--rr-route-a); }
 .input.invalid { border-color: var(--rr-status-affected); background: var(--rr-bg-danger); }
@@ -58,6 +58,11 @@
 .presets { display: flex; gap: 8px; flex-wrap: wrap; padding: 0; border: 0; margin: 24px 0; min-width: 0; }
 .presets button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-pill); background: var(--rr-bg-surface); color: var(--rr-text-primary); font-size: var(--rr-font-label); font-weight: 500; }
 .presets button.activePreset, .presets button[aria-pressed=true] { background: var(--rr-bg-subtle); border-color: var(--rr-text-brand); box-shadow: inset 0 0 0 1px var(--rr-text-brand); }
+.transportChoices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0 0 24px; min-width: 0; padding: 0; border: 0; }
+.transportChoices button { min-width: 0; min-height: 48px; padding: 12px; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-pill); background: var(--rr-bg-surface); color: var(--rr-text-primary); font-size: var(--rr-font-label); line-height: 1.4286; font-weight: 500; white-space: normal; overflow-wrap: anywhere; }
+.transportChoices button:hover:not(:disabled) { background: var(--rr-bg-page); }
+.transportChoices button[aria-pressed=true] { border-color: var(--rr-text-brand); background: var(--rr-bg-subtle); box-shadow: inset 0 0 0 1px var(--rr-text-brand); }
+.transportChoices button:focus-visible { outline: 2px solid var(--rr-route-a); outline-offset: 2px; }
 .primary { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; min-height: 48px; padding: 12px 24px; border: 0; border-radius: var(--rr-radius-pill); background: var(--rr-bg-brand); color: var(--rr-text-brand); text-align: left; font-size: var(--rr-font-label); line-height: 1.4286; font-weight: 500; }
 .primary:hover { background: var(--rr-bg-hover); }
 .primary span { font-size: calc(var(--rr-font-body) * 1.5); }
@@ -75,8 +80,8 @@
 .kicker { display: block; margin-bottom: 8px; color: var(--rr-text-secondary); font-size: var(--rr-font-label); font-weight: 500; letter-spacing: normal; }
 .routeList { display: grid; gap: 24px; }
 .routeCard { min-width: 0; overflow: hidden; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-card); background: var(--rr-bg-surface); --candidate: var(--rr-route-a); }
-.routeCard:nth-child(2) { --candidate: var(--rr-route-b); }
-.routeCard:nth-child(3) { --candidate: var(--rr-route-c); }
+.routeCard:nth-child(3n+2) { --candidate: var(--rr-route-b); }
+.routeCard:nth-child(3n+3) { --candidate: var(--rr-route-c); }
 .selectedRoute { border-color: var(--candidate); box-shadow: inset 0 0 0 1px var(--candidate); }
 .routeSelect { display: block; width: 100%; min-height: 48px; padding: 16px; border: 0; background: transparent; color: var(--rr-text-primary); text-align: left; }
 .routeSelect:focus-visible { outline-offset: -4px; }
@@ -189,5 +194,5 @@
   .timeline { grid-template-columns: 1fr; }
   .timeline li + li { padding-top: 16px; border-top: 1px solid var(--rr-border-control); }
 }
-@media (max-width: 767px) { .header { padding: 16px 20px; } .stage, .journeyLayout { padding: 0 20px 32px; } .panel, .journeyLayout .mobilePanel { padding: 24px 16px; } .refreshNotice { flex-wrap: wrap; } }
+@media (max-width: 767px) { .header { padding: 16px 20px; } .stage, .journeyLayout { padding: 0 20px 32px; } .panel, .journeyLayout .mobilePanel { padding: 24px 16px; } .refreshNotice { flex-wrap: wrap; } .transportChoices button { padding-right: 8px; padding-left: 8px; } }
 @media (max-width: 359px) { .header { padding: 16px; } .stage, .journeyLayout { padding: 0 16px 32px; } .accessControls button { padding: 8px 12px; } }

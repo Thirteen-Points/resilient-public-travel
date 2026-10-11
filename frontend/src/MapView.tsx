@@ -3,7 +3,7 @@ import L from 'leaflet'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import type { Event, Network, RouteCandidate } from './api/types'
-import { CORRIDOR_IDS, nodeIndex } from './data'
+import { CORRIDOR_IDS } from './data'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
 import { resolveNetworkLineGeometry, resolveRouteLegGeometry, resolveImpactGeometry } from './map/geometry'
 import css from './MapView.module.css'
@@ -164,9 +164,7 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
         if (label) line.bindTooltip(label)
       })
     }
-    const nodes = nodeIndex(network)
-    for (const id of picking ? CORRIDOR_IDS : []) {
-      const node = nodes.get(id)
+    for (const node of picking ? network.nodes : []) {
       if (!node || !Number.isFinite(node.lat) || !Number.isFinite(node.lng)) continue
       L.circle([node.lat, node.lng], {
         radius: node.catchment_m ?? network.meta.catchment_m,
@@ -179,13 +177,13 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
         geometry.parts.forEach((part, index) => draw(part, lineStyle(line).colors, 2, routes.length ? .2 : .4, geometry.partQualities[index] === 'schematic'))
       }
     }
-    routes.slice(0, 3).map((route, index) => ({ route, index })).sort((a, b) => Number(a.route.route_id === selectedRouteId) - Number(b.route.route_id === selectedRouteId)).forEach(({ route, index }) => {
+    routes.map((route, index) => ({ route, index })).filter(({ route, index }) => index < 3 || route.route_id === selectedRouteId).sort((a, b) => Number(a.route.route_id === selectedRouteId) - Number(b.route.route_id === selectedRouteId)).forEach(({ route, index }) => {
       for (const leg of route.legs) {
         const geometry = resolveRouteLegGeometry(leg, network)
         schematic ||= geometry.quality === 'schematic' || geometry.quality === 'mixed'
         const selected = route.route_id === selectedRouteId
         const style = lineStyle(resolveLine(network, leg.line), leg.line ?? leg.mode)
-        geometry.parts.forEach((part, partIndex) => draw(part, [routeColours[index]], selected ? 6 : 4, selected ? 1 : .65, leg.mode === 'WALK' || geometry.partQualities[partIndex] === 'schematic', selected, `Option ${'ABC'[index]} · ${leg.mode === 'WALK' ? 'Walk' : style.label}${geometry.partQualities[partIndex] === 'schematic' ? ' · schematic connection' : ''}`))
+        geometry.parts.forEach((part, partIndex) => draw(part, [routeColours[index % routeColours.length]], selected ? 6 : 4, selected ? 1 : .65, leg.mode === 'WALK' || geometry.partQualities[partIndex] === 'schematic', selected, `Option ${String.fromCharCode(65 + index)} · ${leg.mode === 'WALK' ? 'Walk' : style.label}${geometry.partQualities[partIndex] === 'schematic' ? ' · schematic connection' : ''}`))
       }
     })
     for (const event of published) for (const segment of event.affected_segments) {
@@ -199,8 +197,9 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
       const middle = geometry.parts[0]?.[Math.floor(geometry.parts[0].length / 2)]
       if (middle) L.marker(middle, { keyboard: false, interactive: false, icon: L.divIcon({ className: `${css.impactMarker} ${segment.impact === 'closed' ? '' : css.affectedMarker}`, html: segment.impact === 'closed' ? '×' : '!', iconSize: [24, 24], iconAnchor: [12, 12] }) }).addTo(group)
     }
-    for (const id of CORRIDOR_IDS) {
-      const node = nodes.get(id)
+    for (const node of network.nodes) {
+      const id = node.id
+      const corridor = CORRIDOR_IDS.some(stationId => stationId === id)
       if (!node || !Number.isFinite(node.lat) || !Number.isFinite(node.lng)) continue
       const label = document.createElement('span')
       const english = document.createElement('span')
@@ -208,9 +207,9 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
       english.textContent = `${node.name_en} · `
       label.append(english, document.createTextNode(node.name_zh))
       L.circleMarker([node.lat, node.lng], {
-        radius: node.lines.length > 1 ? 7 : 5, color: '#18221D', weight: 2,
+        radius: corridor ? node.lines.length > 1 ? 7 : 5 : 4, color: node.kind === 'bus_stop' ? '#B14336' : node.kind === 'pier' ? '#287857' : '#18221D', weight: 2,
         fillColor: '#fff', fillOpacity: 1,
-      }).bindTooltip(label, { permanent: true, direction: id === 'ADM' || id === 'MKK' ? 'left' : 'right', offset: [id === 'ADM' || id === 'MKK' ? -9 : 9, 0], className: css.stationLabel }).addTo(group)
+      }).bindTooltip(label, { permanent: corridor, direction: id === 'ADM' || id === 'MKK' ? 'left' : 'right', offset: [id === 'ADM' || id === 'MKK' ? -9 : 9, 0], className: css.stationLabel }).addTo(group)
       L.circleMarker([node.lat, node.lng], { radius: 22, opacity: 0, fillOpacity: 0 }).bindTooltip(`${node.name_en} · ${node.name_zh}`, { className: css.stationLabel }).addTo(group)
     }
     const points = routes.flatMap(route => route.legs.flatMap(leg => resolveRouteLegGeometry(leg, network).parts.flat()))
@@ -237,12 +236,12 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     <div ref={element} className={css.map} data-event-revisions={renderedRevision} tabIndex={0} aria-label="Hong Kong journey map. Arrow keys pan; plus and minus zoom. Stations can also be selected from the journey form." />
     <div className={css.tools}><button type="button" onClick={() => resetRef.current(true)} aria-label="Fit corridor on map">◎ Fit journey</button></div>
     <details className={css.legend}><summary>Map legend <span aria-hidden="true">↗</span></summary><div>
-      {routes.map((route, index) => <p key={route.route_id}><b className={css.routeBadge} style={{ background: ['#1565C0', '#6A1B9A', '#00838F'][index] }}>{'ABC'[index]}</b><span>Option {'ABC'[index]}{route.route_id === selectedRouteId ? ' · selected' : ''}</span></p>)}
+      {routes.map((route, index) => <p key={route.route_id}><b className={css.routeBadge} style={{ background: ['#1565C0', '#6A1B9A', '#00838F'][index % 3] }}>{String.fromCharCode(65 + index)}</b><span>Option {String.fromCharCode(65 + index)}{route.route_id === selectedRouteId ? ' · selected' : ''}</span></p>)}
       <p>White outline: selected route</p><p>× Red dashes: closed · ! Amber dots: affected</p><p>Dotted paths: walking or schematic connections</p>
       <details><summary>Transport lines</summary>{network.lines.map(line => { const style = lineStyle(line); return <p key={line.id}><i style={{ background: lineGradient(style.colors) }} /><span>{style.label}</span></p> })}</details>
       <p>Verified paths use CSDI geographic snapshots. Connections without a verified path are schematic.</p>
     </div></details>
     <p className={css.caption}>{provider}{hasSchematic ? ' · includes schematic connections' : ' · sourced path geometry'}</p>
-    {picking && <p className={css.pickHint}>Tap near a station, within {network.meta.catchment_m} m. Or search by name.</p>}
+    {picking && <p className={css.pickHint}>Tap near a station, bus stop or ferry pier, within {network.meta.catchment_m} m. Or search by name.</p>}
   </div>
 }

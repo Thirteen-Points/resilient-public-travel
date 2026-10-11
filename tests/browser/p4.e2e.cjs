@@ -30,7 +30,7 @@ async function ready(url, child) {
 function pass(name) { checks.push(name); console.log('PASS ' + name) }
 async function selectStation(page, field, name) {
   await page.getByRole('combobox', { name: field, exact: true }).click()
-  await page.getByRole('option', { name: new RegExp(name) }).click()
+  await page.getByRole('option', { name: new RegExp(`^${name} MTR ·`) }).click()
 }
 async function chooseTomorrow(page) {
   const day = new Date(Date.now() + 8 * 3600000 + 24 * 3600000).toISOString().slice(0, 10)
@@ -104,8 +104,8 @@ let browser, publicPage
   const applied = routeBodies[0].profile
   assert.equal(applied.mobility, 'wheelchair'); assert.ok(applied.max_walk_m <= 400)
   assert.ok(applied.hard_flags.includes('no_stairs') && applied.hard_flags.includes('no_minibus'))
-  assert.deepEqual(await page.locator('[data-route-id]').evaluateAll(elements => elements.map(el => el.getAttribute('data-route-id'))), actualRoutes.slice(0, 3).map(route => route.route_id))
-  for (const route of actualRoutes.slice(0, 3)) assert.ok((await page.locator(`[data-route-id="${route.route_id}"]`).innerText()).includes(`HK$${route.total.fare_hkd.toFixed(2)}`))
+  assert.deepEqual(await page.locator('[data-route-id]').evaluateAll(elements => elements.map(el => el.getAttribute('data-route-id'))), actualRoutes.map(route => route.route_id))
+  for (const route of actualRoutes) assert.ok((await page.locator(`[data-route-id="${route.route_id}"]`).innerText()).includes(`HK$${route.total.fare_hkd.toFixed(2)}`))
   pass('real preferences: preview, confirmation, accessible routing')
   await navigate(page, 'Agent')
   const actualChatResponse = page.waitForResponse(response => response.url() === api + '/api/ai/chat' && response.ok())
@@ -180,6 +180,34 @@ let browser, publicPage
   const missing = await fetch(api + '/api/sim/result?scenario_id=missing-browser-test-scenario')
   assert.equal(missing.status, 404)
   pass('comparison profiles and simulation contracts remain available through the API')
+  // Latest mode selection includes connecting modes and displays every result.
+  await navigate(page, 'Plan journey'); await page.getByRole('button', { name: 'Commuter', exact: true }).click()
+  await selectStation(page, 'TO', 'Admiralty')
+  for (const [label, mode] of [['Bus · 公交', 'BUS'], ['Ferry · 渡轮', 'FERRY']]) {
+    await page.getByRole('button', { name: label, exact: true }).click()
+    const reply = page.waitForResponse(response => response.url().endsWith('/api/routes/query') && response.ok() && response.request().postDataJSON()?.required_modes?.[0] === mode)
+    await page.getByRole('button', { name: 'Find resilient routes' }).click()
+    const candidates = await (await reply).json()
+    assert.ok(candidates.length > 0 && candidates.every(route => route.legs.some(leg => leg.mode === mode)), `${mode}: every journey must include the selected mode`)
+    await page.locator('#routes-heading').waitFor()
+    assert.deepEqual(await page.locator('[data-route-id]').evaluateAll(elements => elements.map(element => element.dataset.routeId)), candidates.map(route => route.route_id))
+    if (candidates.length > 3) {
+      const later = page.locator('[data-route-id]').nth(3)
+      await later.getByRole('button').first().click()
+      assert.equal(await later.getByRole('button').first().getAttribute('aria-pressed'), 'true')
+      await page.getByRole('button', { name: 'View steps →', exact: true }).nth(3).click()
+      await page.getByText('Each ticket is shown on its first step;', { exact: false }).waitFor()
+    }
+    await navigate(page, 'Plan journey')
+  }
+  await page.getByRole('button', { name: 'Minibus · 小巴', exact: true }).click()
+  await page.getByText('Minibus · 小巴: routes are not available in this modelled network yet.', { exact: false }).waitFor()
+  await page.getByRole('button', { name: 'Find resilient routes' }).click(); await page.locator('#routes-heading').waitFor()
+  assert.equal(await page.locator('[data-route-id]').count(), 0)
+  await page.getByText('Minibus routes are not available in the current modelled network yet.', { exact: false }).waitFor()
+  await navigate(page, 'Plan journey'); await page.getByRole('button', { name: 'All modes', exact: true }).click()
+  await selectStation(page, 'TO', 'Hung Hom'); await page.getByRole('button', { name: 'Find resilient routes' }).click(); await page.locator('#routes-heading').waitFor()
+  pass('bus/ferry mode inclusion, all returned alternatives, later-route selection and explicit unavailable minibus')
   // Source failure is isolated from route queries and preserves previous status.
   await navigate(page, 'How it works'); await page.locator('[data-source="mtr"]').waitFor()
   const actualSources = await call('/api/sources/status'); assert.equal(actualSources.publishes_events, false)
@@ -213,6 +241,10 @@ let browser, publicPage
     await page.setViewportSize({ width, height: 900 })
     await navigate(page, 'Plan journey'); await noOverflow(page, `planner ${width}`)
     if (width < 1024) {
+      for (const label of ['Bus · 公交', 'Ferry · 渡轮']) {
+        const bounds = await page.getByRole('button', { name: label, exact: true }).boundingBox()
+        assert.ok(bounds && bounds.y >= 0 && bounds.y + bounds.height <= 900, `${label}: selector is outside the first mobile screen`)
+      }
       assert.equal(await page.locator('#main-navigation').isVisible(), false)
       const open = page.locator('#navigation-toggle')
       await open.click(); assert.equal(await open.getAttribute('aria-expanded'), 'true')
