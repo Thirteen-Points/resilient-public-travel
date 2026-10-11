@@ -5,11 +5,13 @@
 ---
 
 请部署 resilient-public-travel 的票价数据库修复，并完成完整官方票价库导入和线上验证。
-仓库为 https://github.com/Thirteen-Points/resilient-public-travel，发布分支为 `codex/fare-database`，请查看对应 PR。
+仓库为 https://github.com/Thirteen-Points/resilient-public-travel，发布分支为 `codex/fare-database`，
+草稿 PR 为 https://github.com/Thirteen-Points/resilient-public-travel/pull/108。
 先阅读该分支的 `deploy/FARE-DEPLOYMENT-HANDOFF.zh-CN.md` 和 `deploy/FARES.md`，按交接文档执行。
 
 现有前端是 https://resilient-public-travel.pages.dev，后端是 https://resilient-public-travel-api.onrender.com。
-这次授权你核实现有 Render 服务和持久磁盘，备份现有 SQLite 数据库，合并本次票价 PR 到最新 main，部署该提交，
+这次授权你核实现有 Render 服务和持久磁盘，备份现有 SQLite 数据库，准备完成后将草稿 PR 标记 Ready for review，
+按仓库要求完成检查并合并本次票价 PR 到最新 main，部署该提交，
 并在 Render Shell 从仓库根目录运行 `python -m scripts.refresh_fares --download`。
 随后验证前后端实际版本、健康、票价 SQL 状态、网页价格及重启后的持久性。
 如果 main 已有新提交，保留其他更新，解决冲突并重新验证。

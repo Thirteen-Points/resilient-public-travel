@@ -2,10 +2,13 @@
 
 交接日期：2026-10-11。仓库：<https://github.com/Thirteen-Points/resilient-public-travel>。
 
+发布 PR：[#108](https://github.com/Thirteen-Points/resilient-public-travel/pull/108)（草稿，供所有者接手发布）。
 发布分支：`codex/fare-database`，基于当时最新 `main` 的
 `7d658237e432d1a2a38ae95fc300b9331db216a4`，只合入票价修复。
 原工作区 `ZYC-P4` 中其他出行方式、地图和离线演示改动不在这次发布范围。
 发布分支提交后，通过对应 Pull Request 合并，避免直接上传整个本地目录。
+准备交接期间，已合并更新到 `d07730d84df9f9db11b0a439680e4b503997781d` 的 main，
+保留新合入的首末班车修复和 P4 B 材料。
 
 ## 当前状态和交付内容
 
@@ -26,8 +29,8 @@
 完整 SQLite 约 125 MB，不进入 Git，也不复制其他业务数据库。
 目前轮渡范围为中环↔尖沙咀；并未覆盖全港全部轮渡运营商。
 
-发布版本本地验证：后端及集成全套 529 个测试通过（另有 278 个 subtests），
-前端 103 个测试通过，TypeScript/Vite 生产构建通过，四份契约种子校验及部署 preflight 通过。
+合并最新 main 后的发布版本本地验证：后端及集成全套 532 个测试通过（另有 278 个 subtests），
+前端 104 个测试通过，TypeScript/Vite 生产构建通过，四份契约种子校验及部署 preflight 通过。
 这些结果来自 Windows 本地发布检出，不代表 GitHub CI、浏览器线上验收或 Render 持久磁盘已经通过。
 
 ## 1. 在现有服务部署前记录配置和备份
@@ -80,7 +83,7 @@ PY
 
 ## 2. 发布代码
 
-查看 `codex/fare-database` 对应 PR 和本地验证结果，接手者合并到最新 `main`。
+查看 PR #108 和本地验证结果，确认部署准备完成后将草稿标记为 Ready for review，按仓库要求完成检查并合并到最新 `main`。
 如果 main 已有新提交，先合并最新 main、解决冲突并重新跑受影响测试，保留新功能。
 现有 Pages 项目生产分支为 main，GitHub 自动部署已开启。
 Render 端核实自动部署配置；未自动触发时，使用 Manual Deploy 部署合并后的准确提交。
