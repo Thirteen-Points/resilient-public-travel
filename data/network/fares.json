@@ -1,0 +1,433 @@
+{
+  "meta": {
+    "retrieved_at": "2026-10-11",
+    "currency": "HKD",
+    "passenger": "adult",
+    "note": "Official published fares for the modelled stops; adult Octopus ordinary class, no personal concessions or promotions.",
+    "source_hashes": {
+      "mtr_lines_fares.csv": "1bb28b99c80a019da30123c2815b4f3079584ad353a149637159af946e06f075",
+      "mtr_lines_and_stations.csv": "e0e781152e2e6c5f6d7763262acbae76577b71ca4c66b4b7b72a97252175e0c3",
+      "FARE_BUS.xml": "f1e4eff7d252e5e09c8f7136946446b313b51dd86fdefd72c77a74a282f16509",
+      "ROUTE_BUS.xml": "333ee83775d0909aef031f947db6451c2bca7be9925945035a5a82ad9527f088",
+      "RSTOP_BUS.xml": "8c0bacdc461ac5980838baf2c7feba019e167b60582284074ebb852d6db07c10"
+    }
+  },
+  "mtr": {
+    "source_url": "https://opendata.mtr.com.hk/data/mtr_lines_fares.csv",
+    "od_fares": {
+      "ADM": {
+        "CEN": 4.9,
+        "ADM": 0.0,
+        "TST": 10.6,
+        "JOR": 10.6,
+        "YMT": 13.2,
+        "MOK": 13.2,
+        "KOT": 13.2,
+        "DIH": 15.8,
+        "PRE": 13.2,
+        "WAC": 4.9,
+        "HUH": 12.6,
+        "MKK": 12.9,
+        "TAW": 17.1,
+        "ETS": 10.6,
+        "HOM": 13.2,
+        "EXC": 4.9
+      },
+      "CEN": {
+        "CEN": 0.0,
+        "ADM": 4.9,
+        "TST": 10.6,
+        "JOR": 10.6,
+        "YMT": 13.2,
+        "MOK": 13.2,
+        "KOT": 13.2,
+        "DIH": 15.8,
+        "PRE": 13.2,
+        "WAC": 4.9,
+        "HUH": 12.6,
+        "MKK": 12.9,
+        "TAW": 17.1,
+        "ETS": 10.6,
+        "HOM": 13.2,
+        "EXC": 4.9
+      },
+      "DIH": {
+        "CEN": 15.8,
+        "ADM": 15.8,
+        "TST": 9.2,
+        "JOR": 9.2,
+        "YMT": 9.2,
+        "MOK": 7.4,
+        "KOT": 5.9,
+        "DIH": 0.0,
+        "PRE": 7.4,
+        "WAC": 15.8,
+        "HUH": 7.4,
+        "MKK": 7.1,
+        "TAW": 9.6,
+        "ETS": 9.2,
+        "HOM": 9.2,
+        "EXC": 15.8
+      },
+      "ETS": {
+        "CEN": 10.6,
+        "ADM": 10.6,
+        "TST": 0.0,
+        "JOR": 4.9,
+        "YMT": 4.9,
+        "MOK": 5.9,
+        "KOT": 7.4,
+        "DIH": 9.2,
+        "PRE": 5.9,
+        "WAC": 10.6,
+        "HUH": 4.7,
+        "MKK": 5.9,
+        "TAW": 10.1,
+        "ETS": 0.0,
+        "HOM": 5.9,
+        "EXC": 10.6
+      },
+      "EXC": {
+        "CEN": 4.9,
+        "ADM": 4.9,
+        "TST": 10.6,
+        "JOR": 10.6,
+        "YMT": 13.2,
+        "MOK": 13.2,
+        "KOT": 13.2,
+        "DIH": 15.8,
+        "PRE": 13.2,
+        "WAC": 4.9,
+        "HUH": 10.6,
+        "MKK": 12.9,
+        "TAW": 17.1,
+        "ETS": 10.6,
+        "HOM": 13.2,
+        "EXC": 0.0
+      },
+      "HOM": {
+        "CEN": 13.2,
+        "ADM": 13.2,
+        "TST": 5.9,
+        "JOR": 4.9,
+        "YMT": 4.9,
+        "MOK": 4.9,
+        "KOT": 7.4,
+        "DIH": 9.2,
+        "PRE": 5.9,
+        "WAC": 13.2,
+        "HUH": 4.9,
+        "MKK": 5.9,
+        "TAW": 10.1,
+        "ETS": 5.9,
+        "HOM": 0.0,
+        "EXC": 13.2
+      },
+      "HUH": {
+        "CEN": 12.6,
+        "ADM": 12.6,
+        "TST": 4.7,
+        "JOR": 4.9,
+        "YMT": 5.9,
+        "MOK": 5.9,
+        "KOT": 4.0,
+        "DIH": 7.4,
+        "PRE": 5.9,
+        "WAC": 12.6,
+        "HUH": 0.0,
+        "MKK": 4.0,
+        "TAW": 6.7,
+        "ETS": 4.7,
+        "HOM": 4.9,
+        "EXC": 10.6
+      },
+      "JOR": {
+        "CEN": 10.6,
+        "ADM": 10.6,
+        "TST": 4.9,
+        "JOR": 0.0,
+        "YMT": 4.9,
+        "MOK": 4.9,
+        "KOT": 7.4,
+        "DIH": 9.2,
+        "PRE": 5.9,
+        "WAC": 10.6,
+        "HUH": 4.9,
+        "MKK": 5.9,
+        "TAW": 10.1,
+        "ETS": 4.9,
+        "HOM": 4.9,
+        "EXC": 10.6
+      },
+      "KOT": {
+        "CEN": 13.2,
+        "ADM": 13.2,
+        "TST": 7.4,
+        "JOR": 7.4,
+        "YMT": 5.9,
+        "MOK": 5.9,
+        "KOT": 0.0,
+        "DIH": 5.9,
+        "PRE": 4.9,
+        "WAC": 13.2,
+        "HUH": 4.0,
+        "MKK": 4.0,
+        "TAW": 6.7,
+        "ETS": 7.4,
+        "HOM": 7.4,
+        "EXC": 13.2
+      },
+      "MKK": {
+        "CEN": 12.9,
+        "ADM": 12.9,
+        "TST": 5.9,
+        "JOR": 5.9,
+        "YMT": 5.9,
+        "MOK": 4.9,
+        "KOT": 4.0,
+        "DIH": 7.1,
+        "PRE": 4.9,
+        "WAC": 12.9,
+        "HUH": 4.0,
+        "MKK": 0.0,
+        "TAW": 6.7,
+        "ETS": 5.9,
+        "HOM": 5.9,
+        "EXC": 12.9
+      },
+      "MOK": {
+        "CEN": 13.2,
+        "ADM": 13.2,
+        "TST": 5.9,
+        "JOR": 4.9,
+        "YMT": 4.9,
+        "MOK": 0.0,
+        "KOT": 5.9,
+        "DIH": 7.4,
+        "PRE": 4.9,
+        "WAC": 13.2,
+        "HUH": 5.9,
+        "MKK": 4.9,
+        "TAW": 9.6,
+        "ETS": 5.9,
+        "HOM": 4.9,
+        "EXC": 13.2
+      },
+      "PRE": {
+        "CEN": 13.2,
+        "ADM": 13.2,
+        "TST": 5.9,
+        "JOR": 5.9,
+        "YMT": 4.9,
+        "MOK": 4.9,
+        "KOT": 4.9,
+        "DIH": 7.4,
+        "PRE": 0.0,
+        "WAC": 13.2,
+        "HUH": 5.9,
+        "MKK": 4.9,
+        "TAW": 8.6,
+        "ETS": 5.9,
+        "HOM": 5.9,
+        "EXC": 13.2
+      },
+      "TAW": {
+        "CEN": 17.1,
+        "ADM": 17.1,
+        "TST": 10.1,
+        "JOR": 10.1,
+        "YMT": 9.6,
+        "MOK": 9.6,
+        "KOT": 6.7,
+        "DIH": 9.6,
+        "PRE": 8.6,
+        "WAC": 17.1,
+        "HUH": 6.7,
+        "MKK": 6.7,
+        "TAW": 0.0,
+        "ETS": 10.1,
+        "HOM": 10.1,
+        "EXC": 17.1
+      },
+      "TST": {
+        "CEN": 10.6,
+        "ADM": 10.6,
+        "TST": 0.0,
+        "JOR": 4.9,
+        "YMT": 4.9,
+        "MOK": 5.9,
+        "KOT": 7.4,
+        "DIH": 9.2,
+        "PRE": 5.9,
+        "WAC": 10.6,
+        "HUH": 4.7,
+        "MKK": 5.9,
+        "TAW": 10.1,
+        "ETS": 0.0,
+        "HOM": 5.9,
+        "EXC": 10.6
+      },
+      "WAC": {
+        "CEN": 4.9,
+        "ADM": 4.9,
+        "TST": 10.6,
+        "JOR": 10.6,
+        "YMT": 13.2,
+        "MOK": 13.2,
+        "KOT": 13.2,
+        "DIH": 15.8,
+        "PRE": 13.2,
+        "WAC": 0.0,
+        "HUH": 12.6,
+        "MKK": 12.9,
+        "TAW": 17.1,
+        "ETS": 10.6,
+        "HOM": 13.2,
+        "EXC": 4.9
+      },
+      "YMT": {
+        "CEN": 13.2,
+        "ADM": 13.2,
+        "TST": 4.9,
+        "JOR": 4.9,
+        "YMT": 0.0,
+        "MOK": 4.9,
+        "KOT": 5.9,
+        "DIH": 9.2,
+        "PRE": 4.9,
+        "WAC": 13.2,
+        "HUH": 5.9,
+        "MKK": 5.9,
+        "TAW": 9.6,
+        "ETS": 4.9,
+        "HOM": 4.9,
+        "EXC": 13.2
+      }
+    },
+    "interchanges": [
+      {
+        "from": "ETS",
+        "to": "TST",
+        "max_s": 1800
+      },
+      {
+        "from": "TST",
+        "to": "ETS",
+        "max_s": 1800
+      }
+    ],
+    "interchange_source_url": "https://www.mtr.com.hk/en/customer/services/ael-air-offer.html"
+  },
+  "lines": {
+    "BUS_182": {
+      "fare_hkd": 20.8,
+      "group": null,
+      "od_fares": {
+        "BS_TAW": {
+          "BS_HUH_TUNNEL": 20.8,
+          "BS_ADM_E": 20.8
+        },
+        "BS_HUH_TUNNEL": {
+          "BS_ADM_E": 12.2,
+          "BS_TAW": 12.9
+        },
+        "BS_ADM_E": {
+          "BS_HUH_TUNNEL": 20.8,
+          "BS_TAW": 20.8
+        }
+      },
+      "note": "成人巴士票价按实际上下车站及方向查询运输署分段票价",
+      "stop_mapping": [
+        {
+          "route_id": "1051",
+          "route_seq": "1",
+          "stops": {
+            "BS_TAW": "859",
+            "BS_HUH_TUNNEL": "219",
+            "BS_ADM_E": "734"
+          }
+        },
+        {
+          "route_id": "1051",
+          "route_seq": "2",
+          "stops": {
+            "BS_ADM_E": "8051",
+            "BS_HUH_TUNNEL": "9015",
+            "BS_TAW": "6042"
+          }
+        }
+      ],
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/FARE_BUS.xml"
+    },
+    "BUS_81C": {
+      "fare_hkd": 10.2,
+      "group": null,
+      "od_fares": {
+        "BS_TAW": {
+          "TST": 9.0
+        },
+        "TST": {
+          "BS_TAW": 10.2
+        }
+      },
+      "note": "成人巴士票价按实际上下车站及方向查询运输署分段票价",
+      "stop_mapping": [
+        {
+          "route_id": "1336",
+          "route_seq": "1",
+          "stops": {
+            "BS_TAW": "859",
+            "TST": "4024"
+          }
+        },
+        {
+          "route_id": "1336",
+          "route_seq": "2",
+          "stops": {
+            "TST": "966",
+            "BS_TAW": "6042"
+          }
+        }
+      ],
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/FARE_BUS.xml"
+    },
+    "BUS_982X": {
+      "service_id": "bus:8104",
+      "fare_hkd": 20.8,
+      "group": null,
+      "note": "成人巴士全程票价；该示意线路班次未核实，未提供可运行候选",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml"
+    },
+    "BUS_985B": {
+      "service_id": "bus:8705",
+      "fare_hkd": 20.8,
+      "group": null,
+      "note": "成人巴士全程票价；该示意线路班次未核实，未提供可运行候选",
+      "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml"
+    },
+    "FERRY_TST_CEN": {
+      "fare_hkd": 5.0,
+      "group": null,
+      "fares_by_service_day": {
+        "weekday_peak": {
+          "upper": 5.0,
+          "lower": 4.0
+        },
+        "weekday_offpeak": {
+          "upper": 5.0,
+          "lower": 4.0
+        },
+        "saturday": {
+          "upper": 6.5,
+          "lower": 5.6
+        },
+        "sunday_ph": {
+          "upper": 6.5,
+          "lower": 5.6
+        }
+      },
+      "note": "天星小轮成人票价：标准方案上层，轮椅方案下层；按平日/周末/公众假期计费",
+      "source_url": "https://www.starferry.com.hk/en/service"
+    }
+  }
+}

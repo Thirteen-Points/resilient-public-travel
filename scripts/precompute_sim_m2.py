@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
 from backend.app.engine.service import RouteEngine
 from backend.app.sim.adapters import ODRouteSet, routes_from_c_route_output
 from backend.app.sim.m2 import run_m2_multi_od
+from backend.app.sim.shared_capacity import resources_from_seed
 
 
 STATIONS = ("TAW", "KOT", "MKK", "HUH", "EXC", "ADM")
@@ -106,9 +107,9 @@ def main() -> None:
         "Routes and route_parameters are queried from the current seed-backed C-Route RouteEngine at 2026-09-22T08:20:00+08:00; SeedDataAdapter forces network and fares to simulated provenance.",
         "Each OD candidate set is the union of current C-Route standard and wheelchair query results, capped at 10 candidates per profile; no candidate is synthesized to fill a shortfall.",
         "Route IDs are consumed unchanged. If an identical route_id occurs across ODs, its route-level supply is counted once globally after semantic equality checks.",
-        "C-Route exposes route-level bottleneck capacity, not capacity by physical segment/service identity. Distinct route IDs that share legs cannot be safely de-duplicated; this remains an explicit model limitation.",
+        "Explicit simulated directed-segment resources are resolved from seed line stop order and route legs; distinct route IDs consuming a shared segment draw from one capacity budget.",
         "No verified passenger demand, residual load, service-day calendar, or operator vehicle capacity is connected; all resulting metrics remain simulated algorithm outputs.",
-        "Baseline assigns each passenger to their own best accessible candidate. Guided applies the shared route-id target/physical capacities, wheelchair accessibility filter, and 15-minute extra-delay limit.",
+        "Baseline assigns each passenger to their own best accessible candidate. Guided chooses the highest personal-ranked feasible route while applying route and shared-segment capacities, wheelchair accessibility and the 15-minute extra-travel limit.",
     ]
     input_doc = {
         "input_version": "m2-six-station-v1",
@@ -195,7 +196,7 @@ def main() -> None:
         "known_gaps": [
             "No verified passenger-demand, residual-load, or operator capacity feed is connected.",
             "Service-day and public-holiday rules from data/calendar.json are not applied to this fixed-time scenario.",
-            "Capacity is counted by route_id; overlapping physical line segments across distinct route IDs cannot be pooled or partitioned with the current C-Route contract.",
+            "Directed seed segment capacities are pooled explicitly but remain simulated; external passengers, observed residual load, train-by-train boarding and dedicated wheelchair berth limits are not modelled.",
             "Results are algorithm demonstrations and must not be presented as measured passenger flows, verified operational capacity, or operational forecasts.",
         ],
     }
@@ -209,6 +210,10 @@ def main() -> None:
         window_min=WINDOW_MIN,
         time_range=TIME_RANGE,
         assumptions=assumptions,
+        shared_resources=resources_from_seed(
+            json.loads((ROOT / "contracts/seed/network.seed.json").read_text(encoding="utf-8")),
+            od_payloads, "weekday_peak",
+        ),
     )
     result.update({
         "input_file": "data/sim/m2-route-input.json",
@@ -234,7 +239,7 @@ def main() -> None:
     result["capacity_model"]["shared_line_overlap"] = {
         "line_count": len(shared_lines),
         "lines": shared_lines,
-        "interpretation": "Distinct full-path route_ids can consume the same simulated line. The current C-Route contract exposes only each path's bottleneck capacity, so these capacities cannot be conservatively partitioned by shared line without segment-level supply identities.",
+        "interpretation": "Distinct full-path route_ids share explicit directed segment resources derived from this simulated seed scenario; opposite directions and non-overlapping segments retain separate capacity budgets.",
     }
     _json_write(out_dir / "m2-simulation-result.json", result)
 
@@ -258,7 +263,7 @@ def main() -> None:
         f"- provenance：`{result['provenance']}`；seed：`{SEED}`；OD：`{result['od_count']}`；候选路线：`{result['candidate_count']}`（去重 ID `{result['unique_route_id_count']}`）",
         f"- 无路线 OD：`{result['no_route_od_count']}`；查询错误：`{len(query_errors)}`；跨 OD 重复 route_id：`{result['shared_route_id_count']}`",
         "- 结果为模拟算法输出；不能解释为实测客流、真实运力或运营预测。",
-        f"- 共享线路段：{len(shared_lines)} 条线路对应多个 route_id；当前路线级容量不能按共享线路拆分。",
+        f"- 共享区段资源：{result['capacity_model']['shared_resource_count']} 个有向区段；{len(shared_lines)} 条线路对应多个 route_id，共享容量只计一次。",
         "",
         "| 指标 | baseline | guided |",
         "|---|---:|---:|",
@@ -279,7 +284,7 @@ def main() -> None:
         interpretation = "本场景 guided 与 baseline 总延误相同；不能据此声称引导策略降低延误。"
     md += ["", "## 本次结果解读", "", interpretation,
            "", "## 数据与运力限制", "", result["capacity_model"]["note"],
-           "", "不同路线可能共享部分线路或区段；当前接口没有按区段暴露可分配运力。结果中的 route_id 容量桶无法扣除这种重叠，所以 0 未满足需求只表示当前模拟模型的结果，不能解释为真实网络有足够运力。", ""]
+           "", "区段运力由模拟 seed 停站顺序、车辆载客量与 route leg 班距构造；并非实测残余运力。0 未满足需求只表示当前模拟输入的结果，不能解释为真实网络有足够运力。", ""]
     (out_dir / "m2-comparison.md").write_text("\n".join(md), encoding="utf-8")
     print(json.dumps({
         "input": "data/sim/m2-route-input.json",

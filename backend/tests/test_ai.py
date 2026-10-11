@@ -50,7 +50,7 @@ class ToolTests(unittest.TestCase):
 
     def test_default_registry_contains_contract_tools(self):
         names = {item["function"]["name"] for item in build_default_registry().schemas()}
-        self.assertEqual(names, {"geocode_place", "find_access_points", "search_transit_routes", "score_routes", "estimate_load", "get_diversion_plan"})
+        self.assertEqual(names, {"geocode_place", "find_access_points", "search_transit_routes", "score_routes", "estimate_load", "get_diversion_plan", "get_published_events", "parse_user_preference", "explain_route"})
 
     def test_contract_search_tool_schema(self):
         schema = next(item["function"]["parameters"] for item in build_default_registry().schemas()

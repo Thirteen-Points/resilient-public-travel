@@ -19,7 +19,7 @@ from typing import Any
 
 _PROVIDERS = (
     # (env prefix, default base_url, default model)
-    ("DEEPSEEK", "https://api.deepseek.com", "deepseek-chat"),
+    ("DEEPSEEK", "https://api.deepseek.com", "deepseek-flash"),
     ("QWEN", "https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen-turbo"),
     ("GLM", "https://open.bigmodel.cn/api/paas/v4", "glm-4-flash"),
 )
@@ -44,6 +44,7 @@ class OpenAiCompatJsonClient:
         self.connect_timeout_s = connect_timeout_s
         self.opener = opener or urllib.request.urlopen
         self.request_timeout_s = request_timeout_s
+        self.usage = None
 
     @classmethod
     def from_env(cls) -> "OpenAiCompatJsonClient | None":
@@ -65,6 +66,7 @@ class OpenAiCompatJsonClient:
         json_schema: Mapping[str, Any],
         timeout_seconds: float,
     ) -> str | Mapping[str, Any]:
+        self.usage = None
         payload = {
             "model": self.model,
             "messages": [
@@ -75,7 +77,10 @@ class OpenAiCompatJsonClient:
             # The schema is advisory context; strict validation happens in the
             # structurer, which owns the retry-once-then-fallback policy.
             "temperature": 0,
+            "max_tokens": min(8192, max(1, int(os.getenv("AI_MAX_OUTPUT_TOKENS", "2048")))),
         }
+        if self.base_url in {"https://api.deepseek.com", "https://api.deepseek.com/v1"}:
+            payload["thinking"] = {"type": "disabled"}
         body = json.dumps(payload, ensure_ascii=False).encode()
         request = urllib.request.Request(
             self.base_url + "/chat/completions",
@@ -91,6 +96,7 @@ class OpenAiCompatJsonClient:
                 request, timeout=min(timeout_seconds, self.request_timeout_s or (self.connect_timeout_s + 25))
             ) as response:
                 result = json.loads(response.read().decode())
+                self.usage = result.get("usage")
         except urllib.error.URLError as exc:
             if isinstance(getattr(exc, "reason", None), TimeoutError):
                 raise TimeoutError("provider timeout") from exc

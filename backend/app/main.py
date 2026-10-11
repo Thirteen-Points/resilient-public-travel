@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -15,21 +16,19 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 from fastapi import FastAPI, HTTPException
+from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .api.events import router as events_router
-from .api.persona import catalog_router as persona_catalog_router, router as persona_router
 from .api.review import router as review_router
 from .api.signals import router as signals_router
-from .api.sources import router as sources_router
 from .api.stream import router as stream_router
 from .runtime_config import parse_cors_origins
 from .services.event_store import DEFAULT_DB_PATH, EventStore
-from .services.ingest.collection import SourceCollectionService
-from .services.persona import PreferenceClient
 from .services.signal_store import SignalStore
 from .services.structure.llm_structurer import LlmJsonClient
+from .build_info import get_build_info
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -97,6 +96,7 @@ class Runtime:
         return {
             "ok": self.engine is not None and not self.error,
             "service": "up",
+            "build": get_build_info(),
             "mode": "offline" if settings.offline_mode else "online-optional",
             "llm": {"enabled": settings.ai_enabled, "required_for_startup": False},
             "database": {"configured": True, "status": "available"},
@@ -145,6 +145,16 @@ class EngineSyncEventStore(EventStore):
         self.last_synced_snapshot: str | None = None
 
     def _sync(self) -> None:
+        coordinator = getattr(self, "replanner", None)
+        if coordinator:
+            try:
+                result = coordinator.sync_approved_events()
+                self.last_synced_snapshot = coordinator.engine.snapshots.current.snapshot_id
+                return
+            except Exception:
+                # A completed reviewer write must not turn into a failed write
+                # response just because an optional downstream recompute failed.
+                pass
         self.last_synced_snapshot = sync_engine_events(self)
 
     def create_event(self, *args: Any, **kwargs: Any):
@@ -158,45 +168,19 @@ class EngineSyncEventStore(EventStore):
         return event
 
 
-def build_llm_client() -> LlmJsonClient | None:
-    """Advertise the AI boundary only when a provider key is configured."""
-
-    from .runtime_config import settings
-
-    if not settings.ai_enabled:
-        return None
-    try:
-        from .services.structure.llm_api_client import OpenAiCompatJsonClient
-
-        return OpenAiCompatJsonClient.from_env()
-    except Exception:
-        return None
-
-
-def build_preference_client() -> PreferenceClient | None:
-    """Send free-text preferences to a model only after explicit opt-in."""
-    if os.getenv("AI_ENABLED", "false").lower() != "true":
-        return None
-    if os.getenv("PERSONA_PARSE_AI_ENABLED", "false").lower() != "true":
-        return None
-    try:
-        from .services.structure.llm_api_client import OpenAiCompatJsonClient
-
-        return OpenAiCompatJsonClient.from_env()
-    except Exception:
-        return None
-
-
 def create_app(
     *, db_path: str | Path = DEFAULT_DB_PATH,
     review_token: str | None = None,
     llm_client: LlmJsonClient | None = None,
-    preference_client: PreferenceClient | None = None,
 ) -> FastAPI:
     """Compose B's reviewed-event APIs and C's deterministic services."""
     store = SignalStore(db_path)
     event_store = EngineSyncEventStore(db_path)
-    collector = SourceCollectionService(db_path, signal_store=store, event_store=event_store)
+    coordinator = None
+    if runtime.engine is not None:
+        from .sim.runtime_replanning import RuntimeReplanningCoordinator
+        coordinator = RuntimeReplanningCoordinator(runtime.engine, event_store.approved_events)
+        event_store.replanner = coordinator
 
     @asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncIterator[None]:
@@ -206,12 +190,12 @@ def create_app(
         application.state.signal_store = store
         application.state.event_store = event_store
         application.state.review_token = review_token if review_token is not None else os.getenv("REVIEW_API_TOKEN")
-        application.state.llm_client = llm_client if llm_client is not None else build_llm_client()
+        from .ai.budget import ModelBudget
+        from .ai.runtime import env_client
+        budget = ModelBudget(Path(db_path).parent / "ai_usage.sqlite3")
+        application.state.llm_budget = budget
+        application.state.llm_client = llm_client if llm_client is not None else env_client(budget)
         application.state.llm_injected = llm_client is not None
-        application.state.preference_client = (preference_client if preference_client is not None
-                                               else build_preference_client())
-        application.state.source_collection = collector
-        collector.start()
         from .admin.store import AdminStore
         admin = AdminStore(Path(db_path).parent / "admin.sqlite3", Path(db_path))
         try:
@@ -219,10 +203,32 @@ def create_app(
         except Exception:
             admin.ready = False
         application.state.admin_store = admin
+        admin.llm_budget = budget
+        application.state.replanning = coordinator
+        from .admin.scheduler import SourceScheduler
+        scheduler = SourceScheduler(admin)
+        admin.scheduler = scheduler
+        application.state.source_scheduler = scheduler
+        await scheduler.start()
+        stopping = asyncio.Event()
+        async def watch_approved_windows():
+            while not stopping.is_set():
+                try:
+                    await asyncio.wait_for(stopping.wait(), timeout=1)
+                except TimeoutError:
+                    if coordinator:
+                        try:
+                            await asyncio.to_thread(coordinator.sync_approved_events)
+                            application.state.replanning_error = None
+                        except Exception:
+                            application.state.replanning_error = "approved_event_reconciliation_failed"
+        monitor = asyncio.create_task(watch_approved_windows(), name="approved-event-windows")
         try:
             yield
         finally:
-            collector.stop()
+            stopping.set()
+            await monitor
+            await scheduler.stop()
 
     application = FastAPI(title="ResilientRoute API", version="m0-integrated", lifespan=lifespan)
     application.add_middleware(
@@ -233,14 +239,19 @@ def create_app(
         allow_credentials=False,
         allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization", "x-review-token", "Last-Event-ID"],
+        expose_headers=["X-Route-Snapshot"],
     )
     application.include_router(signals_router)
     application.include_router(events_router)
-    application.include_router(persona_router)
-    application.include_router(persona_catalog_router)
-    application.include_router(sources_router)
     application.include_router(review_router)
     application.include_router(stream_router)
+    from .api.persona import router as persona_router
+    application.include_router(persona_router)
+    from .admin.scheduler import router as sources_router
+    application.include_router(sources_router)
+    if coordinator:
+        from .sim.runtime_replanning import build_router
+        application.include_router(build_router(coordinator))
     from .admin.api import router as admin_router
     from fastapi.staticfiles import StaticFiles
     from fastapi.exceptions import RequestValidationError
@@ -277,6 +288,7 @@ def create_app(
         snapshot = runtime.engine.snapshots.current.snapshot_id if runtime.engine else None
         return {
             "generated_at": datetime.now(timezone.utc).isoformat(),
+            "build": get_build_info(),
             "graph_snapshot": snapshot,
             "sources": ["contracts/seed/network.seed.json", "contracts/seed/event.seed.json"],
             "disclaimer": "Seed values may be simulated and do not represent live transit conditions.",
@@ -325,21 +337,34 @@ def create_app(
                             content={"ok": ok, "checks": checks, "offline": settings.offline_mode})
 
     @application.post("/api/ai/chat")
-    async def ai_chat(payload: dict[str, Any]) -> dict[str, Any]:
+    async def ai_chat(payload: dict[str, Any], request: Request) -> dict[str, Any]:
         if runtime.ai_service is None:
             raise HTTPException(status_code=503, detail="AI fallback service unavailable")
         if not isinstance(payload.get("message"), str) or not payload["message"].strip():
             raise HTTPException(status_code=422, detail="Missing non-empty field: message")
+        if len(payload["message"]) > 2000:
+            raise HTTPException(status_code=422, detail="message must contain at most 2000 characters")
         required = ("origin", "destination", "depart_at")
         if any(not isinstance(payload.get(key), str) or not payload[key].strip() for key in required):
             return {"message": "请提供起点、终点和出发时间，我才能调用确定性路线工具。",
-                    "tool_calls": [], "fallback": True, "user_input": payload["message"]}
-        return await runtime.ai_service.query(
+                    "tool_calls": [], "fallback": True, "user_input": payload["message"],
+                    "graph_snapshot": None, "effective_profile": None}
+        # Tool handlers keep intermediate routes/parameters. Construct them per
+        # request so simultaneous users cannot overwrite each other's context.
+        from .ai.handlers import build_engine_handlers
+        from .ai.query import NoLLMQueryService
+        from .ai.tools import build_default_registry
+        from .ai.runtime import add_wording, configured_client
+        from .sim.service import build_diversion_plan
+        service = NoLLMQueryService(build_default_registry(build_engine_handlers(runtime.engine, build_diversion_plan)))
+        result = await service.query(
             user_input=payload["message"], origin=payload["origin"],
             destination=payload["destination"], depart_at=payload["depart_at"],
             profile_id=payload.get("profile_id"), event_id=payload.get("event_id"),
+            profile=payload.get("profile"),
             demand=payload.get("demand"),
         )
+        return await add_wording(result, configured_client(request.app))
 
     @application.get("/health")
     def health_alias() -> JSONResponse:
@@ -359,4 +384,4 @@ def create_app(
     return application
 
 
-app = create_app()
+app = create_app(db_path=_path(os.getenv("DB_PATH") or str(DEFAULT_DB_PATH)))

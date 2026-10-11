@@ -1,5 +1,6 @@
 import networkSeed from '../../../contracts/seed/network.seed.json'
 import eventSeed from '../../../contracts/seed/event.seed.json'
+import { routeMatchesModes } from '../lib/transport'
 import routeSeed from '../../../contracts/seed/routes.seed.json'
 import simSeed from '../../../contracts/seed/sim.seed.json'
 import { normalizeEventFeed, normalizeNetwork, normalizeRoutes, simSeedAvailable } from './normalizers'
@@ -45,6 +46,46 @@ export function rankSeedRoutes(items: RouteCandidate[], preset: Preset): RouteCa
   })
 }
 
+const HKT_OFFSET_MS = 8 * 60 * 60 * 1000
+const DAY_MS = 24 * 60 * 60 * 1000
+
+function serviceSeconds(clock: string): number {
+  const [hour, minute] = clock.split(':').map(Number)
+  return (hour * 60 + minute) * 60
+}
+
+function withinServiceHours(at: number, hours: string, offsetSeconds: number): boolean {
+  const [startText, endText] = hours.split('-')
+  const start = serviceSeconds(startText) + offsetSeconds
+  let end = serviceSeconds(endText) + offsetSeconds
+  if (end < start) end += 24 * 60 * 60
+  const local = at + HKT_OFFSET_MS
+  const midnight = Math.floor(local / DAY_MS) * DAY_MS
+  return [-DAY_MS, 0].some(day => midnight + day + start * 1000 <= local && local <= midnight + day + end * 1000)
+}
+
+function seedRouteBoardable(route: RouteCandidate, departAt: string): boolean {
+  const queryTime = Date.parse(departAt)
+  const snapshotTime = Date.parse(snapshotAt)
+  if (!Number.isFinite(queryTime)) return false
+  return route.legs.every(leg => {
+    if (leg.mode === 'WALK') return true
+    const line = network.lines.find(item => item.id === leg.line)
+    if (!line?.service_hours) return true // An actual overnight service remains eligible.
+    const fromIndex = line.stops.indexOf(leg.from)
+    const toIndex = line.stops.indexOf(leg.to)
+    if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex || !leg.depart) return false
+    const reverse = toIndex < fromIndex
+    const durations = line.seg_time_s ?? []
+    const offset = reverse
+      ? durations.slice(fromIndex).reduce((sum, seconds) => sum + seconds, 0)
+      : durations.slice(0, fromIndex).reduce((sum, seconds) => sum + seconds, 0)
+    const boardAt = queryTime + Date.parse(leg.depart) - snapshotTime
+    const hours = reverse ? line.service_hours_reverse ?? line.service_hours : line.service_hours
+    return Number.isFinite(boardAt) && withinServiceHours(boardAt, hours, offset)
+  })
+}
+
 function validateSeed() {
   if (!network.meta.catchment_m || !network.nodes.length || !network.lines.length) throw new Error('Network seed is incomplete')
   if (!events.length || !routes.length || !snapshotAt) throw new Error('Event or route seed is incomplete')
@@ -66,8 +107,8 @@ export const seedDataSource: TransitDataSource = {
   async getPublishedEvents(at) { return activePublishedEvents(events, at) },
   async getRoutes(query: RouteQuery) {
     if (query.origin !== seedOd.origin || query.destination !== seedOd.destination) return []
-    // Fixed seed estimates: preset reorders candidates, time does not recalculate them.
-    return rankSeedRoutes(routes, query.preset)
+    // Seed travel times stay fixed; discard cards that would board a closed service.
+    return rankSeedRoutes(routes.filter(route => routeMatchesModes(route, query.modes, query.requiredModes)), query.preset).filter(route => seedRouteBoardable(route, query.departAt))
   },
   async getMeta() { return meta },
 }

@@ -1,5 +1,24 @@
 export type Provenance = 'real' | 'real-derived' | 'simulated'
 export type Preset = 'fastest' | 'most_stable' | 'fewest_transfers' | 'least_walking'
+export type Persona = 'commuter' | 'wheelchair'
+export type TransitMode = 'MTR' | 'BUS' | 'MINIBUS' | 'FERRY'
+
+/** Fields already accepted by C-Route; no frontend weights or numeric estimates. */
+export interface TravelProfile {
+  mobility: 'standard' | 'reduced' | 'wheelchair'
+  preset: Preset
+  max_walk_m?: number
+  max_transfers?: number
+  hard_flags: string[]
+  weights?: Record<string, number>
+  walking_speed_mps?: number
+}
+
+export interface JourneyContext extends RouteQuery {
+  persona: Persona
+  eventIds: string[]
+  eventRevisions: string
+}
 
 export interface NetworkNode {
   id: string
@@ -20,6 +39,9 @@ export interface NetworkLine {
   mode: string
   operator?: string | string[]
   stops: string[]
+  seg_time_s?: number[]
+  service_hours?: string
+  service_hours_reverse?: string
   provenance: Provenance
 }
 
@@ -79,6 +101,7 @@ export interface RouteLeg {
   depart?: string
   arrive?: string
   walk_m: number
+  fare_hkd?: number
   accessible: boolean | 'partial' | null
   provenance: Provenance
 }
@@ -109,6 +132,10 @@ export interface RouteQuery {
   destination: string
   departAt: string
   preset: Preset
+  persona?: Persona
+  profile?: TravelProfile
+  modes?: TransitMode[]
+  requiredModes?: TransitMode[]
 }
 
 export interface DemoMeta {

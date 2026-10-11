@@ -143,16 +143,16 @@ def ingest_signal(
         signal = signals.get_signal(body.signal_id)
     except SignalNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Signal not found") from exc
-    client = request.app.state.llm_client
+    from ..ai.runtime import configured_client
+    client = configured_client(request.app)
     timeout_seconds = 10
     admin = getattr(request.app.state, "admin_store", None)
     if admin and admin.ready and not getattr(request.app.state, "llm_injected", False):
-        from ..admin.config import llm_client
         config = admin.settings()
-        client = llm_client(config, admin)
         timeout_seconds = config["ai"]["timeout_s"]
     structurer = LlmEventStructurer(client, timeout_seconds=timeout_seconds)
-    extracted = structurer.structure(signal)
+    from ..ai.budget import external_ai_allowed
+    extracted = structurer.structure(signal, allow_llm=external_ai_allowed())
     draft = extracted.draft
     diagnostics = dict(structure_method=extracted.method, llm_used=getattr(client, "used", None) if extracted.method == "llm" else None, structure_errors=[e["message"] for e in getattr(client, "errors", [])] or list(extracted.errors))
     observation = StructuredObservation(signal=signal, draft=draft)

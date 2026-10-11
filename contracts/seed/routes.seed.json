@@ -29,14 +29,14 @@
           "headway_s": 200.0,
           "in_vehicle_s": 270.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 17.1,
           "accessible": true,
           "provenance": "simulated",
           "line": "ERL",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -50,11 +50,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -74,7 +75,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -88,11 +89,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -112,7 +114,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -126,11 +128,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         }
@@ -143,7 +146,7 @@
         ],
         "transfers": 2,
         "walk_m": 0,
-        "fare_hkd": 12.5,
+        "fare_hkd": 17.1,
         "co2_g": 377.6459250773652,
         "reliability": 0.9527124634696297,
         "freshness_s": 117540.0
@@ -173,7 +176,7 @@
         },
         {
           "criterion": "price",
-          "raw": 12.5,
+          "raw": 17.1,
           "normalized": 0.0,
           "weight": 0.1,
           "contribution": 0.0
@@ -215,18 +218,16 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
         "ERL 数据较旧",
         "ERL 受事件影响，运力系数 0.9",
         "KTL 数据较旧",
         "TWL 数据较旧",
         "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
         "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
+        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
       ],
-      "notes": [
-        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
-      ],
+      "notes": [],
       "explain": "ERL + KTL + TWL：约 23–25 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
       "evidence": [
         {
@@ -271,13 +272,18 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
           "freshness_s": 117540.0
         },
         {
           "source": "contracts/seed/event.seed.json",
           "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
           "freshness_s": 117540.0
+        },
+        {
+          "source": "fare_database:r788747",
+          "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
+          "freshness_s": 0
         }
       ],
       "provenance": "simulated"
@@ -295,14 +301,14 @@
           "headway_s": 200.0,
           "in_vehicle_s": 645.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 17.1,
           "accessible": false,
           "provenance": "simulated",
           "line": "ERL",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -316,11 +322,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -333,14 +340,14 @@
           "headway_s": 180.0,
           "in_vehicle_s": 180.0,
           "walk_m": 0,
-          "fare_hkd": 0,
+          "fare_hkd": 0.0,
           "accessible": false,
           "provenance": "simulated",
           "line": "TML",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -354,11 +361,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -371,14 +379,14 @@
           "headway_s": 120.0,
           "in_vehicle_s": 210.0,
           "walk_m": 0,
-          "fare_hkd": 0,
+          "fare_hkd": 0.0,
           "accessible": true,
           "provenance": "simulated",
           "line": "KTL",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -392,11 +400,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -416,7 +425,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -430,11 +439,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         }
@@ -447,7 +457,7 @@
         ],
         "transfers": 3,
         "walk_m": 0,
-        "fare_hkd": 12.5,
+        "fare_hkd": 17.1,
         "co2_g": 487.45646140970234,
         "reliability": 0.956032247438536,
         "freshness_s": 117780.0
@@ -477,7 +487,7 @@
         },
         {
           "criterion": "price",
-          "raw": 12.5,
+          "raw": 17.1,
           "normalized": 0.0,
           "weight": 0.1,
           "contribution": 0.0
@@ -519,7 +529,6 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
         "ERL 数据较旧",
         "ERL 受事件影响，运力系数 0.9",
         "TML 数据较旧",
@@ -527,10 +536,11 @@
         "TWL 数据较旧",
         "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
         "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
+        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
       ],
       "notes": [
-        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+        "未确认全程无障碍"
       ],
       "explain": "ERL + TML + KTL + TWL：约 26–30 分钟，换乘 3 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
       "evidence": [
@@ -580,13 +590,18 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
           "freshness_s": 117780.0
         },
         {
           "source": "contracts/seed/event.seed.json",
           "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
           "freshness_s": 117780.0
+        },
+        {
+          "source": "fare_database:r788747",
+          "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
+          "freshness_s": 0
         }
       ],
       "provenance": "simulated"
@@ -604,14 +619,14 @@
           "headway_s": 180.0,
           "in_vehicle_s": 900.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 17.1,
           "accessible": true,
           "provenance": "simulated",
           "line": "TML",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -625,11 +640,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -642,14 +658,14 @@
           "headway_s": 120.0,
           "in_vehicle_s": 210.0,
           "walk_m": 0,
-          "fare_hkd": 0,
+          "fare_hkd": 0.0,
           "accessible": true,
           "provenance": "simulated",
           "line": "KTL",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -663,11 +679,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -687,7 +704,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -701,11 +718,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         }
@@ -718,7 +736,7 @@
         ],
         "transfers": 2,
         "walk_m": 0,
-        "fare_hkd": 12.5,
+        "fare_hkd": 17.1,
         "co2_g": 470.0858589846166,
         "reliability": 0.9510283528741148,
         "freshness_s": 117900.0
@@ -748,7 +766,7 @@
         },
         {
           "criterion": "price",
-          "raw": 12.5,
+          "raw": 17.1,
           "normalized": 0.0,
           "weight": 0.1,
           "contribution": 0.0
@@ -790,18 +808,16 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
         "TML 数据较旧",
         "KTL 数据较旧",
         "TWL 数据较旧",
         "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
         "负载来自显式模拟场景，不代表真实客流",
         "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "此普通示例路径物理连通，但与其他方案高度重合/共用换乘点，未入普通严格多样性查询；不代表独立替代走廊"
+        "此普通示例路径物理连通，但与其他方案高度重合/共用换乘点，未入普通严格多样性查询；不代表独立替代走廊",
+        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
       ],
-      "notes": [
-        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
-      ],
+      "notes": [],
       "explain": "TML + KTL + TWL：约 28–32 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
       "evidence": [
         {
@@ -842,13 +858,18 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
           "freshness_s": 117900.0
         },
         {
           "source": "contracts/seed/event.seed.json",
           "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
           "freshness_s": 117900.0
+        },
+        {
+          "source": "fare_database:r788747",
+          "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
+          "freshness_s": 0
         }
       ],
       "provenance": "simulated"
@@ -866,14 +887,14 @@
           "headway_s": 200.0,
           "in_vehicle_s": 645.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 17.1,
           "accessible": false,
           "provenance": "simulated",
           "line": "ERL",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -887,11 +908,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -904,14 +926,14 @@
           "headway_s": 180.0,
           "in_vehicle_s": 240.0,
           "walk_m": 0,
-          "fare_hkd": 0,
+          "fare_hkd": 0.0,
           "accessible": false,
           "provenance": "simulated",
           "line": "TML",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -925,11 +947,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -947,7 +970,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -959,11 +982,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -976,14 +1000,14 @@
           "headway_s": 120.0,
           "in_vehicle_s": 300.0,
           "walk_m": 0,
-          "fare_hkd": 0,
+          "fare_hkd": 0.0,
           "accessible": false,
           "provenance": "simulated",
           "line": "TWL",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -997,11 +1021,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         }
@@ -1014,7 +1039,7 @@
         ],
         "transfers": 2,
         "walk_m": 420,
-        "fare_hkd": 12.5,
+        "fare_hkd": 17.1,
         "co2_g": 395.42328086188735,
         "reliability": 0.9553285805655818,
         "freshness_s": 117780.0
@@ -1044,7 +1069,7 @@
         },
         {
           "criterion": "price",
-          "raw": 12.5,
+          "raw": 17.1,
           "normalized": 0.0,
           "weight": 0.1,
           "contribution": 0.0
@@ -1086,7 +1111,6 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
         "ERL 数据较旧",
         "ERL 受事件影响，运力系数 0.9",
         "TML 数据较旧",
@@ -1095,10 +1119,11 @@
         "TWL 数据较旧",
         "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
         "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
+        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
       ],
       "notes": [
-        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+        "未确认全程无障碍"
       ],
       "explain": "ERL + TML + 步行 + TWL：约 26–30 分钟，换乘 2 次，步行 420 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
       "evidence": [
@@ -1140,13 +1165,18 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
           "freshness_s": 117780.0
         },
         {
           "source": "contracts/seed/event.seed.json",
           "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
           "freshness_s": 117780.0
+        },
+        {
+          "source": "fare_database:r788747",
+          "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
+          "freshness_s": 0
         }
       ],
       "provenance": "simulated"
@@ -1164,14 +1194,14 @@
           "headway_s": 180.0,
           "in_vehicle_s": 420.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 17.1,
           "accessible": true,
           "provenance": "simulated",
           "line": "TML",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -1185,11 +1215,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -1209,7 +1240,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -1223,11 +1254,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -1247,7 +1279,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -1261,11 +1293,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         }
@@ -1278,7 +1311,7 @@
         ],
         "transfers": 2,
         "walk_m": 0,
-        "fare_hkd": 12.5,
+        "fare_hkd": 17.1,
         "co2_g": 484.5578101793136,
         "reliability": 0.9535645609474832,
         "freshness_s": 118020.0
@@ -1308,7 +1341,7 @@
         },
         {
           "criterion": "price",
-          "raw": 12.5,
+          "raw": 17.1,
           "normalized": 0.0,
           "weight": 0.1,
           "contribution": 0.0
@@ -1350,18 +1383,16 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
         "TML 数据较旧",
         "KTL 数据较旧",
         "TWL 数据较旧",
         "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
         "负载来自显式模拟场景，不代表真实客流",
         "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "此普通示例路径物理连通，但与其他方案高度重合/共用换乘点，未入普通严格多样性查询；不代表独立替代走廊"
+        "此普通示例路径物理连通，但与其他方案高度重合/共用换乘点，未入普通严格多样性查询；不代表独立替代走廊",
+        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
       ],
-      "notes": [
-        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
-      ],
+      "notes": [],
       "explain": "TML + KTL + TWL：约 30–34 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
       "evidence": [
         {
@@ -1410,13 +1441,18 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
           "freshness_s": 118020.0
         },
         {
           "source": "contracts/seed/event.seed.json",
           "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
           "freshness_s": 118020.0
+        },
+        {
+          "source": "fare_database:r788747",
+          "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
+          "freshness_s": 0
         }
       ],
       "provenance": "simulated"
@@ -1434,14 +1470,14 @@
           "headway_s": 180.0,
           "in_vehicle_s": 1320.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 17.1,
           "accessible": false,
           "provenance": "simulated",
           "line": "TML",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -1455,11 +1491,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -1477,7 +1514,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -1489,11 +1526,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -1506,14 +1544,14 @@
           "headway_s": 120.0,
           "in_vehicle_s": 300.0,
           "walk_m": 0,
-          "fare_hkd": 0,
+          "fare_hkd": 0.0,
           "accessible": false,
           "provenance": "simulated",
           "line": "TWL",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -1527,11 +1565,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         }
@@ -1544,7 +1583,7 @@
         ],
         "transfers": 1,
         "walk_m": 420,
-        "fare_hkd": 12.5,
+        "fare_hkd": 17.1,
         "co2_g": 429.5423181381969,
         "reliability": 0.9425144820403738,
         "freshness_s": 118140.0
@@ -1574,7 +1613,7 @@
         },
         {
           "criterion": "price",
-          "raw": 12.5,
+          "raw": 17.1,
           "normalized": 0.0,
           "weight": 0.1,
           "contribution": 0.0
@@ -1616,17 +1655,17 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
         "TML 数据较旧",
         "步行通道 数据较旧",
         "站内步行通道，时长与电梯可用性待核实（关键：轮椅方案依赖它）",
         "TWL 数据较旧",
         "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
         "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
+        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
       ],
       "notes": [
-        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+        "未确认全程无障碍"
       ],
       "explain": "TML + 步行 + TWL：约 31–37 分钟，换乘 1 次，步行 420 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
       "evidence": [
@@ -1668,13 +1707,18 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
           "freshness_s": 118140.0
         },
         {
           "source": "contracts/seed/event.seed.json",
           "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
           "freshness_s": 118140.0
+        },
+        {
+          "source": "fare_database:r788747",
+          "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
+          "freshness_s": 0
         }
       ],
       "provenance": "simulated"
@@ -1692,14 +1736,14 @@
           "headway_s": 200.0,
           "in_vehicle_s": 645.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 6.7,
           "accessible": false,
           "provenance": "simulated",
           "line": "ERL",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -1713,11 +1757,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -1735,7 +1780,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -1747,11 +1792,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -1764,14 +1810,14 @@
           "headway_s": 900.0,
           "in_vehicle_s": 1140.0,
           "walk_m": 0,
-          "fare_hkd": 20.8,
+          "fare_hkd": 12.2,
           "accessible": true,
           "provenance": "simulated",
           "line": "BUS_182",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -1785,11 +1831,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -1807,7 +1854,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -1819,11 +1866,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         }
@@ -1836,7 +1884,7 @@
         ],
         "transfers": 1,
         "walk_m": 450,
-        "fare_hkd": 33.3,
+        "fare_hkd": 18.9,
         "co2_g": 558.7913669970235,
         "reliability": 0.8373718799090476,
         "freshness_s": 118740.0
@@ -1866,7 +1914,7 @@
         },
         {
           "criterion": "price",
-          "raw": 33.3,
+          "raw": 18.9,
           "normalized": 0.0,
           "weight": 0.1,
           "contribution": 0.0
@@ -1908,7 +1956,6 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
         "ERL 数据较旧",
         "ERL 受事件影响，运力系数 0.9",
         "步行通道 数据较旧",
@@ -1916,11 +1963,12 @@
         "唯全日直达金钟/中环的沙田过海线；班距与票价为推算，待核实",
         "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
         "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
+        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费",
+        "成人巴士票价按实际上下车站及方向查询运输署分段票价"
       ],
       "notes": [
-        "票价超过配置基线 1.3 倍",
-        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+        "未确认全程无障碍"
       ],
       "explain": "ERL + 步行 + BUS_182 + 步行：约 33–50 分钟，换乘 1 次，步行 450 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
       "evidence": [
@@ -1962,13 +2010,18 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
           "freshness_s": 118740.0
         },
         {
           "source": "contracts/seed/event.seed.json",
           "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
           "freshness_s": 118740.0
+        },
+        {
+          "source": "fare_database:r788747",
+          "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
+          "freshness_s": 0
         }
       ],
       "provenance": "simulated"
@@ -1991,7 +2044,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -2003,11 +2056,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2027,7 +2081,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -2041,11 +2095,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2063,7 +2118,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -2075,11 +2130,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         }
@@ -2165,16 +2221,15 @@
       },
       "warnings": [
         "步行通道 数据较旧",
-        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
         "BUS_182 数据较旧",
         "唯全日直达金钟/中环的沙田过海线；班距与票价为推算，待核实",
         "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
         "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
+        "成人巴士票价按实际上下车站及方向查询运输署分段票价"
       ],
       "notes": [
-        "票价超过配置基线 1.3 倍",
-        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+        "未确认全程无障碍"
       ],
       "explain": "步行 + BUS_182 + 步行：约 37–76 分钟，换乘 0 次，步行 350 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
       "evidence": [
@@ -2208,13 +2263,18 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
           "freshness_s": 119640.0
         },
         {
           "source": "contracts/seed/event.seed.json",
           "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
           "freshness_s": 119640.0
+        },
+        {
+          "source": "fare_database:r788747",
+          "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
+          "freshness_s": 0
         }
       ],
       "provenance": "simulated"
@@ -2232,14 +2292,14 @@
           "headway_s": 180.0,
           "in_vehicle_s": 1320.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 10.1,
           "accessible": false,
           "provenance": "simulated",
           "line": "TML",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -2253,11 +2313,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2275,7 +2336,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -2287,11 +2348,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2309,7 +2371,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -2321,11 +2383,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2338,14 +2401,14 @@
           "headway_s": 360.0,
           "in_vehicle_s": 480.0,
           "walk_m": 0,
-          "fare_hkd": 6.5,
+          "fare_hkd": 5.0,
           "accessible": false,
           "provenance": "simulated",
           "line": "FERRY_TST_CEN",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -2359,11 +2422,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2381,7 +2445,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -2393,11 +2457,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2410,14 +2475,14 @@
           "headway_s": 240.0,
           "in_vehicle_s": 120.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 4.9,
           "accessible": false,
           "provenance": "simulated",
           "line": "TWL",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -2431,11 +2496,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         }
@@ -2448,7 +2514,7 @@
         ],
         "transfers": 2,
         "walk_m": 1070,
-        "fare_hkd": 31.5,
+        "fare_hkd": 20.0,
         "co2_g": 555.668976301476,
         "reliability": 0.9421612074982437,
         "freshness_s": 119280.0
@@ -2478,7 +2544,7 @@
         },
         {
           "criterion": "price",
-          "raw": 31.5,
+          "raw": 20.0,
           "normalized": 0.0,
           "weight": 0.1,
           "contribution": 0.0
@@ -2520,7 +2586,6 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
         "TML 数据较旧",
         "步行通道 数据较旧",
         "站内步行通道，时长与电梯可用性待核实（关键：轮椅方案依赖它）",
@@ -2530,12 +2595,13 @@
         "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
         "较长步行：全程累计 1070 米，请预留时间",
         "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
+        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费",
+        "天星小轮成人票价：标准方案上层，轮椅方案下层；按平日/周末/公众假期计费"
       ],
       "notes": [
         "步行 1070 米，超过 500 米软偏好",
-        "票价超过配置基线 1.3 倍",
-        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+        "未确认全程无障碍"
       ],
       "explain": "TML + 步行 + 步行 + FERRY_TST_CEN + 步行 + TWL：约 46–54 分钟，换乘 2 次，步行 1070 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
       "evidence": [
@@ -2589,13 +2655,18 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
           "freshness_s": 119280.0
         },
         {
           "source": "contracts/seed/event.seed.json",
           "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
           "freshness_s": 119280.0
+        },
+        {
+          "source": "fare_database:r788747",
+          "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
+          "freshness_s": 0
         }
       ],
       "provenance": "simulated"
@@ -2618,7 +2689,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -2630,11 +2701,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2647,14 +2719,14 @@
           "headway_s": 900.0,
           "in_vehicle_s": 2100.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 9.0,
           "accessible": true,
           "provenance": "simulated",
           "line": "BUS_81C",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -2668,11 +2740,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2690,7 +2763,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -2702,11 +2775,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2719,14 +2793,14 @@
           "headway_s": 420.0,
           "in_vehicle_s": 480.0,
           "walk_m": 0,
-          "fare_hkd": 6.5,
+          "fare_hkd": 5.0,
           "accessible": false,
           "provenance": "simulated",
           "line": "FERRY_TST_CEN",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -2740,11 +2814,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2762,7 +2837,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "from",
@@ -2774,11 +2849,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         },
@@ -2791,14 +2867,14 @@
           "headway_s": 240.0,
           "in_vehicle_s": 120.0,
           "walk_m": 0,
-          "fare_hkd": 12.5,
+          "fare_hkd": 4.9,
           "accessible": false,
           "provenance": "simulated",
           "line": "TWL",
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
               "fields": [
                 "mode",
                 "line",
@@ -2812,11 +2888,12 @@
               "status": "simulated-engine-computation-not-official-verification"
             },
             {
-              "source": "backend/app/engine/fixtures/seed_policy.json",
+              "source": "fare_database:r788747",
+              "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
               "fields": [
                 "fare_hkd"
               ],
-              "status": "simulated-fare-policy"
+              "status": "official-adult-fare-policy"
             }
           ]
         }
@@ -2829,7 +2906,7 @@
         ],
         "transfers": 2,
         "walk_m": 800,
-        "fare_hkd": 31.5,
+        "fare_hkd": 18.9,
         "co2_g": 955.7760054228138,
         "reliability": 0.8114640876902408,
         "freshness_s": 120240.0
@@ -2859,7 +2936,7 @@
         },
         {
           "criterion": "price",
-          "raw": 31.5,
+          "raw": 18.9,
           "normalized": 0.0,
           "weight": 0.1,
           "contribution": 0.0
@@ -2902,7 +2979,6 @@
       },
       "warnings": [
         "步行通道 数据较旧",
-        "种子票价/区间上界/缺省票价为模拟假设，待 C-Data 核验",
         "BUS_81C 数据较旧",
         "不过海；用于接驳到尖沙咀再换乘",
         "FERRY_TST_CEN 数据较旧",
@@ -2911,12 +2987,14 @@
         "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
         "较长步行：全程累计 800 米，请预留时间",
         "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限"
+        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
+        "成人巴士票价按实际上下车站及方向查询运输署分段票价",
+        "天星小轮成人票价：标准方案上层，轮椅方案下层；按平日/周末/公众假期计费",
+        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
       ],
       "notes": [
         "步行 800 米，超过 500 米软偏好",
-        "票价超过配置基线 1.3 倍",
-        "可达性按轮椅 M0 模式默认假设展示，尚未官方核验"
+        "未确认全程无障碍"
       ],
       "explain": "步行 + BUS_81C + 步行 + FERRY_TST_CEN + 步行 + TWL：约 50–82 分钟，换乘 2 次，步行 800 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
       "evidence": [
@@ -2958,13 +3036,18 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "355d820344a54af375c281074739d7ef0bdaa4cf7263bbc7052c5ffeaffc024b",
+          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
           "freshness_s": 120240.0
         },
         {
           "source": "contracts/seed/event.seed.json",
           "sha256": "38e20c86959d25eaacd3b7df04f97462effd8e86e276387447c9e692bf79168c",
           "freshness_s": 120240.0
+        },
+        {
+          "source": "fare_database:r788747",
+          "sha256": "6d1eca9ebf4c88a44673c2ac9f3cb9409e98b5dfe06b3d52f830a79cd97d9a4a",
+          "freshness_s": 0
         }
       ],
       "provenance": "simulated"
@@ -2982,7 +3065,7 @@
         "r_a3da1ce3aa06f995"
       ],
       "headline": "模拟通勤top3：与公开查询fastest画像同顺序",
-      "reason": "仅使用模型可通行路径，时间票价和客流均为模拟。",
+      "reason": "仅使用模型可通行路径；时间和客流为模拟，票价来自官方成人收费表。",
       "mobility": "standard"
     },
     {

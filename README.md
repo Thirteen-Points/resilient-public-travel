@@ -1,166 +1,150 @@
-# Resilient Public Travel
+# ResilientRoute
 
-ResilientRoute is an academic transit-disruption prototype by **Thirteen Points** for Hong Kong's East Rail corridor, Tai Wai → Admiralty. It combines unverified reports, human-reviewed events, a deterministic route engine and a map. It does not provide official emergency advice or a live timetable.
+ResilientRoute is an academic prototype for exploring disruption-aware journeys on a modelled Hong Kong East Rail corridor from Tai Wai to Admiralty. It combines a route engine, map, public reports, human review, optional AI assistance and precomputed simulations.
 
-## What is available
+**This is not an official transport service, a live timetable or an accessibility guarantee.** Seed routes, event examples, capacities and simulations include derived or simulated assumptions. Check operator announcements for real travel decisions.
 
-- React map and journey planner with alternative-route cards, ETA ranges, score factors, warnings, provenance and source age.
-- Public report submission; reviewer inbox; text-to-draft extraction; manual first-card creation; evidence aggregation; approve, edit, reject and withdraw actions.
-- Persistent SQLite signals/events and append-only reviewer audit history.
-- Header-authenticated event streaming with reconnect cursors, plus three-second polling. Public journey planning and approved-event reads require no reviewer credential.
-- Immutable graph snapshots and route recomputation using **last approved facts**. An edit stays private until approval; the previous approved impact remains active. Rejecting an edited card or withdrawing it removes that impact.
-- Simulation backend and precomputed scenario results. The frontend simulation dashboard and side-by-side persona comparison remain later work.
-- Offline rule extraction and deterministic AI backend replies. The visible Agent panel currently uses local templates; it is not connected to live AI chat.
+## What the project does
+
+| Area | Current behavior | Boundary |
+| --- | --- | --- |
+| Journey planner and map | Queries the backend route engine, shows route alternatives, estimates, warnings, provenance and approved event impacts. | The network and service assumptions are modelled. A successful API query does not mean the transport data is live. |
+| Reports and review | Anyone can submit an unverified report. Reviewers can structure reports, merge evidence, create pending events, edit, approve, reject or withdraw them. | A submitted report is a Signal, not a verified incident. Only the last approved event revision affects routes. |
+| Journey companion and preferences | In API mode, uses the requested journey, travel profile and event context. Preference parsing presents a preview before applying a new route query. Deterministic backend tools provide route numbers; an optional model can provide validated wording. | Estimates and accessibility constraints remain modelled; seed conversations use local templates. |
+| Backend simulations | The retained API exposes precomputed baseline and guided scenarios, including modelled shared-segment capacity results. | There is no public Simulation page. Results are simulated scenarios, not measured demand or real capacity. |
+| Source collection | Optional HKO and MTR collectors can create reports for human review. Safe collection and replanning status endpoints are available. | Collection must be configured and enabled. It does not publish events automatically; live source behavior still requires operational verification. |
+| Administrator console | `/admin/` provides a separate login for report review, encrypted AI settings and source configuration. | Configure server-side credentials and storage before deployment; see the administrator guide. |
 
 ## Run locally
 
-Requirements: Python 3.11+ and Node.js 20.19+ or 22.12+. Git is needed to clone. Existing `.venv` and `frontend/node_modules` directories may be reused.
+Requirements: Python 3.11+, Node.js 20.19+ or 22.12+, and Git. The commands below use PowerShell on Windows. On macOS or Linux, use `python3`, `.venv/bin/python`, and `export NAME=value` for the corresponding commands.
 
-From PowerShell, start the API:
+Clone the repository and start the API:
 
 ```powershell
 git clone https://github.com/Thirteen-Points/resilient-public-travel.git
 cd resilient-public-travel
-git switch main
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r backend/requirements.txt
 $env:AI_ENABLED = 'false'
 $env:OFFLINE_MODE = 'true'
+$env:AI_DISABLE_EXTERNAL = 'true'
 .\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
 ```
 
-In a second terminal, from the repository root:
+In a second terminal, start the frontend:
 
 ```powershell
-cd frontend
+cd resilient-public-travel\frontend
 npm ci
 npm run dev
 ```
 
-Open [the frontend](http://localhost:5173). The default API URL is `http://127.0.0.1:8000`. The API exposes [interactive endpoint documentation](http://127.0.0.1:8000/docs). On Linux/macOS, replace `.venv\Scripts\python.exe` with `.venv/bin/python` and set environment variables using `export`.
+Open <http://localhost:5173>. The API is at `http://127.0.0.1:8000`; interactive API documentation is at <http://127.0.0.1:8000/docs>. Check <http://127.0.0.1:8000/api/health/deep> for local readiness.
 
-To configure a different API, set only the public endpoint in `frontend/.env.local`:
+To point Vite at a different API, set `VITE_API_BASE_URL` in `frontend/.env.local` and restart Vite:
 
 ```dotenv
 VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
 
-Restart Vite after configuration changes. For a deployed frontend, use an HTTPS API and set `CORS_ALLOWED_ORIGINS` on the server to the exact frontend origins, separated by commas. A public deployment has not been verified by the local regression.
+Do not put API keys, reviewer tokens, passwords or other secrets in `VITE_*` variables. Vite embeds those values in browser assets.
 
-### Optional reviewer access for a controlled local demo
+## Data modes and review access
 
-Before starting the API, set a fresh temporary `REVIEW_API_TOKEN` in the server terminal. For example, generate one locally:
+API mode is the default. It queries the deterministic route engine and applies approved events effective at the requested departure time. A query uses repository data and the local SQLite database; it is not a live service feed.
 
-```powershell
-$env:REVIEW_API_TOKEN = .\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_urlsafe(32))"
-```
+The fixed seed demo is an explicit alternative: open `http://localhost:5173/?data=seed`. It supports its fixture journey only. Seed routes do not recalculate for a new departure time. Switching modes reloads the page.
 
-Keep that terminal available. Enter its temporary value into **Review → Temporary credential → Connect reviewer**. The UI holds it in memory and sends it in `X-Review-Token`; disconnect and reload clear the browser credential. It is never placed in a URL, browser storage or a Vite build variable. Never configure `VITE_REVIEW_TOKEN`.
+Public route queries, approved-event reads and report submission do not need reviewer credentials. Review is available in the separate `/admin/` console; configure its server-side login using the [administrator guide](deploy/ADMIN.md). The public frontend has no Compare, Simulation or Review screen and does not request or store reviewer credentials. Protected legacy reviewer APIs remain available to trusted clients.
 
-This shared-token access is for a controlled demo. A production deployment needs reviewer identity/session authentication or a trusted proxy that keeps the service credential on the server. CORS does not authenticate reviewers. Without a configured server token, protected endpoints return 503; missing/incorrect authorization returns 401. Public queries and reports continue to work.
+Public updates are checked every three seconds, with source status every fifteen seconds. Healthy refreshes stay quiet. Failures retain existing results with an inline retry notice; recovery clears the notice. Actual route updates use a short notification.
 
-### Two explicit data modes
+Map lines use bundled, attributed geographic snapshots without runtime geometry requests. Verified rail, bus and pedestrian paths retain real bends and multipart boundaries; unavailable paths remain visibly schematic. See [path sources and limits](frontend/src/map/GEOMETRY_SOURCES.md).
 
-- **API mode** (default): local modelled network, current approved facts and deterministic route calculations. Network/route policies contain simulated assumptions; API mode does not imply live or verified transport data.
-- **Fixed seed demo**: open `http://localhost:5173/?data=seed`. Only the fixture OD is supported; preference changes reorder fixed routes. Review decisions are local and do not recalculate fixture routes. Dates do not turn the fixture into a live timetable.
+## Trust and data limits
 
-API failures preserve already loaded data with a stale notice; they do not silently switch to seed mode. With no previous successful data, the page offers retry and an explicit seed-mode switch. The seed demo must be loaded before disconnecting; it is not an installed offline PWA. Basemap failures leave schematic network overlays visible.
+- Provenance is reported as `real`, `real-derived` or `simulated`. A user report marked `real` describes its source channel; it does not verify the report's facts.
+- Events affect route calculations only after human approval. Pending edits do not replace the active approved revision.
+- Unknown accessibility stays unknown. Modelled wheelchair constraints do not certify a real step-free journey.
+- AI can help structure report text or explain tool results. It does not set route numbers, confidence, capacity or simulation metrics.
+- Offline mode and `AI_DISABLE_EXTERNAL=true` block external model and collector calls, including calls enabled in saved administrator settings.
 
-## Reproduce the event workflow
+See the [data provenance ledger](data/PROVENANCE.md) and [data quality notes](data/DATA_QUALITY.md) before interpreting seed values.
 
-1. In **Report**, submit a supported East Rail disruption description. HTTP 202 means receipt of an unverified Signal, not event publication.
-2. Connect a reviewer in **Review**, refresh **Unlinked reports**, and choose **Extract / merge**.
-3. If there is no reliable existing match, confirm the draft, severity, affected segments, capacity factors and HKT time window; choose **Create pending card**. A closed segment requires an explicit capacity factor of 0. Extraction never invents these numeric facts.
-4. Ingest corroborating reports into the matching card. The server recalculates confidence; identical/anonymous sources do not automatically count as independent. A card below 0.55 cannot reach the 0.60 publication threshold with the 0.05 human-confirmation bonus.
-5. Choose **Publish → Confirm publication**. An approved event affects the graph and current route query within its time window. The map and graph read the same last-approved event revision at the query's departure time.
-6. Edit a published card and save: its reviewer status becomes `updated`. The previous approved facts remain public. Reapprove to replace them, or **Withdraw event** to remove the impact. Rejecting an updated card also removes the previous impact.
+## API quick reference
 
-A deterministic rule extracts only supported station spans and categories. Unsupported or ambiguous reports require manual review. User-input provenance `real` describes the channel; it does not verify the content. Scripted tests and seed scenarios are not live incidents. The UI's rejection note is session-local; the server audits the rejection action, not that note.
+| Method | Endpoint | Access and purpose |
+| --- | --- | --- |
+| `GET` | `/api/health`, `/api/health/deep`, `/api/meta` | Public readiness, build identity and metadata |
+| `GET` | `/api/graph/network`, `/api/graph/snapshot?at=<ISO time>` | Public modelled network and time-specific impact |
+| `POST` | `/api/routes/query` | Public deterministic route candidates |
+| `POST` | `/api/signals` | Public unverified report intake |
+| `GET` | `/api/events/published?at=<ISO time>` | Public last-approved events effective at that time |
+| `POST` | `/api/ai/chat`, `/api/persona/parse` | Public tool-backed chat and conservative preference parsing |
+| `POST`, `GET` | `/api/sim/load`, `/api/sim/result?scenario_id=...` | Modelled diversion plan and precomputed scenario results |
+| `GET` | `/api/sources/status`, `/api/replanning/status` | Public safe source and replanning status |
+| `GET` | `/api/events`, `/api/signals`, `/api/stream/events` | Reviewer queue, evidence and authenticated event stream |
+| `POST` | `/api/events`, `/api/events/ingest`, `/api/events/{id}/review` | Reviewer event creation, evidence intake and review actions |
+| `POST` | `/api/replanning/load-observations` | Reviewer-authenticated, explicitly simulated load exercise |
 
-For databases predating approved-revision storage, current `published` cards migrate automatically. An old `updated` card has no reconstructible approved payload and must be reviewed again. Expired time windows stop affecting routes and maps without a reviewer click; explicit withdrawal also removes the saved approval.
+Protected reviewer routes require `X-Review-Token`; the SSE stream accepts reconnect cursors. Administrator routes under `/api/admin` use the administrator session. See [administrator setup](deploy/ADMIN.md) for credentials, CSRF handling and encrypted settings.
 
-## API surface
-
-| Method | Endpoint | Access / purpose |
-|---|---|---|
-| GET | `/api/health`, `/api/health/deep`, `/api/meta` | Public readiness and source metadata |
-| GET | `/api/graph/network` | Public modelled network |
-| GET | `/api/graph/snapshot?at=<ISO time>` | Public graph impact at a timezone-aware instant; current time by default |
-| POST | `/api/routes/query` | Public deterministic route candidates |
-| POST | `/api/signals` | Public unverified report intake |
-| GET | `/api/events/published?at=<ISO time>` | Public last-approved events effective at that instant |
-| GET | `/api/signals`, `/api/signals/{id}` | Reviewer originals; `unlinked_only=true` supported |
-| GET | `/api/events`, `/api/events/{id}`, `/api/events/{id}/signals` | Reviewer queue and evidence |
-| POST | `/api/events/ingest`, `/api/events` | Reviewer draft/merge and complete pending-card creation |
-| POST | `/api/events/{id}/review` | Reviewer `approve`, `edit` with `edits`, `reject`, `expire` |
-| GET | `/api/stream/events` | Reviewer SSE; `X-Review-Token`, `Last-Event-ID` or `after_id`; no URL credentials |
-| POST | `/api/sim/load` | Public modelled diversion plan |
-| GET | `/api/sim/result?scenario_id=...` | Public precomputed simulation |
-| POST | `/api/ai/chat` | Public deterministic backend tool reply; not wired to the visible Agent panel |
-
-Route-query example:
+Example route query:
 
 ```json
-{"origin":"TAW","destination":"ADM","depart_at":"2026-09-30T18:30:00+08:00","profile":{"preset":"fastest"}}
+{
+  "origin": "TAW",
+  "destination": "ADM",
+  "depart_at": "2026-10-05T08:30:00+08:00",
+  "profile": { "preset": "fastest" }
+}
 ```
 
-## Architecture and data boundaries
+## Validate changes
 
-```mermaid
-flowchart LR
-    UI[React map and planner] --> Public[Public network / approved events / routes]
-    Reviewer[Reviewer session and inbox] --> Review[Signal extraction / aggregation / review]
-    Review --> DB[(SQLite originals and audit)]
-    DB --> Approved[Last approved event facts]
-    Approved --> Graph[Immutable graph snapshots]
-    Graph --> Engine[Deterministic route engine]
-    Engine --> Public
-    Review --> Stream[Authenticated SSE]
-    Stream --> UI
-    Engine --> Sim[Simulation and cached scenarios]
-```
-
-Every record carries `real`, `real-derived` or `simulated` provenance. Unknown station accessibility stays `null`, never `true`. A general map pick may select such a station while explicitly requiring accessibility verification; it does not certify wheelchair access. Route-leg accessibility may still reflect model assumptions, as stated in route warnings.
-
-The event AI adapter is optional (`AI_ENABLED`, provider-specific `DEEPSEEK_`, `QWEN_` or `GLM_` configuration; see `.env.example`). Schema validation and deterministic fallback do not prove factual accuracy. AI extraction is limited to categorical/text fields; routing numbers, confidence, capacity and simulation metrics come from code, traceable data or explicit reviewer inputs. No live model acceptance or HKO/MTR polling verification is claimed here. External-source poller modules exist but are not automatically scheduled by the default application.
-
-See [provenance](data/PROVENANCE.md), [data quality](data/DATA_QUALITY.md), [contracts](contracts/README.md), [frontend guide](frontend/README.md) and [current M2 integration notes](frontend/M2-INTEGRATION.md).
-
-## Verification
+Install the backend and test dependencies, then validate the checked-in data and run the full backend suite:
 
 ```powershell
-cd frontend
+.\.venv\Scripts\python.exe -m pip install -r backend/requirements.txt -r backend/requirements-dev.txt "pytest-subtests>=0.14,<1"
+$env:PYTHONPATH = '.;backend'
+$env:AI_ENABLED = 'false'
+$env:OFFLINE_MODE = 'true'
+$env:AI_DISABLE_EXTERNAL = 'true'
+.\.venv\Scripts\python.exe scripts/validate_contract_seeds.py
+.\.venv\Scripts\python.exe scripts/validate_data_layer.py
+.\.venv\Scripts\python.exe -m pytest --import-mode=importlib backend/tests backend/app/engine/tests tests -q
+```
+
+Run frontend checks from `frontend`:
+
+```powershell
+npm ci
 npm run typecheck
 npm run test
 npm run build
-cd ..
-$env:PYTHONPATH = Join-Path (Get-Location) 'backend'
-.\.venv\Scripts\python.exe -m unittest discover -s backend/tests -q
-.\.venv\Scripts\python.exe -m pytest backend/app/engine/tests tests/cross_module -q
+npm run build:admin
 ```
 
-Install `backend/requirements-dev.txt` when pytest is missing. For the isolated browser regression, provide an installed Playwright module via `M2_PLAYWRIGHT` (or install it separately), and optionally use an installed Edge with `M2_BROWSER_CHANNEL=msedge`:
+The isolated browser regression starts a temporary API/database and Vite server, signs into `/admin/`, submits scripted reports, and checks publication, route refresh, recovery and mobile layout. It prints its checks and three publication-to-render timings, creates no media, and requires Playwright plus Chromium:
 
 ```powershell
-$env:M2_BROWSER_CHANNEL = 'msedge'
+npm install --prefix .cache/p3-playwright --no-audit --no-fund --package-lock=false playwright@1.56.1
+node .cache/p3-playwright/node_modules/playwright/cli.js install chromium
+$env:M2_PLAYWRIGHT = Join-Path (Get-Location) '.cache/p3-playwright/node_modules/playwright'
+$env:M2_PYTHON = Join-Path (Get-Location) '.venv/Scripts/python.exe'
 node tests/browser/m2.e2e.cjs
 ```
 
-The browser test starts temporary API/database and Vite processes, uses visibly scripted reports, and writes screenshots/results under `.cache/m2-browser/`. Its test credential is not a production secret. The test closes its processes afterward. No API keys are required.
+GitHub Actions also runs a disposable Docker container recreation check for database and encrypted-setting persistence. A local unit test does not replace that container check. See [P3 regression and deployment acceptance](deploy/P3-ACCEPTANCE.md) for its fixture guard and production acceptance steps.
 
-## Simulation scope and interim deliverables
+## Deployment and project notes
 
-The 10,000-person multi-OD sandbox belongs to P3/M3 in the project timeline. Files named `data/sim/m2-*` are early simulated preparation, not M2 interim acceptance evidence. Guided total delay is higher than baseline in the current comparison; the simulated result does not show a benefit. Route-level capacities do not account for shared capacity across overlapping segments.
+The repository includes a Render Blueprint and deployment guidance for a Cloudflare Pages frontend. Before relying on a deployed instance, verify `/api/health/deep`, `/api/meta` and the deployed build SHA; local tests do not establish live source, model, latency or storage behavior.
 
-C-Sim includes sequential journey timeline simulation and contract validation for checked-in seeds. See [simulation data](data/sim/README.md), [M2 C-side status](docs/acceptance/m2-c-status.md), [interim progress report](docs/submissions/m2-progress-report.md), [data and AI usage](docs/submissions/data-and-ai-usage.md), and [demo shot list](docs/coordination/M2-3-minute-demo-shotlist.md).
-
-![Resilient Public Travel architecture](docs/architecture/resilient-public-travel.png)
-
-The [editable architecture SVG](docs/architecture/resilient-public-travel.svg) documents the event-to-route flow, optional AI assistance and separately scoped simulation work. The frontend is available at [resilient-public-travel.pages.dev](https://resilient-public-travel.pages.dev/). The Render API is deployed at `https://resilient-public-travel-api.onrender.com`; the frontend-to-API connection still requires end-to-end verification. The Render Blueprint and health-ping workflow require service creation and the repository variable `RENDER_API_URL`. See [deployment instructions](deploy/DEPLOYMENT.md).
-
-## Administrator console
-
-The backend serves an English operations console at `/admin/` for reports,
-human review, encrypted AI settings and manual MTR/HKO collection. See
-[administrator setup and deployment](deploy/ADMIN.md). It requires a separate
-administrator login; credentials are never embedded in the Cloudflare frontend.
+- [Deployment guide](deploy/DEPLOYMENT.md)
+- [Administrator guide](deploy/ADMIN.md)
+- [DeepSeek configuration](deploy/DEEPSEEK.md)
+- [Simulation data and assumptions](data/sim/README.md)
+- [P3 integration status and outstanding acceptance](docs/acceptance/p3-integration-report.md)
+- [Editable architecture diagram](docs/architecture/resilient-public-travel.svg)

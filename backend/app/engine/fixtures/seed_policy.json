@@ -1,10 +1,9 @@
 {
   "provenance": "simulated",
-  "note": "C-Route test assumptions only; not verified transport data",
-  "baseline_fare_hkd": 12.5,
-  "fallback_fare_hkd": 12.5,
+  "note": "Simulated route/load policy. The fare database is authoritative; fare_bootstrap initializes an empty database only.",
+  "baseline_fare_hkd": 17.1,
   "fare_groups_by_mode": {
-    "MTR": "fixture_rail"
+    "MTR": "mtr_octopus"
   },
   "load": {
     "users_on_route": 0,
@@ -34,5 +33,6 @@
         "no_non_lowfloor_bus"
       ]
     }
-  }
+  },
+  "fare_bootstrap": "../../../../data/network/fares.json"
 }

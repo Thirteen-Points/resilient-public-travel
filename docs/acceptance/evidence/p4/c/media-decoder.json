@@ -1,0 +1,42 @@
+{
+  "environment": "local media decoder",
+  "passed": true,
+  "samples": [
+    {
+      "seconds": 30,
+      "width": 1440,
+      "height": 1000,
+      "error": null,
+      "decoded_frames": 121
+    },
+    {
+      "seconds": 90,
+      "width": 1440,
+      "height": 1000,
+      "error": null,
+      "decoded_frames": 201
+    },
+    {
+      "seconds": 150,
+      "width": 1440,
+      "height": 1000,
+      "error": null,
+      "decoded_frames": 246
+    },
+    {
+      "seconds": 210,
+      "width": 1440,
+      "height": 1000,
+      "error": null,
+      "decoded_frames": 254
+    },
+    {
+      "seconds": 285,
+      "width": 1440,
+      "height": 1000,
+      "error": null,
+      "decoded_frames": 346
+    }
+  ],
+  "duration_seconds": 300
+}

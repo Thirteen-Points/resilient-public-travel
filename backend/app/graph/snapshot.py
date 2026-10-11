@@ -36,6 +36,11 @@ class Snapshot:
     snapshot_id: str
     network: object
     events: tuple
+    weather_policy: object = None
+
+    def weather_effect(self, mode, at):
+        from ..engine.environment import weather_effect
+        return weather_effect(self.events, self.weather_policy, mode, at, active)
 
     def impact(self, edge, at, until=None):
         factor, slow, ids = 1.0, 1.0, []
@@ -73,9 +78,10 @@ class SnapshotStore:
     Build/persist first, then swap a single immutable pointer under a lock.
     Readers pin that pointer for the entire query.
     """
-    def __init__(self, network, *, path=None):
+    def __init__(self, network, *, path=None, weather_policy=None):
         self.network = network
         self.path = Path(path) if path else None
+        self.weather_policy = freeze(thaw(weather_policy)) if weather_policy else None
         self._lock = threading.RLock()
         self._events = {}
         self._snapshot = self._make({})
@@ -87,10 +93,10 @@ class SnapshotStore:
 
     def _make(self, events):
         payload = {"network": thaw(self.network.source), "holidays": sorted(self.network.holidays),
-                   "events": [thaw(events[k]) for k in sorted(events)]}
+                   "events": [thaw(events[k]) for k in sorted(events)], "weather_policy": thaw(self.weather_policy)}
         raw = json.dumps(payload, sort_keys=True, ensure_ascii=False)
         sid = "g_" + hashlib.sha256(raw.encode()).hexdigest()[:16]
-        return Snapshot(sid, self.network, tuple(freeze(e) for e in payload["events"]))
+        return Snapshot(sid, self.network, tuple(freeze(e) for e in payload["events"]), self.weather_policy)
 
     def _publish(self, events):
         for event in events.values():
@@ -111,7 +117,8 @@ class SnapshotStore:
             self.path.parent.mkdir(parents=True, exist_ok=True)
             temp = self.path.with_suffix(self.path.suffix + ".tmp")
             temp.write_text(json.dumps({"network": thaw(self.network.source), "holidays": sorted(self.network.holidays),
-                                       "events": [thaw(e) for e in candidate.events]}, ensure_ascii=False), encoding="utf-8")
+                                       "events": [thaw(e) for e in candidate.events],
+                                       "weather_policy": thaw(self.weather_policy)}, ensure_ascii=False), encoding="utf-8")
             temp.replace(self.path)
         self._events = {k: freeze(thaw(v)) for k, v in events.items()}
         self._snapshot = candidate
@@ -131,6 +138,7 @@ class SnapshotStore:
     @classmethod
     def restore(cls, path):
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
-        store = cls(build_graph(payload["network"], holidays=payload.get("holidays", ())), path=path)
+        store = cls(build_graph(payload["network"], holidays=payload.get("holidays", ())), path=path,
+                    weather_policy=payload.get("weather_policy"))
         store.replace_events(payload["events"])
         return store

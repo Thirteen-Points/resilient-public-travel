@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import type { Map as MapLibreMap } from 'maplibre-gl'
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import type { Event, Network, RouteCandidate } from './api/types'
-import { CORRIDOR_IDS, legCoordinates, nodeIndex } from './data'
+import { CORRIDOR_IDS } from './data'
+import { eastRailStations } from './lib/eastRailAccess'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
+import { resolveNetworkLineGeometry, resolveRouteLegGeometry, resolveImpactGeometry } from './map/geometry'
 import css from './MapView.module.css'
 
-/** Map footprint across screens: full-bleed behind a floating panel, a
-    right-hand card beside page content, or faded out for plain pages. */
+/** Map occupies the journey grid cell, docks beside Updates, or hides on text pages. */
 export type MapMode = 'full' | 'docked' | 'hidden'
 
 type Props = {
@@ -25,16 +27,19 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
   const mapRef = useRef<L.Map | null>(null)
   const overlaysRef = useRef<L.LayerGroup | null>(null)
   const pickerRef = useRef(onMapPick)
+  const pickingRef = useRef(picking)
   const [provider, setProvider] = useState('Loading basemap')
-  const [zoom, setZoom] = useState(12)
   const [renderedRevision, setRenderedRevision] = useState('')
+  const [hasSchematic, setHasSchematic] = useState(false)
+  const boundsRef = useRef<L.LatLngBounds | null>(null)
   const resetRef = useRef<(animated?: boolean) => void>(() => {})
   pickerRef.current = onMapPick
+  pickingRef.current = picking
 
   useEffect(() => {
     if (!element.current || mapRef.current) return
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const map = L.map(element.current, { zoomControl: false, scrollWheelZoom: true, preferCanvas: true,
+    const map = L.map(element.current, { zoomControl: false, scrollWheelZoom: true, preferCanvas: false,
       zoomSnap: .25, zoomDelta: .5, wheelPxPerZoomLevel: 100, wheelDebounceTime: 40,
       keyboard: true, touchZoom: true, minZoom: 9, maxZoom: 19,
       zoomAnimation: !motion.matches, fadeAnimation: !motion.matches, markerZoomAnimation: !motion.matches })
@@ -42,22 +47,18 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     motion.addEventListener('change', updateMotion)
     mapRef.current = map
     L.control.zoom({ position: 'bottomright' }).addTo(map)
-    const corridor = CORRIDOR_IDS.map(id => nodeIndex(network).get(id)!).map(node => [node.lat, node.lng] as L.LatLngTuple)
-    const bounds = L.latLngBounds(corridor)
+    map.attributionControl.addAttribution('Paths: &copy; <a href="https://portal.csdi.gov.hk/" target="_blank" rel="noopener noreferrer">HKSARG / CSDI</a>')
+    const corridor = network.nodes.filter(node => CORRIDOR_IDS.some(id => id === node.id) && Number.isFinite(node.lat) && Number.isFinite(node.lng)).map(node => [node.lat, node.lng] as L.LatLngTuple)
+    boundsRef.current = L.latLngBounds(corridor)
     const fit = (animated = false) => {
       map.invalidateSize()
-      // Full-bleed mode reserves the left panel area; the docked card is small
-      // and needs near-uniform padding or the corridor sits off-centre.
-      const wide = element.current!.clientWidth >= 800 && element.current!.clientHeight >= 500
-      const pad = wide ? { topLeft: [500, 64] as [number, number], bottomRight: [72, 82] as [number, number] }
-        : { topLeft: [22, 22] as [number, number], bottomRight: [22, 22] as [number, number] }
-      map.fitBounds(bounds, { paddingTopLeft: pad.topLeft, paddingBottomRight: pad.bottomRight,
-        maxZoom: 13, animate: animated && !motion.matches, duration: .5 })
+      if (!element.current?.clientWidth || !element.current.clientHeight || !boundsRef.current?.isValid()) return
+      // The map owns its grid cell; panels no longer cover its useful viewport.
+      map.fitBounds(boundsRef.current, { paddingTopLeft: [32, pickingRef.current ? 160 : 72], paddingBottomRight: [48, window.innerWidth < 1024 ? 160 : 80],
+        maxZoom: 14, animate: animated && !motion.matches, duration: .18 })
     }
     fit()
     resetRef.current = fit
-    setZoom(map.getZoom())
-    map.on('zoomend', () => setZoom(map.getZoom()))
     let resizeTimer: ReturnType<typeof setTimeout> | undefined
     const resize = new ResizeObserver(() => {
       map.invalidateSize({ pan: false })
@@ -87,30 +88,48 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
         if (++failures === 3) {
           clearTimeout(deadline)
           if (active) map.removeLayer(active)
-          setProvider('Schematic · offline')
+          setProvider('Basemap unavailable')
         }
       })
       replace(tiles)
-      deadline = setTimeout(() => { if (!disposed && active === tiles) { map.removeLayer(tiles); setProvider('Schematic · basemap unavailable') } }, 10000)
+      deadline = setTimeout(() => { if (!disposed && active === tiles) { map.removeLayer(tiles); setProvider('Basemap unavailable') } }, 10000)
     }
     const openFreeMap = async () => {
       try {
-        await import('@maplibre/maplibre-gl-leaflet')
+        const [{ maplibreGL }, { setWorkerUrl }] = await Promise.all([
+          import('@maplibre/maplibre-gl-leaflet'), import('maplibre-gl'),
+        ])
         if (disposed) return
-        const plugin = L as typeof L & { maplibreGL: (options: { style: string }) => L.Layer & { getMaplibreMap: () => MapLibreMap } }
-        const layer = plugin.maplibreGL({ style: 'https://tiles.openfreemap.org/styles/liberty' })
-        replace(layer)
-        setProvider('OpenFreeMap')
-        let failures = 0
-        layer.getMaplibreMap?.().on('error', () => { if (++failures === 3 && active === layer) osm() })
-        layer.getMaplibreMap().once('idle', () => {
-          if (active !== layer || disposed) return
-          // A style can finish loading with only a background if its sources fail.
-          if (!layer.getMaplibreMap().queryRenderedFeatures().length) { osm(); return }
-          clearTimeout(deadline)
+        setWorkerUrl(workerUrl)
+        // A mobile list starts with a hidden, uninitialised Leaflet viewport.
+        // Initialise the vector layer only after the first visible fit.
+        map.whenReady(() => {
+          if (disposed) return
+          try {
+            const layer = maplibreGL({ style: 'https://tiles.openfreemap.org/styles/positron', interactive: false }) as L.Layer & { getMaplibreMap: () => MapLibreMap }
+            replace(layer)
+            const base = layer.getMaplibreMap()
+            setProvider('OpenFreeMap')
+            let failures = 0
+            base.on('error', () => { if (++failures === 3 && active === layer) osm() })
+            base.once('style.load', () => {
+              if (disposed || active !== layer) return
+              for (const item of base.getStyle().layers ?? []) {
+                if (item.type === 'fill' && /water/.test(item.id)) base.setPaintProperty(item.id, 'fill-color', '#DEE9E4')
+                if (item.type === 'fill' && /park|landcover.*grass/.test(item.id)) base.setPaintProperty(item.id, 'fill-color', '#E8EFDE')
+                if (item.type === 'background') base.setPaintProperty(item.id, 'background-color', '#F7F8F2')
+                if (item.type === 'symbol' && /poi|housenumber/.test(item.id)) base.setLayoutProperty(item.id, 'visibility', 'none')
+              }
+            })
+            base.once('idle', () => {
+              if (active !== layer || disposed) return
+              if (!base.queryRenderedFeatures().length) { osm(); return }
+              clearTimeout(deadline)
+            })
+            deadline = setTimeout(() => { if (!disposed && active === layer) osm() }, 10000)
+          } catch (error) { if (import.meta.env.DEV) console.warn('Vector basemap unavailable', error); osm() }
         })
-        deadline = setTimeout(() => { if (!disposed && active === layer) osm() }, 10000)
-      } catch { osm() }
+      } catch (error) { if (import.meta.env.DEV) console.warn('Vector basemap unavailable', error); osm() }
     }
     const cartoUrl = import.meta.env.VITE_CARTO_TILE_URL
     if (cartoUrl) {
@@ -118,7 +137,7 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
       replace(L.tileLayer(cartoUrl, { attribution: '&copy; OpenStreetMap contributors &copy; CARTO', maxZoom: 19 })
         .on('tileerror', () => { if (++failures === 3) void openFreeMap() }))
       setProvider('CARTO')
-    } else osm()
+    } else void openFreeMap()
     return () => {
       disposed = true
       clearTimeout(deadline)
@@ -135,58 +154,74 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     const group = overlaysRef.current
     if (!group) return
     group.clearLayers()
+    let schematic = false
+    const routeColours = ['#1565C0', '#6A1B9A', '#00838F']
     const draw = (points: L.LatLngExpression[], colors: string[], weight: number, opacity: number, dashed = false, selected = false, label?: string) => {
-      if (selected) L.polyline(points, { color: '#fffef4', weight: weight + 5, opacity: .95, interactive: false }).addTo(group)
+      if (points.length < 2) return
+      if (selected) L.polyline(points, { color: '#FFFFFF', weight: weight + 4, opacity: 1, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(group)
       colors.forEach((color, index) => {
         const line = L.polyline(points, { color, weight: index ? weight * .48 : weight, opacity,
-          dashArray: dashed ? '5 6' : undefined, lineCap: 'round', interactive: Boolean(label) }).addTo(group)
+          dashArray: dashed ? '4 6' : undefined, lineCap: 'round', lineJoin: 'round', interactive: Boolean(label) }).addTo(group)
         if (label) line.bindTooltip(label)
       })
     }
-    const nodes = nodeIndex(network)
-    for (const id of CORRIDOR_IDS) {
-      const node = nodes.get(id)
-      if (!node) continue
+    for (const node of picking ? eastRailStations(network) : []) {
+      if (!node || !Number.isFinite(node.lat) || !Number.isFinite(node.lng)) continue
       L.circle([node.lat, node.lng], {
-        radius: node.catchment_m ?? network.meta.catchment_m,
-        color: '#2576af', weight: 1, opacity: .24, fillColor: '#3b9fcb', fillOpacity: .055, interactive: false,
+        radius: Math.min(node.catchment_m ?? network.meta.catchment_m, 800),
+        color: '#1565C0', weight: 1, opacity: .3, fillColor: '#1565C0', fillOpacity: .05, interactive: false,
       }).addTo(group)
     }
     for (const line of network.lines) {
-      for (let i = 0; i < line.stops.length - 1; i++) {
-        const a = nodes.get(line.stops[i]), b = nodes.get(line.stops[i + 1])
-        if (!a || !b) continue // Never invent absent seed coordinates.
-        draw([[a.lat, a.lng], [b.lat, b.lng]], lineStyle(line).colors, line.mode === 'MTR' ? 3 : 3.5, .48, line.mode !== 'MTR')
+      for (const geometry of resolveNetworkLineGeometry(line, network)) {
+        schematic ||= geometry.quality === 'schematic' || geometry.quality === 'mixed'
+        geometry.parts.forEach((part, index) => draw(part, lineStyle(line).colors, 2, routes.length ? .2 : .4, geometry.partQualities[index] === 'schematic'))
       }
     }
-    routes.slice(0, 3).map((route, index) => ({ route, index })).sort((a, b) => Number(a.route.route_id === selectedRouteId) - Number(b.route.route_id === selectedRouteId)).forEach(({ route, index }) => {
+    routes.map((route, index) => ({ route, index })).filter(({ route, index }) => index < 3 || route.route_id === selectedRouteId).sort((a, b) => Number(a.route.route_id === selectedRouteId) - Number(b.route.route_id === selectedRouteId)).forEach(({ route, index }) => {
       for (const leg of route.legs) {
-        const points = legCoordinates(leg, network)
-        if (points.length < 2) continue
+        const geometry = resolveRouteLegGeometry(leg, network)
+        schematic ||= geometry.quality === 'schematic' || geometry.quality === 'mixed'
         const selected = route.route_id === selectedRouteId
         const style = lineStyle(resolveLine(network, leg.line), leg.line ?? leg.mode)
-        draw(points, leg.mode === 'WALK' ? ['#67796B'] : style.colors, selected ? 8 : 4.5, selected ? 1 : .55, leg.mode === 'WALK', selected, `Option ${'ABC'[index]} · ${leg.mode === 'WALK' ? 'Walk' : style.label}`)
+        geometry.parts.forEach((part, partIndex) => draw(part, [routeColours[index % routeColours.length]], selected ? 6 : 4, selected ? 1 : .65, leg.mode === 'WALK' || geometry.partQualities[partIndex] === 'schematic', selected, `Option ${String.fromCharCode(65 + index)} · ${leg.mode === 'WALK' ? 'Walk' : style.label}${geometry.partQualities[partIndex] === 'schematic' ? ' · schematic connection' : ''}`))
       }
     })
     for (const event of published) for (const segment of event.affected_segments) {
-      const a = nodes.get(segment.from_node), b = nodes.get(segment.to_node)
-      if (!a || !b) continue
-      L.polyline([[a.lat, a.lng], [b.lat, b.lng]], {
-        color: segment.impact === 'closed' ? '#d53c3c' : '#cb8500',
-        weight: segment.impact === 'closed' ? 7 : 5,
-        dashArray: segment.impact === 'closed' ? '9 6' : '2 8', interactive: false,
+      const geometry = resolveImpactGeometry(segment, event.line, network)
+      schematic ||= geometry.quality === 'schematic' || geometry.quality === 'mixed'
+      for (const part of geometry.parts) L.polyline(part, {
+        color: segment.impact === 'closed' ? '#C62828' : '#F9A825',
+        weight: segment.impact === 'closed' ? 6 : 4,
+        lineCap: 'round', lineJoin: 'round', dashArray: segment.impact === 'closed' ? '8 6' : '2 6', interactive: false,
       }).addTo(group)
+      const middle = geometry.parts[0]?.[Math.floor(geometry.parts[0].length / 2)]
+      if (middle) L.marker(middle, { keyboard: false, interactive: false, icon: L.divIcon({ className: `${css.impactMarker} ${segment.impact === 'closed' ? '' : css.affectedMarker}`, html: segment.impact === 'closed' ? '×' : '!', iconSize: [24, 24], iconAnchor: [12, 12] }) }).addTo(group)
     }
-    for (const id of CORRIDOR_IDS) {
-      const node = nodes.get(id)
-      if (!node) continue
+    for (const node of network.nodes) {
+      const id = node.id
+      const corridor = CORRIDOR_IDS.some(stationId => stationId === id)
+      if (!node || !Number.isFinite(node.lat) || !Number.isFinite(node.lng)) continue
+      const label = document.createElement('span')
+      const english = document.createElement('span')
+      english.className = css.stationEnglish
+      english.textContent = `${node.name_en} · `
+      label.append(english, document.createTextNode(node.name_zh))
       L.circleMarker([node.lat, node.lng], {
-        radius: id === 'TAW' || id === 'ADM' ? 7 : 5, color: '#264455', weight: 2,
+        radius: corridor ? node.lines.length > 1 ? 7 : 5 : 4, color: node.kind === 'bus_stop' ? '#B14336' : node.kind === 'pier' ? '#287857' : '#18221D', weight: 2,
         fillColor: '#fff', fillOpacity: 1,
-      }).bindTooltip(`${node.name_en} · ${node.name_zh}`, { permanent: true, direction: id === 'ADM' || id === 'MKK' ? 'left' : 'right', offset: [id === 'ADM' || id === 'MKK' ? -9 : 9, 0], className: css.stationLabel }).addTo(group)
+      }).bindTooltip(label, { permanent: corridor, direction: id === 'ADM' || id === 'MKK' ? 'left' : 'right', offset: [id === 'ADM' || id === 'MKK' ? -9 : 9, 0], className: css.stationLabel }).addTo(group)
+      L.circleMarker([node.lat, node.lng], { radius: 22, opacity: 0, fillOpacity: 0 }).bindTooltip(`${node.name_en} · ${node.name_zh}`, { className: css.stationLabel }).addTo(group)
     }
+    const points = routes.flatMap(route => route.legs.flatMap(leg => resolveRouteLegGeometry(leg, network).parts.flat()))
+    if (points.length) boundsRef.current = L.latLngBounds(points)
+    else boundsRef.current = L.latLngBounds(network.nodes.filter(node => CORRIDOR_IDS.some(id => id === node.id) && Number.isFinite(node.lat) && Number.isFinite(node.lng)).map(node => [node.lat, node.lng] as L.LatLngTuple))
+    setHasSchematic(schematic)
     setRenderedRevision(published.map(event => `${event.event_id}@${event.version}`).join(','))
-  }, [network, published, routes, selectedRouteId])
+  }, [network, published, routes, selectedRouteId, picking])
+
+  const routeKey = routes.map(route => route.route_id).join(',')
+  useEffect(() => { resetRef.current(false) }, [routeKey, picking])
 
   // Re-fit the corridor once the mode transition has settled so it recentres in
   // whichever geometry is now active; hidden maps re-fit when shown again.
@@ -194,15 +229,20 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
   useEffect(() => {
     if (firstMode.current) { firstMode.current = false; return }
     if (mode === 'hidden') return
-    const timer = setTimeout(() => resetRef.current(true), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 620)
+    const timer = setTimeout(() => resetRef.current(true), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180)
     return () => clearTimeout(timer)
   }, [mode])
 
   return <div className={`${css.wrap} ${picking ? css.picking : ''} ${mode === 'docked' ? css.docked : ''} ${mode === 'hidden' ? css.hidden : ''}`}>
-    <div ref={element} className={css.map} data-event-revisions={renderedRevision} tabIndex={0} aria-label="Hong Kong schematic network map. Scroll to zoom around the pointer; use arrow keys to pan and plus or minus to zoom." />
-    <div className={css.tools}><button type="button" onClick={() => resetRef.current(true)} aria-label="Fit corridor on map">◎ Fit corridor</button><span>Zoom {zoom.toFixed(2)}</span></div>
-    <details className={css.legend}><summary>Network colours <span>↗</span></summary><div>{network.lines.map(line => { const style = lineStyle(line); return <p key={line.id}><i style={{ background: lineGradient(style.colors) }} /><span>{style.label}</span></p> })}<p><i style={{ background: lineStyle(undefined, 'unmapped').colors[0] }} /><span>Unknown line · assigned colour (example)</span></p><hr /><p>Bold + white outline: selected candidate</p><p>Red dashes: closed · amber dots: affected</p><p>Scroll at your pointer to zoom. Pinch or use + / −. All paths are schematic.</p></div></details>
-    <p className={css.caption}>ACADEMIC DEMO · Map &amp; stations schematic · {provider}</p>
+    <div ref={element} className={css.map} data-event-revisions={renderedRevision} tabIndex={0} aria-label="Hong Kong journey map. Arrow keys pan; plus and minus zoom. Stations can also be selected from the journey form." />
+    <div className={css.tools}><button type="button" onClick={() => resetRef.current(true)} aria-label="Fit corridor on map">◎ Fit journey</button></div>
+    <details className={css.legend}><summary>Map legend <span aria-hidden="true">↗</span></summary><div>
+      {routes.map((route, index) => <p key={route.route_id}><b className={css.routeBadge} style={{ background: ['#1565C0', '#6A1B9A', '#00838F'][index % 3] }}>{String.fromCharCode(65 + index)}</b><span>Option {String.fromCharCode(65 + index)}{route.route_id === selectedRouteId ? ' · selected' : ''}</span></p>)}
+      <p>White outline: selected route</p><p>× Red dashes: closed · ! Amber dots: affected</p><p>Dotted paths: walking or schematic connections</p>
+      <details><summary>Transport lines</summary>{network.lines.map(line => { const style = lineStyle(line); return <p key={line.id}><i style={{ background: lineGradient(style.colors) }} /><span>{style.label}</span></p> })}</details>
+      <p>Verified paths use CSDI geographic snapshots. Connections without a verified path are schematic.</p>
+    </div></details>
+    <p className={css.caption}>{provider}{hasSchematic ? ' · includes schematic connections' : ' · sourced path geometry'}</p>
     {picking && <p className={css.pickHint}>Tap near an East Rail station. The circles screen by straight-line distance; pedestrian routing checks the 800 m walking limit.</p>}
   </div>
 }

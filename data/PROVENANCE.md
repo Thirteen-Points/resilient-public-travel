@@ -248,3 +248,85 @@ contract-freeze change.
    TAW→ADM end-to-end claim was not re-verified in this pass.
 9. TML/KTL/TWL/ISL headway bands not re-verified against a current official
    page in this pass (only EAL was captured, S28).
+
+## 2026-10-11: modelled first/last boarding windows
+
+The earlier gap about MTR first/last trains is now partly addressed. The
+`service_hours` values in `contracts/seed/network.seed.json` and
+`data/network/lines.json` are **boarding windows at the first modelled stop**
+in the listed direction; `service_hours_reverse` is at the last modelled stop
+for the reverse direction. The route engine shifts a window to an intermediate
+boarding stop using the modelled segment times. Those segment times and the
+headway grid remain estimates, so these fields do not constitute an official
+per-station timetable. Special holiday extensions and unplanned changes are
+not modelled. A train already boarded may finish after the last boarding time.
+
+| Line | Forward window / source | Reverse window / source |
+| --- | --- | --- |
+| ERL | Tai Wai toward Admiralty 05:40–00:31, [MTR Tai Wai](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=67) | Admiralty toward Sheung Shui 06:04–00:22, [MTR Admiralty](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=2) |
+| TML | Tai Wai toward Tuen Mun 05:58–00:14, [MTR Tai Wai](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=67); used conservatively for the modelled East Tsim Sha Tsui direction | East Tsim Sha Tsui toward Wu Kai Sha 06:01–00:45, [MTR East Tsim Sha Tsui](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=80) |
+| KTL | Diamond Hill toward Whampoa 05:59–00:37, [MTR Diamond Hill](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=11) | Ho Man Tin 06:15–00:40 is a conservative **modelled estimate** from [MTR Yau Ma Tei](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=5) toward Tiu Keng Leng (06:14–00:44) and the modelled 3.5-minute Ho Man Tin–Yau Ma Tei segment; it needs station-level verification |
+| TWL | Yau Ma Tei toward Central 06:01–00:50, [MTR Yau Ma Tei](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=5) | Central toward Tsuen Wan 06:06–00:54, [MTR Central](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=1) |
+| ISL | Central toward Chai Wan 06:07–00:58, [MTR Central](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=1) | Wan Chai toward Kennedy Town 06:03–00:54, [MTR Wan Chai](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=27) |
+| SIL | Admiralty toward South Horizons 06:11–01:05, [MTR Admiralty](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=2) | South Horizons toward Admiralty 06:00–00:42, [MTR South Horizons](https://www.mtr.com.hk/en/customer/services/service_hours_search.php?query_type=search&station=89); SIL has only one modelled stop and yields no routing edge |
+
+MTR warns that last-train entry gates may close five minutes before the
+published departure. The model checks whether a passenger can board at the
+computed platform time; it does not model gate-entry or transfer walking time
+beyond the existing graph links. The fixed frontend seed uses the same windows
+to remove cards that would board a closed service, while keeping its journey
+durations explicitly illustrative. Services without a configured window are
+not globally blocked at night; an actual overnight line may still be returned.
+
+### Fare calculation correction — 2026-10-11
+
+`data/network/fares.json` now supplies executable adult fares rather than the
+HK$12.5 simulated flat fare. Source snapshots were downloaded and checked:
+
+- MTR `mtr_lines_fares.csv` and `mtr_lines_and_stations.csv` from
+  `https://opendata.mtr.com.hk/data/`: all 256 directed OD pairs for the 16
+  modelled stations, using `OCT_ADT_FARE` (ordinary class, adult Octopus).
+  Examples: TAW→ADM 17.1, KOT→ADM 13.2, HUH→ADM 12.6, EXC→ADM 4.9.
+  Station transfers form one ticket. The Octopus ETS↔TST interchange rule
+  (within 30 minutes) is documented at
+  `https://www.mtr.com.hk/en/customer/services/ael-air-offer.html`.
+- TD `FARE_BUS.xml`, `ROUTE_BUS.xml` and `RSTOP_BUS.xml` from
+  `https://static.data.gov.hk/td/routes-fares-xml/`: route 1051 (182) and 1336
+  (81C), direction-specific actual stop IDs mapped to modelled nodes before
+  resolving `ON_SEQ`/`OFF_SEQ`/`PRICE`. 182 outbound stop 859→734 costs 20.8;
+  red-tunnel stop 219→734 costs 12.2. Inbound 9015→6042 costs 12.9.
+  81C outbound 859→4024 costs 9.0; inbound 966→6042 costs 10.2.
+  The exact mappings and source SHA-256 hashes are retained in the fare file.
+  This verifies those section fares; historical unverified $16/$6 claims
+  above are not used. Abstract node geometry remains a modelling approximation.
+- Star Ferry `https://www.starferry.com.hk/en/service`: Central↔TST adult
+  upper deck 5.0 weekday / 6.5 weekends and public holidays, lower deck
+  4.0 / 5.6. Standard routes use the upper deck; wheelchair routes use the
+  lower deck. The boarding date and existing holiday calendar choose the rate.
+
+No personal concessions, first class, passes or temporary promotions are
+assumed. Overall route provenance stays simulated because journey times,
+accessibility and load remain modelled. Offline route IDs are preserved;
+fare totals, ticket charges and price scores can be refreshed with
+`python -m scripts.update_seed_fares`.
+
+### Persistent fare catalogue — 2026-10-11
+
+The backend now uses SQLite `fares.sqlite3` as its authoritative fare database.
+`data/network/fares.json` is only an empty-database bootstrap; changing it does
+not overwrite an existing database. The official import command is
+`python -m scripts.refresh_fares --download`. The completed local import has
+9,216 adult Octopus MTR OD records (96 × 96), 777,319 directional bus section
+records, 1,622 bus full-fare records and four Central–TST adult ferry day/deck
+rates. All source rows are retained beyond the current planning graph.
+Racecourse is present in the fare CSV but absent from the station-code CSV;
+its official station ID 70 is stored as `mtr_station:70`, without inventing
+a station code or adding an operational graph node.
+
+Ferry rates are parsed from the operator's labelled XLSX at
+`https://www.starferry.com.hk/sites/default/files/upload/open_data/excel/ferry_sf_central_tsimshatsui_faretable_eng.xlsx`,
+SHA-256 `c510af5973f154879fde2f7d88e80bdce0d674e36d6bc0885d5d4e41318d6e1d`.
+The database stores all six source URLs/checksums/import timestamps. Failed
+imports roll back atomically. Runtime queries read a consistent price/revision
+snapshot; direct SQL changes and successful imports invalidate cached prices.
+See `deploy/FARES.md` for lookup endpoints, effective dates and scope.

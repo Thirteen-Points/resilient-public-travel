@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { BorderBeam } from 'border-beam'
-import type { Event, Preset } from '../api/types'
+import type { Event, JourneyContext, Preset } from '../api/types'
+import { chat, type ChatReply } from '../api/p3Api'
+import { contextKey, LatestRequest, profileLabel, resolveProfile } from '../api/p3Context'
+import { LiveApiError } from '../api/liveTransitApi'
+import { formatHktTime } from '../lib/formatters'
+import { BackendRoute } from './BackendRoute'
 import { seedDataSource } from '../api/seedDataSource'
 import { formatRange } from '../data'
 import { useReducedMotion, useSuccessMotion } from '../lib/motion'
@@ -8,7 +13,54 @@ import { AgentAvatar } from './AgentAvatar'
 import css from './Experience.module.css'
 
 type Message = { role: 'you' | 'agent'; text: string; preference?: Preset }
-export function AgentPanel({ published, departAt, onRoutes, onBack }: { published: Event[]; departAt: string; onRoutes: (preference: Preset) => void; onBack: () => void }) {
+export function AgentPanel({ published, context, seedMode, active, onRoutes, onBack }: { published: Event[]; context: JourneyContext; seedMode: boolean; active: boolean; onRoutes: (preference: Preset) => void; onBack: () => void }) {
+  return seedMode ? <SeedAgentPanel published={published} departAt={context.departAt} onRoutes={onRoutes} onBack={onBack} /> : <LiveAgentPanel context={context} active={active} published={published} onBack={onBack} />
+}
+
+function LiveAgentPanel({ context, active, published, onBack }: { context: JourneyContext; active: boolean; published: Event[]; onBack: () => void }) {
+  const [input, setInput] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState(''), [retryText, setRetryText] = useState('')
+  const [messages, setMessages] = useState<Array<{ question: string; context: JourneyContext; reply: ChatReply }>>([])
+  const latest = useRef(new LatestRequest()), busyRef = useRef(false)
+  const key = contextKey(context)
+  useEffect(() => { latest.current.cancel(); busyRef.current = false; setBusy(false); return () => latest.current.cancel() }, [key, active])
+  const send = async (text = input) => {
+    if (busyRef.current || !text.trim()) return
+    busyRef.current = true
+    const request = latest.current.begin(), frozen = structuredClone(context), question = text.trim()
+    setBusy(true); setError(''); setRetryText(question); setInput('')
+    try {
+      const reply = await chat(frozen, question, request.signal)
+      if (request.current()) setMessages(items => [...items, { question, context: frozen, reply }])
+    } catch (cause) {
+      if (request.current()) setError(cause instanceof LiveApiError ? `${cause.code ?? `HTTP ${cause.status}`}: ${cause.message}${cause.fallback ? ` Backend fallback instruction: ${cause.fallback}` : ''}` : cause instanceof Error ? cause.message : String(cause))
+    } finally { if (request.current()) { busyRef.current = false; setBusy(false) } }
+  }
+  return <section className={css.agentPanel} data-panel aria-labelledby="agent-heading">
+    <button type="button" className={css.textButton} onClick={onBack}>← Station planner</button>
+    <div className={css.agentHeading}><AgentAvatar issue={published.length > 0} loading={busy} /><div><span className={css.eyebrow}>API JOURNEY COMPANION</span><h1 id="agent-heading">Guidance with evidence.</h1></div></div>
+    <p className={css.micro}>Current journey: {context.origin} → {context.destination || 'choose a destination'} · {formatHktTime(context.departAt)} · {profileLabel(resolveProfile(context))}</p>
+    <p className={css.issueStatus}>The active planner profile is sent to the route tools. Change preferences in the planner and confirm them before asking again. Chat text does not automatically change your profile. Events are current approved backend facts, not a pinned historical snapshot.</p>
+    <p className={css.micro}>Answers, routes and numbers come from /api/ai/chat. Backend fallback means deterministic tools; an API failure never loads seed data.</p>
+    {!messages.length && <div className={css.promptList}>{['Show the routes for my current journey', 'Explain the returned route estimates', 'What are the limitations of this journey?'].map(prompt => <button key={prompt} type="button" disabled={busy} onClick={() => void send(prompt)}>{prompt}<span>↗</span></button>)}</div>}
+    <div className={css.conversation} role="log" aria-label="Agent conversation" aria-live="polite" aria-busy={busy}>{messages.map((item, index) => <div key={index}>
+      <div className={css.userMessage}><span className={css.eyebrow}>YOU</span><p>{item.question}</p></div>
+      <div className={css.agentMessage}><span className={css.eyebrow}>{item.reply.fallback ? 'BACKEND FALLBACK · DETERMINISTIC' : 'BACKEND ANSWER'}</span><p>{item.reply.message}</p>
+        <p className={css.micro}>{item.context.origin} → {item.context.destination} · {formatHktTime(item.context.departAt)} · approved revisions at request: {item.context.eventRevisions || 'none'}</p>
+        <p className={css.micro}>{item.reply.effective_profile ? `Engine profile: ${profileLabel(item.reply.effective_profile)}` : `Requested profile: ${profileLabel(resolveProfile(item.context))}. Effective-profile metadata not supplied.`}<br />Calculation snapshot: {item.reply.graph_snapshot ?? 'not supplied — calculation context unverified'}</p>
+        {contextKey(item.context) !== key && <p className={css.issueStatus}>Previous context — this answer may be stale. Ask again for the current journey.</p>}
+        {item.reply.tool_calls.filter(call => !call.ok).map((call, i) => <p key={i} className={css.error}>Tool failure: {call.trace?.tool ?? 'backend tool'} · {call.error ?? 'unavailable'} {call.detail ?? ''}</p>)}
+        {item.reply.routes.map(route => <BackendRoute key={route.route_id} route={route} />)}
+        {!item.reply.routes.length && <p>No route candidates supplied by the backend. None have been added.</p>}
+        <details><summary>Backend tool sources</summary>{item.reply.tool_calls.map((call, i) => <p key={i}>{call.trace?.tool ?? 'tool name not supplied'} · {call.trace?.provenance ?? 'provenance not supplied'} · source age {call.trace?.freshness_s === undefined ? 'not supplied' : `${call.trace.freshness_s}s`} · {call.ok ? 'returned' : 'failed'}</p>)}</details>
+      </div></div>)}</div>
+    {busy && <p role="status">Waiting for backend answer… <button type="button" className={css.textButton} onClick={() => { latest.current.cancel(); busyRef.current = false; setBusy(false); setError('CANCELLED: Request cancelled. Previous answers retained.') }}>Cancel reply</button></p>}
+    {error && <div role="alert" className={css.error}><p>{error}</p><button type="button" className={css.textButton} disabled={busy} onClick={() => void send(retryText)}>Retry with current context</button></div>}
+    <form onSubmit={event => { event.preventDefault(); void send() }}><label htmlFor="agent-prompt" className={css.eyebrow}>ASK ABOUT THE CURRENT JOURNEY</label><div className={css.composer}><textarea id="agent-prompt" value={input} maxLength={1200} onChange={event => setInput(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send() } }} /><button type="submit" disabled={busy || !input.trim()} aria-label="Send message">↑</button></div></form>
+    <p className={css.micro}>Enter to send · Shift+Enter for a new line. Source: backend chat/tools · departure and source age above. Academic demonstration; follow official travel advice.</p>
+  </section>
+}
+
+function SeedAgentPanel({ published, departAt, onRoutes, onBack }: { published: Event[]; departAt: string; onRoutes: (preference: Preset) => void; onBack: () => void }) {
   const [state, setState] = useState<'idle' | 'loading' | 'answer'>('idle')
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')

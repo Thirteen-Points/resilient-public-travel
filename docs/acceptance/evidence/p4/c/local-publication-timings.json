@@ -1,0 +1,50 @@
+[
+  {
+    "round": 1,
+    "environment": "isolated local, NOT online acceptance",
+    "started_at": "2026-10-05T16:51:08.743Z",
+    "network": "online; browser not throttled",
+    "service": "warm after health preflight; cold-start not measured",
+    "map_ms": 1868,
+    "routes_ms": 1697,
+    "passed": true,
+    "event_version": 4,
+    "route_ids": [
+      "r_5c91b279469e1f04",
+      "r_97faee46ee5484be",
+      "r_f0aae63ed71b2edf"
+    ]
+  },
+  {
+    "round": 2,
+    "environment": "isolated local, NOT online acceptance",
+    "started_at": "2026-10-05T16:51:10.946Z",
+    "network": "online; browser not throttled",
+    "service": "warm after health preflight; cold-start not measured",
+    "map_ms": 2893,
+    "routes_ms": 2410,
+    "passed": true,
+    "event_version": 6,
+    "route_ids": [
+      "r_5c91b279469e1f04",
+      "r_97faee46ee5484be",
+      "r_f0aae63ed71b2edf"
+    ]
+  },
+  {
+    "round": 3,
+    "environment": "isolated local, NOT online acceptance",
+    "started_at": "2026-10-05T16:51:14.183Z",
+    "network": "online; browser not throttled",
+    "service": "warm after health preflight; cold-start not measured",
+    "map_ms": 2384,
+    "routes_ms": 2206,
+    "passed": true,
+    "event_version": 8,
+    "route_ids": [
+      "r_5c91b279469e1f04",
+      "r_97faee46ee5484be",
+      "r_f0aae63ed71b2edf"
+    ]
+  }
+]

@@ -56,7 +56,7 @@ class LLMConfig:
                             float(os.getenv(f"{prefix}_INPUT_COST_PER_MILLION", "0")),
                             float(os.getenv(f"{prefix}_OUTPUT_COST_PER_MILLION", "0")))
         providers = tuple(filter(None, (
-            provider("DEEPSEEK", "https://api.deepseek.com", "deepseek-v4-flash"),
+            provider("DEEPSEEK", "https://api.deepseek.com", "deepseek-flash"),
             provider("QWEN", "https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen3.7-flash"),
             provider("GLM", "https://open.bigmodel.cn/api/paas/v4", "glm-4.5-flash"),
         )))

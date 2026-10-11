@@ -5,6 +5,7 @@ export const CORRIDOR_IDS = ['TAW', 'KOT', 'MKK', 'HUH', 'EXC', 'ADM'] as const
 export const nodeIndex = (network: Network) => new Map(network.nodes.map(node => [node.id, node]))
 
 export function formatHkt(value: string) {
+  if (!Number.isFinite(Date.parse(value))) return 'Time not supplied'
   return new Intl.DateTimeFormat('en-HK', {
     timeZone: 'Asia/Hong_Kong', day: 'numeric', month: 'short',
     hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
@@ -45,7 +46,7 @@ export function distanceMetres(a: { lat: number; lng: number }, b: { lat: number
 }
 
 export function nearestAccessPoint(network: Network, point: { lat: number; lng: number }, requireAccessible = false) {
-  const ordered = network.nodes.filter(node => node.kind === 'mtr_station' &&
+  const ordered = network.nodes.filter(node => ['mtr_station', 'bus_stop', 'pier'].includes(node.kind) &&
     (!requireAccessible || node.accessible === true) && Number.isFinite(node.lat) && Number.isFinite(node.lng))
     .map(node => ({ node, metres: distanceMetres(node, point) }))
     .sort((a, b) => a.metres - b.metres)

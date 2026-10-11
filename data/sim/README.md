@@ -64,7 +64,49 @@ python scripts/precompute_sim_m2.py
 It queries the current seed-backed C-Route engine for all 30 directed OD pairs
 and writes `m2-route-input.json`, `m2-simulation-result.json`, and the CSV/Markdown
 comparison. The checked-in result records the seed, input hashes and query
-coverage. All inputs remain simulated. Route-level capacity buckets do not
-model capacity shared by partially overlapping route legs; the generated
-report states this limitation and does not treat zero unmet demand as evidence
-of real-world sufficiency.
+coverage. All inputs remain simulated. The P3 version of this generator also
+projects the seed's directed line segments into explicit shared capacity
+resources. Previously checked-in M2 artifacts are retained as historical
+evidence; they do not automatically acquire the newer model's semantics.
+
+The P3 comparison uses the same frozen M2 input so route/population changes
+cannot explain the difference:
+
+```text
+python scripts/precompute_sim_p3.py
+```
+
+`p3-shared-capacity-report.md` and `p3-shared-capacity-evidence.json` record the
+old result, current model, complete resource inputs and a deliberately
+constrained 10% residual-capacity sensitivity run. The normal 10,000-person,
+30-OD run is computed twice and must produce identical results. Capacities
+are passengers per hour on each directed segment, floored over the scenario
+window; one passenger consumes one place on every traversed segment.
+
+The two scenario files can be fetched through the existing result endpoint:
+
+```text
+/api/sim/result?scenario_id=m2_six_station_directed_od_am_peak_p3_shared_segments
+/api/sim/result?scenario_id=m2_six_station_directed_od_am_peak_p3_shared_segments_residual_10pct
+```
+
+Both policies use the same protected-first physical boarding evaluation.
+Guided chooses each person's highest-ranked feasible route rather than filling
+the largest route bucket regardless of preference. Accessibility and extra
+travel of at most 15 minutes remain hard filters. That limit does not promise
+that queue waits or unserved passengers' waits stay below 15 minutes.
+
+No operator residual occupancy, dedicated wheelchair berth throughput,
+train-by-train seat propagation or inter-window queue carryover is verified.
+Queue delay uses the maximum route/segment bottleneck estimate to avoid adding
+overlapping waits. Zero unmet demand remains a property of simulated inputs,
+not evidence of real-world capacity. The 10% factor is explicitly synthetic.
+
+The aggregate `/api/sim/load` accepts optional private `shared_resources`
+metadata (`resource_id`, `route_ids`, `service_capacity_per_hour`, `headway_s`,
+`target_factor`, `provenance`) without changing frozen public response fields.
+Repeated identical route supplies are counted once; conflicting duplicates
+fail. With no explicit resource input, it cannot infer partial overlaps from
+route IDs alone. Runtime integration can project a pinned graph using
+`sim.shared_capacity.resources_from_snapshot(snapshot, route_details, depart_at)`;
+route/graph revision mismatches fail rather than applying stale capacity.

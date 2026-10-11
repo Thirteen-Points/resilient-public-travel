@@ -1,0 +1,16 @@
+{
+  "provenance": "simulated",
+  "scope": "local Python process; no startup/network/online SLA",
+  "fresh_engine_plus_query": {
+    "samples": 25,
+    "p95_ms": 26.126
+  },
+  "cached_query": {
+    "samples": 50,
+    "p95_ms": 3.053
+  },
+  "cached_p3_simulation_read": {
+    "samples": 25,
+    "p95_ms": 0.069
+  }
+}
