@@ -15,8 +15,9 @@ import { ProvenanceBadge } from './components/ProvenanceBadge'
 import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
 import { TRANSPORT_OPTIONS, transportLabel } from './lib/transport'
+import { eastRailStations, findEastRailWalkingAccess, type WalkingAccess } from './lib/eastRailAccess'
 import type { DemoMeta, Event, JourneyContext, Network, Persona, Preset, RouteCandidate, Signal, TravelProfile, TransitMode } from './api/types'
-import { formatHkt, formatRange, legDuration, modeSummary, nearestAccessPoint, nodeIndex } from './data'
+import { formatHkt, formatRange, legDuration, modeSummary, nodeIndex } from './data'
 import css from './App.module.css'
 
 type Screen = 'journey' | 'results' | 'updates' | 'detail' | 'sources' | 'agent' | 'report'
@@ -43,7 +44,7 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
   const nodes = nodeIndex(network)
   const [query, setQuery] = useState('')
   const [index, setIndex] = useState(0)
-  const choices = network.nodes.filter(node =>
+  const choices = eastRailStations(network).filter(node =>
     node.name_en.toLowerCase().includes(query.toLowerCase()) || node.name_zh.includes(query) || node.id.toLowerCase().includes(query.toLowerCase()),
   )
   return <div className={css.fieldWrap}>
@@ -51,7 +52,7 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
     <input id={id} className={`${css.input} ${invalid ? css.invalid : ''}`} role="combobox"
       aria-expanded={active} aria-controls={`${id}-options`} aria-autocomplete="list" aria-invalid={Boolean(invalid)}
       aria-activedescendant={active && choices[index] ? `${id}-option-${choices[index].id}` : undefined}
-      placeholder={label === 'TO' ? 'Choose a destination' : 'Search a station, stop or pier'}
+      placeholder={label === 'TO' ? 'Choose an East Rail destination' : 'Search an East Rail station'}
       value={active ? query : nodes.get(value)?.name_en ?? ''}
       onFocus={() => { setQuery(''); setIndex(0); onFocus() }}
       onChange={event => { setQuery(event.target.value); setIndex(0) }}
@@ -62,11 +63,11 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
         if (event.key === 'Escape') { onSelect(value); setQuery('') }
       }} />
     {active && <div className={css.suggestions} id={`${id}-options`} role="listbox">
-      <span className={css.suggestionLabel}>STATIONS, BUS STOPS & PIERS</span>
+      <span className={css.suggestionLabel}>EAST RAIL STATIONS</span>
       {choices.map((node, i) => <button key={node.id} id={`${id}-option-${node.id}`} type="button" role="option" aria-selected={index === i}
         className={`${css.suggestion} ${index === i ? css.highlighted : ''}`} onMouseDown={event => event.preventDefault()}
-        onClick={() => { onSelect(node.id); setQuery('') }}>{node.name_en}<small>{node.kind === 'bus_stop' ? 'Bus stop' : node.kind === 'pier' ? 'Ferry pier' : 'MTR'} · {node.name_zh}</small></button>)}
-      {!choices.length && <p className={css.small}>No matching modelled station, stop or pier. Map selection is available.</p>}
+        onClick={() => { onSelect(node.id); setQuery('') }}>{node.name_en}<small>East Rail · {node.name_zh}</small></button>)}
+      {!choices.length && <p className={css.small}>No matching East Rail station. Map selection is available.</p>}
       <button type="button" className={css.mapChoice} onMouseDown={event => event.preventDefault()} onClick={onPickMap}>◎ Select a point on the map</button>
     </div>}
   </div>
@@ -124,6 +125,9 @@ export function App() {
   const [activeField, setActiveField] = useState<Field | null>(null)
   const [picking, setPicking] = useState<Field | null>(null)
   const [picked, setPicked] = useState('')
+  const [access, setAccess] = useState<{ origin: WalkingAccess | null; destination: WalkingAccess | null }>({ origin: null, destination: null })
+  const [checkingWalk, setCheckingWalk] = useState(false)
+  const walkCheck = useRef<AbortController | null>(null)
   const [error, setError] = useState('')
   const [preset, setPreset] = useState<Preset>('fastest')
   const [persona, setPersona] = useState<Persona>('commuter')
@@ -210,19 +214,23 @@ export function App() {
   const nodes = nodeIndex(network)
   const celebrate = (text: string) => setSuccess(previous => ({ text, revision: previous.revision + 1 }))
   const navigate = (next: Screen) => {
+    walkCheck.current?.abort(); setCheckingWalk(false)
     if (next === 'journey') window.scrollTo({ top: 0, behavior: 'instant' })
     setScreen(next); setMenuOpen(false); setMobileView('content'); setActiveField(null); setPicking(null)
   }
   const pickOnMap = (field: Field) => {
+    walkCheck.current?.abort(); setCheckingWalk(false)
     setActiveField(null); setPicking(field); setError(''); setMobileView('map')
   }
   const invalidateResults = () => {
     routeRequests.current.cancel(); searchingRef.current = false; setSearching(false); setSubmitted(null)
   }
   const setField = (field: Field, value: string) => {
+    walkCheck.current?.abort(); setCheckingWalk(false)
     invalidateResults()
     if (field === 'origin') setOrigin(value)
     else setDestination(value)
+    setAccess(previous => ({ ...previous, [field]: null }))
     setActiveField(null); setPicking(null); setError(''); setPicked(''); setMobileView('content')
   }
   const editProfile = (next: Persona) => {
@@ -233,9 +241,12 @@ export function App() {
     setCustomProfile(previous => previous ? { ...previous, weights: undefined } : undefined)
   }
   const showRoutes = async (from = origin, to = destination, preference = preset, profile = effectiveProfile, traveller = persona) => {
+    if (checkingWalk) return
     setActiveField(null)
     if (!to || !from) { setError('Choose a destination and starting point before continuing.'); return }
-    if (from === to) { setError('Choose two different stations, stops or piers.'); return }
+    const allowed = new Set(eastRailStations(network).map(station => station.id))
+    if (!allowed.has(from) || !allowed.has(to)) { setError('Choose East Rail stations for both ends.'); return }
+    if (from === to) { setError('Choose two different East Rail stations.'); return }
     const departAt = hktDeparture(departureDate, departure)
     if (!Number.isFinite(Date.parse(departAt))) { setError('Choose a valid Hong Kong departure date and time.'); return }
     searchingRef.current = true; setSearching(true)
@@ -255,16 +266,32 @@ export function App() {
     } catch (cause) { if (request.current()) { setSubmitted(null); setScreen('journey'); setError(`Route request failed. ${cause instanceof Error ? cause.message : String(cause)}`) } }
     finally { if (request.current()) { setSearching(false); searchingRef.current = false } }
   }
-  const mapPick = (point: { lat: number; lng: number }) => {
+  const mapPick = async (point: { lat: number; lng: number }) => {
     if (!picking) return
-    const nearest = nearestAccessPoint(network, point)
-    if (!nearest) { setError(`No modelled access point within ${network.meta.catchment_m} m. Search for a station, stop or pier instead.`); return }
-    setField(picking, nearest.node.id)
-    setPicked(`Closest modelled stop: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. ${nearest.node.accessible === true ? 'Accessibility uses modelled assumptions; verify on site.' : 'Accessibility is unknown or incomplete; verify on site.'}`)
-    if (compactViewport) requestAnimationFrame(() => {
-      document.getElementById(picking)?.scrollIntoView({ block: 'center' })
-      document.getElementById('content-view-tab')?.focus({ preventScroll: true })
-    })
+    walkCheck.current?.abort()
+    const controller = new AbortController()
+    walkCheck.current = controller
+    const field = picking
+    setCheckingWalk(true); setError(''); setPicked('')
+    try {
+      const match = await findEastRailWalkingAccess(network, point, controller.signal)
+      if (controller.signal.aborted) return
+      if (!match) { setError('No East Rail station is within 800 m by a modelled walking route. Choose a closer point.'); return }
+      invalidateResults()
+      if (field === 'origin') setOrigin(match.station.id)
+      else setDestination(match.station.id)
+      setAccess(previous => ({ ...previous, [field]: match }))
+      setActiveField(null); setPicking(null); setMobileView('content')
+      setPicked(`${field === 'origin' ? 'Start' : 'End'} point: ${Math.round(match.metres)} m walking to ${match.station.name_en} (OpenStreetMap pedestrian route). Verify the station entrance and path on site.`)
+      if (compactViewport) requestAnimationFrame(() => {
+        document.getElementById(field)?.scrollIntoView({ block: 'center' })
+        document.getElementById('content-view-tab')?.focus({ preventScroll: true })
+      })
+    } catch (cause) {
+      if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : 'Walking route could not be checked.')
+    } finally {
+      if (walkCheck.current === controller) { walkCheck.current = null; setCheckingWalk(false) }
+    }
   }
   const activeRoutes = resultCurrent && (screen === 'results' || screen === 'detail') ? routes : []
   const journeyScreen = screen === 'journey' || screen === 'results' || screen === 'detail'
@@ -272,6 +299,7 @@ export function App() {
   const mapVisible = screen !== 'sources' && (!compactViewport || (journeyScreen && mobileView === 'map'))
   const contentVisible = !showViewTabs || mobileView === 'content'
   const chooseView = (view: 'content' | 'map') => {
+    if (view === 'content') { walkCheck.current?.abort(); setCheckingWalk(false) }
     setMobileView(view); setActiveField(null)
     if (screen === 'journey' && view === 'map') { setPicking(previous => previous ?? 'destination'); setError('') }
     else setPicking(null)
@@ -304,8 +332,9 @@ export function App() {
         <button id="map-view-tab" type="button" role="tab" aria-selected={mobileView === 'map'} aria-controls="journey-map" tabIndex={mobileView === 'map' ? 0 : -1} onClick={() => chooseView('map')}>Map</button>
       </div>}
       <div id="journey-map" className={css.mapFrame} hidden={!mapVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'map-view-tab' : undefined}>
-        <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} mode={mapMode} />
+        <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') void mapPick(point) }} mode={mapMode} />
         {showViewTabs && mobileView === 'map' && error && <p className={css.mapPickNotice} role="alert">{error}</p>}
+        {showViewTabs && mobileView === 'map' && checkingWalk && <p className={css.mapPickNotice} role="status">Checking pedestrian routes…</p>}
       </div>
       {(mapMode === 'docked' || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
         {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta?.sources} sourceWarning={live.sourceWarning} collectorStatus={live.sources} replanningStatus={live.replanning} collectorWarning={live.sourcesWarning || live.warning} replanningWarning={live.replanningWarning} sourcesReadAt={live.sourcesReadAt} onRefresh={live.refresh} onClose={() => navigate('journey')} />}
@@ -315,22 +344,25 @@ export function App() {
       {screen === 'report' && (SEED_MODE ? <section className={css.panel}><h1>Reports use the API.</h1><p>Switch to API mode to submit an unverified report.</p><button type="button" onClick={switchDataMode}>Use API mode</button></section> : <SignalReportForm onAccepted={() => void live.refresh()} />)}
       {screen === 'journey' && <div id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'content-view-tab' : undefined} className={`${css.panel} ${css.mobilePanel}`}>
           <h1>Where are you<br />heading?</h1>
-          <p className={css.subhead}>Choose transport, then search a station, bus stop or ferry pier.</p>
+          <p className={css.subhead}>Choose transport, then select East Rail stations or map points within 800 m walking distance of them.</p>
           <fieldset className={`${css.presets} ${css.transportChoices}`}><legend>TRANSPORT · 交通方式</legend>{TRANSPORT_OPTIONS.map(option => <button key={option.id} type="button" aria-pressed={transport === option.id} disabled={searching} className={transport === option.id ? css.activePreset : ''} onClick={() => { invalidateResults(); setTransport(option.id); setActiveField(null); setPicking(null); setError('') }}>{option.label}</button>)}</fieldset>
           <p className={css.tiny}>{transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus · 小巴: routes are not available in this modelled network yet. Choose another mode for available routes.' : transport === 'all' ? 'Compare all available modes, including bus and ferry connections.' : `Routes include ${transportLabel([transport])}; other modes and walking may provide connections.`}</p>
           <button type="button" className={css.agentEntry} onClick={() => { navigate('agent'); setError('') }}><AgentAvatar issue={published.length > 0} small /><span><strong>Meet your route companion</strong><small>Ask the Agent · explore this scenario</small></span><b>↗</b></button>
           <form onSubmit={event => { event.preventDefault(); void showRoutes() }}>
             <StationField id="origin" label="FROM" value={origin} network={network} active={activeField === 'origin'} onFocus={() => { setActiveField('origin'); setPicking(null) }} onSelect={value => setField('origin', value)} onPickMap={() => pickOnMap('origin')} />
-            <button className={css.swap} type="button" onClick={() => { invalidateResults(); setOrigin(destination); setDestination(origin); setActiveField(null) }} aria-label="Swap stations">⇅</button>
+            <button className={css.swap} type="button" onClick={() => { walkCheck.current?.abort(); setCheckingWalk(false); invalidateResults(); setOrigin(destination); setDestination(origin); setAccess(previous => ({ origin: previous.destination, destination: previous.origin })); setActiveField(null); setPicking(null); setPicked('') }} aria-label="Swap stations">⇅</button>
             <StationField id="destination" label="TO" value={destination} network={network} active={activeField === 'destination'} invalid={Boolean(error && !destination)} onFocus={() => { setActiveField('destination'); setPicking(null) }} onSelect={value => setField('destination', value)} onPickMap={() => pickOnMap('destination')} />
-            <div className={css.fieldAssist}><button type="button" onClick={() => pickOnMap('destination')}>◎ Tap the map</button><span>Within {network.meta.catchment_m} m of a stop</span></div>
+            <div className={css.fieldAssist}><button type="button" onClick={() => pickOnMap('destination')}>◎ Tap the map</button><span>Up to 800 m walking to East Rail</span></div>
+            {checkingWalk && <p role="status" className={css.confirm}>Checking pedestrian routes…</p>}
+            {access.origin && <p className={css.confirm}>Start point → {nodes.get(origin)?.name_en}: {Math.round(access.origin.metres)} m walking</p>}
+            {access.destination && <p className={css.confirm}>End point → {nodes.get(destination)?.name_en}: {Math.round(access.destination.metres)} m walking</p>}
             {picked && <p className={css.confirm}>{picked}</p>}
             {error && <p role="alert" className={css.error}>{error}</p>}
             <DeparturePicker date={departureDate} time={departure} onDate={value => { invalidateResults(); setDepartureDate(value) }} onTime={value => { invalidateResults(); setDeparture(value) }} />
             <PersonaSelector value={persona} onSelect={editProfile} />
             <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} disabled={!SEED_MODE && option.id === 'least_walking'} title={!SEED_MODE && option.id === 'least_walking' ? 'Use a walking limit in your travel preferences' : undefined} className={preset === option.id ? css.activePreset : ''} onClick={() => editPreset(option.id)}>{option.label}</button>)}</fieldset>
             {!SEED_MODE && <p className={css.tiny}>Less walking preset awaits backend support. Wheelchair hard walking and accessibility constraints still apply.</p>}
-            <button type="submit" disabled={searching} className={css.primary}>{searching ? 'Finding routes…' : 'Find resilient routes'} <span>↗</span></button>
+            <button type="submit" disabled={searching || checkingWalk} className={css.primary}>{searching ? 'Finding routes…' : 'Find resilient routes'} <span>↗</span></button>
           </form>
           {!SEED_MODE && <PreferenceEditor active={screen === 'journey'} profile={effectiveProfile} onApply={next => { invalidateResults(); const traveller = next.mobility === 'wheelchair' ? 'wheelchair' : 'commuter'; setCustomProfile(next); setPersona(traveller); setError(''); if (origin && destination) void showRoutes(origin, destination, preset, next, traveller) }} />}
           <p className={css.tiny}>{SEED_MODE ? 'Only Tai Wai → Admiralty has route candidates in this fixture.' : 'Routes use the modelled network and published events; estimates are not a live timetable.'}</p>
@@ -342,6 +374,7 @@ export function App() {
           <span className={css.kicker}>ROUTES FOR YOUR JOURNEY</span>
           <h1 id="routes-heading">{nodes.get(origin)?.name_en ?? origin} <span>→</span><br />{nodes.get(destination)?.name_en ?? destination}</h1>
           <p className={css.subhead}>{routes.length} alternatives · {transportLabel(submitted.transport === 'all' ? undefined : [submitted.transport])} · {PRESETS.find(option => option.id === submitted.preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
+          {(access.origin || access.destination) && <p className={css.confirm}>Access walks: {access.origin ? `start point → ${nodes.get(origin)?.name_en} ${Math.round(access.origin.metres)} m` : 'start at station'} · {access.destination ? `${nodes.get(destination)?.name_en} → end point ${Math.round(access.destination.metres)} m` : 'end at station'}. These walks are separate from the route times and walking totals below.</p>}
           <p className={css.queryStamp}>Queried persona: {submitted.persona === 'wheelchair' ? 'Wheelchair' : 'Commuter'} · Preset: {PRESETS.find(option => option.id === submitted.preset)?.label}<br />Profile sent: {profileLabel(submitted.profile)}</p>
           <p className={css.queryStamp}>Requested departure: {formatHkt(queriedAt)}<br /><small>Query value: {queriedAt} · {SEED_MODE ? 'fixed seed estimates filtered by modelled service hours; journey times are not recalculated.' : 'recomputed when the graph or published events change.'}</small></p>
           {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={String.fromCharCode(65 + index)} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); navigate('detail') }} />)}</div> : <div className={css.empty} role="status"><strong>{submitted.persona === 'wheelchair' && SEED_MODE ? '没有符合轮椅约束的路线' : submitted.persona === 'wheelchair' ? 'No wheelchair-compliant route returned.' : `No ${submitted.transport === 'all' ? '' : `${transportLabel([submitted.transport])} `}route returned for this pair.`}</strong><p>{submitted.persona === 'wheelchair' ? SEED_MODE ? 'The seed lacks affirmative step-free station and leg data or low-floor bus evidence, so ordinary routes cannot be shown as accessible.' : 'The API returned no qualifying candidate. Accessibility data may be incomplete; try another time or station, stop or pier.' : submitted.transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus routes are not available in the current modelled network yet. Choose another transport mode.' : SEED_MODE ? 'The fixed fixture only covers Tai Wai → Admiralty. Switch to API mode to query other stations, stops and piers.' : 'Try All modes, another departure, or another station, bus stop or ferry pier.'}</p><button type="button" className={css.back} onClick={() => navigate('journey')}>Edit transport and journey →</button></div>}
@@ -351,6 +384,7 @@ export function App() {
       {screen === 'detail' && resultCurrent && selected && submitted && <section id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'content-view-tab' : undefined} className={`${css.panel} ${css.detailPanel} ${css.mobilePanel}`}>
         <button type="button" className={css.back} onClick={() => navigate('results')}>← All routes</button><span className={css.kicker}>ROUTE DETAILS · DERIVED ESTIMATE</span>
         <h1>{nodes.get(origin)?.name_en} <span>→</span><br />{nodes.get(destination)?.name_en}</h1>
+        {(access.origin || access.destination) && <p className={css.confirm}>Map-point access walks: {access.origin ? `${Math.round(access.origin.metres)} m at start` : 'start at station'} · {access.destination ? `${Math.round(access.destination.metres)} m at end` : 'end at station'}. Add these to the route walking total; time estimates below exclude them.</p>}
         <p className={css.queryStamp}>Queried persona: {submitted.persona === 'wheelchair' ? 'Wheelchair' : 'Commuter'} · Preset: {PRESETS.find(option => option.id === submitted.preset)?.label}<br />Profile sent: {profileLabel(submitted.profile)}</p>
         <div className={css.detailStats}><strong>{formatRange(selected.total.time_range_s)}</strong><span>{selected.total.transfers} transfer{selected.total.transfers === 1 ? '' : 's'}</span><span>{selected.total.walk_m} m walk</span><span>HK${selected.total.fare_hkd.toFixed(2)}</span></div>
         <p className={css.tiny}>Adult fares · Octopus ordinary class · ferry upper deck (lower deck for wheelchair routes). Each ticket is shown on its first step; connecting MTR lines share the same ticket.</p>

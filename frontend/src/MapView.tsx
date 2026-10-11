@@ -4,6 +4,7 @@ import type { Map as MapLibreMap } from 'maplibre-gl'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import type { Event, Network, RouteCandidate } from './api/types'
 import { CORRIDOR_IDS } from './data'
+import { eastRailStations } from './lib/eastRailAccess'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
 import { resolveNetworkLineGeometry, resolveRouteLegGeometry, resolveImpactGeometry } from './map/geometry'
 import css from './MapView.module.css'
@@ -164,10 +165,10 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
         if (label) line.bindTooltip(label)
       })
     }
-    for (const node of picking ? network.nodes : []) {
+    for (const node of picking ? eastRailStations(network) : []) {
       if (!node || !Number.isFinite(node.lat) || !Number.isFinite(node.lng)) continue
       L.circle([node.lat, node.lng], {
-        radius: node.catchment_m ?? network.meta.catchment_m,
+        radius: Math.min(node.catchment_m ?? network.meta.catchment_m, 800),
         color: '#1565C0', weight: 1, opacity: .3, fillColor: '#1565C0', fillOpacity: .05, interactive: false,
       }).addTo(group)
     }
@@ -242,6 +243,6 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
       <p>Verified paths use CSDI geographic snapshots. Connections without a verified path are schematic.</p>
     </div></details>
     <p className={css.caption}>{provider}{hasSchematic ? ' · includes schematic connections' : ' · sourced path geometry'}</p>
-    {picking && <p className={css.pickHint}>Tap near a station, bus stop or ferry pier, within {network.meta.catchment_m} m. Or search by name.</p>}
+    {picking && <p className={css.pickHint}>Tap near an East Rail station. The circles screen by straight-line distance; pedestrian routing checks the 800 m walking limit.</p>}
   </div>
 }

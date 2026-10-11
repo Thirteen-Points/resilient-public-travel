@@ -58,8 +58,9 @@ export function HowItWorksPage({
       <div className={css.facts}>
         <div><strong>{seedMode ? 'Seed snapshot' : 'API generated at'}</strong>{formatHkt(snapshotAt)}</div>
         <div><strong>Network</strong>{networkVersion}</div>
-        <div><strong>Access radius</strong>{catchmentM} m straight-line</div>
+        <div><strong>Map-point access</strong>Up to {Math.min(catchmentM, 800)} m walking to East Rail</div>
       </div>
+      <p>Map selection checks OpenStreetMap pedestrian routes to modelled East Rail station points. Blue map circles show straight-line search bounds, not walking coverage. A point is accepted only when a pedestrian route measures 800 m or less. The station point may differ from a usable entrance; confirm access on site. Map-point access walks are shown separately and are excluded from station-to-station route times and walking totals. If pedestrian routing is unavailable, choose a station by name.</p>
       <p className={css.disclaimer}>{disclaimer}</p>
     </section>
 
