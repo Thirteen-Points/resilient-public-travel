@@ -1,2 +1,5 @@
 frontend/** text eol=lf
 backend/app/admin_static/** text eol=lf
+deploy/offline/media/*.pdf binary
+deploy/offline/media/*.webm binary
+deploy/offline/start.sh text eol=lf

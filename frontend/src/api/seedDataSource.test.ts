@@ -4,6 +4,24 @@ import { profileFor } from './p3Context'
 import { CORRIDOR_IDS, distanceMetres, legCoordinates, legDuration, nearestAccessPoint } from '../data'
 
 describe('M0 seed boundary', () => {
+  it('keeps bus and ferry filters meaningful in the fixed demo', async () => {
+    const query = { origin: 'TAW', destination: 'ADM', departAt: snapshotAt, preset: 'fastest' } as const
+    for (const mode of ['BUS', 'FERRY'] as const) {
+      const routes = await seedDataSource.getRoutes({ ...query, requiredModes: [mode] })
+      expect(routes.length).toBeGreaterThan(0)
+      expect(routes.every(route => route.legs.some(leg => leg.mode === mode))).toBe(true)
+    }
+    expect(await seedDataSource.getRoutes({ ...query, requiredModes: ['MINIBUS'] })).toEqual([])
+  })
+
+  it('supports bus stops and ferry piers as map access points', async () => {
+    const network = await seedDataSource.getNetwork()
+    for (const id of ['BS_TAW', 'PIER_TST', 'PIER_CEN']) {
+      const node = network.nodes.find(item => item.id === id)!
+      expect(nearestAccessPoint(network, node)?.node.id).toBe(id)
+    }
+  })
+
   it('loads all four versioned seeds through the adapter and reports a fixed snapshot', async () => {
     const [network, { events, signals }, meta] = await Promise.all([
       seedDataSource.getNetwork(), seedDataSource.getEvents(), seedDataSource.getMeta(),
@@ -78,7 +96,9 @@ describe('M0 seed boundary', () => {
     const taiWai = network.nodes.find(node => node.id === 'TAW')!
     expect(nearestAccessPoint(network, taiWai)?.node.id).toBe('TAW')
     expect(taiWai.accessible).toBeNull()
-    expect(nearestAccessPoint(network, taiWai, true)).toBeNull()
+    const accessible = nearestAccessPoint(network, taiWai, true)
+    expect(accessible?.node.id).toBe('BS_TAW')
+    expect(accessible?.node.accessible).toBe(true)
     expect(nearestAccessPoint(network, { lat: 0, lng: 0 })).toBeNull()
     expect(distanceMetres(taiWai, taiWai)).toBe(0)
     expect(network.meta.catchment_m).toBe(800)
@@ -89,5 +109,15 @@ describe('M0 seed boundary', () => {
     const leg = { mode: 'MTR', from: 'TAW', to: 'KOT', walk_m: 0, accessible: true, provenance: 'simulated' } as const
     expect(legDuration({ ...leg, in_vehicle_s: 270 })).toBe('About 5 min')
     expect(legDuration(leg)).toBe('Travel time unavailable')
+  })
+  it('ships official adult fares for rail and mixed-mode tickets', async () => {
+    const routes = await seedDataSource.getRoutes({ origin: 'TAW', destination: 'ADM', departAt: snapshotAt, preset: 'fastest' })
+    expect(routes.filter(route => route.legs.every(leg => leg.mode === 'MTR' || leg.mode === 'WALK'))
+      .every(route => route.total.fare_hkd === 17.1)).toBe(true)
+    expect(routes.find(route => route.route_id === 'r_a3bb2d93a795746f')?.total.fare_hkd).toBe(18.9)
+    expect(routes.find(route => route.route_id === 'r_007c4e09879d19cc')?.total.fare_hkd).toBe(20)
+    for (const route of routes) {
+      expect(route.legs.reduce((sum, leg) => sum + (leg.fare_hkd ?? 0), 0)).toBeCloseTo(route.total.fare_hkd)
+    }
   })
 })

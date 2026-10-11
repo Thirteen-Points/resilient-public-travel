@@ -38,6 +38,7 @@ export function parseChat(value: unknown): ChatReply {
 
 export function chatPayload(context: JourneyContext, message: string) {
   validateContext(context)
+  if (context.modes?.length || context.requiredModes?.length) throw new LiveApiError('POST', '/api/ai/chat', 0, 'CONTRACT_PENDING', 'The chat contract does not accept transport filters. Use the planner for the selected transport mode.')
   if (context.preset === 'least_walking') throw new LiveApiError('POST', '/api/ai/chat', 0, 'CONTRACT_PENDING', 'Less walking preset is unavailable. Apply a walking limit in the planner instead.')
   return { message, origin: context.origin, destination: context.destination, depart_at: context.departAt, profile: resolveProfile(context) }
 }

@@ -22,6 +22,7 @@ describe('explicit preference application', () => {
     expect(wheelchair).not.toBe(commuter)
     expect(routeSelectionKey({ ...context, persona: 'wheelchair', preset: 'most_stable' })).not.toBe(wheelchair)
     expect(routeSelectionKey({ ...context, persona: 'wheelchair', profile: { ...profileFor('wheelchair', 'fastest'), max_walk_m: 200 } })).not.toBe(wheelchair)
+    expect(routeSelectionKey({ ...context, requiredModes: ['BUS'] })).not.toBe(commuter)
     expect(routeSelectionKey({ ...context, persona: 'commuter' })).toBe(commuter)
   })
 
@@ -133,7 +134,8 @@ describe('multi-OD simulation accounting', () => {
     expect(congested.delta?.delay_reduction_pct).toBe(1.6)
     expect(congested.guided.unmet_demand).toBe(199)
     expect(congested.guided.unassigned_demand).toBe(199)
-    expect(congested.generated_at).toBeUndefined()
+    expect(normal.generated_at).toBe(baseline.generated_at)
+    expect(congested.generated_at).toBe(stress.generated_at)
   })
   it('keeps every person in the chart denominator, including unassigned demand', () => {
     const value = parseSimulation(stress), rows = allocationRows(value)!

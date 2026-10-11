@@ -1,0 +1,741 @@
+{
+  "captured_at": "2026-10-11T14:22:29.790Z",
+  "code_commit": "766a876",
+  "main_commit": "fe99a6c9abde1e1dba8c8e8e67b13732cb6033d8",
+  "working_tree_note": "Captured from working tree after resolving latest main merge; merge was not committed at capture time. code_commit identifies the prior HEAD, not the complete pictured changes. Includes the transport label word-break correction.",
+  "mode": "fixed seed snapshot; local Vite source preview at 127.0.0.1:5177; map basemap requested from OpenFreeMap",
+  "updated_images": [
+    {
+      "path": "after-routes-1440.png",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "full_page": true
+    },
+    {
+      "path": "after-planner-390.png",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "full_page": true
+    }
+  ],
+  "visible_first_route_fare_hkd": 17.1,
+  "mobile_transport_controls": [
+    {
+      "text": "All modes",
+      "height": 48,
+      "width": 100,
+      "x": 37,
+      "y": 448
+    },
+    {
+      "text": "MTR · 地铁",
+      "height": 48,
+      "width": 100,
+      "x": 145,
+      "y": 448
+    },
+    {
+      "text": "Bus · 公交",
+      "height": 48,
+      "width": 100,
+      "x": 253,
+      "y": 448
+    },
+    {
+      "text": "Minibus · 小巴",
+      "height": 66,
+      "width": 100,
+      "x": 37,
+      "y": 504
+    },
+    {
+      "text": "Ferry · 渡轮",
+      "height": 66,
+      "width": 100,
+      "x": 145,
+      "y": 504
+    }
+  ],
+  "removed_public_pages_checked": true,
+  "horizontal_overflow_390": false,
+  "errors": [],
+  "transport_geometry": {
+    "width_390": [
+      {
+        "text": "All modes",
+        "height": 48,
+        "width": 100,
+        "left": 37,
+        "right": 137,
+        "top": 448,
+        "bottom": 496,
+        "client_width": 98,
+        "scroll_width": 98,
+        "characters": [
+          {
+            "character": "A",
+            "left": 54.515625,
+            "right": 64.015625,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "l",
+            "left": 64,
+            "right": 67.328125,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "l",
+            "left": 67.3125,
+            "right": 70.65625,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "m",
+            "left": 74.21875,
+            "right": 86.9375,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "o",
+            "left": 86.921875,
+            "right": 95.3125,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "d",
+            "left": 95.296875,
+            "right": 104.203125,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "e",
+            "left": 104.1875,
+            "right": 112.3125,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "s",
+            "left": 112.296875,
+            "right": 119.46875,
+            "top": 463,
+            "bottom": 481
+          }
+        ]
+      },
+      {
+        "text": "MTR · 地铁",
+        "height": 48,
+        "width": 100,
+        "left": 145,
+        "right": 245,
+        "top": 448,
+        "bottom": 496,
+        "client_width": 98,
+        "scroll_width": 98,
+        "characters": [
+          {
+            "character": "M",
+            "left": 161.671875,
+            "right": 173.65625,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "T",
+            "left": 173.640625,
+            "right": 181.65625,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "R",
+            "left": 181.640625,
+            "right": 190.125,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "·",
+            "left": 193.703125,
+            "right": 196.71875,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "地",
+            "left": 200.296875,
+            "right": 214.3125,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "铁",
+            "left": 214.296875,
+            "right": 228.3125,
+            "top": 463,
+            "bottom": 481
+          }
+        ]
+      },
+      {
+        "text": "Bus · 公交",
+        "height": 48,
+        "width": 100,
+        "left": 253,
+        "right": 353,
+        "top": 448,
+        "bottom": 496,
+        "client_width": 98,
+        "scroll_width": 98,
+        "characters": [
+          {
+            "character": "B",
+            "left": 271.921875,
+            "right": 280.53125,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "u",
+            "left": 280.515625,
+            "right": 288.75,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "s",
+            "left": 288.734375,
+            "right": 295.890625,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "·",
+            "left": 299.46875,
+            "right": 302.484375,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "公",
+            "left": 306.0625,
+            "right": 320.078125,
+            "top": 463,
+            "bottom": 481
+          },
+          {
+            "character": "交",
+            "left": 320.0625,
+            "right": 334.078125,
+            "top": 463,
+            "bottom": 481
+          }
+        ]
+      },
+      {
+        "text": "Minibus · 小巴",
+        "height": 66,
+        "width": 100,
+        "left": 37,
+        "right": 137,
+        "top": 504,
+        "bottom": 570,
+        "client_width": 98,
+        "scroll_width": 98,
+        "characters": [
+          {
+            "character": "M",
+            "left": 57.953125,
+            "right": 69.9375,
+            "top": 518,
+            "bottom": 536
+          },
+          {
+            "character": "i",
+            "left": 69.921875,
+            "right": 73.4375,
+            "top": 518,
+            "bottom": 536
+          },
+          {
+            "character": "n",
+            "left": 73.421875,
+            "right": 81.671875,
+            "top": 518,
+            "bottom": 536
+          },
+          {
+            "character": "i",
+            "left": 81.65625,
+            "right": 85.1875,
+            "top": 518,
+            "bottom": 536
+          },
+          {
+            "character": "b",
+            "left": 85.171875,
+            "right": 94.078125,
+            "top": 518,
+            "bottom": 536
+          },
+          {
+            "character": "u",
+            "left": 94.0625,
+            "right": 102.296875,
+            "top": 518,
+            "bottom": 536
+          },
+          {
+            "character": "s",
+            "left": 102.28125,
+            "right": 109.453125,
+            "top": 518,
+            "bottom": 536
+          },
+          {
+            "character": "·",
+            "left": 113.015625,
+            "right": 116.046875,
+            "top": 518,
+            "bottom": 536
+          },
+          {
+            "character": "小",
+            "left": 73,
+            "right": 87,
+            "top": 538,
+            "bottom": 556
+          },
+          {
+            "character": "巴",
+            "left": 87,
+            "right": 101,
+            "top": 538,
+            "bottom": 556
+          }
+        ]
+      },
+      {
+        "text": "Ferry · 渡轮",
+        "height": 66,
+        "width": 100,
+        "left": 145,
+        "right": 245,
+        "top": 504,
+        "bottom": 570,
+        "client_width": 98,
+        "scroll_width": 98,
+        "characters": [
+          {
+            "character": "F",
+            "left": 158.875,
+            "right": 166.15625,
+            "top": 528,
+            "bottom": 546
+          },
+          {
+            "character": "e",
+            "left": 166.140625,
+            "right": 174.265625,
+            "top": 528,
+            "bottom": 546
+          },
+          {
+            "character": "r",
+            "left": 174.25,
+            "right": 179.609375,
+            "top": 528,
+            "bottom": 546
+          },
+          {
+            "character": "r",
+            "left": 179.59375,
+            "right": 184.953125,
+            "top": 528,
+            "bottom": 546
+          },
+          {
+            "character": "y",
+            "left": 184.9375,
+            "right": 192.953125,
+            "top": 528,
+            "bottom": 546
+          },
+          {
+            "character": "·",
+            "left": 196.515625,
+            "right": 199.546875,
+            "top": 528,
+            "bottom": 546
+          },
+          {
+            "character": "渡",
+            "left": 203.109375,
+            "right": 217.125,
+            "top": 528,
+            "bottom": 546
+          },
+          {
+            "character": "轮",
+            "left": 217.109375,
+            "right": 231.125,
+            "top": 528,
+            "bottom": 546
+          }
+        ]
+      }
+    ],
+    "width_320": [
+      {
+        "text": "All modes",
+        "height": 66,
+        "width": 79.328125,
+        "left": 33,
+        "right": 112.328125,
+        "top": 448,
+        "bottom": 514,
+        "client_width": 77,
+        "scroll_width": 77,
+        "characters": [
+          {
+            "character": "A",
+            "left": 64.59375,
+            "right": 74.09375,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "l",
+            "left": 74.078125,
+            "right": 77.40625,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "l",
+            "left": 77.390625,
+            "right": 80.734375,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "m",
+            "left": 50.046875,
+            "right": 62.75,
+            "top": 482,
+            "bottom": 500
+          },
+          {
+            "character": "o",
+            "left": 62.734375,
+            "right": 71.125,
+            "top": 482,
+            "bottom": 500
+          },
+          {
+            "character": "d",
+            "left": 71.109375,
+            "right": 80.03125,
+            "top": 482,
+            "bottom": 500
+          },
+          {
+            "character": "e",
+            "left": 80.015625,
+            "right": 88.140625,
+            "top": 482,
+            "bottom": 500
+          },
+          {
+            "character": "s",
+            "left": 88.125,
+            "right": 95.28125,
+            "top": 482,
+            "bottom": 500
+          }
+        ]
+      },
+      {
+        "text": "MTR · 地铁",
+        "height": 66,
+        "width": 79.328125,
+        "left": 120.328125,
+        "right": 199.65625,
+        "top": 448,
+        "bottom": 514,
+        "client_width": 77,
+        "scroll_width": 77,
+        "characters": [
+          {
+            "character": "M",
+            "left": 142.46875,
+            "right": 154.453125,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "T",
+            "left": 154.4375,
+            "right": 162.453125,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "R",
+            "left": 162.4375,
+            "right": 170.921875,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "·",
+            "left": 174.5,
+            "right": 177.515625,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "地",
+            "left": 145.984375,
+            "right": 159.984375,
+            "top": 482,
+            "bottom": 500
+          },
+          {
+            "character": "铁",
+            "left": 159.984375,
+            "right": 173.984375,
+            "top": 482,
+            "bottom": 500
+          }
+        ]
+      },
+      {
+        "text": "Bus · 公交",
+        "height": 66,
+        "width": 79.34375,
+        "left": 207.65625,
+        "right": 287,
+        "top": 448,
+        "bottom": 514,
+        "client_width": 77,
+        "scroll_width": 77,
+        "characters": [
+          {
+            "character": "B",
+            "left": 232.046875,
+            "right": 240.65625,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "u",
+            "left": 240.640625,
+            "right": 248.875,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "s",
+            "left": 248.859375,
+            "right": 256.015625,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "·",
+            "left": 259.59375,
+            "right": 262.609375,
+            "top": 462,
+            "bottom": 480
+          },
+          {
+            "character": "公",
+            "left": 233.328125,
+            "right": 247.328125,
+            "top": 482,
+            "bottom": 500
+          },
+          {
+            "character": "交",
+            "left": 247.328125,
+            "right": 261.328125,
+            "top": 482,
+            "bottom": 500
+          }
+        ]
+      },
+      {
+        "text": "Minibus · 小巴",
+        "height": 66,
+        "width": 79.328125,
+        "left": 33,
+        "right": 112.328125,
+        "top": 522,
+        "bottom": 588,
+        "client_width": 77,
+        "scroll_width": 77,
+        "characters": [
+          {
+            "character": "M",
+            "left": 43.609375,
+            "right": 55.59375,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "i",
+            "left": 55.578125,
+            "right": 59.09375,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "n",
+            "left": 59.078125,
+            "right": 67.328125,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "i",
+            "left": 67.3125,
+            "right": 70.84375,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "b",
+            "left": 70.828125,
+            "right": 79.734375,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "u",
+            "left": 79.71875,
+            "right": 87.953125,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "s",
+            "left": 87.9375,
+            "right": 95.109375,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "·",
+            "left": 98.671875,
+            "right": 101.703125,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "小",
+            "left": 58.65625,
+            "right": 72.65625,
+            "top": 556,
+            "bottom": 574
+          },
+          {
+            "character": "巴",
+            "left": 72.65625,
+            "right": 86.65625,
+            "top": 556,
+            "bottom": 574
+          }
+        ]
+      },
+      {
+        "text": "Ferry · 渡轮",
+        "height": 66,
+        "width": 79.328125,
+        "left": 120.328125,
+        "right": 199.65625,
+        "top": 522,
+        "bottom": 588,
+        "client_width": 77,
+        "scroll_width": 77,
+        "characters": [
+          {
+            "character": "F",
+            "left": 139.65625,
+            "right": 146.9375,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "e",
+            "left": 146.921875,
+            "right": 155.046875,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "r",
+            "left": 155.03125,
+            "right": 160.390625,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "r",
+            "left": 160.375,
+            "right": 165.734375,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "y",
+            "left": 165.71875,
+            "right": 173.734375,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "·",
+            "left": 177.296875,
+            "right": 180.328125,
+            "top": 536,
+            "bottom": 554
+          },
+          {
+            "character": "渡",
+            "left": 145.984375,
+            "right": 159.984375,
+            "top": 556,
+            "bottom": 574
+          },
+          {
+            "character": "轮",
+            "left": 159.984375,
+            "right": 173.984375,
+            "top": 556,
+            "bottom": 574
+          }
+        ]
+      }
+    ]
+  },
+  "transport_checks": {
+    "min_target_height_px": 48,
+    "text_within_button": true,
+    "chinese_minibus_label_on_same_line": true,
+    "scroll_width_within_client_width": true
+  },
+  "horizontal_overflow_320": false
+}

@@ -83,12 +83,16 @@ cp .env.example .env
 
 See [P3 acceptance](P3-ACCEPTANCE.md) for persistent database migration, CI,
 startup flag verification and the online redeployment acceptance procedure.
+See [P4-C acceptance](P4-ACCEPTANCE.md) for release identity, the three-database
+backup/rollback procedure, publication/withdrawal/natural-expiry measurements,
+and the unexecuted online evidence template. Current P4-C preparation is local
+on `ZYC-P4`; the Blueprint's `main` setting does not deploy that branch.
 
 ---
 
 ## 4. Offline Mode
 
-For demos without internet:
+For preparation while dependencies can still be installed:
 
 ```bash
 ./scripts/start.sh --offline
@@ -99,6 +103,11 @@ Or set `OFFLINE_MODE=true` in `.env`. In offline mode:
 - LLM disabled (deterministic fallback)
 - All data served from local JSON files
 - Full demo scenario (TAW->ADM, ERL cross-harbour closed) works
+
+The one-click setup may install dependencies. For a demo that must start with no
+network, prepare the built bundle and dependencies first, then use the launchers
+in [deploy/offline](offline/README.md). The strict media gate verifies the C local
+recording/PDF; the team's final PPT review/sign-off is a separate handoff.
 
 ---
 
@@ -118,6 +127,19 @@ curl http://localhost:8000/api/health/deep
 ```bash
 python scripts/preflight.py
 ```
+
+The default checks local data and fixed-input P3 results without contacting a
+service. It does not require the backend to be running. To check an already
+running API and verify its full release SHA:
+
+```bash
+python scripts/preflight.py --api-base-url http://127.0.0.1:8000 --expected-build-sha <full-40-character-sha>
+```
+
+For the prepared local offline frontend/media bundle add `--demo --require-media`;
+when checking the running offline API also add `--require-offline`. Save JSON
+and exit code. `--demo` validates the local offline inventory, not the deployed
+frontend. Check its `/build-info.json` separately.
 
 ---
 
@@ -168,7 +190,8 @@ before it can safely be enabled for public users.
 
 The Blueprint uses a paid Starter instance with one 1 GB persistent disk mounted
 at `/opt/render/project/src/backend/app/data`. This contains `events.sqlite3`,
-shared by user reports, Events, and audit history. Initialization runs at startup,
+shared by user reports, Events, and audit history, plus `admin.sqlite3` and
+`ai_usage.sqlite3` beside it. Initialization runs at startup,
 when the disk is available. Do not remove the disk or switch to Free if reports
 must survive redeploys. Disk-backed services run as one instance and have brief
 downtime on deploys. Use SQLite-native backups for database recovery.

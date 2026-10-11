@@ -2,10 +2,13 @@
 from __future__ import annotations
 
 from dataclasses import asdict, replace
+from datetime import datetime, timezone
+import argparse
 import hashlib
 import json
 from pathlib import Path
 import sys
+import subprocess
 from time import perf_counter
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,17 +19,33 @@ from backend.app.sim.adapters import od_route_sets_from_contract
 from backend.app.sim.m2 import run_m2_multi_od
 from backend.app.sim.cache import write_precomputed
 from backend.app.sim.shared_capacity import resources_from_seed
+from scripts.p4_readiness import frozen_text_matches
 
 
-def main() -> None:
-    out = ROOT / "data/sim"
-    raw_input = (out / "m2-route-input.json").read_bytes()
+METRIC_UNITS = {
+    "total_delay_person_min": "person-minutes", "avg_delay_min": "minutes/person",
+    "p95_wait_min": "minutes", "served_demand": "people/window",
+    "unmet_demand": "people/window", "unstoppable_demand": "people/window",
+    "unassigned_demand": "people/window", "shares": "fraction of population",
+    "overloaded_routes": "route count", "overloaded_shared_resources": "directed segment count",
+    "service_capacity_per_hour": "people/hour", "window_min": "minutes",
+}
+
+
+def simulation_inputs():
+    # Historical manifests used CRLF byte hashes. Accept either checkout style;
+    # normalize newly emitted hashes to LF, never JSON values or parameters.
+    raw_input = (ROOT / "data/sim/m2-route-input.json").read_bytes().replace(b"\r\n", b"\n")
     payload = json.loads(raw_input)
     route_sets = od_route_sets_from_contract(payload, fixture=True)
-    network_bytes = (ROOT / "contracts/seed/network.seed.json").read_bytes()
+    network = ROOT / payload["data_version"]["network_file"]
+    network_bytes = network.read_bytes().replace(b"\r\n", b"\n")
     expected_hash = payload["data_version"]["network_sha256"]
-    if hashlib.sha256(network_bytes).hexdigest() != expected_hash:
-        raise ValueError("Frozen route input network hash differs from current seed; regenerate input before comparing")
+    if not frozen_text_matches(network, expected_hash):
+        raise ValueError("Frozen route input network hash differs from recorded snapshot")
+    policy = ROOT / payload["data_version"]["route_policy_file"]
+    if not frozen_text_matches(policy, payload["data_version"]["route_policy_sha256"]):
+        raise ValueError("Frozen route policy hash differs; do not silently compare different weight inputs")
     resources = resources_from_seed(json.loads(network_bytes), payload["od_route_sets"], "weekday_peak")
     common = dict(scenario_id=payload["scenario_id"] + "_p3_shared_segments",
                   route_sets=route_sets, population=payload["population"], seed=payload["seed"],
@@ -40,6 +59,41 @@ def main() -> None:
                       "Wheelchair/elderly are protected first; accessibility/max-walk and 15-minute route extra-delay are hard constraints. Dedicated wheelchair berth/boarding-assistance throughput is unknown and not guaranteed.",
                       "Queue delays are the maximum route/segment bottleneck estimate, not a schedule-based network forecast. No train-by-train seat propagation, external passengers or inter-window carryover is modelled.",
                   ])
+    return payload, raw_input, resources, common
+
+
+def stress_inputs(common, resources):
+    stressed_resources = tuple(replace(item, service_capacity_per_hour=item.service_capacity_per_hour * 0.1)
+                               for item in resources)
+    stress_common = {**common, "scenario_id": common["scenario_id"] + "_residual_10pct",
+                     "assumptions": [*common["assumptions"],
+                                     "Stress-only sensitivity: every segment has 10% of simulated capacity available; factor is invented for testing, not measured."]}
+    return stress_common, stressed_resources
+
+
+def result_metadata(payload, raw_input):
+    revision = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True)
+    dirty = subprocess.run(["git", "diff", "--quiet", "HEAD"], cwd=ROOT)
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "query_time": payload["depart_at"], "input_version": payload["input_version"],
+        "input_file": "data/sim/m2-route-input.json", "input_sha256": hashlib.sha256(raw_input).hexdigest(),
+        "data_version": payload["data_version"], "model_version": "shared-directed-segments-v1",
+        "source_revision": revision.stdout.strip() if revision.returncode == 0 else "unknown",
+        "source_dirty": dirty.returncode != 0,
+        "generator_sha256": hashlib.sha256(Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest(),
+        "input_hash_semantics": "SHA-256 of UTF-8 source text with CRLF normalized to LF",
+        "metric_units": METRIC_UNITS,
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "data/sim")
+    args = parser.parse_args()
+    out = args.output_dir.resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    payload, raw_input, resources, common = simulation_inputs()
     started = perf_counter()
     result = run_m2_multi_od(**common, shared_resources=resources)
     repeated = run_m2_multi_od(**common, shared_resources=resources)
@@ -48,18 +102,19 @@ def main() -> None:
     duration = perf_counter() - started
     # A deliberately constrained fixture verifies that pooling remains active;
     # this 10% factor is a sensitivity input, not an observed residual load.
-    stressed_resources = tuple(replace(item, service_capacity_per_hour=item.service_capacity_per_hour * 0.1)
-                               for item in resources)
-    stress_common = {**common, "scenario_id": common["scenario_id"] + "_residual_10pct",
-                     "assumptions": [*common["assumptions"],
-                                     "Stress-only sensitivity: every segment has 10% of simulated capacity available; factor is invented for testing, not measured."]}
+    stress_common, stressed_resources = stress_inputs(common, resources)
     stressed = run_m2_multi_od(**stress_common, shared_resources=stressed_resources)
+    if stressed != run_m2_multi_od(**stress_common, shared_resources=stressed_resources):
+        raise AssertionError("Fixed-seed stress simulation is not reproducible")
+    metadata = result_metadata(payload, raw_input)
+    result.update(metadata)
+    stressed.update(metadata)
     write_precomputed(result, out)
     write_precomputed(stressed, out)
-    old = json.loads((out / "m2-simulation-result.json").read_text(encoding="utf-8"))
+    old = json.loads((ROOT / "data/sim/m2-simulation-result.json").read_text(encoding="utf-8"))
     evidence = {
         "input_file": "data/sim/m2-route-input.json", "input_sha256": hashlib.sha256(raw_input).hexdigest(),
-        "source_revision": "working-tree", "provenance": "simulated",
+        **metadata, "provenance": "simulated",
         "reproducible_equal": True, "two_runs_elapsed_s": round(duration, 3),
         "previous_model": {"source": "data/sim/m2-simulation-result.json", "baseline": old["baseline"],
                            "guided": old["guided"], "capacity_model": old["capacity_model"]},

@@ -1,5 +1,6 @@
 import networkSeed from '../../../contracts/seed/network.seed.json'
 import eventSeed from '../../../contracts/seed/event.seed.json'
+import { routeMatchesModes } from '../lib/transport'
 import routeSeed from '../../../contracts/seed/routes.seed.json'
 import simSeed from '../../../contracts/seed/sim.seed.json'
 import { normalizeEventFeed, normalizeNetwork, normalizeRoutes, simSeedAvailable } from './normalizers'
@@ -46,7 +47,7 @@ export function rankSeedRoutes(items: RouteCandidate[], preset: Preset): RouteCa
   })
 }
 
-/** Seed accessibility is unknown at several stations. Only affirmative evidence can qualify a wheelchair demo card. */
+/** Only affirmative step-free evidence can qualify a wheelchair demo card. */
 export function verifiedWheelchairSeedRoute(route: RouteCandidate, sourceNetwork: Network = network): boolean {
   if (route.total.walk_m > 400 || route.legs.reduce((sum, leg) => sum + leg.walk_m, 0) > 400 || route.total.transfers > 2 || !route.legs.length) return false
   const nodes = new Map(sourceNetwork.nodes.map(node => [node.id, node]))
@@ -122,7 +123,7 @@ export const seedDataSource: TransitDataSource = {
     if (query.origin !== seedOd.origin || query.destination !== seedOd.destination) return []
     const profile = resolveProfile(query)
     // Seed travel times stay fixed; discard cards that would board a closed service.
-    return rankSeedRoutes(routes, query.preset).filter(route =>
+    return rankSeedRoutes(routes.filter(route => routeMatchesModes(route, query.modes, query.requiredModes)), query.preset).filter(route =>
       seedRouteBoardable(route, query.departAt) &&
       (profile.mobility !== 'wheelchair' || verifiedWheelchairSeedRoute(route) &&
         route.total.walk_m <= (profile.max_walk_m ?? 400) &&

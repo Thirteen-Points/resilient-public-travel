@@ -1,0 +1,54 @@
+{
+  "environment": "local isolated offline browser",
+  "measured_at": "2026-10-05T16:34:38.891Z",
+  "passed": true,
+  "wan_blocked": [
+    "https://fonts.googleapis.com",
+    "https://tile.openstreetmap.org"
+  ],
+  "assertions": [
+    "production-frontend-local-route-query",
+    "matching-backend-frontend-SHA",
+    "offline-health",
+    "negative-benefit-visible",
+    "P3-normal-zero-benefit-preserved",
+    "P3-stress-gap-visible",
+    "verbatim-backend-delay-and-gap",
+    "non-loopback-requests-aborted",
+    "assumptions-visible",
+    "no-page-errors"
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "scn_huh_exc_closed_am_peak",
+      "delay_reduction_pct": -8.8,
+      "baseline_delay": 367770,
+      "guided_delay": 400170,
+      "guided_capacity_gap": 6059
+    },
+    {
+      "scenario_id": "m2_six_station_directed_od_am_peak_p3_shared_segments",
+      "delay_reduction_pct": 0,
+      "baseline_delay": 32103.4,
+      "guided_delay": 32103.4,
+      "guided_capacity_gap": 0
+    },
+    {
+      "scenario_id": "m2_six_station_directed_od_am_peak_p3_shared_segments_residual_10pct",
+      "delay_reduction_pct": 1.6,
+      "baseline_delay": 125121.6,
+      "guided_delay": 123138.1,
+      "guided_capacity_gap": 199
+    }
+  ],
+  "backend_build": {
+    "commit_sha": "d952216cd6360c73fc01b17e6e8b4de30865f045",
+    "source": "APP_BUILD_SHA"
+  },
+  "frontend_build": {
+    "commit_sha": "d952216cd6360c73fc01b17e6e8b4de30865f045",
+    "source": "VITE_BUILD_SHA"
+  },
+  "tour_elapsed_seconds": 300.003,
+  "tour_file": "deploy/offline/media/demo.webm"
+}

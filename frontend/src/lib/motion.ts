@@ -21,11 +21,11 @@ export function usePageMotion(scope: RefObject<HTMLDivElement | null>, screen: s
     if (!ready) return
     const media = gsap.matchMedia()
     media.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.from('[data-panel]', { opacity: 0, y: 15, scale: screen === 'agent' ? .94 : 1, duration: screen === 'agent' ? .65 : .32, ease: screen === 'agent' ? 'elastic.out(1, .65)' : 'power2.out', clearProps: 'all' })
+      gsap.from('[data-panel]', { opacity: 0, y: 8, duration: .18, ease: 'power2.out', clearProps: 'all' })
       const cards = scope.current?.querySelectorAll('[data-enter]')
       const confidence = scope.current?.querySelectorAll('[data-confidence]')
-      if (cards?.length) gsap.from(cards, { opacity: 0, y: 10, stagger: .055, duration: .3, delay: .08, clearProps: 'all' })
-      if (confidence?.length) gsap.from(confidence, { scaleX: 0, transformOrigin: 'left center', stagger: .12, duration: .65, ease: 'power2.out', clearProps: 'transform' })
+      if (cards?.length) gsap.from(cards, { opacity: 0, y: 4, stagger: .02, duration: .18, clearProps: 'all' })
+      if (confidence?.length) gsap.from(confidence, { scaleX: 0, transformOrigin: 'left center', duration: .18, ease: 'power2.out', clearProps: 'transform' })
     })
     return () => media.revert()
   }, { scope, dependencies: [screen, ready], revertOnUpdate: true })
@@ -36,7 +36,7 @@ export function useSuccessMotion(scope: RefObject<HTMLElement | null>, revision:
     if (!revision || !scope.current) return
     const media = gsap.matchMedia()
     media.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.fromTo(scope.current, { y: 8, scale: .94, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: .55, ease: 'back.out(2)', clearProps: 'all' })
+      gsap.fromTo(scope.current, { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: .18, ease: 'power2.out', clearProps: 'all' })
     })
     return () => media.revert()
   }, { dependencies: [revision], revertOnUpdate: true })

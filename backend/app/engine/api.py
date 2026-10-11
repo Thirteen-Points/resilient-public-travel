@@ -27,13 +27,31 @@ def create_router(engine):
             return error(422, 'INVALID_SNAPSHOT_TIME', 'at must include a timezone')
         return engine.snapshots.current.describe(at)
 
+    @router.get('/fares/status')
+    def fare_status():
+        if engine.fare_store is None:
+            return error(503,'DATA_UNAVAILABLE','No fare database configured')
+        return engine.fare_store.status()
+
+    @router.get('/fares/lookup')
+    def fare_lookup(service_id: str, origin: str, destination: str, at: datetime,
+                    direction: str = 'all', day_type: str = 'all', deck: str = 'all',
+                    passenger: str = 'adult', payment: str = 'standard'):
+        if engine.fare_store is None:
+            return error(503,'DATA_UNAVAILABLE','No fare database configured')
+        if at.tzinfo is None:
+            return error(422,'INVALID_FARE_TIME','at must include a timezone')
+        value = engine.fare_store.lookup(service_id,origin,destination,at,direction=direction,
+                                        day_type=day_type,deck=deck,passenger=passenger,payment=payment)
+        return value if value is not None else error(404,'FARE_UNAVAILABLE','No applicable fare for this journey')
+
     @router.post('/routes/query')
     async def query(request: Request):
         try:
             payload = await request.json()
             if not isinstance(payload, dict):
                 raise ValueError('Query body must be an object')
-            allowed = {'origin', 'destination', 'depart_at', 'profile', 'event_ids'}
+            allowed = {'origin', 'destination', 'depart_at', 'profile', 'event_ids', 'modes', 'required_modes'}
             if set(payload) - allowed:
                 raise ValueError('Unknown query fields')
             for key in ('origin', 'destination', 'depart_at'):
@@ -44,6 +62,10 @@ def create_router(engine):
             if 'event_ids' in payload and (not isinstance(payload['event_ids'], list) or
                                           any(not isinstance(x, str) for x in payload['event_ids'])):
                 raise ValueError('event_ids must be a string array')
+            for key in ('modes', 'required_modes'):
+                if key in payload and (not isinstance(payload[key], list) or not payload[key] or
+                                       any(not isinstance(x, str) for x in payload[key])):
+                    raise ValueError(f'{key} must be a nonempty string array')
             # One query_details call supplies both the body and the snapshot used
             # for this computation; the global current snapshot is never re-read.
             details = engine.query_details(**payload)

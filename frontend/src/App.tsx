@@ -1,29 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { MapView } from './MapView'
-import { activePublishedEvents, seedDataSource } from './api/seedDataSource'
+import { seedDataSource } from './api/seedDataSource'
 import { useLiveSession } from './api/useLiveSession'
 import { SignalReportForm } from './components/SignalReportForm'
 import { DeparturePicker, hktDeparture } from './components/DeparturePicker'
 import { AgentAvatar } from './components/AgentAvatar'
 import { AgentPanel } from './components/AgentPanel'
-import { ComparePage } from './components/ComparePage'
-import { SimulationPage } from './components/SimulationPage'
 import { PreferenceEditor } from './components/PreferenceEditor'
 import { PersonaSelector } from './components/PersonaSelector'
 import { LatestRequest, resolveProfile, profileLabel, routeSelectionKey } from './api/p3Context'
-import { ReviewConsole, type ReviewLog } from './components/ReviewConsole'
-import { ReviewAccess } from './components/ReviewAccess'
-import { SignalInbox } from './components/SignalInbox'
 import { HowItWorksPage } from './components/HowItWorksPage'
 import { UpdatesPage } from './components/UpdatesPage'
 import { ProvenanceBadge } from './components/ProvenanceBadge'
 import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
-import type { DemoMeta, Event, JourneyContext, Network, Persona, Preset, RouteCandidate, Signal, TravelProfile } from './api/types'
-import { CORRIDOR_IDS, formatHkt, formatRange, legDuration, modeSummary, nearestAccessPoint, nodeIndex } from './data'
+import { TRANSPORT_OPTIONS, transportLabel } from './lib/transport'
+import type { DemoMeta, Event, JourneyContext, Network, Persona, Preset, RouteCandidate, Signal, TravelProfile, TransitMode } from './api/types'
+import { formatHkt, formatRange, legDuration, modeSummary, nearestAccessPoint, nodeIndex } from './data'
 import css from './App.module.css'
 
-type Screen = 'journey' | 'results' | 'updates' | 'detail' | 'sources' | 'agent' | 'review' | 'report' | 'compare' | 'simulation'
+type Screen = 'journey' | 'results' | 'updates' | 'detail' | 'sources' | 'agent' | 'report'
 const SEED_MODE = new URLSearchParams(window.location.search).get('data') === 'seed'
 function switchDataMode() {
   const url = new URL(window.location.href)
@@ -47,14 +43,15 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
   const nodes = nodeIndex(network)
   const [query, setQuery] = useState('')
   const [index, setIndex] = useState(0)
-  const choices = CORRIDOR_IDS.map(id => nodes.get(id)!).filter(node =>
+  const choices = network.nodes.filter(node =>
     node.name_en.toLowerCase().includes(query.toLowerCase()) || node.name_zh.includes(query) || node.id.toLowerCase().includes(query.toLowerCase()),
   )
   return <div className={css.fieldWrap}>
     <label htmlFor={id} className={css.fieldLabel}>{label}</label>
     <input id={id} className={`${css.input} ${invalid ? css.invalid : ''}`} role="combobox"
       aria-expanded={active} aria-controls={`${id}-options`} aria-autocomplete="list" aria-invalid={Boolean(invalid)}
-      placeholder={label === 'TO' ? 'Choose a destination' : 'Search a station'}
+      aria-activedescendant={active && choices[index] ? `${id}-option-${choices[index].id}` : undefined}
+      placeholder={label === 'TO' ? 'Choose a destination' : 'Search a station, stop or pier'}
       value={active ? query : nodes.get(value)?.name_en ?? ''}
       onFocus={() => { setQuery(''); setIndex(0); onFocus() }}
       onChange={event => { setQuery(event.target.value); setIndex(0) }}
@@ -65,11 +62,11 @@ function StationField({ id, label, value, network, active, onFocus, onSelect, on
         if (event.key === 'Escape') { onSelect(value); setQuery('') }
       }} />
     {active && <div className={css.suggestions} id={`${id}-options`} role="listbox">
-      <span className={css.suggestionLabel}>STATIONS · SEARCH OR SELECT</span>
-      {choices.map((node, i) => <button key={node.id} type="button" role="option" aria-selected={index === i}
+      <span className={css.suggestionLabel}>STATIONS, BUS STOPS & PIERS</span>
+      {choices.map((node, i) => <button key={node.id} id={`${id}-option-${node.id}`} type="button" role="option" aria-selected={index === i}
         className={`${css.suggestion} ${index === i ? css.highlighted : ''}`} onMouseDown={event => event.preventDefault()}
-        onClick={() => { onSelect(node.id); setQuery('') }}>{node.name_en}<small>{node.name_zh}</small></button>)}
-      {!choices.length && <p className={css.small}>No matching seed station. Map selection is available.</p>}
+        onClick={() => { onSelect(node.id); setQuery('') }}>{node.name_en}<small>{node.kind === 'bus_stop' ? 'Bus stop' : node.kind === 'pier' ? 'Ferry pier' : 'MTR'} · {node.name_zh}</small></button>)}
+      {!choices.length && <p className={css.small}>No matching modelled station, stop or pier. Map selection is available.</p>}
       <button type="button" className={css.mapChoice} onMouseDown={event => event.preventDefault()} onClick={onPickMap}>◎ Select a point on the map</button>
     </div>}
   </div>
@@ -83,7 +80,7 @@ function RouteCard({ route, letter, network, selected, onSelect, onDetail }: {
   useGSAP(() => {
     const media = gsap.matchMedia()
     media.add('(prefers-reduced-motion: no-preference)', () => {
-      if (selected) gsap.fromTo(card.current, { scale: .985 }, { scale: 1, duration: .35, ease: 'back.out(2)', clearProps: 'transform' })
+      if (selected) gsap.fromTo(card.current, { y: 4 }, { y: 0, duration: .18, ease: 'power2.out', clearProps: 'transform' })
     })
     return () => media.revert()
   }, { dependencies: [selected], revertOnUpdate: true })
@@ -97,8 +94,9 @@ function RouteCard({ route, letter, network, selected, onSelect, onDetail }: {
     <div className={css.routeCaveat}><ProvenanceBadge value={route.provenance} compact /><span>{route.warnings[0] ?? 'No specific warning in fixture; verify service.'}</span></div>
     <p className={css.routeFreshness}>{route.notes[0] ?? 'Illustrative candidate'} · {SEED_MODE ? 'Seed age at snapshot' : 'Source age at query'} {route.total.freshness_s}s</p>
     <div className={css.lineChips}>{Array.from(new Set(route.legs.filter(leg => leg.line).map(leg => leg.line!))).map(id => {
-      const style = lineStyle(resolveLine(network, id), id)
-      return <span key={id} title={style.label}><i style={{ background: lineGradient(style.colors) }} />{id.replace('BUS_', '')}{style.colors.length > 1 ? ' · joint' : ''}</span>
+      const line = resolveLine(network, id)
+      const style = lineStyle(line, id)
+      return <span key={id} title={style.label}><i style={{ background: lineGradient(style.colors) }} />{line?.name_en ?? id}{style.colors.length > 1 ? ' · joint' : ''}</span>
     })}</div>
     <details className={css.routeEvidence}><summary>Score, preferences & sources</summary>
       {route.score_breakdown?.length ? route.score_breakdown.map(factor => <div className={css.factor} key={factor.criterion}><span>{factor.criterion}</span><span>{Math.round(factor.weight * 100)}% weight · {factor.contribution.toFixed(3)}</span></div>) : <p>No factor breakdown supplied in this seed.</p>}
@@ -117,6 +115,10 @@ export function App() {
   } : null
   const [loadError, setLoadError] = useState('')
   const [screen, setScreen] = useState<Screen>('journey')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [compactViewport, setCompactViewport] = useState(() => window.matchMedia('(max-width: 1023px)').matches)
+  const [mobileView, setMobileView] = useState<'content' | 'map'>('content')
+  const [refreshing, setRefreshing] = useState(false)
   const [origin, setOrigin] = useState('TAW')
   const [destination, setDestination] = useState('')
   const [activeField, setActiveField] = useState<Field | null>(null)
@@ -125,6 +127,7 @@ export function App() {
   const [error, setError] = useState('')
   const [preset, setPreset] = useState<Preset>('fastest')
   const [persona, setPersona] = useState<Persona>('commuter')
+  const [transport, setTransport] = useState<'all' | TransitMode>('all')
   const [customProfile, setCustomProfile] = useState<TravelProfile | undefined>()
   const effectiveProfile = useMemo(() => resolveProfile({ persona, preset, profile: customProfile }), [persona, preset, customProfile])
   const [largeText, setLargeText] = useState(false), [highContrast, setHighContrast] = useState(false)
@@ -132,12 +135,10 @@ export function App() {
   const [departureDate, setDepartureDate] = useState('2026-09-22')
   const [searching, setSearching] = useState(false)
   const [queriedAt, setQueriedAt] = useState('')
-  const [submitted, setSubmitted] = useState<{ key: string; persona: Persona; preset: Preset; profile: TravelProfile } | null>(null)
-  const [logs, setLogs] = useState<ReviewLog[]>([])
+  const [submitted, setSubmitted] = useState<{ key: string; persona: Persona; preset: Preset; profile: TravelProfile; transport: 'all' | TransitMode } | null>(null)
   const [success, setSuccess] = useState({ text: '', revision: 0 })
   const root = useRef<HTMLDivElement>(null)
   const toast = useRef<HTMLDivElement>(null)
-  const originalEvents = useRef<Event[]>([])
   const searchingRef = useRef(false)
   const routeRequests = useRef(new LatestRequest()), requestedJourney = useRef('')
   const requestedScreen = useRef<Screen>('journey')
@@ -146,13 +147,30 @@ export function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = useMemo(() => routes.find(route => route.route_id === selectedId), [routes, selectedId])
   const eventRevisions = (SEED_MODE ? seedBundle?.published : live.bundle?.published)?.map(event => `${event.event_id}@${event.version}`).sort().join(',') ?? ''
-  const context = useMemo<JourneyContext>(() => ({ origin, destination, departAt: hktDeparture(departureDate, departure), preset, persona, profile: effectiveProfile, eventRevisions, eventIds: eventRevisions ? eventRevisions.split(',').map(value => value.slice(0, value.lastIndexOf('@'))) : [] }), [origin, destination, departureDate, departure, preset, persona, effectiveProfile, eventRevisions])
+  const context = useMemo<JourneyContext>(() => ({ origin, destination, departAt: hktDeparture(departureDate, departure), preset, persona, profile: effectiveProfile, requiredModes: transport === 'all' ? undefined : [transport], eventRevisions, eventIds: eventRevisions ? eventRevisions.split(',').map(value => value.slice(0, value.lastIndexOf('@'))) : [] }), [origin, destination, departureDate, departure, preset, persona, effectiveProfile, transport, eventRevisions])
   const plannerKey = routeSelectionKey(context)
   const resultCurrent = submitted?.key === plannerKey
   useEffect(() => {
     if (searchingRef.current && (requestedJourney.current !== plannerKey || requestedScreen.current !== screen)) { routeRequests.current.cancel(); searchingRef.current = false; setSearching(false) }
   }, [plannerKey, screen])
   useEffect(() => () => routeRequests.current.cancel(), [])
+  useEffect(() => {
+    if (compactViewport) window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [screen, mobileView, compactViewport])
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 1023px)')
+    const update = () => { setCompactViewport(media.matches); setMenuOpen(false) }
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+  useEffect(() => {
+    if (!menuOpen) return
+    const close = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setMenuOpen(false); document.getElementById('navigation-toggle')?.focus() }
+    }
+    window.addEventListener('keydown', close)
+    return () => window.removeEventListener('keydown', close)
+  }, [menuOpen])
   usePageMotion(root, screen, Boolean(bundle))
   useSuccessMotion(toast, success.revision)
   useEffect(() => {
@@ -160,6 +178,9 @@ export function App() {
     const timer = setTimeout(() => setSuccess(value => ({ ...value, text: '' })), 4200)
     return () => clearTimeout(timer)
   }, [success.revision, success.text])
+  useEffect(() => {
+    if (!SEED_MODE && live.revision > 0) setSuccess(previous => ({ text: 'Routes updated for the latest network.', revision: previous.revision + 1 }))
+  }, [live.revision])
 
   useEffect(() => {
     if (!SEED_MODE) {
@@ -172,7 +193,6 @@ export function App() {
       .then(async ([network, { events, signals }, meta]) => {
         const published = await seedDataSource.getPublishedEvents(meta.snapshotAt)
         if (alive) {
-          originalEvents.current = structuredClone(events)
           setDepartureDate(meta.snapshotAt.slice(0, 10)); setDeparture(meta.snapshotAt.slice(11, 16))
           setBundle({ network, events, signals, published, meta })
         }
@@ -189,28 +209,12 @@ export function App() {
   const { network, events, signals, published, meta } = bundle
   const nodes = nodeIndex(network)
   const celebrate = (text: string) => setSuccess(previous => ({ text, revision: previous.revision + 1 }))
-  const review = async (event: Event, action: 'edit' | 'publish' | 'reject' | 'expire', reason = '') => {
-    if (!SEED_MODE) {
-      await live.review(event, action, reason)
-      setLogs(previous => [...previous, { id: event.event_id, action, detail: `API accepted the review. Server audit history is authoritative.${reason ? ' Session-only note: ' + reason : ''}` }])
-      celebrate('Review saved by API · refreshing events and routes')
-      return
-    }
-    const record = { ...event, updated_at: meta.snapshotAt, status: action === 'publish' ? 'published' as const : action === 'reject' ? 'rejected' as const : action === 'expire' ? 'expired' as const : 'pending_review' as const, ...(action === 'publish' ? { published_at: meta.snapshotAt } : {}) }
-    setBundle(previous => {
-      if (!previous) return previous
-      const next = previous.events.map(item => item.event_id === record.event_id ? record : action === 'publish' && item.status === 'published' ? { ...item, status: 'updated' as const } : item)
-      return { ...previous, events: next, published: activePublishedEvents(next, previous.meta.snapshotAt) }
-    })
-    setLogs(previous => [...previous, { id: event.event_id, action, detail: `${new Date().toLocaleTimeString('en-HK', { timeZone: 'Asia/Hong_Kong' })} HKT local action. ${reason || (action === 'publish' ? 'Explicitly confirmed; evaluated at seed snapshot.' : 'Saved local structured fields.')}` }])
-    celebrate(action === 'publish' ? 'Event published · demo map updated' : action === 'reject' ? 'Event rejected · reason recorded' : 'Draft saved')
+  const navigate = (next: Screen) => {
+    if (next === 'journey') window.scrollTo({ top: 0, behavior: 'instant' })
+    setScreen(next); setMenuOpen(false); setMobileView('content'); setActiveField(null); setPicking(null)
   }
-  const replay = () => {
-    if (!SEED_MODE) { void live.refresh(); return }
-    const next = structuredClone(originalEvents.current).map(event => ({ ...event, status: 'pending_review' as const, published_at: null }))
-    setBundle(previous => previous ? { ...previous, events: next, published: [] } : previous)
-    setLogs([{ id: 'scenario', action: 'replay', detail: 'Restored seed fields and confidence values; all stages now await review. Fixed route candidates are unchanged.' }])
-    celebrate('Review replay ready · no published disruption')
+  const pickOnMap = (field: Field) => {
+    setActiveField(null); setPicking(field); setError(''); setMobileView('map')
   }
   const invalidateResults = () => {
     routeRequests.current.cancel(); searchingRef.current = false; setSearching(false); setSubmitted(null)
@@ -219,90 +223,107 @@ export function App() {
     invalidateResults()
     if (field === 'origin') setOrigin(value)
     else setDestination(value)
-    setActiveField(null); setPicking(null); setError(''); setPicked('')
+    setActiveField(null); setPicking(null); setError(''); setPicked(''); setMobileView('content')
   }
   const editProfile = (next: Persona) => {
-    invalidateResults(); setError('')
-    setPersona(next); setCustomProfile(undefined)
+    invalidateResults(); setError(''); setPersona(next); setCustomProfile(undefined)
   }
   const editPreset = (next: Preset) => {
-    invalidateResults(); setError('')
-    setPreset(next); setCustomProfile(previous => previous ? { ...previous, weights: undefined } : undefined)
+    invalidateResults(); setError(''); setPreset(next)
+    setCustomProfile(previous => previous ? { ...previous, weights: undefined } : undefined)
   }
   const showRoutes = async (from = origin, to = destination, preference = preset, profile = effectiveProfile) => {
     setActiveField(null)
     if (!to || !from) { setError('Choose a destination and starting point before continuing.'); return }
-    if (from === to) { setError('Choose two different stations.'); return }
+    if (from === to) { setError('Choose two different stations, stops or piers.'); return }
     const departAt = hktDeparture(departureDate, departure)
     if (!Number.isFinite(Date.parse(departAt))) { setError('Choose a valid Hong Kong departure date and time.'); return }
     searchingRef.current = true; setSearching(true)
     const request = routeRequests.current.begin()
     const requestedProfile = resolveProfile({ persona, preset: preference, profile })
-    requestedJourney.current = routeSelectionKey({ origin: from, destination: to, departAt, preset: preference, persona, profile: requestedProfile })
+    requestedJourney.current = routeSelectionKey({ origin: from, destination: to, departAt, preset: preference, persona, profile: requestedProfile, requiredModes: context.requiredModes })
     requestedScreen.current = screen
     try {
-      const value = { origin: from, destination: to, departAt, preset: preference, persona, profile: requestedProfile }
+      const value = { origin: from, destination: to, departAt, preset: preference, persona, requiredModes: context.requiredModes, profile: requestedProfile }
       const next = SEED_MODE ? await seedDataSource.getRoutes(value) : await live.query(value, request.signal)
       if (!request.current()) return
-      setRoutes(next.slice(0, 3)); setOrigin(from); setDestination(to); setPreset(preference); setQueriedAt(departAt)
-      setSubmitted({ key: requestedJourney.current, persona, preset: preference, profile: requestedProfile })
+      setRoutes(next); setOrigin(from); setDestination(to); setPreset(preference); setQueriedAt(departAt)
+      setSubmitted({ key: requestedJourney.current, persona, preset: preference, profile: requestedProfile, transport })
       setSelectedId(next[0]?.route_id ?? null)
-      setScreen('results'); setError(''); setPicking(null)
-      if (next.length) celebrate(`${Math.min(next.length, 3)} ${SEED_MODE ? 'seed' : 'API'} alternatives ready`)
+      setScreen('results'); setMobileView('content'); setError(''); setPicking(null)
+      if (next.length) celebrate(`${next.length} ${SEED_MODE ? 'seed' : 'API'} alternatives ready`)
     } catch (cause) { if (request.current()) { setSubmitted(null); setScreen('journey'); setError(`Route request failed. ${cause instanceof Error ? cause.message : String(cause)}`) } }
     finally { if (request.current()) { setSearching(false); searchingRef.current = false } }
   }
   const mapPick = (point: { lat: number; lng: number }) => {
     if (!picking) return
     const nearest = nearestAccessPoint(network, point)
-    if (!nearest) { setError(`No modelled access point within ${network.meta.catchment_m} m. Search by station instead.`); return }
+    if (!nearest) { setError(`No modelled access point within ${network.meta.catchment_m} m. Search for a station, stop or pier instead.`); return }
     setField(picking, nearest.node.id)
-    setPicked(`Closest modelled station: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. ${nearest.node.accessible === true ? 'Accessibility uses modelled assumptions; verify on site.' : 'Accessibility is unknown or incomplete; verify on site.'}`)
+    setPicked(`Closest modelled stop: ${nearest.node.name_en} · about ${Math.round(nearest.metres)} m straight-line. ${nearest.node.accessible === true ? 'Accessibility uses modelled assumptions; verify on site.' : 'Accessibility is unknown or incomplete; verify on site.'}`)
+    if (compactViewport) requestAnimationFrame(() => {
+      document.getElementById(picking)?.scrollIntoView({ block: 'center' })
+      document.getElementById('content-view-tab')?.focus({ preventScroll: true })
+    })
   }
   const activeRoutes = resultCurrent && (screen === 'results' || screen === 'detail') ? routes : []
-  // Map footprint: full behind the floating panels, a right-hand card beside
-  // page content, faded out on the plain How-it-works page.
+  const journeyScreen = screen === 'journey' || screen === 'results' || screen === 'detail'
+  const showViewTabs = compactViewport && journeyScreen
+  const mapVisible = screen !== 'sources' && (!compactViewport || (journeyScreen && mobileView === 'map'))
+  const contentVisible = !showViewTabs || mobileView === 'content'
+  const chooseView = (view: 'content' | 'map') => {
+    setMobileView(view); setActiveField(null)
+    if (screen === 'journey' && view === 'map') { setPicking(previous => previous ?? 'destination'); setError('') }
+    else setPicking(null)
+  }
   const mapMode: 'full' | 'docked' | 'hidden' =
-    screen === 'updates' || screen === 'review' ? 'docked' : ['sources', 'compare', 'simulation'].includes(screen) ? 'hidden' : 'full'
+    screen === 'updates' ? 'docked' : mapVisible ? 'full' : 'hidden'
   return <div ref={root} className={`${css.shell} ${largeText ? css.largeText : ''} ${highContrast ? css.highContrast : ''}`}>
     <header className={css.header}>
-      <button type="button" className={css.brand} onClick={() => setScreen('journey')} aria-label="ResilientRoute home">rr<span>.</span></button>
-      <nav aria-label="Main navigation">
-        <button type="button" aria-current={screen === 'report' ? 'page' : undefined} onClick={() => { setScreen('report'); setPicking(null) }}>Report</button>
-        <button type="button" aria-current={screen === 'agent' ? 'page' : undefined} onClick={() => { setScreen('agent'); setPicking(null) }}>Agent</button>
-        <button type="button" aria-current={screen === 'journey' || screen === 'results' || screen === 'detail' ? 'page' : undefined} onClick={() => { setScreen('journey'); setPicking(null) }}>Plan journey</button>
-        <button type="button" aria-current={screen === 'updates' ? 'page' : undefined} onClick={() => setScreen('updates')}>Updates</button>
-        <button type="button" aria-current={screen === 'compare' ? 'page' : undefined} onClick={() => { setScreen('compare'); setPicking(null) }}>Compare</button>
-        <button type="button" aria-current={screen === 'simulation' ? 'page' : undefined} onClick={() => { setScreen('simulation'); setPicking(null) }}>Simulation</button>
-        <button type="button" aria-current={screen === 'review' ? 'page' : undefined} onClick={() => { setScreen('review'); setPicking(null) }}>Review</button>
-        <button type="button" aria-current={screen === 'sources' ? 'page' : undefined} onClick={() => setScreen('sources')}>How it works</button>
+      <button type="button" className={css.brand} onClick={() => navigate('journey')} aria-label="ResilientRoute home">rr<span>.</span></button>
+      <button id="navigation-toggle" type="button" className={css.menuToggle} aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} aria-controls="main-navigation" onClick={() => setMenuOpen(value => !value)}>{menuOpen ? 'Close' : 'Menu'} <span aria-hidden="true">{menuOpen ? '×' : '☰'}</span></button>
+      <nav id="main-navigation" aria-label="Main navigation" hidden={compactViewport && !menuOpen} className={menuOpen ? css.navOpen : undefined}>
+        <button type="button" aria-current={screen === 'report' ? 'page' : undefined} onClick={() => navigate('report')}>Report</button>
+        <button type="button" aria-current={screen === 'agent' ? 'page' : undefined} onClick={() => navigate('agent')}>Agent</button>
+        <button type="button" aria-current={journeyScreen ? 'page' : undefined} onClick={() => navigate('journey')}>Plan journey</button>
+        <button type="button" aria-current={screen === 'updates' ? 'page' : undefined} onClick={() => navigate('updates')}>Updates</button>
+        <button type="button" aria-current={screen === 'sources' ? 'page' : undefined} onClick={() => navigate('sources')}>How it works</button>
       </nav>
       <button type="button" className={css.demo} onClick={switchDataMode}>{SEED_MODE ? 'FIXED SEED · USE API' : 'API MODE · USE SEED'}</button>
     </header>
-    <main className={css.stage}>
+    <main className={`${css.stage} ${journeyScreen ? css.journeyLayout : ''} ${screen === 'detail' ? css.detailLayout : ''} ${showViewTabs ? mobileView === 'map' ? css.mapOnly : css.contentOnly : ''}`}>
       <div className={css.accessControls} aria-label="Display accessibility"><button type="button" aria-pressed={largeText} onClick={() => setLargeText(value => !value)}>Large text</button><button type="button" aria-pressed={highContrast} onClick={() => setHighContrast(value => !value)}>High contrast</button></div>
-      {!SEED_MODE && <div className={css.connectionStatus} role="status"><strong>{live.connected ? 'Live updates connected' : 'Checking public updates every 3s'}</strong>{live.revision > 0 && <p>Routes refreshed for the latest approved network state.</p>}{(live.warning || live.routeWarning) && <p>{live.warning} {live.routeWarning}</p>}<button type="button" onClick={() => void live.refresh()}>Refresh</button></div>}
-      <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} mode={mapMode} />
-      {(mapMode === 'docked' || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
-        {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta?.sources} sourceWarning={live.sourceWarning} collectorStatus={live.sources} replanningStatus={live.replanning} collectorWarning={live.sourcesWarning || live.warning} replanningWarning={live.replanningWarning} sourcesReadAt={live.sourcesReadAt} onClose={() => setScreen('journey')} />}
-        {screen === 'updates' && <UpdatesPage events={events} signals={signals} network={network} seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} onOpenReview={() => setScreen('review')} onBack={() => setScreen('journey')} />}
-        {screen === 'review' && (SEED_MODE ? <ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} /> : <ReviewAccess><SignalInbox network={network} onChanged={live.refresh} />{live.reviewWarning && <p role="alert">{live.reviewWarning}</p>}<ReviewConsole events={events} signals={signals} network={network} logs={logs} onSave={review} onReplay={replay} live /></ReviewAccess>)}
+      {!SEED_MODE && (live.warning || live.routeWarning) && <div className={css.refreshNotice} role="alert"><p>{live.warning} {live.routeWarning}</p><button type="button" disabled={refreshing} aria-busy={refreshing} onClick={async () => { setRefreshing(true); try { await live.refresh() } finally { setRefreshing(false) } }}>{refreshing ? 'Refreshing…' : 'Refresh'}</button></div>}
+      {showViewTabs && <div className={css.viewTabs} role="tablist" aria-label="Journey view" onKeyDown={event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+        event.preventDefault()
+        const view = event.key === 'Home' ? 'content' : event.key === 'End' ? 'map' : mobileView === 'content' ? 'map' : 'content'
+        chooseView(view); document.getElementById(`${view}-view-tab`)?.focus()
+      }}>
+        <button id="content-view-tab" type="button" role="tab" aria-selected={mobileView === 'content'} aria-controls="journey-content" tabIndex={mobileView === 'content' ? 0 : -1} onClick={() => chooseView('content')}>{screen === 'journey' ? 'Journey' : screen === 'detail' ? 'Steps' : 'Routes'}</button>
+        <button id="map-view-tab" type="button" role="tab" aria-selected={mobileView === 'map'} aria-controls="journey-map" tabIndex={mobileView === 'map' ? 0 : -1} onClick={() => chooseView('map')}>Map</button>
       </div>}
-      <div hidden={screen !== 'agent'}><AgentPanel active={screen === 'agent'} seedMode={SEED_MODE} published={published} context={context} onRoutes={preference => void showRoutes(SEED_MODE ? meta.od.origin : origin, SEED_MODE ? meta.od.destination : destination, preference)} onBack={() => setScreen('journey')} /></div>
-      <div hidden={screen !== 'compare' && screen !== 'simulation'} className={`${css.pagePane} ${css.full}`}>
-        <div hidden={screen !== 'compare'}><ComparePage active={screen === 'compare'} seedMode={SEED_MODE} context={context} warning={live.warning} onBack={() => setScreen('journey')} /></div>
-        <div hidden={screen !== 'simulation'}><SimulationPage active={screen === 'simulation'} seedMode={SEED_MODE} onBack={() => setScreen('journey')} /></div>
+      <div id="journey-map" className={css.mapFrame} hidden={!mapVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'map-view-tab' : undefined}>
+        <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} mode={mapMode} />
+        {showViewTabs && mobileView === 'map' && error && <p className={css.mapPickNotice} role="alert">{error}</p>}
       </div>
+      {(mapMode === 'docked' || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
+        {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} catchmentM={network.meta.catchment_m} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta?.sources} sourceWarning={live.sourceWarning} collectorStatus={live.sources} replanningStatus={live.replanning} collectorWarning={live.sourcesWarning || live.warning} replanningWarning={live.replanningWarning} sourcesReadAt={live.sourcesReadAt} onRefresh={live.refresh} onClose={() => navigate('journey')} />}
+        {screen === 'updates' && <UpdatesPage events={events} signals={signals} network={network} seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} onBack={() => navigate('journey')} />}
+      </div>}
+      <div hidden={screen !== 'agent'}><AgentPanel active={screen === 'agent'} seedMode={SEED_MODE} published={published} context={context} onRoutes={preference => void showRoutes(SEED_MODE ? meta.od.origin : origin, SEED_MODE ? meta.od.destination : destination, preference)} onBack={() => navigate('journey')} /></div>
       {screen === 'report' && (SEED_MODE ? <section className={css.panel}><h1>Reports use the API.</h1><p>Switch to API mode to submit an unverified report.</p><button type="button" onClick={switchDataMode}>Use API mode</button></section> : <SignalReportForm onAccepted={() => void live.refresh()} />)}
-      {screen === 'journey' && <div data-panel className={css.panel}>
+      {screen === 'journey' && <div id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'content-view-tab' : undefined} className={`${css.panel} ${css.mobilePanel}`}>
           <h1>Where are you<br />heading?</h1>
-          <p className={css.subhead}>Search a modelled station or select it on the map.</p>
-          <button type="button" className={css.agentEntry} onClick={() => { setScreen('agent'); setActiveField(null); setPicking(null); setError('') }}><AgentAvatar issue={published.length > 0} small /><span><strong>Meet your route companion</strong><small>Ask the Agent · explore this scenario</small></span><b>↗</b></button>
+          <p className={css.subhead}>Choose transport, then search a station, bus stop or ferry pier.</p>
+          <fieldset className={`${css.presets} ${css.transportChoices}`}><legend>TRANSPORT · 交通方式</legend>{TRANSPORT_OPTIONS.map(option => <button key={option.id} type="button" aria-pressed={transport === option.id} disabled={searching} className={transport === option.id ? css.activePreset : ''} onClick={() => { invalidateResults(); setTransport(option.id); setActiveField(null); setPicking(null); setError('') }}>{option.label}</button>)}</fieldset>
+          <p className={css.tiny}>{transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus · 小巴: routes are not available in this modelled network yet. Choose another mode for available routes.' : transport === 'all' ? 'Compare all available modes, including bus and ferry connections.' : `Routes include ${transportLabel([transport])}; other modes and walking may provide connections.`}</p>
+          <button type="button" className={css.agentEntry} onClick={() => { navigate('agent'); setError('') }}><AgentAvatar issue={published.length > 0} small /><span><strong>Meet your route companion</strong><small>Ask the Agent · explore this scenario</small></span><b>↗</b></button>
           <form onSubmit={event => { event.preventDefault(); void showRoutes() }}>
-            <StationField id="origin" label="FROM" value={origin} network={network} active={activeField === 'origin'} onFocus={() => { setActiveField('origin'); setPicking(null) }} onSelect={value => setField('origin', value)} onPickMap={() => { setActiveField(null); setPicking('origin') }} />
+            <StationField id="origin" label="FROM" value={origin} network={network} active={activeField === 'origin'} onFocus={() => { setActiveField('origin'); setPicking(null) }} onSelect={value => setField('origin', value)} onPickMap={() => pickOnMap('origin')} />
             <button className={css.swap} type="button" onClick={() => { invalidateResults(); setOrigin(destination); setDestination(origin); setActiveField(null) }} aria-label="Swap stations">⇅</button>
-            <StationField id="destination" label="TO" value={destination} network={network} active={activeField === 'destination'} invalid={Boolean(error && !destination)} onFocus={() => { setActiveField('destination'); setPicking(null) }} onSelect={value => setField('destination', value)} onPickMap={() => { setActiveField(null); setPicking('destination') }} />
-            <div className={css.fieldAssist}><button type="button" onClick={() => { setActiveField(null); setPicking('destination') }}>◎ Tap the map</button><span>Within {network.meta.catchment_m} m of a station</span></div>
+            <StationField id="destination" label="TO" value={destination} network={network} active={activeField === 'destination'} invalid={Boolean(error && !destination)} onFocus={() => { setActiveField('destination'); setPicking(null) }} onSelect={value => setField('destination', value)} onPickMap={() => pickOnMap('destination')} />
+            <div className={css.fieldAssist}><button type="button" onClick={() => pickOnMap('destination')}>◎ Tap the map</button><span>Within {network.meta.catchment_m} m of a stop</span></div>
             {picked && <p className={css.confirm}>{picked}</p>}
             {error && <p role="alert" className={css.error}>{error}</p>}
             <DeparturePicker date={departureDate} time={departure} onDate={value => { invalidateResults(); setDepartureDate(value) }} onTime={value => { invalidateResults(); setDeparture(value) }} />
@@ -315,24 +336,25 @@ export function App() {
           <p className={css.tiny}>{SEED_MODE ? 'Only Tai Wai → Admiralty has route candidates in this fixture.' : 'Routes use the modelled network and published events; estimates are not a live timetable.'}</p>
       </div>}
       {screen === 'results' && resultCurrent && submitted && <>
-        {published[0] && <div className={css.alert}><span>!</span><strong>{published[0].title}</strong><span className={css.alertDetail}>Published event · {formatHkt(published[0].updated_at)}</span><button type="button" onClick={() => setScreen('updates')}>View update →</button></div>}
-        <section data-panel data-route-refresh-revision={live.revision} data-route-ids={routes.map(route => route.route_id).join(',')} className={`${css.panel} ${css.results}`} aria-labelledby="routes-heading">
-          <button type="button" className={css.back} onClick={() => setScreen('journey')}>← Edit journey</button>
+        <section id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} data-route-refresh-revision={live.revision} data-route-ids={routes.map(route => route.route_id).join(',')} className={`${css.panel} ${css.results} ${css.mobilePanel}`} aria-labelledby={showViewTabs ? 'content-view-tab' : 'routes-heading'}>
+          <button type="button" className={css.back} onClick={() => navigate('journey')}>← Edit journey</button>
+          {published[0] && <div className={css.alert}><span aria-hidden="true">!</span><strong>{published[0].title}</strong><span className={css.alertDetail}>Published event · {formatHkt(published[0].updated_at)}</span><button type="button" onClick={() => navigate('updates')}>View update →</button></div>}
           <span className={css.kicker}>ROUTES FOR YOUR JOURNEY</span>
           <h1 id="routes-heading">{nodes.get(origin)?.name_en ?? origin} <span>→</span><br />{nodes.get(destination)?.name_en ?? destination}</h1>
-          <p className={css.subhead}>{routes.length} alternatives · {PRESETS.find(option => option.id === submitted.preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
+          <p className={css.subhead}>{routes.length} alternatives · {transportLabel(submitted.transport === 'all' ? undefined : [submitted.transport])} · {PRESETS.find(option => option.id === submitted.preset)?.label} · {SEED_MODE ? 'fixed seed snapshot' : 'API estimates'}</p>
           <p className={css.queryStamp}>Queried persona: {submitted.persona === 'wheelchair' ? 'Wheelchair' : 'Commuter'} · Preset: {PRESETS.find(option => option.id === submitted.preset)?.label}<br />Profile sent: {profileLabel(submitted.profile)}</p>
           <p className={css.queryStamp}>Requested departure: {formatHkt(queriedAt)}<br /><small>Query value: {queriedAt} · {SEED_MODE ? 'fixed seed estimates filtered by modelled service hours; journey times are not recalculated.' : 'recomputed when the graph or published events change.'}</small></p>
-          {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={'ABC'[index]} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); setScreen('detail') }} />)}</div> : <div className={css.empty} role="status"><strong>{submitted.persona === 'wheelchair' && SEED_MODE ? '没有符合轮椅约束的路线' : submitted.persona === 'wheelchair' ? 'No wheelchair-compliant route returned.' : 'No feasible route at the selected departure time.'}</strong><p>{submitted.persona === 'wheelchair' ? SEED_MODE ? 'The seed lacks affirmative step-free station and leg data or low-floor bus evidence, so ordinary routes cannot be shown as accessible.' : 'The API returned no qualifying candidate. Accessibility data may be incomplete; try another time or station pair.' : 'Try another time or station pair. Check operator schedules before travel.'}</p></div>}
-          <p className={css.tiny}>{SEED_MODE ? 'Fixed illustrative candidates.' : 'API candidates on the modelled network.'} Published events affect the network overlay. Times, fares and scores are derived estimates.</p>
+          {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={String.fromCharCode(65 + index)} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); navigate('detail') }} />)}</div> : <div className={css.empty} role="status"><strong>{submitted.persona === 'wheelchair' && SEED_MODE ? '没有符合轮椅约束的路线' : submitted.persona === 'wheelchair' ? 'No wheelchair-compliant route returned.' : `No ${submitted.transport === 'all' ? '' : `${transportLabel([submitted.transport])} `}route returned for this pair.`}</strong><p>{submitted.persona === 'wheelchair' ? SEED_MODE ? 'The seed lacks affirmative step-free station and leg data or low-floor bus evidence, so ordinary routes cannot be shown as accessible.' : 'The API returned no qualifying candidate. Accessibility data may be incomplete; try another time or station, stop or pier.' : submitted.transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus routes are not available in the current modelled network yet. Choose another transport mode.' : SEED_MODE ? 'The fixed fixture only covers Tai Wai → Admiralty. Switch to API mode to query other stations, stops and piers.' : 'Try All modes, another departure, or another station, bus stop or ferry pier.'}</p><button type="button" className={css.back} onClick={() => navigate('journey')}>Edit transport and journey →</button></div>}
+          <p className={css.tiny}>{SEED_MODE ? 'Fixed illustrative candidates.' : 'API candidates on the modelled network.'} Fares use adult Octopus ordinary class, bus section fares and ferry upper deck prices; personal concessions are excluded. Published events affect the network overlay. Times and scores are derived estimates.</p>
         </section>
       </>}
-      {screen === 'detail' && resultCurrent && selected && submitted && <section data-panel className={`${css.panel} ${css.detailPanel}`}>
-        <button type="button" className={css.back} onClick={() => setScreen('results')}>← All routes</button><span className={css.kicker}>ROUTE DETAILS · DERIVED ESTIMATE</span>
+      {screen === 'detail' && resultCurrent && selected && submitted && <section id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'content-view-tab' : undefined} className={`${css.panel} ${css.detailPanel} ${css.mobilePanel}`}>
+        <button type="button" className={css.back} onClick={() => navigate('results')}>← All routes</button><span className={css.kicker}>ROUTE DETAILS · DERIVED ESTIMATE</span>
         <h1>{nodes.get(origin)?.name_en} <span>→</span><br />{nodes.get(destination)?.name_en}</h1>
         <p className={css.queryStamp}>Queried persona: {submitted.persona === 'wheelchair' ? 'Wheelchair' : 'Commuter'} · Preset: {PRESETS.find(option => option.id === submitted.preset)?.label}<br />Profile sent: {profileLabel(submitted.profile)}</p>
         <div className={css.detailStats}><strong>{formatRange(selected.total.time_range_s)}</strong><span>{selected.total.transfers} transfer{selected.total.transfers === 1 ? '' : 's'}</span><span>{selected.total.walk_m} m walk</span><span>HK${selected.total.fare_hkd.toFixed(2)}</span></div>
-        <h2>Step by step</h2><ol className={css.steps}>{selected.legs.map((leg, i) => <li data-enter key={i}><strong><i className={css.lineDot} style={{ background: leg.mode === 'WALK' ? '#6d7e70' : lineGradient(lineStyle(resolveLine(network, leg.line), leg.line).colors) }} />{leg.mode === 'WALK' ? 'Walk' : resolveLine(network, leg.line)?.name_en ?? leg.line ?? leg.mode}</strong><span>{nodes.get(leg.from)?.name_en ?? leg.from} → {nodes.get(leg.to)?.name_en ?? leg.to}</span><small>{legDuration(leg)}{leg.walk_m ? ` · ${leg.walk_m} m walking` : ''}</small></li>)}</ol>
+        <p className={css.tiny}>Adult fares · Octopus ordinary class · ferry upper deck (lower deck for wheelchair routes). Each ticket is shown on its first step; connecting MTR lines share the same ticket.</p>
+        <h2>Step by step</h2><ol className={css.steps}>{selected.legs.map((leg, i) => <li data-enter key={i}><strong><i className={css.lineDot} style={{ background: leg.mode === 'WALK' ? '#6d7e70' : lineGradient(lineStyle(resolveLine(network, leg.line), leg.line).colors) }} />{leg.mode === 'WALK' ? 'Walk' : resolveLine(network, leg.line)?.name_en ?? leg.line ?? leg.mode}</strong><span>{nodes.get(leg.from)?.name_en ?? leg.from} → {nodes.get(leg.to)?.name_en ?? leg.to}</span><small>{legDuration(leg)}{leg.walk_m ? ` · ${leg.walk_m} m walking` : ''}{leg.mode !== 'WALK' && leg.fare_hkd !== undefined ? ` · ${leg.fare_hkd > 0 ? `HK$${leg.fare_hkd.toFixed(2)}` : 'Included in ticket'}` : ''}</small></li>)}</ol>
         <h2>Why this route?</h2><p>{selected.explain}</p>
         {selected.warnings.length > 0 && <div className={css.warning}><strong>Check before travel</strong>{selected.warnings.map(warning => <p key={warning}>{warning}</p>)}</div>}
         {selected.score_breakdown && <div className={css.breakdown}><h2>Score factors</h2>{selected.score_breakdown.map(factor => <div key={factor.criterion}><span>{factor.criterion}</span><span>weight {Math.round(factor.weight * 100)}% · contribution {factor.contribution.toFixed(3)}</span></div>)}</div>}

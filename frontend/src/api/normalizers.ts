@@ -180,6 +180,7 @@ function validateLeg(raw: unknown, path: string, issues: Issues): void {
   const durationKey = raw.travel_s !== undefined ? 'travel_s' : 'in_vehicle_s'
   expectFiniteNumber(raw, durationKey, path, issues, value => value >= 0, 'a non-negative travel time in seconds')
   expectFiniteNumber(raw, 'walk_m', path, issues, value => value >= 0, 'a non-negative walking distance in metres')
+  if (raw.fare_hkd !== undefined) expectFiniteNumber(raw, 'fare_hkd', path, issues, value => value >= 0, 'a non-negative fare in HKD')
   expectEnum(raw, 'accessible', path, issues, ACCESSIBLE_VALUES)
   expectEnum(raw, 'provenance', path, issues, PROVENANCE_VALUES)
 }
