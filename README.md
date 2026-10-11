@@ -10,9 +10,8 @@ ResilientRoute is an academic prototype for exploring disruption-aware journeys 
 | --- | --- | --- |
 | Journey planner and map | Queries the backend route engine, shows route alternatives, estimates, warnings, provenance and approved event impacts. | The network and service assumptions are modelled. A successful API query does not mean the transport data is live. |
 | Reports and review | Anyone can submit an unverified report. Reviewers can structure reports, merge evidence, create pending events, edit, approve, reject or withdraw them. | A submitted report is a Signal, not a verified incident. Only the last approved event revision affects routes. |
-| Journey companion | In API mode, calls `/api/ai/chat` with the selected origin, destination and departure time. Deterministic backend tools provide routes and numbers; an optional model can provide validated wording. | The current chat contract uses standard-mobility and fastest-route defaults. It does not apply profile IDs or free-text preference changes, and event conditions are not pinned to a route snapshot. The UI identifies these limits. |
-| Profile comparison | Queries commuter and wheelchair constraints for the same requested journey and displays the engine's returned routes. | Route responses do not yet identify their calculation snapshot, so the page labels pair consistency as unverified. |
-| Simulation | Loads precomputed baseline and guided scenarios, including modelled shared-segment capacity results. | Results are simulated scenarios, not measured demand or proof of real capacity or benefit. |
+| Journey companion and preferences | In API mode, uses the requested journey, travel profile and event context. Preference parsing presents a preview before applying a new route query. Deterministic backend tools provide route numbers; an optional model can provide validated wording. | Estimates and accessibility constraints remain modelled; seed conversations use local templates. |
+| Backend simulations | The retained API exposes precomputed baseline and guided scenarios, including modelled shared-segment capacity results. | There is no public Simulation page. Results are simulated scenarios, not measured demand or real capacity. |
 | Source collection | Optional HKO and MTR collectors can create reports for human review. Safe collection and replanning status endpoints are available. | Collection must be configured and enabled. It does not publish events automatically; live source behavior still requires operational verification. |
 | Administrator console | `/admin/` provides a separate login for report review, encrypted AI settings and source configuration. | Configure server-side credentials and storage before deployment; see the administrator guide. |
 
@@ -55,15 +54,13 @@ Do not put API keys, reviewer tokens, passwords or other secrets in `VITE_*` var
 
 API mode is the default. It queries the deterministic route engine and applies approved events effective at the requested departure time. A query uses repository data and the local SQLite database; it is not a live service feed.
 
-The fixed seed demo is an explicit alternative: open `http://localhost:5173/?data=seed`. It supports its fixture journey only. Seed routes do not recalculate for a new departure time, and seed review actions do not change API data. Switching modes reloads the page.
+The fixed seed demo is an explicit alternative: open `http://localhost:5173/?data=seed`. It supports its fixture journey only. Seed routes do not recalculate for a new departure time. Switching modes reloads the page.
 
-Public route queries, approved-event reads and report submission do not need reviewer credentials. For a controlled local review demo, create a temporary token in the API terminal before starting the server:
+Public route queries, approved-event reads and report submission do not need reviewer credentials. Review is available in the separate `/admin/` console; configure its server-side login using the [administrator guide](deploy/ADMIN.md). The public frontend has no Compare, Simulation or Review screen and does not request or store reviewer credentials. Protected legacy reviewer APIs remain available to trusted clients.
 
-```powershell
-$env:REVIEW_API_TOKEN = (& .\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_urlsafe(32))")
-```
+Public updates are checked every three seconds, with source status every fifteen seconds. Healthy refreshes stay quiet. Failures retain existing results with an inline retry notice; recovery clears the notice. Actual route updates use a short notification.
 
-Enter that value in **Review → Temporary credential → Connect reviewer**. The browser keeps it in memory and sends it in a request header. This shared-token flow is for local demos; production review should use the administrator session or a trusted authenticated proxy. CORS is not authentication.
+Map lines use bundled, attributed geographic snapshots without runtime geometry requests. Verified rail, bus and pedestrian paths retain real bends and multipart boundaries; unavailable paths remain visibly schematic. See [path sources and limits](frontend/src/map/GEOMETRY_SOURCES.md).
 
 ## Trust and data limits
 
@@ -129,7 +126,7 @@ npm run build
 npm run build:admin
 ```
 
-The isolated browser regression starts a temporary API/database and Vite server, submits scripted reports, and checks publication, route refresh, recovery and mobile layout. It writes evidence to `.cache/m2-browser/` and requires Playwright plus Chromium:
+The isolated browser regression starts a temporary API/database and Vite server, signs into `/admin/`, submits scripted reports, and checks publication, route refresh, recovery and mobile layout. It prints its checks and three publication-to-render timings, creates no media, and requires Playwright plus Chromium:
 
 ```powershell
 npm install --prefix .cache/p3-playwright --no-audit --no-fund --package-lock=false playwright@1.56.1

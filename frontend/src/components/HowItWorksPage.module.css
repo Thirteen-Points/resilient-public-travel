@@ -1,18 +1,17 @@
-/* How-it-works page content (rendered inside the app's page pane).
-   Extension points (keep this structure when adding motion later):
-   - each <section data-reveal> maps 1:1 to a future scroll/entrance animation;
-   - theme tokens come from the shared :root palette only. */
-.kicker { display: block; color: #5d7767; font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-.title { margin: 10px 0 14px; font-weight: 600; font-size: clamp(32px, 4.6vw, 46px); line-height: 1.05; letter-spacing: -.045em; }
-.title span { color: #74a7b9; }
-.page { max-width: 880px; }
-.page p { color: #3d4f45; font-size: 14px; line-height: 1.65; }
-.facts { display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0; padding: 0; border: 0; }
-.facts div { padding: 10px 14px; border: 1px solid #dfe6da; border-radius: 14px; background: #fbfcf9; font-size: 12px; color: #385441; }
-.facts strong { display: block; margin-bottom: 2px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #6a8172; }
-section { margin-top: 34px; }
-section h2 { margin: 0 0 8px; font-size: 19px; font-weight: 600; letter-spacing: -.02em; }
-.disclaimer { padding: 14px 16px; border-left: 3px solid #b3e682; border-radius: 8px; background: #fbfcf9; color: #51655a; font-size: 13px; }
-.sourceList { margin: 0; padding: 0 0 0 18px; }
-.sourceList li { margin: 6px 0; color: #3d4f45; font-size: 13px; }
-.credits a { color: #2376a8; }
+.page { max-width: 880px; color: var(--rr-text-primary); }
+.kicker { display: block; margin-bottom: 8px; color: var(--rr-text-secondary); font-size: var(--rr-font-label); font-weight: 500; }
+.sourceRefresh { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; margin: 16px 0; padding: 12px 24px; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-pill); background: var(--rr-bg-surface); color: var(--rr-text-brand); font-size: var(--rr-font-label); font-weight: 500; line-height: 1.4286; }
+.sourceRefresh:hover:not(:disabled) { background: var(--rr-bg-subtle); }
+.title { margin: 8px 0 24px; font-size: calc(var(--rr-font-body) * 3); line-height: 1.125; font-weight: 500; letter-spacing: -1.5px; }
+.title span { color: var(--rr-text-brand); }
+.page p { max-width: 72ch; font-size: var(--rr-font-body); line-height: 1.5; }
+.page section { margin-top: 48px; }
+.page section h2 { margin: 0 0 16px; font-size: calc(var(--rr-font-body) * 2); line-height: 1.25; font-weight: 500; letter-spacing: -.6px; }
+.facts { display: flex; flex-wrap: wrap; gap: 16px; margin: 24px 0; }
+.facts div { min-width: 0; padding: 16px; border: 1px solid var(--rr-border-default); border-radius: var(--rr-radius-input); background: var(--rr-bg-surface); font-size: var(--rr-font-small); overflow-wrap: anywhere; }
+.facts strong { display: block; margin-bottom: 8px; color: var(--rr-text-secondary); font-size: var(--rr-font-label); font-weight: 500; }
+.disclaimer { padding: 16px 24px; border-left: 4px solid var(--rr-text-brand); border-radius: var(--rr-radius-small); background: var(--rr-bg-subtle); color: var(--rr-text-primary); }
+.sourceList { padding-left: 24px; }
+.sourceList li { margin: 8px 0; font-size: var(--rr-font-body); }
+.credits a { color: var(--rr-route-a); }
+@media (max-width: 1023px) { .title { font-size: calc(var(--rr-font-body) * 2); line-height: 1.25; letter-spacing: -.6px; } .page section { margin-top: 32px; } .page section h2 { font-size: calc(var(--rr-font-body) * 1.5); line-height: 1.333; } }

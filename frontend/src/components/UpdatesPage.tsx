@@ -13,7 +13,6 @@ export interface UpdatesPageProps {
   network: Network
   seedMode: boolean
   snapshotAt: string
-  onOpenReview: () => void
   onBack: () => void
 }
 
@@ -33,13 +32,13 @@ function EventCard({ event, signals, network }: { event: Event; signals: Signal[
   </article>
 }
 
-export function UpdatesPage({ events, signals, network, seedMode, snapshotAt, onOpenReview, onBack }: UpdatesPageProps) {
+export function UpdatesPage({ events, signals, network, seedMode, snapshotAt, onBack }: UpdatesPageProps) {
   return <section data-panel className={`${css.panel} ${css.widePanel} ${css.pagePanel}`}>
     <button type="button" className={css.back} onClick={onBack}>← Back to journey</button>
     <span className={css.kicker}>{seedMode ? 'SCENARIO SNAPSHOT' : 'API GENERATED AT'} · {formatHkt(snapshotAt)}</span><h1>What we know.</h1>
     <p className={css.subhead}>{seedMode ? 'Three stages of one simulated incident.' : 'Events and confidence supplied by the API.'} Pending reports do not change routes or the map.</p>
     <ol className={css.timeline} aria-label="Confidence timeline">{events.map((event, index) => <li data-enter key={event.event_id}><span>{String(index + 1).padStart(2, '0')} · {formatHkt(event.updated_at)}</span><strong>{Math.round(event.confidence * 100)}<small>%</small></strong><p>{seedMode ? (index === 0 ? 'First report' : index === 1 ? 'Corroborating signals' : 'Official demo evidence') : event.title}<span className={css.timelineStatus} data-status={event.status}>{event.status.replaceAll('_', ' ')}</span></p><div><i data-confidence style={{ width: `${event.confidence * 100}%` }} /></div></li>)}</ol>
-    <button type="button" className={css.reviewLink} onClick={onOpenReview}>Open the review desk →</button>
+    {!events.length && <div className={css.empty}><strong>No active published updates.</strong><p>New approved updates appear here automatically.</p></div>}
     <div className={css.eventGrid}>{events.map(event => <EventCard key={event.event_id} event={event} signals={signals} network={network} />)}</div>
   </section>
 }

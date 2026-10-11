@@ -1,37 +1,27 @@
-/* Geometry morphs on a long ease-out; opacity fades on a short ease-in-out.
-   The three footprints (full / docked / hidden) share this one transition list
-   so every switch between them is a single continuous movement. Duration and
-   easing stay separate variables: splicing a duration+easing pair into the
-   visibility delay would overflow the shorthand and void the whole list. */
-.wrap { --morph: .55s cubic-bezier(.22,1,.36,1); --fade-time: .42s; --fade-ease: cubic-bezier(.4,0,.2,1);
-  position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 0; border-radius: 18px 18px 0 0; overflow: hidden; background: #a9e2e6;
-  transition: top var(--morph), right var(--morph), bottom var(--morph), left var(--morph), border-radius var(--morph), box-shadow var(--morph), opacity var(--fade-time) var(--fade-ease), visibility 0s; }
-/* Docked card beside page content: the map shrinks to the right side.
-   Width is responsive so narrow windows keep a usable content pane; below
-   1080px the card hides and the page pane takes the full width. */
-.wrap.docked { top: 16px; right: 28px; bottom: 20px; left: calc(100% - min(420px, 36vw) - 28px); border-radius: 28px; box-shadow: 0 18px 48px #1f5b6d38; }
-/* Hidden behind a plain page: fade out, then leave the tab order. The visibility
-   delay lets the fade finish before the map becomes unreachable. */
-.wrap.hidden { opacity: 0; visibility: hidden; pointer-events: none;
-  transition: top var(--morph), right var(--morph), bottom var(--morph), left var(--morph), border-radius var(--morph), box-shadow var(--morph), opacity var(--fade-time) var(--fade-ease), visibility 0s linear var(--fade-time); }
-@media (prefers-reduced-motion: reduce) { .wrap { transition: none; } }
-@media (max-width: 1080px) { .wrap.docked { display: none; } }
-.map { width: 100%; height: 100%; background: #a9e2e6; }
+.wrap { position: absolute; inset: 0; z-index: 0; overflow: hidden; border-radius: var(--rr-radius-card, 24px); background: var(--rr-bg-water, #DEE9E4); transition: opacity 180ms ease, border-radius 180ms ease; }
+.docked { inset: 24px 32px 24px auto; width: min(420px, 36vw); box-shadow: var(--rr-shadow-card); }
+.hidden { visibility: hidden; opacity: 0; pointer-events: none; }
+.map { width: 100%; height: 100%; background: var(--rr-bg-page, #F7F8F2); }
 .picking .map { cursor: crosshair; }
-.caption { position: absolute; bottom: 6px; left: 13px; margin: 0; padding: 3px 7px; border-radius: 5px; background: rgba(255,255,255,.85); color: #426273; font-size: 10px; z-index: 450; }
-.pickHint { position: absolute; top: 16px; right: 16px; z-index: 450; margin: 0; padding: 10px 14px; border-radius: 12px; color: #173b50; background: #fff; box-shadow: 0 4px 24px #1748592b; font-size: 13px; }
-.tools { position: absolute; top: 24px; right: 24px; z-index: 450; display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 30px; background: #fffffff0; border: 1px solid #e0e6d8; box-shadow: 0 4px 20px #264b2520; font-size: 10px; color: #5a7157; }
-.tools button { padding: 7px 12px; border: 0; border-radius: 30px; background: #eef3e5; color: #355534; font-size: 11px; font-weight: 600; }
-.tools span { padding-right: 8px; }
-.legend { position: absolute; right: 64px; bottom: 30px; z-index: 450; width: 265px; background: #fffffff5; border: 1px solid #e0e6d8; border-radius: 16px; box-shadow: 0 8px 22px #25451d20; color: #3a5337; font-size: 11px; }
-.legend summary { padding: 13px 16px; cursor: pointer; font-weight: 600; }
-.legend summary span { float: right; }
-.legend > div { padding: 0 16px 10px; max-height: 340px; overflow-y: auto; }
-.legend p { display: flex; align-items: center; gap: 8px; line-height: 1.5; margin: 8px 0; }
-.legend i { width: 23px; height: 7px; flex: none; border-radius: 4px; }
-.legend hr { border: 0; border-top: 1px solid #e0e6d8; margin: 12px 0; }
-.stationLabel { padding: 3px 6px; border: 1px solid #dce5d2; border-radius: 6px; background: #fffffff0; box-shadow: none; color: #355038; font-size: 10px; }
-.picking .tools { top: 64px; }
-@media (max-width: 800px) { .wrap { position: relative; height: 340px; border-radius: 0; } .tools { top: 12px; right: 12px; } .legend { bottom: 28px; right: 55px; width: 210px; } .legend > div { max-height: 200px; } }
-@media (max-width: 800px) { .wrap.hidden { position: absolute; height: 0; } }
-@media (max-width: 700px) { .caption { max-width: 70%; } .pickHint { top: 8px; right: 8px; max-width: 52%; } }
+.map :global(.leaflet-control-zoom a) { width: 44px; height: 44px; line-height: 44px; background: var(--rr-bg-surface); color: var(--rr-text-primary); font-size: calc(var(--rr-font-body) * 1.5); }
+.map :global(.leaflet-control-zoom) { overflow: hidden; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-input); box-shadow: var(--rr-shadow-card); }
+.caption { position: absolute; bottom: 24px; left: 12px; z-index: 450; margin: 0; max-width: calc(100% - 80px); padding: 4px 8px; border-radius: 8px; color: var(--rr-text-secondary, #5E6961); background: rgb(255 255 255 / 95%); font-size: var(--rr-font-caption); line-height: 1.5; pointer-events: none; }
+.tools { position: absolute; top: 16px; right: 16px; z-index: 450; }
+.tools button { min-height: 48px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--rr-border-default, #D9DFD5); background: var(--rr-bg-surface, #FFFFFF); color: var(--rr-text-primary, #18221D); font-size: var(--rr-font-small); font-weight: 500; box-shadow: var(--rr-shadow-card); }
+.tools button:hover { background: var(--rr-bg-subtle, #E8EFDE); }
+.legend { position: absolute; right: 64px; bottom: 64px; z-index: 450; width: min(288px, calc(100% - 88px)); border: 1px solid var(--rr-border-default, #D9DFD5); border-radius: 16px; color: var(--rr-text-primary, #18221D); background: var(--rr-bg-surface, #FFFFFF); box-shadow: var(--rr-shadow-card); font-size: var(--rr-font-small); line-height: 1.45; }
+.legend summary { min-height: 48px; display: flex; align-items: center; gap: 8px; padding: 12px 16px; cursor: pointer; font-weight: 500; }
+.legend summary > span { margin-left: auto; }
+.legend > div { padding: 0 16px 12px; max-height: min(360px, 45dvh); overflow: auto; }
+.legend p { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
+.legend i { width: 24px; height: 4px; flex: none; border-radius: 8px; }
+.legend details { border-top: 1px solid var(--rr-border-default, #D9DFD5); margin-top: 16px; }
+.legend details summary { padding: 12px 0; }
+.routeBadge { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; color: #FFFFFF; flex: none; font-size: var(--rr-font-small); }
+.stationLabel { padding: 4px 8px; border: 1px solid var(--rr-border-default, #D9DFD5); border-radius: 8px; background: rgb(255 255 255 / 96%); box-shadow: none; color: var(--rr-text-primary, #18221D); font-family: inherit; font-size: var(--rr-font-small); line-height: 1.4; }
+.affectedMarker { background: var(--rr-status-degraded) !important; color: var(--rr-text-primary) !important; }
+.impactMarker { display: grid; place-items: center; border-radius: 999px; color: #FFFFFF; background: #C62828; border: 2px solid white; font-size: var(--rr-font-body); font-weight: 700; }
+.pickHint { position: absolute; top: 80px; right: 16px; z-index: 450; margin: 0; max-width: min(320px, calc(100% - 32px)); padding: 12px 16px; border-radius: 16px; color: var(--rr-text-primary, #18221D); background: var(--rr-bg-surface, #FFFFFF); box-shadow: var(--rr-shadow-card); font-size: var(--rr-font-small); line-height: 1.45; }
+.stationEnglish { display: inline; }
+@media (max-width: 1023px) { .wrap { border-radius: 16px; } .docked { display: none; } .legend { right: 64px; bottom: 64px; width: min(160px, calc(100% - 80px)); } .legend[open] { width: min(288px, calc(100% - 80px)); } .stationLabel { width: max-content; max-width: 160px; white-space: normal; } .stationEnglish { display: none; } }
+@media (prefers-reduced-motion: reduce) { .wrap { transition: none; } }

@@ -4,7 +4,8 @@ const path = require('node:path'), net = require('node:net')
 const { spawn } = require('node:child_process')
 const assert = require('node:assert/strict')
 const { chromium } = require(process.env.M2_PLAYWRIGHT || 'playwright')
-const { publication, until, frames } = require('./p3-render-timing.cjs')
+const { publication, until, frames, mapPainted } = require('./p3-render-timing.cjs')
+const { navigate, signInAdministrator, assertRemovedPages } = require('./public-ui.cjs')
 const root = path.resolve(__dirname, '../..'), children = [], errors = [], checks = []
 const normalId = 'm2_six_station_directed_od_am_peak_p3_shared_segments'
 const stressId = normalId + '_residual_10pct'
@@ -61,13 +62,15 @@ let browser, publicPage
   await context.route('**/*', route => route.request().url().startsWith(web) || route.request().url().startsWith(api) ? route.continue() : route.abort())
   const page = await context.newPage(); publicPage = page; page.setDefaultTimeout(15000)
   page.on('pageerror', error => errors.push(error.message))
-  const routeBodies = [], chatBodies = [], preferenceBodies = []
+  const routeBodies = [], chatBodies = [], preferenceBodies = [], forbiddenHeaders = []
   page.on('request', request => {
+    if (request.url().startsWith(api) && (request.headers()['x-review-token'] || request.headers()['x-csrf-token'] || request.headers().authorization)) forbiddenHeaders.push(new URL(request.url()).pathname)
     if (request.url() === api + '/api/routes/query') routeBodies.push(request.postDataJSON())
     if (request.url() === api + '/api/ai/chat') chatBodies.push(request.postDataJSON())
     if (request.url() === api + '/api/persona/parse') preferenceBodies.push(request.postDataJSON())
   })
   await page.goto(web); await page.getByRole('button', { name: 'Find resilient routes' }).waitFor()
+  await assertRemovedPages(page)
   await selectStation(page, 'TO', 'Admiralty'); const departAt = await chooseTomorrow(page)
   // All 30 directed station pairs exercise the actual engine for both profiles.
   const stations = ['TAW', 'KOT', 'MKK', 'HUH', 'EXC', 'ADM']
@@ -101,7 +104,7 @@ let browser, publicPage
   assert.ok(applied.hard_flags.includes('no_stairs') && applied.hard_flags.includes('no_minibus'))
   assert.deepEqual(await page.locator('[data-route-id]').evaluateAll(elements => elements.map(el => el.getAttribute('data-route-id'))), actualRoutes.slice(0, 3).map(route => route.route_id))
   pass('real preferences: preview, confirmation, accessible routing')
-  await page.getByRole('button', { name: 'Agent', exact: true }).click()
+  await navigate(page, 'Agent')
   const actualChatResponse = page.waitForResponse(response => response.url() === api + '/api/ai/chat' && response.ok())
   await page.getByLabel('ASK ABOUT THE CURRENT JOURNEY').fill('Explain the returned route estimates')
   await page.getByLabel('ASK ABOUT THE CURRENT JOURNEY').press('Enter')
@@ -126,7 +129,7 @@ let browser, publicPage
   assert.ok(!(await page.getByRole('log').innerText()).includes('OBSOLETE P4 ANSWER'))
   await page.unroute(api + '/api/ai/chat'); pass('injected chat failure and cancelled stale completion')
   // Context changes invalidate a persona preview before it can be applied.
-  await page.getByRole('button', { name: 'Plan journey', exact: true }).click()
+  await navigate(page, 'Plan journey')
   await text.fill('便宜一点'); await page.getByRole('button', { name: 'Preview preferences' }).click(); await page.locator('[data-preference-preview]').waitFor()
   await page.getByRole('button', { name: 'Commuter', exact: true }).click()
   assert.ok(await page.getByRole('button', { name: 'Apply preferences', exact: true }).isDisabled())
@@ -152,100 +155,152 @@ let browser, publicPage
   releaseRoutes = undefined
   await page.route(api + '/api/routes/query', async route => { await new Promise(resolve => releaseRoutes = resolve); await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(actualRoutes) }).catch(() => {}) })
   await page.getByRole('button', { name: 'Find resilient routes' }).click(); await until(() => Boolean(releaseRoutes))
-  await page.getByRole('button', { name: 'How it works', exact: true }).click(); releaseRoutes(); await page.unroute(api + '/api/routes/query'); await frames(page)
+  await navigate(page, 'How it works'); releaseRoutes(); await page.unroute(api + '/api/routes/query'); await frames(page)
   assert.ok(await page.getByRole('heading', { name: 'Source freshness & collection', exact: true }).isVisible())
   assert.equal(await page.locator('#routes-heading').count(), 0)
-  await page.getByRole('button', { name: 'Plan journey', exact: true }).click()
+  await navigate(page, 'Plan journey')
   await page.getByRole('button', { name: 'Find resilient routes' }).click(); await page.getByRole('heading', { name: 'Tai Wai → Hung Hom' }).waitFor()
   pass('changing stations or leaving the planner cancels obsolete route navigation')
-  // Live comparison stays truthful on old servers; future snapshot headers are
-  // tested separately using an explicitly injected metadata contract.
-  const compareStart = routeBodies.length
-  await page.getByRole('button', { name: 'Compare', exact: true }).click()
-  await page.locator('[data-comparison-verified]').waitFor()
-  const pair = routeBodies.slice(compareStart).filter(body => body.event_ids)
-  assert.equal(pair.length, 2); assert.equal(pair[0].origin, pair[1].origin); assert.equal(pair[0].destination, pair[1].destination); assert.equal(pair[0].depart_at, pair[1].depart_at)
-  assert.deepEqual(pair[0].event_ids, pair[1].event_ids); assert.equal(pair[1].profile.mobility, 'wheelchair')
-  const actualVerified = await page.locator('[data-comparison-verified]').getAttribute('data-comparison-verified')
-  if (actualVerified === 'false') await page.getByText('Pair consistency: unverified.', { exact: false }).waitFor()
-  await page.route(api + '/api/routes/query', async route => { const response = await route.fetch(); await route.fulfill({ response, headers: { ...response.headers(), 'X-Route-Snapshot': 'injected-p4-matching', 'Access-Control-Expose-Headers': 'X-Route-Snapshot' } }) })
-  await page.getByRole('button', { name: 'Refresh both profiles', exact: true }).click(); await page.locator('[data-comparison-verified="true"]').waitFor()
-  await page.getByText('calculation snapshot injected-p4-matching', { exact: false }).waitFor()
-  await page.unroute(api + '/api/routes/query')
-  let snapshotCalls = 0
-  await page.route(api + '/api/routes/query', async route => { const response = await route.fetch(); await route.fulfill({ response, headers: { ...response.headers(), 'X-Route-Snapshot': `injected-p4-mismatch-${++snapshotCalls}`, 'Access-Control-Expose-Headers': 'X-Route-Snapshot' } }) })
-  await page.getByRole('button', { name: 'Refresh both profiles', exact: true }).click()
-  await page.getByRole('alert').filter({ hasText: 'Both profiles were retried' }).waitFor()
-  assert.equal(snapshotCalls, 4); await page.getByText('Previous comparison retained', { exact: false }).waitFor()
-  await page.unroute(api + '/api/routes/query'); pass('comparison: actual pair plus injected matching/mismatched snapshot headers')
-  // Actual precomputed scenarios: unchanged results, modest improvement and gap.
-  await page.getByRole('button', { name: 'Simulation', exact: true }).click(); await page.getByRole('button', { name: 'Load precomputed result', exact: true }).click()
-  await page.locator(`[data-simulation-id="${normalId}"]`).waitFor()
+  // Removed presentation pages retain their backend API contracts.
+  const pair = await Promise.all(['standard', 'wheelchair'].map(mobility => call('/api/routes/query', {
+    origin: 'TAW', destination: 'ADM', depart_at: departAt, event_ids: [],
+    profile: mobility === 'standard' ? { mobility, preset: 'fastest', hard_flags: [] }
+      : { mobility, preset: 'most_stable', max_walk_m: 400, max_transfers: 2, hard_flags: ['no_stairs', 'no_minibus', 'no_non_lowfloor_bus'] },
+  })))
+  assert.ok(pair.every(routes => Array.isArray(routes) && routes.length > 0))
   const normal = await call(`/api/sim/result?scenario_id=${normalId}`)
-  await page.getByText('Delay is unchanged.', { exact: false }).waitFor()
-  for (const strategy of ['baseline', 'guided']) assert.ok((await page.locator(`[data-strategy="${strategy}"]`).innerText()).includes(normal[strategy].total_delay_person_min.toLocaleString('en-HK')))
-  await page.getByLabel('Simulation scenario', { exact: true }).selectOption(stressId); await page.getByRole('button', { name: 'Load precomputed result', exact: true }).click()
-  await page.locator(`[data-simulation-id="${stressId}"]`).waitFor()
   const stress = await call(`/api/sim/result?scenario_id=${stressId}`)
-  await page.getByText('Sensitivity experiment:', { exact: false }).waitFor(); await page.getByText('Backend delay change: 1.6% reduction.', { exact: false }).waitFor()
-  const simText = await page.locator('[data-simulation-id]').innerText()
-  assert.ok(simText.includes('199')); assert.equal(stress.guided.unassigned_demand, 199)
-  assert.ok(simText.includes('1.99%')); assert.ok(simText.includes('15-minute limit covers extra route travel'))
-  assert.ok(simText.includes('Not supplied — age unknown'))
-  await page.getByText('Inspect route and shared-segment loads', { exact: true }).click()
-  const resourceRows = page.getByRole('region', { name: 'guided shared segment table', exact: true }).locator('tbody tr')
-  assert.equal(await resourceRows.count(), stress.guided.resource_load.length)
-  await page.getByText('Use another scenario id', { exact: true }).click()
-  await page.getByLabel('Simulation scenario id', { exact: true }).fill('injected-missing-p4-scenario'); await page.getByRole('button', { name: 'Load precomputed result', exact: true }).click()
-  await page.getByRole('alert').filter({ hasText: 'SIM_RESULT_NOT_FOUND' }).waitFor()
-  assert.equal(await page.locator('[data-simulation-id]').getAttribute('data-simulation-id'), stressId)
-  pass('real simulations: unchanged delay, 1.6% stress reduction, 199 unassigned, retained missing scenario')
-  let releaseSimulation
-  await page.route(api + '/api/sim/result?scenario_id=' + normalId, async route => { await new Promise(resolve => releaseSimulation = resolve); await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(normal) }).catch(() => {}) })
-  await page.getByLabel('Simulation scenario', { exact: true }).selectOption(normalId); await page.getByRole('button', { name: 'Load precomputed result', exact: true }).click(); await until(() => Boolean(releaseSimulation))
-  await page.getByLabel('Simulation scenario', { exact: true }).selectOption(stressId); await page.getByRole('button', { name: 'Load precomputed result', exact: true }).click()
-  await page.getByRole('button', { name: 'Load precomputed result', exact: true }).waitFor(); releaseSimulation(); await page.unroute(api + '/api/sim/result?scenario_id=' + normalId); await frames(page)
-  assert.equal(await page.locator('[data-simulation-id]').getAttribute('data-simulation-id'), stressId)
-  pass('changing simulation scenarios rejects an obsolete completion')
+  assert.equal(normal.baseline.total_delay_person_min, normal.guided.total_delay_person_min)
+  assert.equal(stress.guided.unassigned_demand, 199)
+  assert.ok(stress.guided.total_delay_person_min < stress.baseline.total_delay_person_min)
+  assert.ok(stress.guided.resource_load.length > 0)
+  const missing = await fetch(api + '/api/sim/result?scenario_id=missing-browser-test-scenario')
+  assert.equal(missing.status, 404)
+  pass('comparison profiles and simulation contracts remain available through the API')
   // Source failure is isolated from route queries and preserves previous status.
-  await page.getByRole('button', { name: 'How it works', exact: true }).click(); await page.locator('[data-source="mtr"]').waitFor()
+  await navigate(page, 'How it works'); await page.locator('[data-source="mtr"]').waitFor()
   const actualSources = await call('/api/sources/status'); assert.equal(actualSources.publishes_events, false)
   if (!actualSources.sources.mtr.last_success_at) await page.getByText('No persistent last-success time supplied.', { exact: false }).first().waitFor()
   await page.route(api + '/api/sources/status', route => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ detail: 'Injected collection failure' }) }))
   await page.getByRole('button', { name: 'Refresh', exact: true }).click()
   await page.getByRole('alert').filter({ hasText: 'Collection status refresh failed' }).waitFor()
   assert.ok(await page.locator('[data-source="mtr"]').isVisible())
-  await page.getByRole('button', { name: 'Plan journey', exact: true }).click(); await page.getByRole('button', { name: 'Find resilient routes' }).click(); await page.getByRole('heading', { name: 'Tai Wai → Hung Hom' }).waitFor()
+  await navigate(page, 'Plan journey'); await page.getByRole('button', { name: 'Find resilient routes' }).click(); await page.getByRole('heading', { name: 'Tai Wai → Hung Hom' }).waitFor()
   await page.unroute(api + '/api/sources/status'); pass('actual source status and isolated collection failure')
-  // Retain previous simulation while offline, then recover the actual selection.
-  await page.getByRole('button', { name: 'Simulation', exact: true }).click(); await page.getByLabel('Simulation scenario', { exact: true }).selectOption(stressId)
-  await context.setOffline(true); await page.getByRole('alert').filter({ hasText: 'Offline. Previous simulation retained' }).waitFor()
-  assert.equal(await page.locator('[data-simulation-id]').getAttribute('data-simulation-id'), stressId)
-  await context.setOffline(false); await page.getByRole('alert').filter({ hasText: 'Offline. Previous simulation retained' }).waitFor({ state: 'hidden' })
-  pass('offline result retention and automatic online recovery')
-  // Keyboard focus, large text, contrast, mobile, and scrollable tables.
-  for (const width of [1440, 800, 390, 320]) {
-    await page.setViewportSize({ width, height: 900 }); await noOverflow(page, `simulation ${width}`)
-    await page.getByRole('button', { name: 'Large text', exact: true }).click(); await page.getByRole('button', { name: 'High contrast', exact: true }).click(); await noOverflow(page, `simulation large text ${width}`)
+  // Public polling is quiet while healthy and retains route cards offline.
+  await assertRemovedPages(page)
+  const previousRoutes = await page.locator('[data-route-id]').evaluateAll(elements => elements.map(element => element.dataset.routeId))
+  await context.setOffline(true)
+  await page.getByRole('alert').filter({ hasText: /Offline|Refresh failed/ }).waitFor()
+  assert.deepEqual(await page.locator('[data-route-id]').evaluateAll(elements => elements.map(element => element.dataset.routeId)), previousRoutes)
+  await context.setOffline(false)
+  await page.getByRole('alert').filter({ hasText: /Offline|Refresh failed/ }).waitFor({ state: 'hidden' })
+  await page.getByRole('status').filter({ hasText: 'Routes updated for the latest network.' }).waitFor()
+  await page.getByRole('status').filter({ hasText: 'Routes updated for the latest network.' }).waitFor({ state: 'hidden', timeout: 6500 })
+  // An explicit failed graph refresh exposes a retry; success removes it.
+  await page.route(api + '/api/graph/snapshot**', route => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ detail: 'Injected graph refresh failure' }) }))
+  const graphWarning = page.getByRole('alert').filter({ hasText: 'Refresh failed;' })
+  await graphWarning.waitFor({ timeout: 15000 })
+  await page.unroute(api + '/api/graph/snapshot**')
+  await graphWarning.getByRole('button', { name: 'Refresh', exact: true }).click()
+  await graphWarning.waitFor({ state: 'hidden' })
+  pass('quiet healthy polling, offline retention, automatic recovery, retry and 4.2-second toast dismissal')
+  // Actual collapsed menus and map/list panels, enlarged text and focus.
+  for (const width of [1440, 1024, 800, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 })
+    await navigate(page, 'Plan journey'); await noOverflow(page, `planner ${width}`)
+    if (width < 1024) {
+      assert.equal(await page.locator('#main-navigation').isVisible(), false)
+      const open = page.locator('#navigation-toggle')
+      await open.click(); assert.equal(await open.getAttribute('aria-expanded'), 'true')
+      await page.keyboard.press('Escape'); assert.equal(await page.locator('#main-navigation').isVisible(), false)
+      assert.ok(await open.evaluate(button => button === document.activeElement))
+      const content = page.locator('#journey-content'), map = page.locator('#journey-map')
+      assert.equal(await content.isVisible(), true); assert.equal(await map.isVisible(), false)
+      await page.getByRole('tab', { name: 'Journey', exact: true }).focus()
+      await page.keyboard.press('ArrowRight')
+      assert.equal(await map.isVisible(), true); assert.equal(await content.isVisible(), false)
+      assert.equal(await page.getByRole('tab', { name: 'Map', exact: true }).getAttribute('aria-selected'), 'true')
+      await page.keyboard.press('ArrowLeft')
+      assert.equal(await content.isVisible(), true); assert.equal(await map.isVisible(), false)
+    } else {
+      assert.equal(await page.locator('#journey-map').isVisible(), true)
+      assert.equal(await page.getByRole('tablist', { name: 'Journey view' }).count(), 0)
+    }
+    await page.getByRole('button', { name: 'Large text', exact: true }).click(); await page.getByRole('button', { name: 'High contrast', exact: true }).click(); await noOverflow(page, `planner large text ${width}`)
     await page.getByRole('button', { name: 'Large text', exact: true }).click(); await page.getByRole('button', { name: 'High contrast', exact: true }).click()
-    await page.getByRole('button', { name: 'Compare', exact: true }).click(); await page.getByRole('button', { name: 'Refresh both profiles', exact: true }).waitFor(); await noOverflow(page, `comparison ${width}`)
-    await page.getByRole('button', { name: 'How it works', exact: true }).click(); await noOverflow(page, `sources ${width}`)
-    await page.getByRole('button', { name: 'Agent', exact: true }).click(); await noOverflow(page, `agent ${width}`)
+    await page.getByRole('button', { name: 'Find resilient routes' }).click(); await page.locator('#routes-heading').waitFor(); await noOverflow(page, `routes ${width}`)
+    if (width < 1024) {
+      const heading = await page.locator('#routes-heading').boundingBox()
+      assert.ok(heading && heading.y >= 0 && heading.y + heading.height <= 900, `routes ${width}: heading inherits planner scroll position`)
+      await page.getByRole('tab', { name: 'Map', exact: true }).click()
+      assert.equal(await page.locator('#journey-content').isVisible(), false); await noOverflow(page, `route map ${width}`)
+      await page.getByRole('tab', { name: 'Routes', exact: true }).click()
+      assert.equal(await page.locator('#journey-map').isVisible(), false)
+    }
+    await page.getByRole('button', { name: 'View steps →', exact: true }).first().click(); await noOverflow(page, `steps ${width}`)
+    if (width < 1024) {
+      await page.getByRole('tab', { name: 'Map', exact: true }).click(); assert.equal(await page.locator('#journey-content').isVisible(), false)
+      await page.getByRole('tab', { name: 'Steps', exact: true }).click(); assert.equal(await page.locator('#journey-map').isVisible(), false)
+    }
+    for (const name of ['Updates', 'Report', 'How it works', 'Agent']) { await navigate(page, name); await noOverflow(page, `${name} ${width}`) }
     const prompt = page.getByLabel('ASK ABOUT THE CURRENT JOURNEY'); await prompt.fill('Keyboard focus check'); await prompt.press('Tab')
     assert.ok(await page.getByRole('button', { name: 'Send message', exact: true }).evaluate(button => button === document.activeElement && getComputedStyle(button).outlineStyle !== 'none'))
-    await page.getByRole('button', { name: 'Plan journey', exact: true }).click(); await noOverflow(page, `planner ${width}`)
-    await page.getByRole('button', { name: 'Simulation', exact: true }).click()
   }
-  pass('320–1440 px layouts, enlarged text, high contrast and keyboard focus')
+  // Map picking uses the station location shown by Leaflet and returns to form.
+  await navigate(page, 'Plan journey'); await page.getByRole('button', { name: '◎ Tap the map', exact: true }).click()
+  await page.locator('#journey-map').scrollIntoViewIfNeeded()
+  await page.getByRole('button', { name: 'Fit corridor on map', exact: true }).click()
+  await frames(page)
+  let stationPoint
+  await until(async () => {
+    const label = await page.locator('#journey-map .leaflet-tooltip').filter({ hasText: 'Admiralty' }).first().boundingBox()
+    if (!label) return false
+    stationPoint = { x: label.x + label.width + 10, y: label.y + label.height / 2 }
+    return page.evaluate(point => Boolean(document.elementFromPoint(point.x, point.y)?.closest('.leaflet-container')), stationPoint)
+  }, 5000)
+  await page.mouse.click(stationPoint.x, stationPoint.y)
+  await page.locator('#journey-content').waitFor({ state: 'visible' })
+  assert.equal(await page.locator('#journey-map').isVisible(), false)
+  assert.match(await page.getByRole('combobox', { name: 'TO', exact: true }).inputValue(), /Admiralty/)
+  pass('320–1440 px layouts, collapsed navigation, real map/list hiding, keyboard tabs and map picking')
+  // A fresh compact page starts with a genuinely hidden map. First reveal and
+  // subsequent resizes must paint without Leaflet/MapLibre lifecycle errors.
+  const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' })
+  await mobileContext.route('**/*', route => route.request().url().startsWith(web) || route.request().url().startsWith(api) ? route.continue() : route.abort())
+  const mobile = await mobileContext.newPage()
+  mobile.on('pageerror', error => errors.push(error.message))
+  mobile.on('request', request => {
+    if (request.url().startsWith(api) && (request.headers()['x-review-token'] || request.headers()['x-csrf-token'] || request.headers().authorization)) forbiddenHeaders.push(new URL(request.url()).pathname)
+  })
+  await mobile.goto(web); await mobile.getByRole('button', { name: 'Find resilient routes' }).waitFor()
+  assert.equal(await mobile.locator('#journey-map').isVisible(), false)
+  await mobile.getByRole('tab', { name: 'Map', exact: true }).click()
+  await mobile.locator('#journey-map').waitFor({ state: 'visible' })
+  await until(async () => await mobile.locator('.leaflet-overlay-pane').count() > 0 && await mapPainted(mobile))
+  for (const width of [320, 1440, 390]) {
+    await mobile.setViewportSize({ width, height: 844 })
+    await mobile.locator('#journey-map').waitFor({ state: 'visible' })
+    await noOverflow(mobile, `fresh mobile map resized to ${width}`)
+    await until(() => mapPainted(mobile))
+  }
+  await mobile.getByRole('tab', { name: 'Journey', exact: true }).click()
+  assert.equal(await mobile.locator('#journey-map').isVisible(), false)
+  await mobile.getByRole('tab', { name: 'Map', exact: true }).click()
+  await until(() => mapPainted(mobile)); await frames(mobile)
+  assert.deepEqual(errors, [])
+  await mobileContext.close()
+  pass('fresh mobile hidden-map reveal, repeated visibility changes and desktop/mobile resizes without browser errors')
   // Three real approvals, each measured after map and route-card rendering.
-  await page.setViewportSize({ width: 1440, height: 1000 }); await page.getByRole('button', { name: 'Plan journey', exact: true }).click()
+  await page.setViewportSize({ width: 1440, height: 1000 }); await navigate(page, 'Plan journey')
   await page.getByRole('button', { name: 'Commuter', exact: true }).click(); await selectStation(page, 'TO', 'Admiralty'); await page.getByRole('button', { name: 'Find resilient routes' }).click(); await page.getByRole('heading', { name: 'Tai Wai → Admiralty' }).waitFor()
   const reviewContext = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' })
   await reviewContext.route('**/*', route => route.request().url().startsWith(web) || route.request().url().startsWith(api) ? route.continue() : route.abort())
   const reviewer = await reviewContext.newPage(); reviewer.on('pageerror', error => errors.push(error.message))
-  await reviewer.goto(web); await reviewer.getByRole('button', { name: 'Report', exact: true }).click(); await reviewer.getByLabel('What did you see?').fill('【模拟 P4 浏览器测试】东铁线红磡至会展信号故障，暂停服务。')
-  await reviewer.getByRole('button', { name: /Send unverified report/ }).click(); await reviewer.getByText('Report received — not yet verified.').waitFor()
-  await reviewer.getByRole('button', { name: 'Review', exact: true }).click(); await reviewer.getByLabel('Temporary credential').fill('m2-isolated-test'); await reviewer.getByRole('button', { name: 'Connect reviewer', exact: true }).click()
+  await navigate(page, 'Report'); await page.getByLabel('What did you see?').fill('【模拟 P4 浏览器测试】东铁线红磡至会展信号故障，暂停服务。')
+  await page.getByRole('button', { name: /Send unverified report/ }).click(); await page.getByText('Report received — not yet verified.').waitFor()
+  await navigate(page, 'Plan journey'); await page.getByRole('button', { name: 'Find resilient routes' }).click(); await page.locator('#routes-heading').waitFor()
+  await signInAdministrator(reviewer, api)
   await reviewer.getByRole('button', { name: 'Extract / merge', exact: true }).click(); await reviewer.getByRole('combobox', { name: /^Direction/ }).selectOption('both')
   const hktInput = value => new Date(value + 8 * 3600000).toISOString().slice(0, 16)
   await reviewer.getByLabel('Start · HKT', { exact: true }).fill(hktInput(Date.now() - 5 * 60000))
@@ -261,25 +316,55 @@ let browser, publicPage
   for (let round = 0; round < 3; round++) {
     if (round) {
       const approvedTitle = (await call('/api/events/published'))[0].title
+      const approvedRevision = await page.locator('[data-event-revisions]').getAttribute('data-event-revisions')
       await call(`/api/events/${event.event_id}/review`, { action: 'edit', actor: 'P4-test', edits: { title: `【模拟 P4 浏览器测试】revision ${round + 1}` } }, true)
       assert.equal((await call('/api/events/published'))[0].title, approvedTitle)
+      await page.waitForResponse(response => response.url().includes('/api/events/published') && response.ok())
+      await frames(page)
+      assert.equal(await page.locator('[data-event-revisions]').getAttribute('data-event-revisions'), approvedRevision)
+      assert.ok(!(await page.locator('#journey-content').innerText()).includes(`【模拟 P4 浏览器测试】revision ${round + 1}`))
     } else assert.deepEqual(await call('/api/events/published'), [])
     await reviewer.getByRole('button', { name: 'Refresh events ↻', exact: true }).click(); await reviewer.getByRole('button', { name: 'Publish →', exact: true }).click()
     const timing = await publication(page, reviewer, event.event_id); timings.push(timing); assert.ok(timing.passed, JSON.stringify(timing))
   }
+  // A committed administrator write remains successful when queue reads fail.
+  await reviewer.getByRole('button', { name: 'Edit fields ↗', exact: true }).click()
+  await reviewer.getByLabel('Title', { exact: true }).fill('Confirmed write with unavailable queue')
+  await reviewer.route(api + '/api/admin/events', route => route.abort())
+  let confirmedEdits = 0
+  reviewer.on('request', request => {
+    if (request.url().endsWith(`/api/admin/events/${event.event_id}/review`) && request.method() === 'POST' && request.postDataJSON()?.action === 'edit') confirmedEdits++
+  })
+  const savedEdit = reviewer.waitForResponse(response => response.url().endsWith(`/events/${event.event_id}/review`) && response.request().postDataJSON()?.action === 'edit')
+  await reviewer.getByRole('button', { name: 'Save draft', exact: true }).click()
+  assert.equal((await savedEdit).status(), 200)
+  await reviewer.getByText('Review saved. The queue could not refresh; refresh it manually.', { exact: true }).waitFor()
+  assert.equal((await call('/api/events', undefined, true))[0].title, 'Confirmed write with unavailable queue')
+  assert.equal(confirmedEdits, 1)
+  assert.equal(await reviewer.getByRole('button', { name: 'Save draft', exact: true }).count(), 0)
+  assert.ok(!(await reviewer.locator('body').innerText()).includes('The review could not be confirmed.'))
+  await reviewer.unroute(api + '/api/admin/events')
+  await reviewer.getByRole('button', { name: 'Refresh events ↻', exact: true }).click()
+  const withdrawalStarted = performance.now()
+  const withdrawalRevision = Number(await page.locator('[data-route-refresh-revision]').getAttribute('data-route-refresh-revision'))
   await call(`/api/events/${event.event_id}/review`, { action: 'expire', actor: 'P4-test' }, true)
-  await page.locator('[data-event-revisions=""]').waitFor(); await reviewContext.close()
+  await page.locator('[data-event-revisions=""]').waitFor()
+  await until(async () => Number(await page.locator('[data-route-refresh-revision]').getAttribute('data-route-refresh-revision')) > withdrawalRevision)
+  assert.ok(performance.now() - withdrawalStarted <= 5000)
+  await reviewContext.close()
   console.log('LOCAL render timings ms: ' + JSON.stringify(timings.map(value => ({ map: value.map_ms, routes: value.routes_ms }))))
-  pass('three real approvals: rendered map and route cards within 5 seconds; pending revision isolation; withdrawal')
+  pass('three admin approvals rendered within 5 seconds, pending edit isolation, confirmed write with failed refresh and polling withdrawal')
   // The fixed seed demonstration retains its explicit identity.
   const seed = await context.newPage(), seedChats = []
+  seed.on('pageerror', error => errors.push(error.message))
   seed.on('request', request => { if (request.url().endsWith('/api/ai/chat')) seedChats.push(request.url()) })
-  await seed.goto(web + '?data=seed'); await seed.getByRole('button', { name: 'Agent', exact: true }).click(); await seed.getByText('Seed conversation · template replies · no live AI.', { exact: false }).waitFor()
+  await seed.goto(web + '?data=seed'); await navigate(seed, 'Agent'); await seed.getByText('Seed conversation · template replies · no live AI.', { exact: false }).waitFor()
   await seed.getByRole('button', { name: /^Tai Wai to Admiralty, less walking/ }).click(); await seed.getByRole('button', { name: 'Inspect these seed routes →', exact: true }).click(); await seed.getByRole('heading', { name: 'Tai Wai → Admiralty' }).waitFor()
   assert.deepEqual(seedChats, []); assert.deepEqual(errors, [])
+  assert.deepEqual(forbiddenHeaders, [])
   assert.equal(await page.evaluate(() => Object.keys(localStorage).length + Object.keys(sessionStorage).length), 0)
   pass('seed isolation, no browser errors, no stored reviewer credentials')
-  console.log(JSON.stringify({ passed: true, checks: checks.length, actualComparisonVerified: actualVerified === 'true', mediaCreated: false }))
+  console.log(JSON.stringify({ passed: true, checks: checks.length, mediaCreated: false }))
 })().catch(async error => {
   console.error(error.stack)
   if (publicPage) console.error('Visible DOM: ' + (await publicPage.locator('body').innerText().catch(() => '')).slice(-9000))
