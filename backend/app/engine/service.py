@@ -47,7 +47,7 @@ class RouteEngine:
     def query_details(self, origin, destination, depart_at, profile=None, *, event_ids=None, modes=None, required_modes=None, limit=10):
         fares, fare_revision = self.fares, None
         if self.fare_store is not None:
-            fare_revision, fares = self.fare_store.snapshot(thaw(self.snapshots.network.source), depart_at)
+            fare_revision, fares = self.fare_store.snapshot(self.snapshots.network.source, depart_at)
         return self._query_details(origin, destination, depart_at, profile, event_ids=event_ids, modes=modes,
                                    required_modes=required_modes, limit=limit, fares=fares, fare_revision=fare_revision)
 

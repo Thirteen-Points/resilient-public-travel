@@ -83,6 +83,24 @@ def test_gtfs_schedule_has_no_weekend_fabricated_peak_service(imported_engine):
     for line in weekday_only:
         assert not any(operates(s,datetime(2026,10,11).date()) for s in line['gtfs_services'])
 
+def test_public_map_omits_internal_calendars_but_keeps_arrival_lookup(imported_engine):
+    from backend.app.engine.api import create_app
+    with TestClient(create_app(imported_engine)) as client:
+        network=client.get('/api/graph/network').json()
+    buses=[line for line in network['lines'] if line['mode']=='BUS']
+    assert buses and all(line['route_number'] and line['eta_stops'] for line in buses)
+    assert all(not any(key.startswith('gtfs_') for key in line) for line in buses)
+    assert all(line['gtfs_services'] for line in imported_engine.snapshots.network.source['lines'] if line['mode']=='BUS')
+
+def test_fare_queries_receive_shared_immutable_network(imported_engine,monkeypatch):
+    store=imported_engine.fare_store
+    original=store.snapshot
+    def checked(network,at):
+        assert network is imported_engine.snapshots.network.source
+        return original(network,at)
+    monkeypatch.setattr(store,'snapshot',checked)
+    assert imported_engine.query('TAW','ADM','2026-10-12T08:20:00+08:00',modes=['BUS'],required_modes=['BUS'])
+
 def test_reviewed_bus_closure_applies_to_imported_route_number(imported_engine):
     from backend.app.graph.snapshot import SnapshotStore
     store=SnapshotStore(imported_engine.snapshots.network)
