@@ -88,3 +88,7 @@ The searchable bus catalogue includes feeders; a selected journey card also
 shows arrivals for its actual bus boarding stop. Use morning/evening service
 times to check daytime route results, and an operating night route for late-night
 live ETA verification.
+
+The approved-event monitor reuses an immutable snapshot when event contents
+have not changed. It still checks activation/expiry on every reconciliation;
+unchanged events do not repeatedly copy the larger GTFS graph during queries.

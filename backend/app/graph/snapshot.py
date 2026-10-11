@@ -101,6 +101,13 @@ class SnapshotStore:
         return Snapshot(sid, self.network, tuple(freeze(e) for e in payload["events"]), self.weather_policy)
 
     def _publish(self, events):
+        events = {key: freeze(value) for key, value in events.items()}
+        # The expiry monitor reconciles every second. An unchanged revision
+        # must reuse the immutable snapshot instead of copying/hashing the
+        # entire GTFS network while route queries are running. Active-window
+        # transitions are still checked by the replanning coordinator.
+        if events == self._events and (self.path is None or self.path.is_file()):
+            return self._snapshot
         for event in events.values():
             for segment in event.get("affected_segments", ()):
                 if not segment.get("from_node") or not segment.get("to_node"):
