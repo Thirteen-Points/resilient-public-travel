@@ -38,6 +38,9 @@ export interface NetworkLine {
   mode: string
   operator?: string | string[]
   stops: string[]
+  seg_time_s?: number[]
+  service_hours?: string
+  service_hours_reverse?: string
   provenance: Provenance
 }
 

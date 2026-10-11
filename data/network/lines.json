@@ -23,6 +23,8 @@
         "saturday": 300,
         "sunday_ph": 300
       },
+      "service_hours": "05:40-00:31",
+      "service_hours_reverse": "06:04-00:22",
       "capacity_per_vehicle": 2845,
       "capacity_note": "9-car R-Stock, 6 pax/m^2. Source: LegCo paper (secondary). Awaiting primary verification.",
       "accessible": true,
@@ -51,6 +53,8 @@
         "saturday": 240,
         "sunday_ph": 240
       },
+      "service_hours": "05:58-00:14",
+      "service_hours_reverse": "06:01-00:45",
       "capacity_per_vehicle": 2500,
       "capacity_note": "Estimated from similar rolling stock. Unverified.",
       "accessible": true,
@@ -78,6 +82,8 @@
         "saturday": 180,
         "sunday_ph": 180
       },
+      "service_hours": "05:59-00:37",
+      "service_hours_reverse": "06:15-00:40",
       "capacity_per_vehicle": 2500,
       "capacity_note": "Estimated. Unverified.",
       "accessible": true,
@@ -105,6 +111,8 @@
         "saturday": 180,
         "sunday_ph": 180
       },
+      "service_hours": "06:01-00:50",
+      "service_hours_reverse": "06:06-00:54",
       "capacity_per_vehicle": 2500,
       "capacity_note": "Estimated. Unverified.",
       "accessible": true,
@@ -131,6 +139,8 @@
         "saturday": 180,
         "sunday_ph": 180
       },
+      "service_hours": "06:07-00:58",
+      "service_hours_reverse": "06:03-00:54",
       "capacity_per_vehicle": 2500,
       "capacity_note": "Estimated. Unverified.",
       "accessible": true,
@@ -157,6 +167,8 @@
         "saturday": 240,
         "sunday_ph": 240
       },
+      "service_hours": "06:11-01:05",
+      "service_hours_reverse": "06:00-00:42",
       "capacity_per_vehicle": 1000,
       "capacity_note": "3-car train. Estimated.",
       "accessible": true,

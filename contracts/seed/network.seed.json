@@ -35,28 +35,33 @@
     {"id":"ERL","name_zh":"東鐵綫","name_en":"East Rail Line","mode":"MTR","bidirectional":true,
      "stops":["TAW","KOT","MKK","HUH","EXC","ADM"],"seg_time_s":[270,165,210,300,165],
      "headway_s":{"weekday_peak":180,"weekday_offpeak":360,"saturday":300,"sunday_ph":300},
+     "service_hours":"05:40-00:31","service_hours_reverse":"06:04-00:22",
      "capacity_per_vehicle":2845,"capacity_note":"9 卡 6 人/m²，待核实","accessible":true,
      "fare_baseline":true,"provenance":"real-derived","scope_note":"仅建模大围—金钟段"},
 
     {"id":"TML","name_zh":"屯馬綫","name_en":"Tuen Ma Line","mode":"MTR","bidirectional":true,
      "stops":["TAW","DIH","HOM","HUH","ETS"],"seg_time_s":[420,480,180,240],
      "headway_s":{"weekday_peak":180,"weekday_offpeak":300,"saturday":240,"sunday_ph":240},
+     "service_hours":"05:58-00:14","service_hours_reverse":"06:01-00:45",
      "capacity_per_vehicle":2500,"capacity_note":"待核实","accessible":true,
      "collapsed_stops_note":"中间站（顯徑/啟德/宋皇臺/土瓜灣）并入边权","provenance":"real-derived"},
 
     {"id":"KTL","name_zh":"觀塘綫","name_en":"Kwun Tong Line","mode":"MTR","bidirectional":true,
      "stops":["DIH","KOT","PRE","MOK","YMT","HOM"],"seg_time_s":[300,240,150,150,210],
      "headway_s":{"weekday_peak":120,"weekday_offpeak":240,"saturday":180,"sunday_ph":180},
+     "service_hours":"05:59-00:37","service_hours_reverse":"06:15-00:40",
      "capacity_per_vehicle":2500,"capacity_note":"待核实","accessible":true,"provenance":"real-derived"},
 
     {"id":"TWL","name_zh":"荃灣綫","name_en":"Tsuen Wan Line","mode":"MTR","bidirectional":true,
      "stops":["YMT","JOR","TST","ADM","CEN"],"seg_time_s":[150,150,300,120],
      "headway_s":{"weekday_peak":120,"weekday_offpeak":240,"saturday":180,"sunday_ph":180},
+     "service_hours":"06:01-00:50","service_hours_reverse":"06:06-00:54",
      "capacity_per_vehicle":2500,"capacity_note":"待核实","accessible":true,"provenance":"real-derived"},
 
     {"id":"ISL","name_zh":"港島綫","name_en":"Island Line","mode":"MTR","bidirectional":true,
      "stops":["CEN","ADM","WAC"],"seg_time_s":[120,180],
      "headway_s":{"weekday_peak":120,"weekday_offpeak":240,"saturday":180,"sunday_ph":180},
+     "service_hours":"06:07-00:58","service_hours_reverse":"06:03-00:54",
      "capacity_per_vehicle":2500,"capacity_note":"待核实","accessible":true,"provenance":"real-derived"},
 
     {"id":"BUS_182","name_zh":"過海巴士182","name_en":"Cross-harbour Bus 182","mode":"BUS","bidirectional":true,
