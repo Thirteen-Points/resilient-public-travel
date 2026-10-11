@@ -43,9 +43,11 @@ field; it does not tune the frozen policy. Normal delay improvement is 0%, and
 older negative-benefit results remain available. The 10% capacity factor is
 invented for stress testing, not measured residual capacity.
 
-The frozen M2 route input references `data/sim/frozen-network.seed.json`.
-This snapshot preserves the network bytes used to build the historical route
-candidates, independently of later operational seed updates such as first/last
-boarding windows. Both preflight and the generator validate the manifest's
-network path and hash. Moving the reference changes the input manifest hash;
-route candidates, policy weights and simulation metrics remain unchanged.
+The frozen M2 route input references `data/sim/frozen-network.seed.json`
+and `data/sim/frozen-route-policy.json`. These snapshots preserve the network
+and policy bytes used to build the historical route candidates, independently
+of later operational updates such as boarding windows and official fares.
+Preflight and the generator validate both manifest paths and hashes. Moving
+these references changes the input manifest hash; historical route candidates,
+policy weights and simulation metrics remain unchanged. Live routing continues
+to use the current network and persistent fare database.

@@ -353,6 +353,7 @@ def test_generator_uses_frozen_network_after_live_seed_changes(tmp_path, monkeyp
     # The live network is intentionally unusable. Historical simulations must
     # resolve the manifest snapshot and still enforce its exact content hash.
     write_json(tmp_path / "contracts/seed/network.seed.json", {})
+    write_json(tmp_path / "backend/app/engine/fixtures/seed_policy.json", {})
     monkeypatch.setattr(precompute_sim_p3, "ROOT", tmp_path)
     actual, _, resources, _ = precompute_sim_p3.simulation_inputs()
     assert actual["data_version"] == payload["data_version"]

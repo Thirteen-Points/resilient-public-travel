@@ -65,4 +65,14 @@ describe('M0 seed boundary', () => {
     expect(legDuration({ ...leg, in_vehicle_s: 270 })).toBe('About 5 min')
     expect(legDuration(leg)).toBe('Travel time unavailable')
   })
+  it('ships official adult fares for rail and mixed-mode tickets', async () => {
+    const routes = await seedDataSource.getRoutes({ origin: 'TAW', destination: 'ADM', departAt: snapshotAt, preset: 'fastest' })
+    expect(routes.filter(route => route.legs.every(leg => leg.mode === 'MTR' || leg.mode === 'WALK'))
+      .every(route => route.total.fare_hkd === 17.1)).toBe(true)
+    expect(routes.find(route => route.route_id === 'r_a3bb2d93a795746f')?.total.fare_hkd).toBe(18.9)
+    expect(routes.find(route => route.route_id === 'r_007c4e09879d19cc')?.total.fare_hkd).toBe(20)
+    for (const route of routes) {
+      expect(route.legs.reduce((sum, leg) => sum + (leg.fare_hkd ?? 0), 0)).toBeCloseTo(route.total.fare_hkd)
+    }
+  })
 })

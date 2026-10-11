@@ -147,10 +147,11 @@ Signal/Event/audit 与媒体证据；未知计时保留 null，不用本地数�
 
 ## 2026-10-11 merge reconciliation
 
-Merged main through `d07730d84df9f9db11b0a439680e4b503997781d`, including the
-first/last boarding-window corrections. Historical network input is now stored
-at `data/sim/frozen-network.seed.json`; its original content hash is preserved.
-Only the manifest network path changes. P3 caches and capacity evidence are
+Merged main through `e393fb3a3617ba12107b1f8c49e89fe7395ac3ca`, including the
+boarding-window corrections and persistent official fare database. Historical
+network and policy inputs are stored at `data/sim/frozen-network.seed.json`
+and `data/sim/frozen-route-policy.json`; their original hashes are preserved.
+Only the manifest dependency paths change. P3 caches and capacity evidence are
 regenerated with current generation metadata and the new manifest hash, and
 all simulation core fields are checked against the previous recorded results.
 The earlier dated evidence and media above retain their original build/input
