@@ -15,7 +15,7 @@
 ## 使用的 fixture 与真实性
 
 1. `contracts/seed/network.seed.json`、`event.seed.json`：只读；SeedDataAdapter 对内存副本的 meta、节点、线路、步行边及事件统一标记 **simulated**。原文件保持原样。
-2. `engine/fixtures/seed_policy.json`：模拟票价基线、缺省票价、轨道票制分组、零需求场景以及 CLI 示例 OD/时刻。核心没有 12.5 港元或具体 OD 的隐藏默认值。
+2. `engine/fixtures/seed_policy.json`：评分票价基线、零需求场景以及 CLI 示例 OD/时刻。运行票价来自持久化 SQLite `fares.sqlite3`，每次查询读取价格及数据库版本，改价自动使旧路线缓存失效。`data/network/fares.json` 仅首次初始化空库；`python -m scripts.refresh_fares --download` 导入完整官方成人港铁 OD、巴士分段及天星小轮票价。港铁普通车厢按八达通入站/出站计价，站内换线及30分钟内尖东/尖沙咀换乘合并计费；其他出站步行或换乘巴士/渡轮后再入站另计票价。无票价时返回数据缺失错误。见 `deploy/FARES.md`。
 3. `engine/fixtures/network.synthetic.json`：O→D 的十条独立人工线路、两种模式；全部 simulated。用于证明算法不依赖香港种子线路名、车辆容量或班距。
 4. `engine/fixtures/events.synthetic.json`：关闭其中一条人工线路的模拟事件，验证快照及契约返回九条剩余路线。
 5. 单元测试内的小型图、事件和步行边都明确标记 simulated。碳排/座位概率/方差系数属于模拟模型，不声称实测；路线总体仍标 simulated。

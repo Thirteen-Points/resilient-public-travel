@@ -172,12 +172,47 @@ let browser, publicPage
   await page.getByRole('button', { name: 'Refresh both profiles', exact: true }).click(); await page.locator('[data-comparison-verified="true"]').waitFor()
   await page.getByText('calculation snapshot injected-p4-matching', { exact: false }).waitFor()
   await page.unroute(api + '/api/routes/query')
-  let snapshotCalls = 0
-  await page.route(api + '/api/routes/query', async route => { const response = await route.fetch(); await route.fulfill({ response, headers: { ...response.headers(), 'X-Route-Snapshot': `injected-p4-mismatch-${++snapshotCalls}`, 'Access-Control-Expose-Headers': 'X-Route-Snapshot' } }) })
+  const retainedComparison = await page.locator('[data-profile]').allTextContents()
+  const mismatchedPairs = [], backgroundQueries = []
+  let releaseFirstPair
+  const backgroundRefresh = new Promise(resolve => releaseFirstPair = resolve)
+  // Change the surrounding graph read so the normal 3s public poll performs a
+  // route refresh while the first comparison pair is in flight. Those planner
+  // requests omit event_ids; only explicit comparison requests belong to the
+  // two-profile retry contract and receive intentionally mismatched headers.
+  const snapshotPattern = api + '/api/graph/snapshot*'
+  await page.route(snapshotPattern, async route => {
+    const response = await route.fetch(), body = await response.json()
+    await route.fulfill({ response, json: { ...body, snapshot_id: 'injected-p4-background-refresh' } })
+  })
+  await page.route(api + '/api/routes/query', async route => {
+    const body = route.request().postDataJSON()
+    if (!Object.hasOwn(body, 'event_ids')) {
+      backgroundQueries.push(body)
+      await route.continue(); releaseFirstPair()
+      return
+    }
+    const index = mismatchedPairs.push(body)
+    const response = await route.fetch()
+    if (index <= 2) await backgroundRefresh
+    await route.fulfill({ response, headers: { ...response.headers(), 'X-Route-Snapshot': `injected-p4-mismatch-${index}`, 'Access-Control-Expose-Headers': 'X-Route-Snapshot' } })
+  })
   await page.getByRole('button', { name: 'Refresh both profiles', exact: true }).click()
   await page.getByRole('alert').filter({ hasText: 'Both profiles were retried' }).waitFor()
-  assert.equal(snapshotCalls, 4); await page.getByText('Previous comparison retained', { exact: false }).waitFor()
-  await page.unroute(api + '/api/routes/query'); pass('comparison: actual pair plus injected matching/mismatched snapshot headers')
+  assert.ok(backgroundQueries.length > 0, 'A public poll route refresh must overlap the comparison')
+  assert.equal(mismatchedPairs.length, 4, 'Exactly two complete comparison pairs must be attempted')
+  for (const attempt of [mismatchedPairs.slice(0, 2), mismatchedPairs.slice(2)]) {
+    assert.deepEqual(attempt.map(body => body.profile), pair.map(body => body.profile))
+    for (const body of attempt) {
+      for (const key of ['origin', 'destination', 'depart_at', 'event_ids']) assert.deepEqual(body[key], pair[0][key])
+    }
+  }
+  await page.getByText('Previous comparison retained', { exact: false }).waitFor()
+  assert.deepEqual(await page.locator('[data-profile]').allTextContents(), retainedComparison)
+  assert.equal(await page.locator('[data-comparison-verified]').getAttribute('data-comparison-verified'), 'true')
+  await page.getByText('calculation snapshot injected-p4-matching', { exact: false }).waitFor()
+  await page.unroute(api + '/api/routes/query'); await page.unroute(snapshotPattern)
+  pass('comparison: actual pair, snapshot mismatch retry and retained result during overlapping public polling')
   // Actual precomputed scenarios: unchanged results, modest improvement and gap.
   await page.getByRole('button', { name: 'Simulation', exact: true }).click(); await page.getByRole('button', { name: 'Load precomputed result', exact: true }).click()
   await page.locator(`[data-simulation-id="${normalId}"]`).waitFor()
