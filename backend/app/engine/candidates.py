@@ -78,7 +78,15 @@ def search_paths(snapshot, origin, destination, depart_at, profile, *, modes=Non
     # lower-bound priority, tie-breaker, elapsed, node, visited, path, walk, boardings, onboard
     queue = [(remaining(origin), next(serial), 0.0, origin, frozenset({origin}), (), 0.0, 0, None)]
     found, expanded = [], 0
+    frontier_pruned = False
     while queue and expanded < max_expansions and len(found) < max_paths:
+        if bounds is not None and len(queue) > 30000:
+            # GTFS variants can generate a much larger frontier than the
+            # expansion budget. Keep its best optimistic arrivals within the
+            # service's memory budget and report the search as bounded.
+            queue = heapq.nsmallest(15000, queue)
+            heapq.heapify(queue)
+            frontier_pruned = True
         _, _, elapsed, node, visited, path, walked, boardings, onboard = heapq.heappop(queue)
         if node == destination:
             if path and not path[-1].edge.data.get('gtfs_drop_off', {}).get(node, True):
@@ -141,7 +149,7 @@ def search_paths(snapshot, origin, destination, depart_at, profile, *, modes=Non
             heapq.heappush(queue, (next_elapsed + remaining(edge.target), next(serial), next_elapsed, edge.target,
                                   visited | {edge.target}, path + (traversal,), walk, next_boardings,
                                   edge.line if edge.mode != "WALK" else None))
-    return SearchResult(found, expanded, bool(queue))
+    return SearchResult(found, expanded, bool(queue) or frontier_pruned)
 
 
 def intermediate_nodes(path):

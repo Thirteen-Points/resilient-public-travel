@@ -219,7 +219,7 @@ export async function queryRoutesWithMetadata(query: RouteQuery, eventIds?: stri
   if (eventIds !== undefined) payload.event_ids = eventIds
   if (query.modes !== undefined) payload.modes = query.modes
   if (query.requiredModes !== undefined) payload.required_modes = query.requiredModes
-  const { body, headers } = await requestJsonWithMetadata<unknown>('POST', '/api/routes/query', payload, { signal })
+  const { body, headers } = await requestJsonWithMetadata<unknown>('POST', '/api/routes/query', payload, { signal, timeoutMs: 30_000 })
   if (!Array.isArray(body)) {
     throw new LiveApiError('POST', '/api/routes/query', 200, null, 'malformed route payload: expected a RouteCandidate array')
   }
