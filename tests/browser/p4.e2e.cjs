@@ -287,7 +287,7 @@ let browser, publicPage
   // Map picking checks a pedestrian route to East Rail and returns to the form.
   await navigate(page, 'Plan journey'); await page.getByRole('button', { name: '◎ Tap the map', exact: true }).click()
   await page.locator('#journey-map').scrollIntoViewIfNeeded()
-  await page.getByRole('button', { name: 'Fit journey', exact: true }).click()
+  await page.getByRole('button', { name: 'Fit corridor on map', exact: true }).click()
   await frames(page)
   let stationPoint
   await until(async () => {
