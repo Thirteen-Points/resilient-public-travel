@@ -18,6 +18,15 @@ class OperationalCandidateTests(unittest.TestCase):
         return client.post('/api/routes/query', json={
             'origin': origin, 'destination': destination, 'depart_at': AT, **extra})
 
+    def test_seed_api_has_no_tai_wai_to_admiralty_service_at_0300(self):
+        client = TestClient(create_app(RouteEngine.from_seed()))
+        night = self.query(client, 'TAW', 'ADM', depart_at='2026-10-11T03:00:00+08:00')
+        day = self.query(client, 'TAW', 'ADM', depart_at='2026-10-11T12:00:00+08:00')
+        self.assertEqual(night.status_code, 200)
+        self.assertEqual(night.json(), [])
+        self.assertEqual(day.status_code, 200)
+        self.assertTrue(day.json())
+
     def test_unresolved_line_is_excluded_in_full_without_deleting_source(self):
         data = network([line(stops=['A', 'B', 'MISSING'])])
         original = deepcopy(data)
