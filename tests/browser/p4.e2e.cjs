@@ -99,7 +99,7 @@ let browser, publicPage
   const applied = routeBodies[0].profile
   assert.equal(applied.mobility, 'wheelchair'); assert.ok(applied.max_walk_m <= 400)
   assert.ok(applied.hard_flags.includes('no_stairs') && applied.hard_flags.includes('no_minibus'))
-  assert.deepEqual(await page.locator('[data-route-id]').evaluateAll(elements => elements.map(el => el.getAttribute('data-route-id'))), actualRoutes.slice(0, 3).map(route => route.route_id))
+  assert.deepEqual(await page.locator('[data-route-id]').evaluateAll(elements => elements.map(el => el.getAttribute('data-route-id'))), actualRoutes.map(route => route.route_id))
   pass('real preferences: preview, confirmation, accessible routing')
   await page.getByRole('button', { name: 'Agent', exact: true }).click()
   const actualChatResponse = page.waitForResponse(response => response.url() === api + '/api/ai/chat' && response.ok())
