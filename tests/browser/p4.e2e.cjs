@@ -29,7 +29,7 @@ async function ready(url, child) {
 function pass(name) { checks.push(name); console.log('PASS ' + name) }
 async function selectStation(page, field, name) {
   await page.getByRole('combobox', { name: field, exact: true }).click()
-  await page.getByRole('option', { name: new RegExp(name) }).click()
+  await page.getByRole('option', { name: new RegExp(`^${name} MTR ·`) }).click()
 }
 async function chooseTomorrow(page) {
   const day = new Date(Date.now() + 8 * 3600000 + 24 * 3600000).toISOString().slice(0, 10)

@@ -58,7 +58,7 @@ const networkFailures = []
   await page.goto(web)
   await page.getByRole('button', { name: 'Find resilient routes' }).waitFor()
   await page.getByRole('combobox', { name: 'TO', exact: true }).click()
-  await page.getByRole('option', { name: /Admiralty/ }).click()
+  await page.getByRole('option', { name: 'Admiralty MTR · 金鐘', exact: true }).click()
   // Tomorrow's morning service stays after real publication regardless of the
   // runner time, and avoids midnight rollover/no-night-service false failures.
   const departureDate = new Date(Date.now() + 8 * 3600000 + 24 * 3600000).toISOString().slice(0, 10)
@@ -70,6 +70,22 @@ const networkFailures = []
   await page.getByRole('button', { name: 'Find resilient routes' }).click()
   await page.getByRole('heading', { name: 'Tai Wai → Admiralty' }).waitFor()
   assert.ok(!(await page.locator('body').innerText()).includes('NaN'))
+  // A selected non-rail mode must reach the API and occur in every UI candidate.
+  for (const [label, mode] of [['Bus · 公交', 'BUS'], ['Ferry · 渡轮', 'FERRY']]) {
+    await page.getByRole('button', { name: 'Plan journey', exact: true }).click()
+    await page.getByRole('button', { name: label, exact: true }).click()
+    const reply = page.waitForResponse(response => response.url().endsWith('/api/routes/query') && response.ok() && response.request().postDataJSON()?.required_modes?.[0] === mode)
+    await page.getByRole('button', { name: 'Find resilient routes' }).click()
+    const candidates = await (await reply).json()
+    assert.ok(candidates.length > 0, `${mode}: no candidates`)
+    assert.ok(candidates.every(route => route.legs.some(leg => leg.mode === mode)), `${mode}: a returned route lacks the selected mode`)
+    await page.getByRole('heading', { name: 'Tai Wai → Admiralty' }).waitFor()
+    assert.equal(await page.locator('[data-route-id]').count(), candidates.length, 'All returned alternatives should be visible')
+  }
+  await page.getByRole('button', { name: 'Plan journey', exact: true }).click()
+  await page.getByRole('button', { name: 'All modes', exact: true }).click()
+  await page.getByRole('button', { name: 'Find resilient routes' }).click()
+  await page.getByRole('heading', { name: 'Tai Wai → Admiralty' }).waitFor()
   // Public intake and manual first-card creation, through the actual UI.
   await page.getByRole('button', { name: 'Report', exact: true }).click()
   await page.getByLabel('What did you see?').fill('【模拟浏览器测试】东铁线红磡至会展信号故障，暂停服务。')
@@ -176,6 +192,11 @@ const networkFailures = []
   if (captureMedia) await page.screenshot({ path: path.join(out, 'mobile.png'), fullPage: true })
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)
   assert.equal(overflow, false, 'Mobile horizontal overflow')
+  await page.getByRole('button', { name: 'Plan journey', exact: true }).click()
+  for (const label of ['Bus · 公交', 'Ferry · 渡轮']) {
+    const bounds = await page.getByRole('button', { name: label, exact: true }).boundingBox()
+    assert.ok(bounds && bounds.y >= 0 && bounds.y + bounds.height <= 844, `${label}: selector is outside the first mobile screen`)
+  }
   assert.deepEqual(errors, [])
   assert.ok(requests.every(url => !url.includes('token=')))
   assert.equal(await page.evaluate(() => Object.keys(localStorage).length + Object.keys(sessionStorage).length), 0)
