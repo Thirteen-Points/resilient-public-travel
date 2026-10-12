@@ -3,7 +3,8 @@ import { MapView } from './MapView'
 import { seedDataSource } from './api/seedDataSource'
 import { useLiveSession } from './api/useLiveSession'
 import { SignalReportForm } from './components/SignalReportForm'
-import { DeparturePicker, hktDeparture } from './components/DeparturePicker'
+import { DeparturePicker } from './components/DeparturePicker'
+import { hktDeparture, isPastHktDeparture, nextHktMinute } from './lib/departureTime'
 import { AgentAvatar } from './components/AgentAvatar'
 import { AgentPanel } from './components/AgentPanel'
 import { PreferenceEditor } from './components/PreferenceEditor'
@@ -24,6 +25,7 @@ import css from './App.module.css'
 
 type Screen = 'journey' | 'results' | 'updates' | 'detail' | 'sources' | 'agent' | 'report'
 const SEED_MODE = new URLSearchParams(window.location.search).get('data') === 'seed'
+const INITIAL_DEPARTURE = nextHktMinute()
 function switchDataMode() {
   const url = new URL(window.location.href)
   if (SEED_MODE) url.searchParams.delete('data')
@@ -140,8 +142,8 @@ export function App() {
   const [customProfile, setCustomProfile] = useState<TravelProfile | undefined>()
   const effectiveProfile = useMemo(() => resolveProfile({ persona, preset, profile: customProfile }), [persona, preset, customProfile])
   const [largeText, setLargeText] = useState(false), [highContrast, setHighContrast] = useState(false)
-  const [departure, setDeparture] = useState('08:20')
-  const [departureDate, setDepartureDate] = useState('2026-09-22')
+  const [departure, setDeparture] = useState(INITIAL_DEPARTURE.slice(11, 16))
+  const [departureDate, setDepartureDate] = useState(INITIAL_DEPARTURE.slice(0, 10))
   const [searching, setSearching] = useState(false)
   const [queriedAt, setQueriedAt] = useState('')
   const [submitted, setSubmitted] = useState<{ key: string; persona: Persona; preset: Preset; profile: TravelProfile; transport: 'all' | TransitMode } | null>(null)
@@ -192,17 +194,12 @@ export function App() {
   }, [live.revision])
 
   useEffect(() => {
-    if (!SEED_MODE) {
-      const now = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Hong_Kong', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date())
-      setDepartureDate(now.slice(0, 10)); setDeparture(now.slice(11, 16))
-      return
-    }
+    if (!SEED_MODE) return
     let alive = true
     Promise.all([seedDataSource.getNetwork(), seedDataSource.getEvents(), seedDataSource.getMeta()])
       .then(async ([network, { events, signals }, meta]) => {
         const published = await seedDataSource.getPublishedEvents(meta.snapshotAt)
         if (alive) {
-          setDepartureDate(meta.snapshotAt.slice(0, 10)); setDeparture(meta.snapshotAt.slice(11, 16))
           setBundle({ network, events, signals, published, meta })
         }
       }).catch(cause => { if (alive) setLoadError(String(cause)) })
@@ -250,6 +247,7 @@ export function App() {
     if (from === to) { setError('Choose two different East Rail stations.'); return }
     const departAt = hktDeparture(departureDate, departure)
     if (!Number.isFinite(Date.parse(departAt))) { setError('Choose a valid Hong Kong departure date and time.'); return }
+    if (isPastHktDeparture(departureDate, departure)) { setError('Choose a future departure in Hong Kong time.'); return }
     searchingRef.current = true; setSearching(true)
     const request = routeRequests.current.begin()
     const requestedProfile = resolveProfile({ persona: traveller, preset: preference, profile })

@@ -146,8 +146,7 @@ class FareStore:
         for line in network['lines']:
             if line['mode']=='MTR':
                 connection.execute('INSERT INTO fare_services VALUES(?,?,?,?,?,?,?,?)',
-                    (line['id'],'MTR','mtr:octopus','od','mtr_octopus','adult','octopus',
-                     '港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费'))
+                    (line['id'],'MTR','mtr:octopus','od','mtr_octopus','adult','octopus',''))
                 continue
             tariff = data['lines'][line['id']]
             mappings = tariff.get('stop_mapping',[])
@@ -198,7 +197,10 @@ class FareStore:
                     'WHERE service_id=? AND passenger=? AND payment=? AND valid_from<=? '
                     'AND (valid_until IS NULL OR valid_until>?) ORDER BY valid_from',
                     (binding['service_id'],binding['passenger'],binding['payment'],at_date,at_date))
-                tariff = {'group':binding['group_id'],'provenance':'simulated','note':binding['note']}
+                # Existing databases can retain the old MTR policy text. It describes
+                # fare calculation, not a journey-specific warning.
+                tariff = {'group':binding['group_id'],'provenance':'simulated',
+                          'note': '' if binding['mode']=='MTR' else binding['note']}
                 amounts = []
                 if binding['strategy']=='od':
                     matrix = {}

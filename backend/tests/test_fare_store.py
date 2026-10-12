@@ -70,6 +70,16 @@ class FareStoreTests(unittest.TestCase):
         restarted = RouteEngine.from_seed(fare_db_path=self.path)
         self.assertEqual(restarted.query('EXC','ADM',AT,modes=['MTR'])[0]['total']['fare_hkd'],5.5)
 
+    def test_mtr_fare_policy_is_not_repeated_as_route_warning(self):
+        old_note = ('港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；'
+                    '尖东/尖沙咀30分钟内换乘合并计费')
+        with self.store.connection() as connection:
+            connection.execute('UPDATE fare_services SET note=? WHERE mode=?', (old_note, 'MTR'))
+        routes = self.engine.query('TAW','ADM',AT,modes=['MTR'])
+        self.assertTrue(routes)
+        self.assertFalse(any(old_note in warning for route in routes for warning in route['warnings']))
+        self.assertEqual(routes[0]['total']['fare_hkd'],17.1)
+
     def test_new_effective_date_does_not_change_old_journeys(self):
         with self.store.connection() as connection:
             self.store.price(connection,'mtr:octopus','TAW','ADM',18.2,'mtr',payment='octopus',valid_from='2026-11-01')
