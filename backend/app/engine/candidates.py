@@ -244,12 +244,9 @@ def route_from_path(path, snapshot, depart_at, *, fares, profile=None):
             age = max(0., (step.depart - timestamp(built_at)).total_seconds())
         else:
             age = float(data.get("freshness_s", 86400))
-            warnings.append("缺少数据时间，按至少 24 小时旧数据估算")
         freshness = max(freshness, age)
         tau = 900 if data.get("realtime", False) else 21600
         freshness_scores.append(math.exp(-age / tau))
-        if age > tau:
-            warnings.append(f"{edge.line or '步行通道'} 数据较旧")
         if step.events:
             warnings.append(f"{edge.line or '步行通道'} 受事件影响，运力系数 {step.factor:g}")
         if data.get("note"):
