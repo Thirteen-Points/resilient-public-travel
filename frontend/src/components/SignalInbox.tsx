@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import * as eventApi from '../api/eventApi'
 import type { Network, Signal } from '../api/types'
 import { formatHkt, hktLocalInput } from '../data'
+import { capacityFactorForImpact, segmentsWithCapacity, validatePendingCard } from './reviewForm'
 import css from './Experience.module.css'
 
 export function SignalInbox({ network, onChanged, api = eventApi, onDirty }: { network: Network; onChanged: () => Promise<void>; api?: Pick<typeof eventApi, "getInbox" | "ingestSignal" | "createEvent">; onDirty?: (dirty: boolean) => void }) {
@@ -33,11 +34,11 @@ export function SignalInbox({ network, onChanged, api = eventApi, onDirty }: { n
       finally { setBusy(false) }
     }}>Extract / merge</button></article>)}
     {!signals.length && <p>No unlinked reports. New public reports appear after refreshing.</p>}
-    {candidate && <form className={css.structured} onSubmit={async event => {
+    {candidate && <form className={css.structured} noValidate onSubmit={async event => {
       event.preventDefault(); if (busy) return
       const draft = candidate.draft
-      if (!draft.mode || !draft.line || !draft.direction || !draft.affected_segments.length) { setError('Confirm the mode, line, direction and at least one affected segment.'); return }
-      if (draft.affected_segments.some(segment => segment.from_node === segment.to_node)) { setError('Each affected segment needs two different stations.'); return }
+      const validation = validatePendingCard(draft, severity, start, end, factors)
+      if (validation) { setError(validation); return }
       setBusy(true); setError('')
       const now = new Date().toISOString()
       try {
@@ -45,7 +46,7 @@ export function SignalInbox({ network, onChanged, api = eventApi, onDirty }: { n
           ...draft, event_id: `evt_${crypto.randomUUID()}`, version: 1, status: 'pending_review',
           created_at: now, updated_at: now, published_at: null, expires_at: null,
           window: { start: `${start}:00+08:00`, end: end ? `${end}:00+08:00` : null, end_confidence: 'reviewer_supplied' },
-          severity: Number(severity), affected_segments: draft.affected_segments.map((segment, index) => ({ ...segment, capacity_factor: Number(factors[index]) })),
+          severity: Number(severity), affected_segments: segmentsWithCapacity(draft, factors),
           confidence: 0, confidence_factors: [], signals: [candidate.signal.signal_id], reviewed_by: null, audit_log: [], provenance: candidate.signal.provenance,
         })
         setCandidate(null); setNotice('Pending card created. Add corroborating evidence and review before publication.')
@@ -53,7 +54,7 @@ export function SignalInbox({ network, onChanged, api = eventApi, onDirty }: { n
       } catch (cause) { setError(`Creation could not be confirmed. Refresh the queue before retrying. ${cause instanceof Error ? cause.message : String(cause)}`) }
       finally { setBusy(false) }
     }}>
-      <h3>Confirm extracted draft</h3><p>Severity and capacity are reviewer supplied facts. Extraction does not verify this report.</p>
+      <h3>Confirm extracted draft</h3><p>Severity is reviewer supplied. Only reduced capacity needs a confirmed factor; other impacts use fixed factors. Extraction does not verify this report.</p>
       <fieldset disabled={busy}>
         <label>Title<input required value={candidate.draft.title} onChange={event => updateDraft({ title: event.target.value })} /></label>
         <label>Summary<textarea required value={candidate.draft.summary} onChange={event => updateDraft({ summary: event.target.value })} /></label>
@@ -63,7 +64,7 @@ export function SignalInbox({ network, onChanged, api = eventApi, onDirty }: { n
         <div className={css.fieldPair}><label>Start · HKT<input required type="datetime-local" value={start} onChange={event => setStart(event.target.value)} /></label><label>End · HKT<input type="datetime-local" min={start} value={end} onChange={event => setEnd(event.target.value)} /></label></div>
         {candidate.draft.affected_segments.map((segment, index) => <div key={index} className={css.segmentEdit}>
           <div className={css.fieldPair}>{(['from_node', 'to_node'] as const).map(key => <label key={key}>{key === 'from_node' ? 'From' : 'To'}<select required value={segment[key]} onChange={event => updateDraft({ affected_segments: candidate.draft.affected_segments.map((item, i) => i === index ? { ...item, [key]: event.target.value } : item) })}><option value="">Choose station</option>{network.nodes.map(node => <option key={node.id} value={node.id}>{node.name_en}</option>)}</select></label>)}</div>
-          <div className={css.fieldPair}><label>Impact<select value={segment.impact} onChange={event => updateDraft({ affected_segments: candidate.draft.affected_segments.map((item, i) => i === index ? { ...item, impact: event.target.value } : item) })}>{['closed', 'reduced_capacity', 'slow', 'crowded'].map(value => <option key={value}>{value}</option>)}</select></label><label>Confirmed capacity factor (0–1)<input required type="number" min="0" max={segment.impact === 'closed' ? '0' : '1'} step="0.05" value={factors[index] ?? ''} onChange={event => setFactors(previous => previous.map((value, i) => i === index ? event.target.value : value))} /></label></div>
+          <div className={css.fieldPair}><label>Impact<select value={segment.impact} onChange={event => updateDraft({ affected_segments: candidate.draft.affected_segments.map((item, i) => i === index ? { ...item, impact: event.target.value } : item) })}>{['closed', 'reduced_capacity', 'slow', 'crowded'].map(value => <option key={value}>{value}</option>)}</select></label><label>{segment.impact === 'reduced_capacity' ? 'Confirmed capacity factor (0–1)' : 'Capacity factor (fixed)'}<input required={segment.impact === 'reduced_capacity'} disabled={segment.impact !== 'reduced_capacity'} type="number" min="0" max={segment.impact === 'closed' ? '0' : '1'} step="0.05" value={segment.impact === 'reduced_capacity' ? factors[index] ?? '' : capacityFactorForImpact(segment.impact) ?? ''} onChange={event => setFactors(previous => previous.map((value, i) => i === index ? event.target.value : value))} /></label></div>
         </div>)}
         <button type="button" className={css.secondary} onClick={() => { updateDraft({ affected_segments: [...candidate.draft.affected_segments, { from_node: '', to_node: '', impact: 'closed' }] }); setFactors(previous => [...previous, '']) }}>Add affected segment</button>
       </fieldset>
