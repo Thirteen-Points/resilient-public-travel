@@ -41,30 +41,44 @@ const PRESETS: { id: Preset; label: string }[] = [
   { id: 'least_walking', label: 'Less walking' },
 ]
 
-function StationField({ id, label, value, network, active, onFocus, onSelect, onPickMap, invalid }: {
+function StationField({ id, label, value, network, active, onFocus, onClose, onSelect, onPickMap, invalid }: {
   id: string; label: string; value: string; network: Network; active: boolean
-  onFocus: () => void; onSelect: (id: string) => void; onPickMap: () => void; invalid?: boolean
+  onFocus: () => void; onClose: () => void; onSelect: (id: string) => void; onPickMap: () => void; invalid?: boolean
 }) {
+  const wrapper = useRef<HTMLDivElement>(null)
   const nodes = nodeIndex(network)
   const [query, setQuery] = useState('')
   const [index, setIndex] = useState(0)
+  const open = (nextQuery = '') => { setQuery(nextQuery); setIndex(0); onFocus() }
+  useEffect(() => {
+    if (!active) return
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (event.target instanceof Node && !wrapper.current?.contains(event.target)) onClose()
+    }
+    document.addEventListener('pointerdown', closeOnOutsidePointer)
+    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer)
+  }, [active, onClose])
   const choices = eastRailStations(network).filter(node =>
     node.name_en.toLowerCase().includes(query.toLowerCase()) || node.name_zh.includes(query) || node.id.toLowerCase().includes(query.toLowerCase()),
   )
-  return <div className={css.fieldWrap}>
+  return <div ref={wrapper} className={css.fieldWrap}>
     <label htmlFor={id} className={css.fieldLabel}>{label}</label>
     <input id={id} className={`${css.input} ${invalid ? css.invalid : ''}`} role="combobox"
       aria-expanded={active} aria-controls={`${id}-options`} aria-autocomplete="list" aria-invalid={Boolean(invalid)}
       aria-activedescendant={active && choices[index] ? `${id}-option-${choices[index].id}` : undefined}
       placeholder={label === 'TO' ? 'Choose an East Rail destination' : 'Search an East Rail station'}
       value={active ? query : nodes.get(value)?.name_en ?? ''}
-      onFocus={() => { setQuery(''); setIndex(0); onFocus() }}
+      onFocus={() => open()}
+      onClick={() => { if (!active) open() }}
+      onBlur={event => { if (!wrapper.current?.contains(event.relatedTarget)) onClose() }}
       onChange={event => { setQuery(event.target.value); setIndex(0) }}
       onKeyDown={event => {
-        if (event.key === 'ArrowDown') { event.preventDefault(); setIndex(i => Math.min(i + 1, choices.length - 1)) }
+        if (event.key === 'ArrowDown') { event.preventDefault(); if (active) setIndex(i => Math.min(i + 1, choices.length - 1)); else open() }
         if (event.key === 'ArrowUp') { event.preventDefault(); setIndex(i => Math.max(0, i - 1)) }
         if (event.key === 'Enter' && active && choices[index]) { event.preventDefault(); onSelect(choices[index].id); setQuery('') }
         if (event.key === 'Escape') { onSelect(value); setQuery('') }
+        if (!active && (event.key === 'Backspace' || event.key === 'Delete')) { event.preventDefault(); open() }
+        if (!active && event.key.length === 1 && !event.altKey && !event.ctrlKey && !event.metaKey) { event.preventDefault(); open(event.key) }
       }} />
     {active && <div className={css.suggestions} id={`${id}-options`} role="listbox">
       <span className={css.suggestionLabel}>EAST RAIL STATIONS</span>
@@ -344,9 +358,9 @@ export function App() {
           <p className={css.tiny}>{transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus · 小巴: routes are not available in this modelled network yet. Choose another mode for available routes.' : transport === 'all' ? 'Compare all available modes, including bus and ferry connections.' : `Routes include ${transportLabel([transport])}; other modes and walking may provide connections.`}</p>
           <button type="button" className={css.agentEntry} onClick={() => { navigate('agent'); setError('') }}><AgentAvatar issue={published.length > 0} small /><span><strong>Meet your route companion</strong><small>Ask the Agent · explore this scenario</small></span><b>↗</b></button>
           <form noValidate onSubmit={event => { event.preventDefault(); void showRoutes() }}>
-            <StationField id="origin" label="FROM" value={origin} network={network} active={activeField === 'origin'} onFocus={() => { setActiveField('origin'); setPicking(null) }} onSelect={value => setField('origin', value)} onPickMap={() => pickOnMap('origin')} />
+            <StationField id="origin" label="FROM" value={origin} network={network} active={activeField === 'origin'} onFocus={() => { setActiveField('origin'); setPicking(null) }} onClose={() => setActiveField(null)} onSelect={value => setField('origin', value)} onPickMap={() => pickOnMap('origin')} />
             <button className={css.swap} type="button" onClick={() => { invalidateResults(); setOrigin(destination); setDestination(origin); setAccess(previous => ({ origin: previous.destination, destination: previous.origin })); setActiveField(null); setPicking(null); setPicked('') }} aria-label="Swap stations">⇅</button>
-            <StationField id="destination" label="TO" value={destination} network={network} active={activeField === 'destination'} invalid={Boolean(error && !destination)} onFocus={() => { setActiveField('destination'); setPicking(null) }} onSelect={value => setField('destination', value)} onPickMap={() => pickOnMap('destination')} />
+            <StationField id="destination" label="TO" value={destination} network={network} active={activeField === 'destination'} invalid={Boolean(error && !destination)} onFocus={() => { setActiveField('destination'); setPicking(null) }} onClose={() => setActiveField(null)} onSelect={value => setField('destination', value)} onPickMap={() => pickOnMap('destination')} />
             <div className={css.fieldAssist}><button type="button" onClick={() => pickOnMap('destination')}>◎ Tap the map</button><span>Within 800 m straight-line of six East Rail stations</span></div>
             {access.origin && <p className={css.confirm}>Start point → {nodes.get(origin)?.name_en}: {Math.round(access.origin.metres)} m straight-line</p>}
             {access.destination && <p className={css.confirm}>End point → {nodes.get(destination)?.name_en}: {Math.round(access.destination.metres)} m straight-line</p>}
