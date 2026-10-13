@@ -7,3 +7,11 @@ export const nextHktMinute = (now = new Date()) => new Intl.DateTimeFormat('sv-S
 
 export const isPastHktDeparture = (date: string, time: string, now = new Date()) =>
   !Number.isFinite(Date.parse(hktDeparture(date, time))) || Date.parse(hktDeparture(date, time)) < now.getTime()
+
+export function advancePastHktDeparture(date: string, time: string, now = new Date()) {
+  const earliest = nextHktMinute(now)
+  if (!Number.isFinite(Date.parse(hktDeparture(date, time))) || `${date} ${time}` >= earliest) {
+    return { date, time, moved: false }
+  }
+  return { date: earliest.slice(0, 10), time: earliest.slice(11, 16), moved: true }
+}

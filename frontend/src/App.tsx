@@ -4,7 +4,7 @@ import { seedDataSource } from './api/seedDataSource'
 import { useLiveSession } from './api/useLiveSession'
 import { SignalReportForm } from './components/SignalReportForm'
 import { DeparturePicker } from './components/DeparturePicker'
-import { hktDeparture, isPastHktDeparture, nextHktMinute } from './lib/departureTime'
+import { advancePastHktDeparture, hktDeparture, isPastHktDeparture, nextHktMinute } from './lib/departureTime'
 import { AgentAvatar } from './components/AgentAvatar'
 import { AgentPanel } from './components/AgentPanel'
 import { PreferenceEditor } from './components/PreferenceEditor'
@@ -144,6 +144,7 @@ export function App() {
   const [largeText, setLargeText] = useState(false), [highContrast, setHighContrast] = useState(false)
   const [departure, setDeparture] = useState(INITIAL_DEPARTURE.slice(11, 16))
   const [departureDate, setDepartureDate] = useState(INITIAL_DEPARTURE.slice(0, 10))
+  const [departureNotice, setDepartureNotice] = useState('')
   const [searching, setSearching] = useState(false)
   const [queriedAt, setQueriedAt] = useState('')
   const [submitted, setSubmitted] = useState<{ key: string; persona: Persona; preset: Preset; profile: TravelProfile; transport: 'all' | TransitMode } | null>(null)
@@ -245,9 +246,16 @@ export function App() {
     const allowed = new Set(eastRailStations(network).map(station => station.id))
     if (!allowed.has(from) || !allowed.has(to)) { setError('Choose East Rail stations for both ends.'); return }
     if (from === to) { setError('Choose two different East Rail stations.'); return }
-    const departAt = hktDeparture(departureDate, departure)
+    const now = new Date()
+    const resolvedDeparture = advancePastHktDeparture(departureDate, departure, now)
+    const departAt = hktDeparture(resolvedDeparture.date, resolvedDeparture.time)
     if (!Number.isFinite(Date.parse(departAt))) { setError('Choose a valid Hong Kong departure date and time.'); return }
-    if (isPastHktDeparture(departureDate, departure)) { setError('Choose a future departure in Hong Kong time.'); return }
+    if (isPastHktDeparture(resolvedDeparture.date, resolvedDeparture.time, now)) { setError('Choose a future departure in Hong Kong time.'); return }
+    if (resolvedDeparture.moved) {
+      setDepartureDate(resolvedDeparture.date)
+      setDeparture(resolvedDeparture.time)
+      setDepartureNotice(`Departure moved to ${resolvedDeparture.time}${resolvedDeparture.date !== departureDate ? ` on ${resolvedDeparture.date}` : ''} (previous time has passed).`)
+    } else setDepartureNotice('')
     searchingRef.current = true; setSearching(true)
     const request = routeRequests.current.begin()
     const requestedProfile = resolveProfile({ persona: traveller, preset: preference, profile })
@@ -335,7 +343,7 @@ export function App() {
           <fieldset className={`${css.presets} ${css.transportChoices}`}><legend>TRANSPORT · 交通方式</legend>{TRANSPORT_OPTIONS.map(option => <button key={option.id} type="button" aria-pressed={transport === option.id} disabled={searching} className={transport === option.id ? css.activePreset : ''} onClick={() => { invalidateResults(); setTransport(option.id); setActiveField(null); setPicking(null); setError('') }}>{option.label}</button>)}</fieldset>
           <p className={css.tiny}>{transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus · 小巴: routes are not available in this modelled network yet. Choose another mode for available routes.' : transport === 'all' ? 'Compare all available modes, including bus and ferry connections.' : `Routes include ${transportLabel([transport])}; other modes and walking may provide connections.`}</p>
           <button type="button" className={css.agentEntry} onClick={() => { navigate('agent'); setError('') }}><AgentAvatar issue={published.length > 0} small /><span><strong>Meet your route companion</strong><small>Ask the Agent · explore this scenario</small></span><b>↗</b></button>
-          <form onSubmit={event => { event.preventDefault(); void showRoutes() }}>
+          <form noValidate onSubmit={event => { event.preventDefault(); void showRoutes() }}>
             <StationField id="origin" label="FROM" value={origin} network={network} active={activeField === 'origin'} onFocus={() => { setActiveField('origin'); setPicking(null) }} onSelect={value => setField('origin', value)} onPickMap={() => pickOnMap('origin')} />
             <button className={css.swap} type="button" onClick={() => { invalidateResults(); setOrigin(destination); setDestination(origin); setAccess(previous => ({ origin: previous.destination, destination: previous.origin })); setActiveField(null); setPicking(null); setPicked('') }} aria-label="Swap stations">⇅</button>
             <StationField id="destination" label="TO" value={destination} network={network} active={activeField === 'destination'} invalid={Boolean(error && !destination)} onFocus={() => { setActiveField('destination'); setPicking(null) }} onSelect={value => setField('destination', value)} onPickMap={() => pickOnMap('destination')} />
@@ -344,7 +352,8 @@ export function App() {
             {access.destination && <p className={css.confirm}>End point → {nodes.get(destination)?.name_en}: {Math.round(access.destination.metres)} m straight-line</p>}
             {picked && <p className={css.confirm}>{picked}</p>}
             {error && <p role="alert" className={css.error}>{error}</p>}
-            <DeparturePicker date={departureDate} time={departure} onDate={value => { invalidateResults(); setDepartureDate(value) }} onTime={value => { invalidateResults(); setDeparture(value) }} />
+            <DeparturePicker date={departureDate} time={departure} onDate={value => { invalidateResults(); setDepartureNotice(''); setDepartureDate(value) }} onTime={value => { invalidateResults(); setDepartureNotice(''); setDeparture(value) }} />
+            {departureNotice && <p role="status" className={css.warning}>{departureNotice}</p>}
             <PersonaSelector value={persona} onSelect={editProfile} />
             <fieldset className={css.presets}><legend>WHAT MATTERS MOST?</legend>{PRESETS.map(option => <button key={option.id} type="button" aria-pressed={preset === option.id} disabled={!SEED_MODE && option.id === 'least_walking'} title={!SEED_MODE && option.id === 'least_walking' ? 'Use a walking limit in your travel preferences' : undefined} className={preset === option.id ? css.activePreset : ''} onClick={() => editPreset(option.id)}>{option.label}</button>)}</fieldset>
             {!SEED_MODE && <p className={css.tiny}>Less walking preset awaits backend support. Wheelchair hard walking and accessibility constraints still apply.</p>}
@@ -364,6 +373,7 @@ export function App() {
           {(access.origin || access.destination) && <p className={css.confirm}>Straight-line station access: {access.origin ? `start point → ${nodes.get(origin)?.name_en} ${Math.round(access.origin.metres)} m` : 'start at station'} · {access.destination ? `${nodes.get(destination)?.name_en} → end point ${Math.round(access.destination.metres)} m` : 'end at station'}. Actual walking may be longer and is not included in route times or walking totals below.</p>}
           <p className={css.queryStamp}>Queried persona: {submitted.persona === 'wheelchair' ? 'Wheelchair' : 'Commuter'} · Preset: {PRESETS.find(option => option.id === submitted.preset)?.label}<br />Profile sent: {profileLabel(submitted.profile)}</p>
           <p className={css.queryStamp}>Requested departure: {formatHkt(queriedAt)}<br /><small>Query value: {queriedAt} · {SEED_MODE ? 'fixed seed estimates filtered by modelled service hours; journey times are not recalculated.' : 'recomputed when the graph or published events change.'}</small></p>
+          {departureNotice && <p role="status" className={css.warning}>{departureNotice}</p>}
           {routes.length ? <div className={css.routeList}>{routes.map((route, index) => <RouteCard key={route.route_id} route={route} letter={String.fromCharCode(65 + index)} network={network} selected={route.route_id === selectedId} onSelect={() => setSelectedId(route.route_id)} onDetail={() => { setSelectedId(route.route_id); navigate('detail') }} />)}</div> : <div className={css.empty} role="status"><strong>{submitted.persona === 'wheelchair' && SEED_MODE ? '没有符合轮椅约束的路线' : submitted.persona === 'wheelchair' ? 'No wheelchair-compliant route returned.' : `No ${submitted.transport === 'all' ? '' : `${transportLabel([submitted.transport])} `}route returned for this pair.`}</strong><p>{submitted.persona === 'wheelchair' ? SEED_MODE ? 'The seed lacks affirmative step-free station and leg data or low-floor bus evidence, so ordinary routes cannot be shown as accessible.' : 'The API returned no qualifying candidate. Accessibility data may be incomplete; try another time or station, stop or pier.' : submitted.transport === 'MINIBUS' && !network.lines.some(line => line.mode === 'MINIBUS') ? 'Minibus routes are not available in the current modelled network yet. Choose another transport mode.' : SEED_MODE ? 'The fixed fixture only covers Tai Wai → Admiralty. Switch to API mode to query other stations, stops and piers.' : 'Try All modes, another departure, or another station, bus stop or ferry pier.'}</p><button type="button" className={css.back} onClick={() => navigate('journey')}>Edit transport and journey →</button></div>}
           <p className={css.tiny}>{SEED_MODE ? 'Fixed illustrative candidates.' : 'API candidates on the modelled network.'} Fares use adult Octopus ordinary class, bus section fares and ferry upper deck prices; personal concessions are excluded. Published events affect the network overlay. Times and scores are derived estimates.</p>
         </section>
