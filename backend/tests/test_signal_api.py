@@ -136,6 +136,16 @@ class UserSignalApiTestCase(unittest.TestCase):
         self.assertEqual(stored.provenance, "real")
         self.assertIsNotNone(stored.received_at.tzinfo)
 
+    def test_optional_author_hint_is_preserved_or_falls_back_to_anonymous(self) -> None:
+        provided = self.submit(author_hint="qa_auto_independent_source")
+        omitted = self.client.post("/api/signals", json={"raw_text": "红磡站列车延误。"})
+        self.assertEqual(provided.status_code, 202)
+        self.assertEqual(omitted.status_code, 202)
+        self.assertEqual(self.store.get_signal(provided.json()["signal_id"]).author_hint,
+                         "qa_auto_independent_source")
+        self.assertEqual(self.store.get_signal(omitted.json()["signal_id"]).author_hint,
+                         "anonymous")
+
     def test_client_cannot_override_server_controlled_fields(self) -> None:
         protected_fields: dict[str, object] = {
             "signal_id": "forged",

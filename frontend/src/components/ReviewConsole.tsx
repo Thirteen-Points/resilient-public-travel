@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Event, Network, Signal } from '../api/types'
 import { formatHkt, hktLocalInput } from '../data'
+import { capacityFactorForImpact } from './reviewForm'
 import css from './Experience.module.css'
 
 export type ReviewLog = { id: string; action: string; detail: string }
@@ -19,7 +20,6 @@ export function ReviewConsole({ events, signals, network, logs, onSave, onReplay
   const [busy, setBusy] = useState<'edit' | 'publish' | 'reject' | 'expire' | null>(null)
   const saving = useRef(false)
   const dialog = useRef<HTMLDialogElement>(null)
-  const form = useRef<HTMLFormElement>(null)
   const queue = useRef<HTMLDivElement>(null)
   useEffect(() => { onDirty?.(editing); return () => onDirty?.(false) }, [editing, onDirty])
   const current = events.find(event => event.event_id === id)
@@ -41,10 +41,21 @@ export function ReviewConsole({ events, signals, network, logs, onSave, onReplay
   }
   const update = (values: Partial<Event>) => setDraft(previous => previous ? { ...previous, ...values } : previous)
   const valid = () => {
-    if (!item || !form.current?.reportValidity()) return false
-    if (!item.title.trim() || !item.summary.trim()) { setError('Title and summary cannot be blank.'); return false }
-    if (!item.affected_segments.length || item.affected_segments.some(segment => segment.from_node === segment.to_node)) { setError('Each affected segment needs two different modelled stops.'); return false }
-    if (item.window.end && Date.parse(item.window.end) <= Date.parse(item.window.start)) { setError('The end of the event must be after its start.'); return false }
+    if (!item) return false
+    const missing: string[] = []
+    if (!item.title.trim()) missing.push('title')
+    if (!item.summary.trim()) missing.push('summary')
+    if (!item.window.start || !Number.isFinite(Date.parse(item.window.start))) missing.push('start time')
+    if (!item.affected_segments.length) missing.push('affected segment')
+    item.affected_segments.forEach((segment, index) => {
+      if (!segment.from_node) missing.push(`segment ${index + 1} From station`)
+      if (!segment.to_node) missing.push(`segment ${index + 1} To station`)
+    })
+    if (missing.length) { setError(`Complete: ${missing.join(', ')}.`); return false }
+    if (!Number.isInteger(item.severity) || item.severity < 1 || item.severity > 5) { setError('Severity must be a whole number from 1 to 5.'); return false }
+    if (item.affected_segments.some(segment => segment.from_node === segment.to_node)) { setError('Each affected segment needs two different modelled stops.'); return false }
+    if (item.affected_segments.some(segment => segment.impact === 'reduced_capacity' && capacityFactorForImpact(segment.impact, String(segment.capacity_factor)) === null)) { setError('Reduced capacity factors must be between 0 and 1 in steps of 0.05.'); return false }
+    if (item.window.end && (!Number.isFinite(Date.parse(item.window.end)) || Date.parse(item.window.end) <= Date.parse(item.window.start))) { setError('The end of the event must be after its start.'); return false }
     setError(''); return true
   }
   const finish = async (action: 'edit' | 'publish' | 'reject' | 'expire') => {
@@ -86,11 +97,11 @@ export function ReviewConsole({ events, signals, network, logs, onSave, onReplay
             const signal = signals.find(value => value.signal_id === signalId)
             return <article key={signalId}><span className={css.eyebrow}>{signal?.source_type ?? 'MISSING RECORD'} · {signalId}</span><h3>{signal?.source_name ?? 'Referenced evidence unavailable'}</h3><p lang="zh-Hant">{signal?.raw_text ?? 'This seed references a signal without supplying its original text. No text has been inferred.'}</p>{signal && <small>{formatHkt(signal.received_at)} · {signal.provenance}</small>}</article>
           })}</section>
-          <form ref={form} className={css.structured} onSubmit={e => { e.preventDefault(); if (valid()) finish('edit') }}><div className={css.sectionTitle}><h2>Structured event</h2>{!editing && ['pending_review', 'draft', ...(live ? ['published', 'updated'] : [])].includes(item.status) && <button type="button" className={css.textButton} onClick={() => { setDraft(structuredClone(item)); setEditing(true) }}>Edit fields ↗</button>}</div>
+          <form className={css.structured} noValidate onSubmit={e => { e.preventDefault(); if (valid()) finish('edit') }}><div className={css.sectionTitle}><h2>Structured event</h2>{!editing && ['pending_review', 'draft', ...(live ? ['published', 'updated'] : [])].includes(item.status) && <button type="button" className={css.textButton} onClick={() => { setDraft({ ...structuredClone(item), affected_segments: item.affected_segments.map(segment => ({ ...segment, capacity_factor: segment.impact === 'closed' ? 0 : segment.impact === 'slow' || segment.impact === 'crowded' ? 1 : segment.capacity_factor })) }); setEditing(true) }}>Edit fields ↗</button>}</div>
             <fieldset disabled={!editing || busy !== null}><label>Title<input required maxLength={240} value={item.title} onChange={e => update({ title: e.target.value })} /></label><label>Summary<textarea required rows={4} maxLength={1600} value={item.summary} onChange={e => update({ summary: e.target.value })} /></label><div className={css.fieldPair}><label>Line<select value={item.line} onChange={e => update({ line: e.target.value })}>{network.lines.map(line => <option key={line.id} value={line.id}>{line.name_en}</option>)}</select></label><label>Severity (1–5)<input type="number" min="1" max="5" required value={item.severity} onChange={e => update({ severity: Number(e.target.value) })} /></label></div></fieldset>
             <div className={css.confidence}><span>Confidence <strong>{Math.round(item.confidence * 100)}%</strong></span><meter min="0" max="1" value={item.confidence} /><small>Evidence score · publication requires ≥ 60%. Editing text does not increase confidence. Approved facts stay active until reapproval or withdrawal.</small></div>
             <fieldset disabled={!editing || busy !== null}><div className={css.fieldPair}><label>Start · HKT<input type="datetime-local" required value={hktLocalInput(item.window.start)} onChange={e => update({ window: { ...item.window, start: `${e.target.value}:00+08:00` } })} /></label><label>End · HKT<input type="datetime-local" value={item.window.end ? hktLocalInput(item.window.end) : ''} onChange={e => update({ window: { ...item.window, end: e.target.value ? `${e.target.value}:00+08:00` : null } })} /></label></div>
-            <h3>Affected segments</h3>{item.affected_segments.map((segment, i) => <div key={i} className={css.segmentEdit}><div className={css.fieldPair}>{(['from_node', 'to_node'] as const).map(key => <label key={key}>{key === 'from_node' ? 'From' : 'To'}<select value={segment[key]} onChange={e => update({ affected_segments: item.affected_segments.map((value, j) => i === j ? { ...value, [key]: e.target.value } : value) })}>{network.nodes.map(node => <option key={node.id} value={node.id}>{node.name_en}</option>)}</select></label>)}</div><div className={css.fieldPair}><label>Impact<select value={segment.impact} onChange={e => update({ affected_segments: item.affected_segments.map((value, j) => i === j ? { ...value, impact: e.target.value, capacity_factor: e.target.value === 'closed' ? 0 : value.capacity_factor } : value) })}>{['closed', 'crowded', 'reduced_capacity', 'slow'].map(impact => <option key={impact}>{impact}</option>)}</select></label><label>Capacity factor<input type="number" required min="0" max="1" step="0.05" disabled={!editing || segment.impact === 'closed'} value={segment.capacity_factor} onChange={e => update({ affected_segments: item.affected_segments.map((value, j) => i === j ? { ...value, capacity_factor: Number(e.target.value) } : value) })} /></label></div></div>)}</fieldset>
+            <h3>Affected segments</h3>{item.affected_segments.map((segment, i) => <div key={i} className={css.segmentEdit}><div className={css.fieldPair}>{(['from_node', 'to_node'] as const).map(key => <label key={key}>{key === 'from_node' ? 'From' : 'To'}<select value={segment[key]} onChange={e => update({ affected_segments: item.affected_segments.map((value, j) => i === j ? { ...value, [key]: e.target.value } : value) })}>{network.nodes.map(node => <option key={node.id} value={node.id}>{node.name_en}</option>)}</select></label>)}</div><div className={css.fieldPair}><label>Impact<select value={segment.impact} onChange={e => update({ affected_segments: item.affected_segments.map((value, j) => i === j ? { ...value, impact: e.target.value, capacity_factor: e.target.value === 'closed' ? 0 : e.target.value === 'slow' || e.target.value === 'crowded' ? 1 : value.impact === 'reduced_capacity' ? value.capacity_factor : Number.NaN } : value) })}>{['closed', 'crowded', 'reduced_capacity', 'slow'].map(impact => <option key={impact}>{impact}</option>)}</select></label><label>{segment.impact === 'reduced_capacity' ? 'Confirmed capacity factor (0–1)' : 'Capacity factor (fixed)'}<input type="number" required={segment.impact === 'reduced_capacity'} min="0" max={segment.impact === 'closed' ? '0' : '1'} step="0.05" disabled={!editing || segment.impact !== 'reduced_capacity'} value={segment.impact === 'reduced_capacity' ? Number.isFinite(segment.capacity_factor) ? segment.capacity_factor : '' : segment.impact === 'closed' ? 0 : 1} onChange={e => update({ affected_segments: item.affected_segments.map((value, j) => i === j ? { ...value, capacity_factor: e.target.value === '' ? Number.NaN : Number(e.target.value) } : value) })} /></label></div></div>)}</fieldset>
             {editing && <div className={css.actions}><button type="submit" className={css.secondary} aria-busy={busy === 'edit'} disabled={busy !== null}>{busy === 'edit' ? 'Saving…' : 'Save draft'}</button><button type="button" className={css.textButton} disabled={busy !== null} onClick={() => { setEditing(false); setDraft(null); setError('') }}>Cancel edits</button></div>}
           </form>
         </div>

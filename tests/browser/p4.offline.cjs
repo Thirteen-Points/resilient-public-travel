@@ -50,8 +50,9 @@ async function ready(url) {
   await page.getByRole('combobox', { name: 'TO', exact: true }).click()
   await page.getByRole('option', { name: /^Admiralty East Rail/ }).click()
   await page.locator('[aria-controls="departure-calendar"]').click()
-  const day = page.getByRole('button', { name: '2026-09-22', exact: true })
-  for (let month = 0; !(await day.count()) && month < 3; month++) await page.getByRole('button', { name: 'Previous month', exact: true }).click()
+  const tomorrowHkt = new Date(Date.now() + 8 * 3600000 + 24 * 3600000).toISOString().slice(0, 10)
+  const day = page.locator(`[data-date="${tomorrowHkt}"]`)
+  if (!await day.isVisible()) await page.getByRole('button', { name: 'Next month', exact: true }).click()
   await day.click()
   await page.locator('input[type="time"]').fill('08:20')
   const [response] = await Promise.all([

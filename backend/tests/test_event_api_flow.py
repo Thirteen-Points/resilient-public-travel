@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 
 from backend.app.api.stream import event_frames
 from backend.app.main import create_app
+from backend.app.services.confidence import ConfidenceObservation, score_confidence
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -129,6 +130,36 @@ class EventApiFlowTests(unittest.TestCase):
         live_frame, elapsed = asyncio.run(wait_for_live_update())
         self.assertIn('"status":"updated"', live_frame)
         self.assertLess(elapsed, 1.0)
+
+    def test_two_public_source_hints_reach_publish_threshold(self) -> None:
+        first_id = self.report("qa_auto_witness_one")
+        second_id = self.report("qa_auto_witness_two")
+        first = self.app.state.signal_store.get_signal(first_id)
+        second = self.app.state.signal_store.get_signal(second_id)
+        self.assertEqual(first.author_hint, "qa_auto_witness_one")
+        self.assertEqual(second.author_hint, "qa_auto_witness_two")
+
+        scored = score_confidence([ConfidenceObservation(first), ConfidenceObservation(second)])
+        self.assertEqual(scored.independent_agreeing_sources, 2)
+        self.assertEqual(scored.score, 0.55)
+
+        created = self.client.post("/api/events", json=self.initial_card(first_id), headers=self.headers)
+        self.assertEqual(created.status_code, 201, created.text)
+        merged = self.client.post("/api/events/ingest", json={"signal_id": second_id}, headers=self.headers)
+        self.assertEqual(merged.status_code, 200, merged.text)
+        self.assertEqual(merged.json()["state"], "merged")
+        self.assertEqual(merged.json()["event"]["confidence"], 0.55)
+        self.assertEqual(merged.json()["event"]["signals"], [first_id, second_id])
+
+        approved = self.client.post(
+            "/api/events/evt-api-flow-001/review",
+            json={"action": "approve", "actor": "admin"}, headers=self.headers,
+        )
+        self.assertEqual(approved.status_code, 200, approved.text)
+        self.assertEqual(approved.json()["confidence"], 0.60)
+        self.assertEqual(approved.json()["status"], "published")
+        self.assertEqual([event["event_id"] for event in self.client.get("/api/events/published").json()],
+                         ["evt-api-flow-001"])
 
     def test_review_rejects_illegal_transitions_and_low_confidence(self) -> None:
         signal_id = self.report("first")
