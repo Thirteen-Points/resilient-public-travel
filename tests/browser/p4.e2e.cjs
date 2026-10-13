@@ -67,6 +67,8 @@ async function verifyHighContrast(page) {
   })
   await toggle.click()
   assert.equal(await toggle.getAttribute('aria-pressed'), 'true')
+  // Observe painted styles, after React commits and the browser recalculates CSS.
+  await frames(page)
   const active = await input.evaluate(node => {
     const s = getComputedStyle(node); return [s.color, s.backgroundColor, s.borderWidth]
   })
@@ -75,8 +77,10 @@ async function verifyHighContrast(page) {
     const s = getComputedStyle(node); return [s.color, s.backgroundColor]
   }), ['rgb(255, 255, 255)', 'rgb(0, 0, 0)'])
   await input.focus()
+  await frames(page)
   assert.equal(await input.evaluate(node => getComputedStyle(node).outlineWidth), '3px')
   await toggle.click()
+  await frames(page)
   assert.deepEqual(await input.evaluate(node => {
     const s = getComputedStyle(node); return [s.color, s.backgroundColor, s.borderWidth]
   }), original)
