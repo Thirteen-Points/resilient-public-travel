@@ -341,7 +341,10 @@ let browser, publicPage
   const hktInput = value => new Date(value + 8 * 3600000).toISOString().slice(0, 16)
   await reviewer.getByLabel('Start · HKT', { exact: true }).fill(hktInput(Date.now() - 5 * 60000))
   await reviewer.getByLabel('End · HKT', { exact: true }).fill(hktInput(Date.parse(departAt) + 30 * 60000))
-  await reviewer.getByLabel('Severity (1–5)', { exact: true }).fill('4'); await reviewer.getByLabel('Confirmed capacity factor (0–1)').fill('0')
+  await reviewer.getByLabel('Severity (1–5)', { exact: true }).fill('4')
+  const fixedCapacity = reviewer.locator('section[aria-labelledby="inbox-heading"] form input[type="number"]').last()
+  assert.equal(await fixedCapacity.inputValue(), '0')
+  assert.equal(await fixedCapacity.isDisabled(), true)
   await reviewer.getByRole('button', { name: 'Create pending card', exact: true }).click(); await reviewer.getByText('Pending card created.', { exact: false }).waitFor()
   const event = (await call('/api/events', undefined, true))[0]
   for (const author of ['p4-scripted-source-2', 'p4-scripted-source-3']) {
