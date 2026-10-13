@@ -12,7 +12,7 @@ from ..graph.build import thaw
 
 def error(status, code, message):
     return JSONResponse(status_code=status, content={'error': {
-        'code': code, 'message': message, 'fallback': '展示上一次成功数据并标记数据较旧；暂无缓存时提示重试'}})
+        'code': code, 'message': message, 'fallback': 'Keep the last successful data and mark it as stale; retry if no cached data is available.'}})
 
 
 def create_router(engine):
@@ -83,7 +83,7 @@ def create_router(engine):
         except (ValueError, TypeError, KeyError, AttributeError) as exc:
             return error(400, 'INVALID_ROUTE_QUERY', str(exc))
         except Exception:
-            return error(500, 'ROUTE_ENGINE_ERROR', '路线服务暂时不可用')
+            return error(500, 'ROUTE_ENGINE_ERROR', 'The route service is temporarily unavailable.')
 
     return router
 
@@ -99,10 +99,10 @@ def create_app(engine):
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request, exc):
-        return error(422, 'INVALID_REQUEST', '请求格式不正确')
+        return error(422, 'INVALID_REQUEST', 'Invalid request format.')
 
     @app.exception_handler(Exception)
     async def server_error(request, exc):
-        return error(500, 'ROUTE_ENGINE_ERROR', '路线服务暂时不可用')
+        return error(500, 'ROUTE_ENGINE_ERROR', 'The route service is temporarily unavailable.')
 
     return app

@@ -20,6 +20,36 @@ TEXT = "【模拟】东铁线红磡至会展信号故障，暂停服务。"
 
 
 class EventApiFlowTests(unittest.TestCase):
+    def test_colloquial_unknown_cause_reports_merge_without_inventing_a_cause(self) -> None:
+        def submit(text: str, author: str) -> str:
+            result = self.client.post("/api/signals", json={"raw_text": text, "lang": "en", "author_hint": author})
+            self.assertEqual(result.status_code, 202)
+            return result.json()["signal_id"]
+
+        first = submit("East Rail between Hung Hom and Exhibition Centre is running late.", "witness-one")
+        extracted = self.client.post("/api/events/ingest", json={"signal_id": first}, headers=self.headers).json()
+        self.assertEqual(extracted["draft"]["event_type"], "other")
+        payload = self.initial_card(first)
+        payload.update(extracted["draft"])
+        payload.update(mode="MTR", line="ERL", direction="both", affected_segments=[
+            {"from_node": "HUH", "to_node": "EXC", "impact": "slow", "capacity_factor": 1}])
+        created = self.client.post("/api/events", json=payload, headers=self.headers)
+        self.assertEqual(created.status_code, 201, created.text)
+        second = submit("East Rail Hung Hom to Exhibition Centre trains are running slow.", "witness-two")
+        merged = self.client.post("/api/events/ingest", json={"signal_id": second}, headers=self.headers)
+        self.assertEqual(merged.json()["state"], "merged", merged.text)
+        self.assertEqual(merged.json()["event"]["confidence"], 0.55)
+        self.assertEqual(self.client.get("/api/events/published").json(), [])
+        for text in (
+            "East Rail Hung Hom to Exhibition Centre trains are not running late.",
+            "East Rail Hung Hom to Exhibition Centre trains are not running.",
+            "East Rail Exhibition Centre to Admiralty is running late.",
+            "East Rail Hung Hom to Exhibition Centre has signal problems and is running late.",
+        ):
+            report = submit(text, "witness-three")
+            result = self.client.post("/api/events/ingest", json={"signal_id": report}, headers=self.headers)
+            self.assertEqual(result.json()["state"], "needs_review", result.text)
+
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)

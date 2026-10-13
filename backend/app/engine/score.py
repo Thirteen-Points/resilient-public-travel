@@ -58,14 +58,14 @@ def score_routes(routes, profile, *, baseline_fare):
                                     for c in CRITERIA]
         route["score"] = sum(row["contribution"] for row in route["score_breakdown"])
         if total["walk_m"] > 500:
-            route["notes"].append(f"步行 {total['walk_m']:g} 米，超过 500 米软偏好")
+            route["notes"].append(f"Walking {total['walk_m']:g} m exceeds the 500 m soft preference.")
         if total["fare_hkd"] > baseline_fare * 1.3:
-            route["notes"].append("票价超过配置基线 1.3 倍")
+            route["notes"].append("Fare exceeds 1.3 times the configured baseline.")
         if raw["comfort"] < .3:
-            route["notes"].append("舒适度估算偏低，可能较长时间站立")
+            route["notes"].append("Estimated comfort is low; prolonged standing may be required.")
         if any(leg["accessible"] is not True for leg in route["legs"]):
-            route["notes"].append("未确认全程无障碍")
-        route["explain"] = (f"{route['label']}：约 {total['time_range_s'][0] / 60:.0f}–"
-                            f"{total['time_range_s'][1] / 60:.0f} 分钟，换乘 {total['transfers']} 次，"
-                            f"步行 {total['walk_m']:g} 米。按 {preset} 权重计算；碳排放与舒适度为模拟估算。")
+            route["notes"].append("Step-free access has not been confirmed for the entire journey.")
+        route["explain"] = (f"{route['label']}: about {total['time_range_s'][0] / 60:.0f}–"
+                            f"{total['time_range_s'][1] / 60:.0f} min, {total['transfers']} transfers, "
+                            f"{total['walk_m']:g} m walking. Ranked with {preset} weights; carbon emissions and comfort are simulated estimates.")
     return sorted(output, key=lambda r: (-r["score"], r["total"]["time_s"], r["route_id"]))

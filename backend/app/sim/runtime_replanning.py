@@ -127,7 +127,7 @@ class RuntimeReplanningCoordinator:
             weather_changed = weather != self._weather_signature
             self._active_signature, self._weather_signature = signature, weather
             changed = snapshot.snapshot_id != previous or active_changed
-            reason = "路线已更新：已审核天气警告变化" if weather_changed else "路线已更新：已审核事件、撤销或生效时间变化"
+            reason = "Route updated: approved weather warnings changed" if weather_changed else "Route updated: approved events, withdrawals or effective times changed"
             return self._execute(ReplanDecision(changed, "weather_changed" if weather_changed else "approved_events_changed",
                                  reason if changed else None, now if changed else None,
                                  {"weather_conditions": sorted(weather), "graph_snapshot": snapshot.snapshot_id}),

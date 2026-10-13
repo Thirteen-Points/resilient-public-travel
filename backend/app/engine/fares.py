@@ -3,6 +3,15 @@ from ..graph.adapter import DataUnavailable
 from ..graph.build import service_key
 
 
+def english_fare_note(note):
+    """Render known legacy system notes without rewriting the durable fare store."""
+    return {
+        '成人巴士票价按实际上下车站及方向查询运输署分段票价': 'Adult bus fares use Transport Department section fares for the actual boarding stop, alighting stop and direction.',
+        '天星小轮成人票价：标准方案上层，轮椅方案下层；按平日/周末/公众假期计费': 'Star Ferry adult fares: upper deck for standard mobility, lower deck for wheelchair users; prices follow weekdays, weekends and public holidays.',
+        '成人巴士全程票价；该示意线路班次未核实，未提供可运行候选': 'Adult full bus fare; this illustrative service has unverified headways and is excluded from operational candidates.',
+    }.get(note, note)
+
+
 def path_fares(path, fares, network, profile=None):
     """Return one charge per ticket, allocated to its first traversal.
 

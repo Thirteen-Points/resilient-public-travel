@@ -360,7 +360,7 @@ def create_app(
             raise HTTPException(status_code=422, detail="message must contain at most 2000 characters")
         required = ("origin", "destination", "depart_at")
         if any(not isinstance(payload.get(key), str) or not payload[key].strip() for key in required):
-            return {"message": "请提供起点、终点和出发时间，我才能调用确定性路线工具。",
+            return {"message": "Provide an origin, destination and departure time to use the deterministic route tool.",
                     "tool_calls": [], "fallback": True, "user_input": payload["message"],
                     "graph_snapshot": None, "effective_profile": None}
         # Tool handlers keep intermediate routes/parameters. Construct them per

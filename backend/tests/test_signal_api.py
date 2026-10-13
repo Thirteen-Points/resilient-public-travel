@@ -130,7 +130,7 @@ class UserSignalApiTestCase(unittest.TestCase):
         Signal.model_validate(stored.model_dump())
         self.assertEqual(stored.source_type, "user")
         self.assertEqual(stored.source_name, USER_SOURCE_NAME)
-        self.assertIn("未经核实", stored.source_name)
+        self.assertIn("unverified", stored.source_name)
         self.assertEqual(stored.author_hint, "anonymous")
         self.assertIsNone(stored.raw_url)
         self.assertEqual(stored.provenance, "real")

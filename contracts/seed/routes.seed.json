@@ -36,7 +36,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -75,7 +75,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -114,7 +114,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -218,17 +218,17 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "ERL 数据较旧",
-        "ERL 受事件影响，运力系数 0.9",
-        "KTL 数据较旧",
-        "TWL 数据较旧",
-        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
-        "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
+        "ERL data is stale",
+        "ERL affected by an event; capacity factor 0.9",
+        "KTL data is stale",
+        "TWL data is stale",
+        "Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.",
+        "Load comes from an explicitly simulated scenario and does not represent real passenger demand.",
+        "Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses are excluded. Accessibility is not officially verified and personal walking limits still apply.",
+        "Adult Octopus ordinary class: fares use entry and exit stations; changing lines within the paid area does not add a fare. East Tsim Sha Tsui/Tsim Sha Tsui interchange within 30 minutes is charged as one journey."
       ],
       "notes": [],
-      "explain": "ERL + KTL + TWL：约 23–25 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "explain": "ERL + KTL + TWL: about 23–25 min, 2 transfers, 0 m walking. Ranked with fastest weights; carbon emissions and comfort are simulated estimates.",
       "evidence": [
         {
           "source": "ERL",
@@ -272,7 +272,7 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+          "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
           "freshness_s": 117540.0
         },
         {
@@ -308,7 +308,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -347,7 +347,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -386,7 +386,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -425,7 +425,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -529,20 +529,20 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "ERL 数据较旧",
-        "ERL 受事件影响，运力系数 0.9",
-        "TML 数据较旧",
-        "KTL 数据较旧",
-        "TWL 数据较旧",
-        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
-        "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
+        "ERL data is stale",
+        "ERL affected by an event; capacity factor 0.9",
+        "TML data is stale",
+        "KTL data is stale",
+        "TWL data is stale",
+        "Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.",
+        "Load comes from an explicitly simulated scenario and does not represent real passenger demand.",
+        "Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses are excluded. Accessibility is not officially verified and personal walking limits still apply.",
+        "Adult Octopus ordinary class: fares use entry and exit stations; changing lines within the paid area does not add a fare. East Tsim Sha Tsui/Tsim Sha Tsui interchange within 30 minutes is charged as one journey."
       ],
       "notes": [
-        "未确认全程无障碍"
+        "Step-free access has not been confirmed for the entire journey."
       ],
-      "explain": "ERL + TML + KTL + TWL：约 26–30 分钟，换乘 3 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "explain": "ERL + TML + KTL + TWL: about 26–30 min, 3 transfers, 0 m walking. Ranked with fastest weights; carbon emissions and comfort are simulated estimates.",
       "evidence": [
         {
           "source": "ERL",
@@ -590,7 +590,7 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+          "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
           "freshness_s": 117780.0
         },
         {
@@ -626,7 +626,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -665,7 +665,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -704,7 +704,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -808,17 +808,17 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "TML 数据较旧",
-        "KTL 数据较旧",
-        "TWL 数据较旧",
-        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
-        "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "此普通示例路径物理连通，但与其他方案高度重合/共用换乘点，未入普通严格多样性查询；不代表独立替代走廊",
-        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
+        "TML data is stale",
+        "KTL data is stale",
+        "TWL data is stale",
+        "Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.",
+        "Load comes from an explicitly simulated scenario and does not represent real passenger demand.",
+        "Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses are excluded. Accessibility is not officially verified and personal walking limits still apply.",
+        "This physically connected example shares transfer nodes or has high overlap with other routes and is excluded from the strict diversity query; it is not an independent alternative corridor.",
+        "Adult Octopus ordinary class: fares use entry and exit stations; changing lines within the paid area does not add a fare. East Tsim Sha Tsui/Tsim Sha Tsui interchange within 30 minutes is charged as one journey."
       ],
       "notes": [],
-      "explain": "TML + KTL + TWL：约 28–32 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "explain": "TML + KTL + TWL: about 28–32 min, 2 transfers, 0 m walking. Ranked with fastest weights; carbon emissions and comfort are simulated estimates.",
       "evidence": [
         {
           "source": "TML",
@@ -858,7 +858,7 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+          "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
           "freshness_s": 117900.0
         },
         {
@@ -876,7 +876,7 @@
     },
     {
       "route_id": "r_a3da1ce3aa06f995",
-      "label": "ERL + TML + 步行 + TWL",
+      "label": "ERL + TML + Walk + TWL",
       "legs": [
         {
           "mode": "MTR",
@@ -894,7 +894,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -933,7 +933,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -970,7 +970,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -1007,7 +1007,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -1111,21 +1111,21 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "ERL 数据较旧",
-        "ERL 受事件影响，运力系数 0.9",
-        "TML 数据较旧",
-        "步行通道 数据较旧",
-        "站内步行通道，时长与电梯可用性待核实（关键：轮椅方案依赖它）",
-        "TWL 数据较旧",
-        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
-        "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
+        "ERL data is stale",
+        "ERL affected by an event; capacity factor 0.9",
+        "TML data is stale",
+        "Walking link data is stale",
+        "In-station walking link; duration and lift availability are unverified. Wheelchair alternatives depend on this link.",
+        "TWL data is stale",
+        "Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.",
+        "Load comes from an explicitly simulated scenario and does not represent real passenger demand.",
+        "Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses are excluded. Accessibility is not officially verified and personal walking limits still apply.",
+        "Adult Octopus ordinary class: fares use entry and exit stations; changing lines within the paid area does not add a fare. East Tsim Sha Tsui/Tsim Sha Tsui interchange within 30 minutes is charged as one journey."
       ],
       "notes": [
-        "未确认全程无障碍"
+        "Step-free access has not been confirmed for the entire journey."
       ],
-      "explain": "ERL + TML + 步行 + TWL：约 26–30 分钟，换乘 2 次，步行 420 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "explain": "ERL + TML + Walk + TWL: about 26–30 min, 2 transfers, 420 m walking. Ranked with fastest weights; carbon emissions and comfort are simulated estimates.",
       "evidence": [
         {
           "source": "ERL",
@@ -1165,7 +1165,7 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+          "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
           "freshness_s": 117780.0
         },
         {
@@ -1201,7 +1201,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -1240,7 +1240,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -1279,7 +1279,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -1383,17 +1383,17 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "TML 数据较旧",
-        "KTL 数据较旧",
-        "TWL 数据较旧",
-        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
-        "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "此普通示例路径物理连通，但与其他方案高度重合/共用换乘点，未入普通严格多样性查询；不代表独立替代走廊",
-        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
+        "TML data is stale",
+        "KTL data is stale",
+        "TWL data is stale",
+        "Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.",
+        "Load comes from an explicitly simulated scenario and does not represent real passenger demand.",
+        "Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses are excluded. Accessibility is not officially verified and personal walking limits still apply.",
+        "This physically connected example shares transfer nodes or has high overlap with other routes and is excluded from the strict diversity query; it is not an independent alternative corridor.",
+        "Adult Octopus ordinary class: fares use entry and exit stations; changing lines within the paid area does not add a fare. East Tsim Sha Tsui/Tsim Sha Tsui interchange within 30 minutes is charged as one journey."
       ],
       "notes": [],
-      "explain": "TML + KTL + TWL：约 30–34 分钟，换乘 2 次，步行 0 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "explain": "TML + KTL + TWL: about 30–34 min, 2 transfers, 0 m walking. Ranked with fastest weights; carbon emissions and comfort are simulated estimates.",
       "evidence": [
         {
           "source": "TML",
@@ -1441,7 +1441,7 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+          "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
           "freshness_s": 118020.0
         },
         {
@@ -1459,7 +1459,7 @@
     },
     {
       "route_id": "r_b59174a6ed64d8cf",
-      "label": "TML + 步行 + TWL",
+      "label": "TML + Walk + TWL",
       "legs": [
         {
           "mode": "MTR",
@@ -1477,7 +1477,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -1514,7 +1514,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -1551,7 +1551,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -1655,19 +1655,19 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "TML 数据较旧",
-        "步行通道 数据较旧",
-        "站内步行通道，时长与电梯可用性待核实（关键：轮椅方案依赖它）",
-        "TWL 数据较旧",
-        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
-        "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
+        "TML data is stale",
+        "Walking link data is stale",
+        "In-station walking link; duration and lift availability are unverified. Wheelchair alternatives depend on this link.",
+        "TWL data is stale",
+        "Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.",
+        "Load comes from an explicitly simulated scenario and does not represent real passenger demand.",
+        "Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses are excluded. Accessibility is not officially verified and personal walking limits still apply.",
+        "Adult Octopus ordinary class: fares use entry and exit stations; changing lines within the paid area does not add a fare. East Tsim Sha Tsui/Tsim Sha Tsui interchange within 30 minutes is charged as one journey."
       ],
       "notes": [
-        "未确认全程无障碍"
+        "Step-free access has not been confirmed for the entire journey."
       ],
-      "explain": "TML + 步行 + TWL：约 31–37 分钟，换乘 1 次，步行 420 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "explain": "TML + Walk + TWL: about 31–37 min, 1 transfers, 420 m walking. Ranked with fastest weights; carbon emissions and comfort are simulated estimates.",
       "evidence": [
         {
           "source": "TML",
@@ -1707,7 +1707,7 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+          "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
           "freshness_s": 118140.0
         },
         {
@@ -1725,7 +1725,7 @@
     },
     {
       "route_id": "r_a3bb2d93a795746f",
-      "label": "ERL + 步行 + BUS_182 + 步行",
+      "label": "ERL + Walk + BUS_182 + Walk",
       "legs": [
         {
           "mode": "MTR",
@@ -1743,7 +1743,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -1780,7 +1780,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -1817,7 +1817,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -1854,7 +1854,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -1956,21 +1956,21 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "ERL 数据较旧",
-        "ERL 受事件影响，运力系数 0.9",
-        "步行通道 数据较旧",
-        "BUS_182 数据较旧",
-        "唯全日直达金钟/中环的沙田过海线；班距与票价为推算，待核实",
-        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
-        "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费",
-        "成人巴士票价按实际上下车站及方向查询运输署分段票价"
+        "ERL data is stale",
+        "ERL affected by an event; capacity factor 0.9",
+        "Walking link data is stale",
+        "BUS_182 data is stale",
+        "Modelled all-day Sha Tin cross-harbour service to Admiralty/Central; headways and fares are estimates awaiting verification.",
+        "Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.",
+        "Load comes from an explicitly simulated scenario and does not represent real passenger demand.",
+        "Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses are excluded. Accessibility is not officially verified and personal walking limits still apply.",
+        "Adult Octopus ordinary class: fares use entry and exit stations; changing lines within the paid area does not add a fare. East Tsim Sha Tsui/Tsim Sha Tsui interchange within 30 minutes is charged as one journey.",
+        "Adult bus fares use Transport Department section fares for the actual boarding stop, alighting stop and direction."
       ],
       "notes": [
-        "未确认全程无障碍"
+        "Step-free access has not been confirmed for the entire journey."
       ],
-      "explain": "ERL + 步行 + BUS_182 + 步行：约 33–50 分钟，换乘 1 次，步行 450 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "explain": "ERL + Walk + BUS_182 + Walk: about 33–50 min, 1 transfers, 450 m walking. Ranked with fastest weights; carbon emissions and comfort are simulated estimates.",
       "evidence": [
         {
           "source": "ERL",
@@ -2010,7 +2010,7 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+          "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
           "freshness_s": 118740.0
         },
         {
@@ -2028,7 +2028,7 @@
     },
     {
       "route_id": "r_8d4bf8596c86646e",
-      "label": "步行 + BUS_182 + 步行",
+      "label": "Walk + BUS_182 + Walk",
       "legs": [
         {
           "mode": "WALK",
@@ -2044,7 +2044,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -2081,7 +2081,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -2118,7 +2118,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -2220,18 +2220,18 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "步行通道 数据较旧",
-        "BUS_182 数据较旧",
-        "唯全日直达金钟/中环的沙田过海线；班距与票价为推算，待核实",
-        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
-        "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "成人巴士票价按实际上下车站及方向查询运输署分段票价"
+        "Walking link data is stale",
+        "BUS_182 data is stale",
+        "Modelled all-day Sha Tin cross-harbour service to Admiralty/Central; headways and fares are estimates awaiting verification.",
+        "Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.",
+        "Load comes from an explicitly simulated scenario and does not represent real passenger demand.",
+        "Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses are excluded. Accessibility is not officially verified and personal walking limits still apply.",
+        "Adult bus fares use Transport Department section fares for the actual boarding stop, alighting stop and direction."
       ],
       "notes": [
-        "未确认全程无障碍"
+        "Step-free access has not been confirmed for the entire journey."
       ],
-      "explain": "步行 + BUS_182 + 步行：约 37–76 分钟，换乘 0 次，步行 350 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "explain": "Walk + BUS_182 + Walk: about 37–76 min, 0 transfers, 350 m walking. Ranked with fastest weights; carbon emissions and comfort are simulated estimates.",
       "evidence": [
         {
           "source": "WALK_1:TAW>BS_TAW",
@@ -2263,7 +2263,7 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+          "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
           "freshness_s": 119640.0
         },
         {
@@ -2281,7 +2281,7 @@
     },
     {
       "route_id": "r_007c4e09879d19cc",
-      "label": "TML + 步行 + 步行 + FERRY_TST_CEN + 步行 + TWL",
+      "label": "TML + Walk + Walk + FERRY_TST_CEN + Walk + TWL",
       "legs": [
         {
           "mode": "MTR",
@@ -2299,7 +2299,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -2336,7 +2336,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -2371,7 +2371,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -2408,7 +2408,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -2445,7 +2445,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -2482,7 +2482,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -2586,24 +2586,24 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "TML 数据较旧",
-        "步行通道 数据较旧",
-        "站内步行通道，时长与电梯可用性待核实（关键：轮椅方案依赖它）",
-        "FERRY_TST_CEN 数据较旧",
-        "台风迫近停航（确切门槛待核实）；票价待核实是否为当前价",
-        "TWL 数据较旧",
-        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
-        "较长步行：全程累计 1070 米，请预留时间",
-        "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费",
-        "天星小轮成人票价：标准方案上层，轮椅方案下层；按平日/周末/公众假期计费"
+        "TML data is stale",
+        "Walking link data is stale",
+        "In-station walking link; duration and lift availability are unverified. Wheelchair alternatives depend on this link.",
+        "FERRY_TST_CEN data is stale",
+        "Suspended when typhoons approach (exact threshold unverified); fare currency awaits verification.",
+        "TWL data is stale",
+        "Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.",
+        "Long walk: 1070 m in total; allow extra time.",
+        "Load comes from an explicitly simulated scenario and does not represent real passenger demand.",
+        "Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses are excluded. Accessibility is not officially verified and personal walking limits still apply.",
+        "Adult Octopus ordinary class: fares use entry and exit stations; changing lines within the paid area does not add a fare. East Tsim Sha Tsui/Tsim Sha Tsui interchange within 30 minutes is charged as one journey.",
+        "Star Ferry adult fares: upper deck for standard mobility, lower deck for wheelchair users; prices follow weekdays, weekends and public holidays."
       ],
       "notes": [
-        "步行 1070 米，超过 500 米软偏好",
-        "未确认全程无障碍"
+        "Walking 1070 m exceeds the 500 m soft preference.",
+        "Step-free access has not been confirmed for the entire journey."
       ],
-      "explain": "TML + 步行 + 步行 + FERRY_TST_CEN + 步行 + TWL：约 46–54 分钟，换乘 2 次，步行 1070 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "explain": "TML + Walk + Walk + FERRY_TST_CEN + Walk + TWL: about 46–54 min, 2 transfers, 1070 m walking. Ranked with fastest weights; carbon emissions and comfort are simulated estimates.",
       "evidence": [
         {
           "source": "TML",
@@ -2655,7 +2655,7 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+          "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
           "freshness_s": 119280.0
         },
         {
@@ -2673,7 +2673,7 @@
     },
     {
       "route_id": "r_a6162cc3a32c489b",
-      "label": "步行 + BUS_81C + 步行 + FERRY_TST_CEN + 步行 + TWL",
+      "label": "Walk + BUS_81C + Walk + FERRY_TST_CEN + Walk + TWL",
       "legs": [
         {
           "mode": "WALK",
@@ -2689,7 +2689,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -2726,7 +2726,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -2763,7 +2763,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -2800,7 +2800,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -2837,7 +2837,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "from",
@@ -2874,7 +2874,7 @@
           "evidence": [
             {
               "source": "contracts/seed/network.seed.json",
-              "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+              "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
               "fields": [
                 "mode",
                 "line",
@@ -2978,25 +2978,25 @@
         "board_refusal_prob": 0
       },
       "warnings": [
-        "步行通道 数据较旧",
-        "BUS_81C 数据较旧",
-        "不过海；用于接驳到尖沙咀再换乘",
-        "FERRY_TST_CEN 数据较旧",
-        "台风迫近停航（确切门槛待核实）；票价待核实是否为当前价",
-        "TWL 数据较旧",
-        "碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算",
-        "较长步行：全程累计 800 米，请预留时间",
-        "负载来自显式模拟场景，不代表真实客流",
-        "轮椅 M0 演示默认假设 MTR/大巴可用、小巴不可用；无官方无障碍核验，仍须遵守个人步行上限",
-        "成人巴士票价按实际上下车站及方向查询运输署分段票价",
-        "天星小轮成人票价：标准方案上层，轮椅方案下层；按平日/周末/公众假期计费",
-        "港铁成人八达通普通车厢：按入站/出站票价计费，站内换线不重复收费；尖东/尖沙咀30分钟内换乘合并计费"
+        "Walking link data is stale",
+        "BUS_81C data is stale",
+        "Does not cross the harbour; connects to Tsim Sha Tsui for interchange.",
+        "FERRY_TST_CEN data is stale",
+        "Suspended when typhoons approach (exact threshold unverified); fare currency awaits verification.",
+        "TWL data is stale",
+        "Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.",
+        "Long walk: 800 m in total; allow extra time.",
+        "Load comes from an explicitly simulated scenario and does not represent real passenger demand.",
+        "Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses are excluded. Accessibility is not officially verified and personal walking limits still apply.",
+        "Adult bus fares use Transport Department section fares for the actual boarding stop, alighting stop and direction.",
+        "Star Ferry adult fares: upper deck for standard mobility, lower deck for wheelchair users; prices follow weekdays, weekends and public holidays.",
+        "Adult Octopus ordinary class: fares use entry and exit stations; changing lines within the paid area does not add a fare. East Tsim Sha Tsui/Tsim Sha Tsui interchange within 30 minutes is charged as one journey."
       ],
       "notes": [
-        "步行 800 米，超过 500 米软偏好",
-        "未确认全程无障碍"
+        "Walking 800 m exceeds the 500 m soft preference.",
+        "Step-free access has not been confirmed for the entire journey."
       ],
-      "explain": "步行 + BUS_81C + 步行 + FERRY_TST_CEN + 步行 + TWL：约 50–82 分钟，换乘 2 次，步行 800 米。按 fastest 权重计算；碳排放与舒适度为模拟估算。",
+      "explain": "Walk + BUS_81C + Walk + FERRY_TST_CEN + Walk + TWL: about 50–82 min, 2 transfers, 800 m walking. Ranked with fastest weights; carbon emissions and comfort are simulated estimates.",
       "evidence": [
         {
           "source": "WALK_1:TAW>BS_TAW",
@@ -3036,7 +3036,7 @@
         },
         {
           "source": "contracts/seed/network.seed.json",
-          "sha256": "872a408a00aaa2eb1710e43b47ba3366cf0c26794a86023e76bb81ade7d5516c",
+          "sha256": "3b1d5b426afa6cb993235791fbed2bab772956eb95579f9885cffc56f5bb4c68",
           "freshness_s": 120240.0
         },
         {
@@ -3103,7 +3103,7 @@
     },
     {
       "route": "大围 → 88K → 九龙塘",
-      "reason": "88K 疑已于 2025-08-04 取消（待核实）"
+      "reason": "88K may have been withdrawn on 2025-08-04 (unverified)."
     },
     {
       "route": "旧 r_seed_006 / 982X",

@@ -117,7 +117,7 @@ export function buildMapModel(network: Network): MapModel {
 
   const labels = stations
     .filter(station => station.position !== null)
-    .map(station => ({ stationId: station.id, text: `${station.name_en} · ${station.name_zh}`, position: station.position as MapLatLng }))
+    .map(station => ({ stationId: station.id, text: station.name_en, position: station.position as MapLatLng }))
 
   const metaCatchment = network.meta.catchment_m
   const defaultCatchmentM = typeof metaCatchment === 'number' && Number.isFinite(metaCatchment) && metaCatchment > 0

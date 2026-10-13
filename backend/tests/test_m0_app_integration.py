@@ -41,6 +41,6 @@ def test_b_signal_intake_and_c_wheelchair_route_share_the_integrated_app():
                 for leg in route["legs"]
             )
             assert all(
-                any("MTR/大巴默认可用" in warning for warning in route["warnings"])
+                any("MTR and buses are assumed usable" in warning for warning in route["warnings"])
                 for route in result
             )

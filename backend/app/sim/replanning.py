@@ -70,17 +70,17 @@ class ReplanningMonitor:
         self._events[event_id] = current
         if previous is None:
             if current[1] in {"published", "updated"} and current[2]:
-                return ReplanDecision(True, "event_new", f"路线已更新：新增已发布事件 {event_id}", now)
+                return ReplanDecision(True, "event_new", f"Route updated: new published event {event_id}", now)
             return ReplanDecision(False)
         current_active = current[1] in {"published", "updated"} and current[2]
         previous_active = previous[1] in {"published", "updated"} and previous[2]
         if current != previous and (current_active or previous_active):
             if current[1] in {"expired", "rejected"}:
-                reason = f"路线已更新：事件 {event_id} 已撤销或过期"
+                reason = f"Route updated: event {event_id} withdrawn or expired"
             elif current[2] != previous[2]:
-                reason = f"路线已更新：事件 {event_id} 置信度跨过发布阈值"
+                reason = f"Route updated: event {event_id} crossed the publication confidence threshold"
             else:
-                reason = f"路线已更新：事件 {event_id} 内容或状态有变化"
+                reason = f"Route updated: event {event_id} facts or status changed"
             return ReplanDecision(True, "event_changed", reason, now)
         return ReplanDecision(False)
 
@@ -102,7 +102,7 @@ class ReplanningMonitor:
             return ReplanDecision(
                 True,
                 "sustained_load",
-                f"路线已更新：{route_id} 载客率持续 5 分钟高于 95%",
+                f"Route updated: {route_id} load remained above 95% for 5 minutes",
                 now,
                 {"route_id": route_id, "load_factor": load_factor},
             )
@@ -126,7 +126,7 @@ class ReplanningMonitor:
             return ReplanDecision(
                 True,
                 "weather_changed",
-                f"路线已更新：严重天气警告变化（{labels}）",
+                f"Route updated: severe weather warnings changed ({labels})",
                 now,
                 {"warning_codes": sorted(signature)},
             )

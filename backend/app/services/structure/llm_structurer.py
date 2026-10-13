@@ -77,7 +77,7 @@ class ConservativeTemplateFallback:
     def extract(self, signal: Signal) -> StructuredEventDraft:
         return StructuredEventDraft(
             event_type="other",
-            title="待人工结构化的事件信号",
+            title="Report awaiting manual structuring" if signal.lang == "en" else "待人工结构化的事件信号",
             summary=signal.raw_text[:1000],
             mode=None,
             line=None,

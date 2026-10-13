@@ -126,6 +126,6 @@ def parse_preference(text: str, *, client: PreferenceClient | None = None,
                          weights=base.weights or candidate.weights)
     if mobility == "wheelchair" and (patch.max_walk_m is None or patch.max_walk_m > 400):
         patch.max_walk_m = 400
-    explanation = "已保留无障碍限制；" if mobility in {"reduced", "wheelchair"} else ""
-    explanation += "已提高价格偏好。" if patch.price_sensitive is not None else "仅使用明确提及的偏好；其他设置保持原样。"
+    explanation = "Accessibility restrictions have been preserved. " if mobility in {"reduced", "wheelchair"} else ""
+    explanation += "Price preference has been increased." if patch.price_sensitive is not None else "Only explicitly stated preferences were used; other settings remain unchanged."
     return PreferenceResult(patch=patch, explanation=explanation, method=method)

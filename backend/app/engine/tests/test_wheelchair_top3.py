@@ -32,7 +32,7 @@ class WheelchairTopThreeTests(unittest.TestCase):
         self.assertEqual(response.status_code,200)
         routes=response.json();self.assertEqual(len(routes),3)
         added=next(r for r in routes if r['legs'][0]['line']=='L3')
-        self.assertTrue(any('局部回退' in w and 'Y' in w and '高度重合' in w and '0.857' in w for w in added['warnings']))
+        self.assertTrue(any('diversity fallback' in w and 'Y' in w and 'high overlap' in w and '0.857' in w for w in added['warnings']))
         for route in routes:
             self.assertLessEqual(route['total']['walk_m'],400)
             self.assertLessEqual(route['total']['transfers'],2)

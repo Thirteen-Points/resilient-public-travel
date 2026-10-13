@@ -95,7 +95,7 @@ class CorridorCoverageTests(unittest.TestCase):
             for route in routes:
                 self.assertTrue(all(leg.get('line') != 'ERL' for leg in route['legs']))
                 self.assertGreaterEqual(route['total']['walk_m'], 1000)
-                self.assertTrue(any('较长步行' in w for w in route['warnings']))
+                self.assertTrue(any('Long walk' in w for w in route['warnings']))
         self.assertEqual(seed_path.read_bytes(), before)
 
     def test_access_unknown_partial_and_direction_are_not_upgraded(self):

@@ -1,3 +1,4 @@
+import { sourceLabel } from '../lib/systemCopy'
 import { useEffect, useState } from 'react'
 import * as eventApi from '../api/eventApi'
 import type { Network, Signal } from '../api/types'
@@ -23,7 +24,7 @@ export function SignalInbox({ network, onChanged, api = eventApi, onDirty }: { n
     <div className={css.sectionTitle}><h2 id="inbox-heading">Unlinked reports</h2><button type="button" className={css.secondary} disabled={busy} onClick={() => void refresh()}>Refresh reports</button></div>
     <p>Receipt is unverified. Extract a draft or merge evidence into an existing card; publication remains a separate review decision.</p>
     <label>Search reports<input value={query} placeholder="Search evidence or source" onChange={e => setQuery(e.target.value)} /></label>
-    {signals.filter(signal => `${signal.raw_text} ${signal.source_name}`.toLowerCase().includes(query.toLowerCase())).map(signal => <article className={css.evidence} key={signal.signal_id}><strong>{signal.source_name}</strong><p>{signal.raw_text}</p><small>{formatHkt(signal.received_at)} · {signal.provenance} channel · unverified</small><button type="button" className={css.secondary} disabled={busy} onClick={async () => {
+    {signals.filter(signal => `${signal.raw_text} ${sourceLabel(signal)}`.toLowerCase().includes(query.toLowerCase())).map(signal => <article className={css.evidence} key={signal.signal_id}><strong>{sourceLabel(signal)}</strong><p lang={signal.lang === 'en' ? 'en' : 'zh-Hant'}>{signal.raw_text}</p><small>{formatHkt(signal.received_at)} · {signal.provenance} channel · unverified</small><button type="button" className={css.secondary} disabled={busy} onClick={async () => {
       setBusy(true); setError(''); setNotice('')
       try {
         const result = await api.ingestSignal(signal.signal_id)

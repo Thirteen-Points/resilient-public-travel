@@ -101,7 +101,7 @@ def test_walk_speed_and_ferry_suspension_are_explicit_simulated_policy():
     route_engine.snapshots.replace_events([event])
     walk = route_engine.query(**query("WALK"))[0]
     assert walk["total"]["time_s"] == pytest.approx(baseline_walk * 1.5 / .75)
-    assert any("模拟系数" in warning for warning in walk["warnings"])
+    assert any("simulated factors" in warning for warning in walk["warnings"])
     event.update(title="天气警告生效 T8", summary="T8", version=2)
     route_engine.snapshots.replace_events([event])
     assert route_engine.query(**query("FERRY")) == []

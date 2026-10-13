@@ -112,13 +112,13 @@ def score_confidence(
             factor=name, weight=round(weight, 2), score=float(active), note=note,
         ))
 
-    add("base_signal", POLICY.base, True, "至少一条相关信号；不代表事实已确认")
+    add("base_signal", POLICY.base, True, "At least one related report; the incident remains unverified.")
     add("independent_source", POLICY.second_independent, count >= 2,
-        f"独立且同意的来源 {count} 个")
+        f"{count} independent agreeing sources")
     add("multi_source_agreement", POLICY.multi_source_agreement, count >= 2,
-        "至少两个独立来源一致" if count >= 2 else "尚未满足多源一致")
+        "At least two independent sources agree." if count >= 2 else "Multiple-source agreement has not been established.")
     add("source_authority", POLICY.official_authority, official,
-        "已核实与本事件相关的真实官方公告" if official else "无相关的已核实官方公告")
+        "A verified official notice relates to this incident." if official else "No related verified official notice.")
 
     pre_cap = POLICY.base + (
         POLICY.second_independent + POLICY.multi_source_agreement if count >= 2 else 0
@@ -133,13 +133,13 @@ def score_confidence(
         cap_adjustment = max(0.0, pre_cap - cap)
         stage = min(cap, pre_cap)
     add("official_floor", floor_adjustment, floor_adjustment > 0,
-        "官方公告直接达到 0.85 阶梯；补足量")
+        "Adjustment to the 0.85 confidence floor for official notices.")
     add("stage_cap", cap_adjustment, cap_adjustment > 0,
-        "扣减超出当前阶段上限的部分")
+        "Deduction above the current confidence stage cap.")
     add("admin_confirmation", POLICY.admin_confirmation, admin_confirmed,
-        "人工审核已确认" if admin_confirmed else "仍需人工审核")
+        "Confirmed by human review." if admin_confirmed else "Human review is still required.")
     add("source_conflict", POLICY.contradiction, conflict,
-        "扣减 0.15；须标记待核实" if conflict else "无相关矛盾")
+        "Deduct 0.15 for conflicting evidence; verification is required." if conflict else "No related conflicting evidence.")
 
     score = round(min(1.0, max(0.0, stage + (
         POLICY.admin_confirmation if admin_confirmed else 0

@@ -23,6 +23,54 @@ def signal(text: str) -> Signal:
 
 
 class RuleEventExtractorTests(unittest.TestCase):
+    def test_colloquial_english_cause_and_explicit_span(self) -> None:
+        cases = (
+            ("East Rail between Hung Hom and Exhibition Centre is running late due to signal problems.", "signal_failure", "slow"),
+            ("East Rail Hung Hom station to Exhibition Centre has a train breakdown and trains are not running.", "train_failure", "closed"),
+            ("East Rail Hung Hom-Exhibition Centre is packed.", "crowd", "crowded"),
+            ("East Rail Hung Hom to Exhibition Centre has fewer trains due to a power outage.", "power_failure", "reduced_capacity"),
+            ("East Rail Hung Hom to Exhibition Centre is running slow.", "other", "slow"),
+        )
+        for text, cause, impact in cases:
+            with self.subTest(text=text):
+                report = signal(text).model_copy(update={"lang": "en"})
+                draft = RuleEventExtractor().extract(report)
+                self.assertEqual(draft.event_type, cause)
+                self.assertEqual(draft.line, "ERL")
+                self.assertEqual([s.model_dump() for s in draft.affected_segments],
+                                 [{"from_node": "HUH", "to_node": "EXC", "impact": impact}])
+                self.assertTrue(draft.title.startswith("Unverified: "))
+                self.assertEqual(draft.summary, text)
+
+    def test_colloquial_denial_uncertainty_and_recovery_stay_unstructured(self) -> None:
+        for text in (
+            "East Rail Hung Hom to Exhibition Centre is not running late.",
+            "East Rail Hung Hom to Exhibition Centre isn't packed.",
+            "East Rail Hung Hom to Exhibition Centre has no signal problems.",
+            "East Rail Hung Hom to Exhibition Centre has no trains delayed.",
+            "East Rail Hung Hom to Exhibition Centre might be running slow.",
+            "East Rail Hung Hom to Exhibition Centre is no longer delayed.",
+            "East Rail Hung Hom to Exhibition Centre service resumed after signal problems.",
+        ):
+            with self.subTest(text=text):
+                draft = RuleEventExtractor().extract(signal(text).model_copy(update={"lang": "en"}))
+                self.assertEqual(draft.affected_segments, [])
+                self.assertEqual(draft.event_type, "other")
+                self.assertEqual(draft.title, "Report awaiting manual structuring")
+
+    def test_station_list_does_not_imply_a_span(self) -> None:
+        draft = RuleEventExtractor().extract(signal("East Rail Hung Hom and Exhibition Centre are crowded."))
+        self.assertEqual(draft.affected_segments, [])
+
+    def test_original_colloquial_witness_report_matches_signal_fault(self) -> None:
+        text = 'Same signal fault near Hung Hom. Southbound East Rail Line trains crawling between Hung Hom and Exhibition Centre, 15 to 20 minutes late, repeated platform announcements. Crowds on the platform.'
+        draft = RuleEventExtractor().extract(signal(text).model_copy(update={"lang": "en"}))
+        self.assertEqual(draft.event_type, 'signal_failure')
+        self.assertEqual(draft.direction, 'southbound')
+        self.assertEqual([s.model_dump() for s in draft.affected_segments],
+                         [{"from_node": "HUH", "to_node": "EXC", "impact": "slow"}])
+        self.assertFalse({'severity', 'confidence', 'delay_minutes'} & set(draft.model_dump()))
+
     def test_explicit_keyword_cases(self) -> None:
         cases = (
             ("东铁线旺角东站车门故障。", "door_fault", "ERL", "MTR"),

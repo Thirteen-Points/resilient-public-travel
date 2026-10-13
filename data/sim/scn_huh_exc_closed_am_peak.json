@@ -92,8 +92,8 @@
       }
     ],
     "advice": [
-      "运力缺口 6,059 人/60分钟：建议错峰出发或等待官方加开服务",
-      "目标容量已满：sim_route_rail、sim_route_bus"
+      "Capacity shortfall: 6,059 passengers/60 min; consider travelling later or waiting for additional official services.",
+      "Target capacity is full: sim_route_rail, sim_route_bus"
     ]
   },
   "delta": {
@@ -105,7 +105,7 @@
   "fairness": {
     "max_extra_delay_min": 15.0,
     "protected_users": 959,
-    "note": "轮椅与长者优先获得可达容量；所有分配均受额外延误 15 分钟硬上限保护"
+    "note": "Wheelchair users and older passengers receive accessible capacity first; all allocations enforce a 15-minute additional delay limit."
   },
   "capacity_calculations": [
     {

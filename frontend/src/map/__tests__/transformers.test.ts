@@ -61,7 +61,7 @@ describe('buildMapModel', () => {
     expect(partial.lines[0].segments[0].points).toBeNull()
     expect(model.stationsWithoutPosition).toEqual([])
     expect(model.labels).toHaveLength(network.nodes.length)
-    expect(model.labels[0].text).toBe('Tai Wai · 大圍')
+    expect(model.labels[0].text).toBe('Tai Wai')
   })
 
   it('keeps missing coordinates explicitly unknown end to end', () => {

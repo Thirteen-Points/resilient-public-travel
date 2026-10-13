@@ -21,6 +21,6 @@ def walking_matrix(nodes, *, radius_m=800, detour_factor=1.3, speed_mps=1.4):
         raise ValueError("detour_factor must be >= 1")
     return [{"from": a["id"], "to": b["id"], "walk_m": round(d, 2),
              "walk_s": round(walking_seconds(d, speed_mps), 2), "provenance": "simulated" if any(n.get("provenance", "simulated") == "simulated" for n in (a, b)) else "real-derived",
-             "note": "直线距离×绕行系数；未核实步行通道与无障碍条件"}
+             "note": "Straight-line distance multiplied by a detour factor; walking links and accessibility are unverified."}
             for a in nodes for b in nodes if a["id"] != b["id"]
             if (d := distance_m(a, b) * detour_factor) <= radius_m]

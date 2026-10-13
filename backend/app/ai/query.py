@@ -46,7 +46,7 @@ class NoLLMQueryService:
         # deterministic constraints leave fewer, say so plainly; never pad the
         # response with an invented alternative.
         if len(route_list) < 10:
-            message += " 当前 OD 的可行候选少于目标数量；系统仅展示引擎计算出的候选，不补造路线。"
+            message += " Fewer feasible routes are available for this journey than the target; only candidates calculated by the engine are shown."
         return {"message": message, "tool_calls": tool_calls, "routes": route_list,
                 "loads": loads.get("data"), "diversion": diversion.get("data") if diversion else None, "fallback": True,
                 "graph_snapshot": tool_snapshot, "effective_profile": tool_profile,

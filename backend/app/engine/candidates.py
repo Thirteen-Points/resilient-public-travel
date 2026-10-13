@@ -12,7 +12,7 @@ from ..graph.build import timestamp
 from ..graph.snapshot import active
 from .constraints import allows_edge, edge_accessible
 from .eco import estimates
-from .fares import path_fares
+from .fares import english_fare_note, path_fares
 from .walk import distance_m, walking_seconds
 
 
@@ -220,8 +220,8 @@ def route_from_path(path, snapshot, depart_at, *, fares, profile=None):
         cv = snapshot.weather_policy.get("reliability_cv", {}).get("values", {}).get(edge.mode) if snapshot.weather_policy else None
         model = estimates(edge.mode, length, duration, step.factor, False, cv=cv)
         if weather:
-            warnings.append("天气影响采用 data/weather_impact.json 模拟系数：" + ", ".join(step.weather_conditions)
-                            + "；已审核区域天气警告用于整个演示网络")
+            warnings.append("Weather effects use simulated factors from data/weather_impact.json: " + ", ".join(step.weather_conditions)
+                            + "; approved regional weather warnings apply to the entire demo network.")
         co2 += model["co2_g"]
         if legs and edge.mode != "WALK" and not step.boarding and legs[-1].get("line") == edge.line:
             leg_sigmas[-1] += model["sigma_s"]
@@ -235,7 +235,7 @@ def route_from_path(path, snapshot, depart_at, *, fares, profile=None):
             boardings += 1
             tariff = fares[edge.line]
             if tariff['note']:
-                warnings.append(tariff['note'])
+                warnings.append(english_fare_note(tariff['note']))
             if tariff.get('source_url'):
                 evidence.append({'source': tariff['source_url'], 'freshness_s': 0})
         fare += amount
@@ -248,7 +248,7 @@ def route_from_path(path, snapshot, depart_at, *, fares, profile=None):
         tau = 900 if data.get("realtime", False) else 21600
         freshness_scores.append(math.exp(-age / tau))
         if step.events:
-            warnings.append(f"{edge.line or '步行通道'} 受事件影响，运力系数 {step.factor:g}")
+            warnings.append(f"{edge.line or 'Walking link'} affected by an event; capacity factor {step.factor:g}")
         if data.get("note"):
             warnings.append(data["note"])
         if edge.mode != "WALK":
@@ -284,16 +284,16 @@ def route_from_path(path, snapshot, depart_at, *, fares, profile=None):
     event_ids |= {e["event_id"] for e in snapshot.events if active(e, depart_at)}
     evidence.extend({"event_id": eid, "used": True} for eid in sorted(event_ids))
     evidence.append({"source": "route_model_v1", "freshness_s": 0})
-    warnings.append("碳排放、舒适度和 ETA 方差采用模拟系数；距离使用节点直线距离推算")
+    warnings.append("Carbon emissions, comfort and ETA variance use simulated factors; distances are estimated from straight-line node coordinates.")
     if (profile or {}).get("mobility") == "wheelchair":
-        warnings.append("轮椅 M0 演示规则：MTR/大巴默认可用、小巴排除；明确不可达或部分可达标记仍排除")
+        warnings.append("Wheelchair M0 demo assumptions: MTR and buses are assumed usable; minibuses and explicitly inaccessible or partially accessible links are excluded.")
     walked = sum(t.edge.walk_m for t in path)
     if walked > 500:
-        warnings.append(f"较长步行：全程累计 {walked:g} 米，请预留时间")
+        warnings.append(f"Long walk: {walked:g} m in total; allow extra time.")
     signature = "|".join(t.edge.id for t in path)
     return {
         "route_id": "r_" + hashlib.sha256(signature.encode()).hexdigest()[:16],
-        "label": " + ".join(leg.get("line", "步行") for leg in legs), "legs": legs,
+        "label": " + ".join(leg.get("line", "Walk") for leg in legs), "legs": legs,
         "total": {"time_s": elapsed, "time_range_s": [max(0, elapsed - 1.28155 * sigma), elapsed + 1.28155 * sigma],
                   "transfers": max(0, boardings - 1), "walk_m": sum(t.edge.walk_m for t in path),
                   "fare_hkd": round(fare, 2), "co2_g": co2, "reliability": max(0, 1 - sigma / elapsed) if elapsed else 1,

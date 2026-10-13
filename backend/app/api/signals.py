@@ -18,7 +18,7 @@ from .review import require_reviewer
 MAX_REPORT_LENGTH = 2000
 MAX_AUTHOR_LENGTH = 100
 ANONYMOUS_AUTHOR = "anonymous"
-USER_SOURCE_NAME = "ResilientRoute 用户上报（未经核实）"
+USER_SOURCE_NAME = "ResilientRoute user report (unverified)"
 
 ReportText = Annotated[
     str,
