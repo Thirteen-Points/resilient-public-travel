@@ -25,13 +25,14 @@ function firstValidationDetail(detail: unknown): string | undefined {
   return parts.length ? parts.join(' · ') : undefined
 }
 
-export async function submitSignalReport(report: { rawText: string; lang: SignalLang }): Promise<SignalReportResult> {
+export async function submitSignalReport(report: { rawText: string; lang: SignalLang; authorHint?: string }): Promise<SignalReportResult> {
+  const authorHint = report.authorHint?.trim().slice(0, 100)
   let response: Response
   try {
     response = await fetch(`${apiBaseUrl()}/api/signals`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ raw_text: report.rawText, lang: report.lang }),
+      body: JSON.stringify({ raw_text: report.rawText, lang: report.lang, ...(authorHint ? { author_hint: authorHint } : {}) }),
       signal: AbortSignal.timeout(10000),
     })
   } catch {

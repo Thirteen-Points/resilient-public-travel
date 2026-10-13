@@ -3,6 +3,7 @@ import { submitSignalReport, type SignalLang } from '../api/signalReportClient'
 import css from './SignalReport.module.css'
 
 const MAX_CHARACTERS = 2000
+const MAX_SOURCE_HINT_CHARACTERS = 100
 const LANGUAGES: { id: SignalLang; label: string }[] = [
   { id: 'zh-HK', label: '中文' },
   { id: 'en', label: 'English' },
@@ -10,9 +11,10 @@ const LANGUAGES: { id: SignalLang; label: string }[] = [
 
 type Failure = { message: string; detail?: string; retryable: boolean }
 
-/** Standalone public signal-report form: POSTs raw_text + lang to /api/signals and shows review-pending states. */
+/** Standalone public signal-report form: POSTs unverified evidence to /api/signals. */
 export function SignalReportForm({ onAccepted }: { onAccepted?: (signalId: string) => void } = {}) {
   const [text, setText] = useState('')
+  const [sourceHint, setSourceHint] = useState('')
   const [lang, setLang] = useState<SignalLang>('zh-HK')
   const [sending, setSending] = useState(false)
   const [inputError, setInputError] = useState('')
@@ -28,14 +30,14 @@ export function SignalReportForm({ onAccepted }: { onAccepted?: (signalId: strin
     if (value.length > MAX_CHARACTERS) { setInputError(`Reports are limited to ${MAX_CHARACTERS} characters. Shorten the text (currently ${value.length}).`); return }
     setInputError(''); setFailure(null)
     sendingRef.current = true; setSending(true)
-    const result = await submitSignalReport({ rawText: value, lang })
+    const result = await submitSignalReport({ rawText: value, lang, authorHint: sourceHint })
     sendingRef.current = false; setSending(false)
     if (result.ok) { setAcceptedId(result.signalId); onAccepted?.(result.signalId); return }
     setFailure({ message: result.message, detail: result.detail, retryable: result.kind !== 'invalid' })
   }
 
   const reset = () => {
-    setText(''); setAcceptedId(''); setFailure(null); setInputError('')
+    setText(''); setSourceHint(''); setAcceptedId(''); setFailure(null); setInputError('')
     requestAnimationFrame(() => textarea.current?.focus())
   }
 
@@ -61,6 +63,11 @@ export function SignalReportForm({ onAccepted }: { onAccepted?: (signalId: strin
         onChange={event => { setText(event.target.value); if (inputError) setInputError('') }} />
       <p id="signal-report-hint" className={css.micro}>Line or station, direction, and what is happening. Facts you observed only — reports are logged as unverified signals.</p>
       {inputError && <p id="signal-report-input-error" role="alert" className={css.error}>{inputError}</p>}
+      <label htmlFor="signal-source-hint" className={css.fieldLabel}>Source hint (optional)</label>
+      <input id="signal-source-hint" className={css.sourceHint} type="text" maxLength={MAX_SOURCE_HINT_CHARACTERS}
+        disabled={sending} value={sourceHint} aria-describedby="signal-source-hint-help"
+        onChange={event => setSourceHint(event.target.value.slice(0, MAX_SOURCE_HINT_CHARACTERS))} />
+      <p id="signal-source-hint-help" className={css.micro}>Helps reviewers tell independent reports apart; it does not verify your report. No personal details are required.</p>
       <fieldset className={css.language}>
         <legend>Report language</legend>
         <div className={css.languageOptions}>{LANGUAGES.map(option => <label key={option.id} className={css.languageOption}>

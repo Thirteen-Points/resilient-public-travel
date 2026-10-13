@@ -9,6 +9,7 @@
 .counterNear { color: var(--rr-text-primary); font-weight: 600; }
 .counterOver { color: var(--rr-status-affected); font-weight: 600; }
 .textarea { display: block; width: 100%; min-height: 144px; margin: 8px 0; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-input); padding: 12px 16px; color: var(--rr-text-primary); background: var(--rr-bg-surface); font-size: var(--rr-font-body); line-height: 1.5; resize: vertical; }
+.sourceHint { display: block; width: 100%; min-height: 44px; margin: 8px 0; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-input); padding: 8px 16px; color: var(--rr-text-primary); background: var(--rr-bg-surface); font-size: var(--rr-font-body); }
 .invalid { border-color: var(--rr-status-affected); background: var(--rr-bg-danger); }
 .micro { margin: 0 0 16px; color: var(--rr-text-secondary); font-size: var(--rr-font-small); line-height: 1.4286; }
 .error, .retryable { padding: 16px; border-radius: var(--rr-radius-input); font-size: var(--rr-font-small); line-height: 1.4286; margin: 0 0 16px; overflow-wrap: anywhere; }
