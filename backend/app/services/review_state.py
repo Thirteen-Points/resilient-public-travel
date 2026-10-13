@@ -69,7 +69,7 @@ class EventReviewService:
         ]
         factors.append(ConfidenceFactor(
             factor="admin_confirmation", weight=0.05, score=1.0,
-            note="审核员确认",
+            note="Reviewer confirmed.",
         ))
         return self.store.update_event(
             event_id,
@@ -117,7 +117,7 @@ class EventReviewService:
                    for factor in current.confidence_factors):
                 effective_updates["confidence"] = round(max(0.0, current.confidence - 0.05), 2)
                 effective_updates["confidence_factors"] = [
-                    factor.model_copy(update={"score": 0.0, "note": "修改后待重新审核"})
+                    factor.model_copy(update={"score": 0.0, "note": "Edited; awaiting reapproval."})
                     if factor.factor == "admin_confirmation" else factor
                     for factor in current.confidence_factors
                 ]

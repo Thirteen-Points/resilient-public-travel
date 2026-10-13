@@ -209,13 +209,13 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
       const label = document.createElement('span')
       const english = document.createElement('span')
       english.className = css.stationEnglish
-      english.textContent = `${node.name_en} · `
-      label.append(english, document.createTextNode(node.name_zh))
+      english.textContent = node.name_en
+      label.append(english)
       L.circleMarker([node.lat, node.lng], {
         radius: corridor ? node.lines.length > 1 ? 7 : 5 : 4, color: node.kind === 'bus_stop' ? '#B14336' : node.kind === 'pier' ? '#287857' : '#18221D', weight: 2,
         fillColor: '#fff', fillOpacity: 1,
       }).bindTooltip(label, { permanent: corridor, direction: id === 'ADM' || id === 'MKK' ? 'left' : 'right', offset: [id === 'ADM' || id === 'MKK' ? -9 : 9, 0], className: css.stationLabel }).addTo(group)
-      L.circleMarker([node.lat, node.lng], { radius: 22, opacity: 0, fillOpacity: 0 }).bindTooltip(`${node.name_en} · ${node.name_zh}`, { className: css.stationLabel }).addTo(group)
+      L.circleMarker([node.lat, node.lng], { radius: 22, opacity: 0, fillOpacity: 0 }).bindTooltip(node.name_en, { className: css.stationLabel }).addTo(group)
     }
     const points = routes.flatMap(route => route.legs.flatMap(leg => resolveRouteLegGeometry(leg, network).parts.flat()))
     if (points.length) boundsRef.current = L.latLngBounds(points)

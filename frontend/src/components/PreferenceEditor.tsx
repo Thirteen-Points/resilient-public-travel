@@ -24,7 +24,7 @@ export function PreferenceEditor({ profile, active, onApply }: { profile: Travel
     <p className={css.micro}>Describe a walking or price preference. Review it before applying; existing accessibility restrictions stay in place.</p>
     <form onSubmit={event => { event.preventDefault(); void parse() }}>
       <label htmlFor="preference-text">Travel preferences</label>
-      <textarea id="preference-text" rows={2} maxLength={500} value={text} placeholder="例如：我坐轮椅，别让我走太多路 · e.g. wheelchair, please keep costs low" onChange={event => { latest.current.cancel(); setBusy(false); setText(event.target.value); setPreview(null); setApplied(false); setError('') }} />
+      <textarea id="preference-text" rows={2} maxLength={500} value={text} placeholder="e.g. I use a wheelchair; please limit walking and keep costs low" onChange={event => { latest.current.cancel(); setBusy(false); setText(event.target.value); setPreview(null); setApplied(false); setError('') }} />
       <div className={css.actions}><button type="submit" disabled={busy || !text.trim()}>{busy ? 'Reading preferences…' : 'Preview preferences'}</button>{busy && <button type="button" onClick={() => { latest.current.cancel(); setBusy(false); setError('Preference request cancelled. Current settings retained.') }}>Cancel preferences</button>}</div>
     </form>
     {error && <p role="alert" className={css.error}>{error}</p>}

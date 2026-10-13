@@ -169,7 +169,22 @@
 .successToast span { display: grid; place-items: center; flex: none; border-radius: 50%; width: 32px; height: 32px; background: var(--rr-bg-brand); color: var(--rr-text-brand); font-size: var(--rr-font-body); }
 .hiddenToast { position: fixed; width: 1px; height: 1px; overflow: hidden; }
 .largeText { --rr-font-body: 1.25rem; --rr-font-small: 1.125rem; --rr-font-label: 1.125rem; --rr-font-caption: 1rem; }
-.highContrast { --rr-text-secondary: var(--rr-text-primary); --rr-border-default: var(--rr-text-primary); --rr-border-control: var(--rr-text-primary); --rr-text-brand: var(--rr-text-primary); }
+.highContrast {
+  --rr-bg-page: #fff; --rr-bg-surface: #fff; --rr-bg-hero: #000;
+  --rr-bg-brand: #ffeb00; --rr-bg-hover: #ffe000; --rr-bg-subtle: #fff;
+  --rr-bg-danger: #fff; --rr-bg-warning: #fff; --rr-bg-info: #fff;
+  --rr-text-primary: #000; --rr-text-secondary: #000; --rr-text-brand: #000;
+  --rr-text-inverse: #fff; --rr-border-default: #000; --rr-border-control: #000;
+  --rr-status-affected: #a00000; --rr-status-degraded: #765000; --rr-status-normal: #005a18;
+  --rr-route-a: #0044a0; --rr-route-b: #650080; --rr-route-c: #005a60;
+  --rr-source-simulated: #0044a0; --rr-shadow-card: none; --rr-shadow-floating: none;
+}
+.highContrast :is(button, input, select, textarea) { border: 2px solid #000; }
+.highContrast :is(button[aria-pressed=true], button[aria-current=page], [role=tab][aria-selected=true]) { background: #000; color: #fff; }
+.highContrast :is(.panel, .eventCard, .routeCard, .connectionStatus) { border: 2px solid #000; }
+.highContrast :focus-visible { outline: 3px solid #000; outline-offset: 3px; box-shadow: 0 0 0 6px #ffeb00; }
+.highContrast button:disabled { opacity: 1; border-style: dashed; color: #555; }
+.highContrast a { text-decoration: underline; }
 .highContrast [role=alert] { border: 2px solid var(--rr-status-affected); }
 @media (min-width: 1440px) { .header { padding-right: 64px; padding-left: 64px; } .journeyLayout { padding-right: 64px; padding-left: 64px; } }
 @media (min-width: 1024px) and (max-width: 1279px) { .journeyLayout { grid-template-columns: 360px minmax(0, 1fr); } .detailLayout { grid-template-columns: 440px minmax(0, 1fr); } }

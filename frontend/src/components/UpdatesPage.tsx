@@ -1,6 +1,7 @@
 import type { Event, Network, Signal } from '../api/types'
 import { formatHkt, nodeIndex } from '../data'
 import { ProvenanceBadge } from './ProvenanceBadge'
+import { confidenceNote, sourceLabel } from '../lib/systemCopy'
 import css from '../App.module.css'
 
 /**
@@ -27,8 +28,8 @@ function EventCard({ event, signals, network }: { event: Event; signals: Signal[
     <div className={css.eventMeta}><span>{event.signals.length} signals · Severity {event.severity}</span><span>{formatHkt(event.updated_at)}</span></div>
     <ProvenanceBadge value={event.provenance} /><p>Report-channel provenance does not independently verify the incident.</p>
     {event.audit_log?.length ? <details><summary>Confidence history</summary><ol>{event.audit_log.map((entry, index) => <li key={index}>{formatHkt(entry.at)} · {entry.action} · {entry.actor}{entry.confidence_after !== undefined ? ` · ${Math.round(entry.confidence_after * 100)}%` : ''}</li>)}</ol></details> : null}
-    {event.confidence_factors?.length ? <details><summary>Confidence factors</summary>{event.confidence_factors.map(factor => <p key={factor.factor}>{factor.factor}: {Math.round(factor.score * 100)}% · weight {Math.round(factor.weight * 100)}% · {factor.note}</p>)}</details> : null}
-    <details><summary>Evidence &amp; effect</summary><p>{event.status === 'published' ? 'Approved facts affect the map within their time window.' : event.status === 'updated' ? 'This revision awaits approval; the previous approved facts stay active until reapproval or withdrawal.' : 'This revision does not affect the map or routing.'}</p><ul>{evidence.map(signal => <li key={signal.signal_id}>{signal.source_type}: {signal.source_name}</li>)}</ul>{evidence.length < event.signals.length && <p>Some original evidence is unavailable in this visitor or reviewer session.</p>}</details>
+    {event.confidence_factors?.length ? <details><summary>Confidence factors</summary>{event.confidence_factors.map(factor => <p key={factor.factor}>{factor.factor}: {Math.round(factor.score * 100)}% · weight {Math.round(factor.weight * 100)}% · {confidenceNote(factor)}</p>)}</details> : null}
+    <details><summary>Evidence &amp; effect</summary><p>{event.status === 'published' ? 'Approved facts affect the map within their time window.' : event.status === 'updated' ? 'This revision awaits approval; the previous approved facts stay active until reapproval or withdrawal.' : 'This revision does not affect the map or routing.'}</p><ul>{evidence.map(signal => <li key={signal.signal_id}>{signal.source_type}: {sourceLabel(signal)}</li>)}</ul>{evidence.length < event.signals.length && <p>Some original evidence is unavailable in this visitor or reviewer session.</p>}</details>
   </article>
 }
 

@@ -64,7 +64,7 @@ class OperationalCandidateTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             route = response.json()[0]
             self.assertEqual(route['total']['walk_m'], 900)
-            self.assertTrue(any('较长步行' in w for w in route['warnings']))
+            self.assertTrue(any('Long walk' in w for w in route['warnings']))
             self.assertEqual([(leg['from'], leg['to']) for leg in route['legs']],
                              [('A', 'B'), ('B', 'C'), ('C', 'D')])
         # An explicitly requested personal limit still applies.

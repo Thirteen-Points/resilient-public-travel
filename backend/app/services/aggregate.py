@@ -166,11 +166,16 @@ class EventAggregator:
             return False
         if observed.tzinfo is None or observed.utcoffset() is None:
             return False
-        if event.event_type == "other" or draft.event_type != event.event_type:
+        if draft.event_type != event.event_type:
             return False
         if draft.mode != event.mode or draft.line != event.line:
             return False
         if not draft.affected_segments or not (_edges(event).keys() & _edges(draft).keys()):
+            return False
+        # An explicit disruption with an unknown cause can still corroborate
+        # another such report. Require the entire span and impact to agree;
+        # an unstructured 'other' draft or a conflicting span stays for review.
+        if event.event_type == "other" and (not draft.line or _edges(event) != _edges(draft)):
             return False
         if draft.direction not in (None, "unknown", "both") and event.direction not in ("both", "unknown", draft.direction):
             return False

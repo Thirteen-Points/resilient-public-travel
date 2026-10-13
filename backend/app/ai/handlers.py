@@ -141,7 +141,7 @@ def build_engine_handlers(engine: Any, diversion_builder: Callable[[dict[str, An
 
     def explain_route(route_id: str) -> dict[str, Any]:
         route = deepcopy(state["routes"][route_id])
-        return {"route_id": route_id, "message": "此路线由确定性引擎计算；排序依据如下评分，运力和天气假设请查看警告。",
+        return {"route_id": route_id, "message": "The deterministic engine calculated this route. The scores below explain its ranking; check the warnings for capacity and weather assumptions.",
                 "score": route.get("score"), "score_breakdown": route.get("score_breakdown", []),
                 "notes": route.get("notes", []), "total": route["total"], "warnings": route.get("warnings", []),
                 "graph_snapshot": route.get("graph_snapshot"), "provenance": route["provenance"],

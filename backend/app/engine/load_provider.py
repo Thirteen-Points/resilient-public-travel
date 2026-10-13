@@ -52,5 +52,5 @@ def attach_load(details, provider):
         route['evidence'].append({'source': provider.source, 'freshness_s': provider.freshness_s})
         if provider.provenance == 'simulated':
             route['provenance'] = 'simulated'
-            route['warnings'].append('负载来自显式模拟场景，不代表真实客流')
+            route['warnings'].append('Load comes from an explicitly simulated scenario and does not represent real passenger demand.')
     return result

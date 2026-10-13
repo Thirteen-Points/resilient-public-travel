@@ -86,6 +86,7 @@ export interface Event {
 }
 
 export interface Signal {
+  lang?: 'en' | 'zh-HK'
   signal_id: string
   source_type: string
   source_name: string

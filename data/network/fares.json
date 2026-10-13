@@ -336,7 +336,7 @@
           "BS_TAW": 20.8
         }
       },
-      "note": "成人巴士票价按实际上下车站及方向查询运输署分段票价",
+      "note": "Adult bus fares use Transport Department section fares for the actual boarding stop, alighting stop and direction.",
       "stop_mapping": [
         {
           "route_id": "1051",
@@ -370,7 +370,7 @@
           "BS_TAW": 10.2
         }
       },
-      "note": "成人巴士票价按实际上下车站及方向查询运输署分段票价",
+      "note": "Adult bus fares use Transport Department section fares for the actual boarding stop, alighting stop and direction.",
       "stop_mapping": [
         {
           "route_id": "1336",
@@ -395,14 +395,14 @@
       "service_id": "bus:8104",
       "fare_hkd": 20.8,
       "group": null,
-      "note": "成人巴士全程票价；该示意线路班次未核实，未提供可运行候选",
+      "note": "Adult full bus fare; this illustrative service has unverified headways and is excluded from operational candidates.",
       "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml"
     },
     "BUS_985B": {
       "service_id": "bus:8705",
       "fare_hkd": 20.8,
       "group": null,
-      "note": "成人巴士全程票价；该示意线路班次未核实，未提供可运行候选",
+      "note": "Adult full bus fare; this illustrative service has unverified headways and is excluded from operational candidates.",
       "source_url": "https://static.data.gov.hk/td/routes-fares-xml/ROUTE_BUS.xml"
     },
     "FERRY_TST_CEN": {
@@ -426,7 +426,7 @@
           "lower": 5.6
         }
       },
-      "note": "天星小轮成人票价：标准方案上层，轮椅方案下层；按平日/周末/公众假期计费",
+      "note": "Star Ferry adult fares: upper deck for standard mobility, lower deck for wheelchair users; prices follow weekdays, weekends and public holidays.",
       "source_url": "https://www.starferry.com.hk/en/service"
     }
   }

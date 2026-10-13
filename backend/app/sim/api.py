@@ -34,7 +34,7 @@ def build_router(result_directory: Path):
                     "error": {
                         "code": "INVALID_SIM_INPUT",
                         "message": str(exc),
-                        "fallback": "请保留上一次成功的分流结果并标注数据较旧",
+                        "fallback": "Keep the last successful diversion result and mark it as stale.",
                     }
                 },
             )
@@ -50,11 +50,11 @@ def build_router(result_directory: Path):
                     "error": {
                         "code": "SIM_RESULT_NOT_FOUND",
                         "message": f"No precomputed result for {scenario_id}",
-                        "fallback": "请保留上一次成功的仿真结果并标注数据较旧",
+                        "fallback": "Keep the last successful simulation result and mark it as stale.",
                     }
                 },
             )
         except ValueError as exc:
-            return JSONResponse(status_code=422, content={"error": {"code": "INVALID_SCENARIO_ID", "message": str(exc), "fallback": "请选择已预计算场景"}})
+            return JSONResponse(status_code=422, content={"error": {"code": "INVALID_SCENARIO_ID", "message": str(exc), "fallback": "Choose a precomputed scenario."}})
 
     return router

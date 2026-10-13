@@ -73,7 +73,7 @@ def build_diversion_plan(payload: dict) -> dict:
     advice = []
     if allocation.unstoppable_demand:
         advice.append(
-            f"运力缺口 {allocation.unstoppable_demand:,} 人/{int(window_min)}分钟，建议错峰出发或等待官方加开服务"
+            f"Capacity shortfall: {allocation.unstoppable_demand:,} passengers/{int(window_min)} min; consider travelling later or waiting for additional official services."
         )
     stable_key = f"{event_id}:{demand}:{window_min}:" + ",".join(
         f"{item.route_id}:{item.capacity_per_hour:.6f}" for item in supplies
@@ -93,7 +93,7 @@ def build_diversion_plan(payload: dict) -> dict:
         "fairness": {
             "max_extra_delay_min": 15,
             "protected_users": 0,
-            "note": "聚合端点未收到逐人画像；公平约束在 1 万人仿真分配中执行",
+            "note": "The aggregate endpoint has no individual profiles; fairness constraints are enforced in the 10,000-person simulation allocation.",
         },
         "provenance": "simulated",
     }

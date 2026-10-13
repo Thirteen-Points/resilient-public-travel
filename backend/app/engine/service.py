@@ -101,10 +101,10 @@ class RouteEngine:
             relaxed = fallback.get(tuple(step.edge.id for step in path))
             if relaxed:
                 reused, overlap = relaxed
-                route['warnings'].append('轮椅 top3 局部回退：共用换乘点 ' + (', '.join(reused) or '无')
-                                         + f'；与已有方案最高节点重合度 {overlap:.3f}'
-                                         + ('，高度重合，不能视为独立替代走廊' if overlap >= .7 else '')
-                                         + '；仅回退多样性软规则，无障碍、步行和换乘次数硬约束不变')
+                route['warnings'].append('Wheelchair top3 diversity fallback: shared transfer nodes ' + (', '.join(reused) or 'none')
+                                         + f'; maximum node overlap with existing alternatives {overlap:.3f}'
+                                         + ('; high overlap, so this is not an independent alternative corridor' if overlap >= .7 else '')
+                                         + '; only the diversity preference is relaxed; accessibility, walking and transfer hard limits remain enforced.')
             raw.append(route)
         routes = score_routes(raw, profile, baseline_fare=self.baseline_fare)
         diagnostics = list(snapshot.network.diagnostics)

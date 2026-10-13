@@ -59,6 +59,28 @@ async function verifyStationPicker(page) {
   await page.mouse.click(1, 1)
   assert.equal(await from.getAttribute('aria-expanded'), 'false')
 }
+async function verifyHighContrast(page) {
+  const toggle = page.getByRole('button', { name: 'High contrast', exact: true })
+  const input = page.getByRole('combobox', { name: 'FROM', exact: true })
+  const original = await input.evaluate(node => {
+    const s = getComputedStyle(node); return [s.color, s.backgroundColor, s.borderWidth]
+  })
+  await toggle.click()
+  assert.equal(await toggle.getAttribute('aria-pressed'), 'true')
+  const active = await input.evaluate(node => {
+    const s = getComputedStyle(node); return [s.color, s.backgroundColor, s.borderWidth]
+  })
+  assert.deepEqual(active, ['rgb(0, 0, 0)', 'rgb(255, 255, 255)', '2px'])
+  assert.deepEqual(await toggle.evaluate(node => {
+    const s = getComputedStyle(node); return [s.color, s.backgroundColor]
+  }), ['rgb(255, 255, 255)', 'rgb(0, 0, 0)'])
+  await input.focus()
+  assert.equal(await input.evaluate(node => getComputedStyle(node).outlineWidth), '3px')
+  await toggle.click()
+  assert.deepEqual(await input.evaluate(node => {
+    const s = getComputedStyle(node); return [s.color, s.backgroundColor, s.borderWidth]
+  }), original)
+}
 async function chooseTomorrow(page) {
   const day = new Date(Date.now() + 8 * 3600000 + 24 * 3600000).toISOString().slice(0, 10)
   await page.locator('[aria-controls="departure-calendar"]').click()
@@ -100,6 +122,8 @@ let browser, publicPage
   await assertRemovedPages(page)
   await verifyStationPicker(page)
   pass('desktop station picker reopens after selection, closes outside and supports closed ArrowDown')
+  await verifyHighContrast(page)
+  pass('high contrast: black/white input, 2px border, inverted selected control, 3px focus and toggle restoration')
   await selectStation(page, 'TO', 'Admiralty'); const departAt = await chooseTomorrow(page)
   // All 30 directed station pairs exercise the actual engine for both profiles.
   const stations = ['TAW', 'KOT', 'MKK', 'HUH', 'EXC', 'ADM']
@@ -213,7 +237,7 @@ let browser, publicPage
   // Latest mode selection includes connecting modes and displays every result.
   await navigate(page, 'Plan journey'); await page.getByRole('button', { name: 'Commuter', exact: true }).click()
   await selectStation(page, 'TO', 'Admiralty')
-  for (const [label, mode] of [['Bus · 公交', 'BUS'], ['Ferry · 渡轮', 'FERRY']]) {
+  for (const [label, mode] of [['Bus', 'BUS'], ['Ferry', 'FERRY']]) {
     await page.getByRole('button', { name: label, exact: true }).click()
     const reply = page.waitForResponse(response => response.url().endsWith('/api/routes/query') && response.ok() && response.request().postDataJSON()?.required_modes?.[0] === mode)
     await page.getByRole('button', { name: 'Find resilient routes' }).click()
@@ -230,8 +254,8 @@ let browser, publicPage
     }
     await navigate(page, 'Plan journey')
   }
-  await page.getByRole('button', { name: 'Minibus · 小巴', exact: true }).click()
-  await page.getByText('Minibus · 小巴: routes are not available in this modelled network yet.', { exact: false }).waitFor()
+  await page.getByRole('button', { name: 'Minibus', exact: true }).click()
+  await page.getByText('Minibus: routes are not available in this modelled network yet.', { exact: false }).waitFor()
   await page.getByRole('button', { name: 'Find resilient routes' }).click(); await page.locator('#routes-heading').waitFor()
   assert.equal(await page.locator('[data-route-id]').count(), 0)
   await page.getByText('Minibus routes are not available in the current modelled network yet.', { exact: false }).waitFor()
@@ -271,7 +295,7 @@ let browser, publicPage
     await page.setViewportSize({ width, height: 900 })
     await navigate(page, 'Plan journey'); await noOverflow(page, `planner ${width}`)
     if (width < 1024) {
-      for (const label of ['Bus · 公交', 'Ferry · 渡轮']) {
+      for (const label of ['Bus', 'Ferry']) {
         const bounds = await page.getByRole('button', { name: label, exact: true }).boundingBox()
         assert.ok(bounds && bounds.y >= 0 && bounds.y + bounds.height <= 900, `${label}: selector is outside the first mobile screen`)
       }
@@ -341,6 +365,8 @@ let browser, publicPage
   await mobile.goto(web); await mobile.getByRole('button', { name: 'Find resilient routes' }).waitFor()
   await verifyStationPicker(mobile)
   pass('390 px station picker keeps first-click, reopen and outside-close behavior')
+  await verifyHighContrast(mobile)
+  pass('390 px high contrast preserves input, selected control and focus visibility')
   assert.equal(await mobile.locator('#journey-map').isVisible(), false)
   await mobile.getByRole('tab', { name: 'Map', exact: true }).click()
   await mobile.locator('#journey-map').waitFor({ state: 'visible' })
@@ -428,7 +454,7 @@ let browser, publicPage
   const seed = await context.newPage(), seedChats = []
   seed.on('pageerror', error => errors.push(error.message))
   seed.on('request', request => { if (request.url().endsWith('/api/ai/chat')) seedChats.push(request.url()) })
-  await seed.goto(web + '?data=seed'); await navigate(seed, 'Agent'); await seed.getByText('Seed conversation · template replies · no live AI.', { exact: false }).waitFor()
+  await seed.goto(web + '?data=seed'); await seed.getByRole('button', { name: 'Find resilient routes' }).waitFor(); await chooseTomorrow(seed); await navigate(seed, 'Agent'); await seed.getByText('Seed conversation · template replies · no live AI.', { exact: false }).waitFor()
   await seed.getByRole('button', { name: /^Tai Wai to Admiralty, less walking/ }).click(); await seed.getByRole('button', { name: 'Inspect these seed routes →', exact: true }).click(); await seed.getByRole('heading', { name: 'Tai Wai → Admiralty' }).waitFor()
   assert.deepEqual(seedChats, []); assert.deepEqual(errors, [])
   assert.deepEqual(forbiddenHeaders, [])

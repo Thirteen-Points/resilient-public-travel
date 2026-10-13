@@ -3,7 +3,7 @@ import type { Settings, Provider } from './client'
 import { call } from './client'
 type AI = Settings['ai']
 export function LLMSettings({ ai, change, dirty, busy, test }: { ai: AI; change: (ai: AI) => void; dirty: boolean; busy: string; test: (provider: string, key: string) => void }) {
-  const [sample, setSample] = useState('東鐵線紅磡至會展因信號故障暫停南行服務。'), [preview, setPreview] = useState<{structure_method: string; llm_used: {name: string; model: string} | null; structure_errors: string[]; draft: {title: string; summary: string}} | null>(null), [testing, setTesting] = useState(false), [error, setError] = useState('')
+  const [sample, setSample] = useState('East Rail Line Hung Hom to Exhibition Centre southbound service suspended due to signal failure.'), [preview, setPreview] = useState<{structure_method: string; llm_used: {name: string; model: string} | null; structure_errors: string[]; draft: {title: string; summary: string}} | null>(null), [testing, setTesting] = useState(false), [error, setError] = useState('')
   const [collapsed, setCollapsed] = useState(() => new Set(ai.order.filter(id => !ai.providers[id].keys.length)))
   const move = (index: number, delta: number) => { const order = [...ai.order]; [order[index], order[index+delta]] = [order[index+delta], order[index]]; change({ ...ai, order, provider: order[0] }) }
   const patch = (id: string, value: Partial<Provider>) => change({ ...ai, providers: { ...ai.providers, [id]: { ...ai.providers[id], ...value } } })

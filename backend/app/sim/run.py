@@ -310,11 +310,11 @@ def run_simulation(
     advice = []
     if unstoppable:
         advice.append(
-            f"运力缺口 {unstoppable:,} 人/{int(window_min)}分钟：建议错峰出发或等待官方加开服务"
+            f"Capacity shortfall: {unstoppable:,} passengers/{int(window_min)} min; consider travelling later or waiting for additional official services."
         )
     saturated = [item["route_id"] for item in shares if item["load_factor"] >= 0.999]
     if saturated:
-        advice.append("目标容量已满：" + "、".join(saturated))
+        advice.append("Target capacity is full: " + ", ".join(saturated))
     guided_metrics["advice"] = advice
 
     def reduction(before: float, after: float) -> float:
@@ -346,7 +346,7 @@ def run_simulation(
         "fairness": {
             "max_extra_delay_min": FAIRNESS_MAX_EXTRA_MIN,
             "protected_users": len(protected_by_rule),
-            "note": "轮椅与长者优先获得可达容量；所有分配均受额外延误 15 分钟硬上限保护",
+            "note": "Wheelchair users and older passengers receive accessible capacity first; all allocations enforce a 15-minute additional delay limit.",
         },
         "capacity_calculations": [supply.calculation() for supply in supplies],
         "assumptions": assumptions,

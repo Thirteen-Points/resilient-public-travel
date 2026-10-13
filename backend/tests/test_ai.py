@@ -166,7 +166,7 @@ class NoLLMFlowTests(unittest.TestCase):
         self.assertTrue(response["loads"]["loads"])
         self.assertEqual(response["diversion"]["provenance"], "simulated")
         self.assertIsInstance(response["message"], str)
-        self.assertIn("确定性", response["message"])
+        self.assertIn("deterministic", response["message"])
         self.assertTrue(all(call["trace"]["tool"] for call in response["tool_calls"]))
 
     def test_corridor_od_search_is_not_pinned_to_taw_adm(self):
@@ -192,8 +192,8 @@ class NoLLMFlowTests(unittest.TestCase):
         response = asyncio.run(NoLLMQueryService(self.registry()).query(
             user_input="给我替代方案", origin="EXC", destination="MKK", depart_at="2026-09-22T08:20:00+08:00"))
         self.assertLess(len(response["routes"]), 10)
-        self.assertIn("少于目标数量", response["message"])
-        self.assertIn("不补造路线", response["message"])
+        self.assertIn("Fewer feasible routes", response["message"])
+        self.assertIn("only candidates calculated by the engine are shown", response["message"])
 
 
 if __name__ == "__main__":

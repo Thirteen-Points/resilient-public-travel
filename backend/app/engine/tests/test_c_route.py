@@ -244,7 +244,7 @@ class RouteTests(unittest.TestCase):
             routes = engine.query("A", "C", AT, {"mobility": "wheelchair"})
             self.assertTrue(routes)
             self.assertTrue(all(route["legs"][0]["accessible"] for route in routes))
-            self.assertTrue(all(any("默认可用" in warning for warning in route["warnings"])
+            self.assertTrue(all(any("assumed usable" in warning for warning in route["warnings"])
                                 for route in routes))
         for p in ({"mobility": "wheelchair", "max_walk_m": 999}, {"mobility": "reduced"}):
             for route in self.seed_engine().query("TAW", "ADM", AT, p):

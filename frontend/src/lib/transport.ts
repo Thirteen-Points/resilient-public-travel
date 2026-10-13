@@ -2,10 +2,10 @@ import type { RouteCandidate, TransitMode } from '../api/types'
 
 export const TRANSPORT_OPTIONS: { id: 'all' | TransitMode; label: string }[] = [
   { id: 'all', label: 'All modes' },
-  { id: 'MTR', label: 'MTR · 地铁' },
-  { id: 'BUS', label: 'Bus · 公交' },
-  { id: 'MINIBUS', label: 'Minibus · 小巴' },
-  { id: 'FERRY', label: 'Ferry · 渡轮' },
+  { id: 'MTR', label: 'MTR' },
+  { id: 'BUS', label: 'Bus' },
+  { id: 'MINIBUS', label: 'Minibus' },
+  { id: 'FERRY', label: 'Ferry' },
 ]
 
 export function transportLabel(modes?: TransitMode[]): string {
