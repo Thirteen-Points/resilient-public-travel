@@ -1,0 +1,752 @@
+{
+  "passed": true,
+  "checks": [
+    "1440 and 1024: Journey, Report and Agent share the same sidebar and adjacent map geometry",
+    "default map retains subtle station markers and draws no network paths",
+    "real route query displays returned candidates and draws their journey geometry",
+    "Agent stays mounted and preserves its unsent draft through Updates and How it works",
+    "approved updates remain visible while Journey, Report and Agent backgrounds stay free of disruption lines",
+    "390 and 320: all five retained pages fit; Report form actions and Agent composer remain reachable by keyboard",
+    "390 and 320: the revealed journey map retains visible English station labels",
+    "all six requested page changes paint compatible panel motion without document snapshots",
+    "rapid navigation settles on the last page, with interactive controls and no orphan transition overlay",
+    "enabling reduced motion during an active transition immediately leaves the selected Report form interactive",
+    "reduced motion skips all six page transitions and leaves visible panels fully opaque",
+    "browsers without scoped View Transitions paint panel motion, accept input and deliver every rapid header click"
+  ],
+  "scopedCapability": false,
+  "layouts": {
+    "1024": {
+      "Plan journey": {
+        "panel": {
+          "left": 32,
+          "top": 148,
+          "width": 360,
+          "height": 828,
+          "right": 392,
+          "bottom": 976
+        },
+        "map": {
+          "left": 416,
+          "top": 148,
+          "width": 576,
+          "height": 828,
+          "right": 992,
+          "bottom": 976
+        },
+        "viewport": 1024,
+        "document": 1024
+      },
+      "Report": {
+        "panel": {
+          "left": 32,
+          "top": 148,
+          "width": 360,
+          "height": 828,
+          "right": 392,
+          "bottom": 976
+        },
+        "map": {
+          "left": 416,
+          "top": 148,
+          "width": 576,
+          "height": 828,
+          "right": 992,
+          "bottom": 976
+        },
+        "viewport": 1024,
+        "document": 1024
+      },
+      "Agent": {
+        "panel": {
+          "left": 32,
+          "top": 148,
+          "width": 360,
+          "height": 828,
+          "right": 392,
+          "bottom": 976
+        },
+        "map": {
+          "left": 416,
+          "top": 148,
+          "width": 576,
+          "height": 828,
+          "right": 992,
+          "bottom": 976
+        },
+        "viewport": 1024,
+        "document": 1024
+      }
+    },
+    "1440": {
+      "Plan journey": {
+        "panel": {
+          "left": 64,
+          "top": 148,
+          "width": 400,
+          "height": 828,
+          "right": 464,
+          "bottom": 976
+        },
+        "map": {
+          "left": 488,
+          "top": 148,
+          "width": 888,
+          "height": 828,
+          "right": 1376,
+          "bottom": 976
+        },
+        "viewport": 1440,
+        "document": 1440
+      },
+      "Report": {
+        "panel": {
+          "left": 64,
+          "top": 148,
+          "width": 400,
+          "height": 828,
+          "right": 464,
+          "bottom": 976
+        },
+        "map": {
+          "left": 488,
+          "top": 148,
+          "width": 888,
+          "height": 828,
+          "right": 1376,
+          "bottom": 976
+        },
+        "viewport": 1440,
+        "document": 1440
+      },
+      "Agent": {
+        "panel": {
+          "left": 64,
+          "top": 148,
+          "width": 400,
+          "height": 828,
+          "right": 464,
+          "bottom": 976
+        },
+        "map": {
+          "left": 488,
+          "top": 148,
+          "width": 888,
+          "height": 828,
+          "right": 1376,
+          "bottom": 976
+        },
+        "viewport": 1440,
+        "document": 1440
+      }
+    }
+  },
+  "mobileLayouts": {
+    "320": {
+      "Plan journey": {
+        "panel": {
+          "left": 16,
+          "top": 235,
+          "width": 288,
+          "height": 2463.078125,
+          "right": 304,
+          "bottom": 2698.078125
+        },
+        "map": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "viewport": 320,
+        "document": 320
+      },
+      "Report": {
+        "panel": {
+          "left": 16,
+          "top": 157,
+          "width": 288,
+          "height": 1012,
+          "right": 304,
+          "bottom": 1169
+        },
+        "map": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "viewport": 320,
+        "document": 320
+      },
+      "Agent": {
+        "panel": {
+          "left": 16,
+          "top": 157,
+          "width": 288,
+          "height": 1310,
+          "right": 304,
+          "bottom": 1467
+        },
+        "map": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "viewport": 320,
+        "document": 320
+      },
+      "Updates": {
+        "panel": {
+          "left": 16,
+          "top": 181,
+          "width": 288,
+          "height": 1235.078125,
+          "right": 304,
+          "bottom": 1416.078125
+        },
+        "map": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "viewport": 320,
+        "document": 320
+      },
+      "How it works": {
+        "panel": {
+          "left": 16,
+          "top": 181,
+          "width": 288,
+          "height": 5312.765625,
+          "right": 304,
+          "bottom": 5493.765625
+        },
+        "map": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "viewport": 320,
+        "document": 320
+      }
+    },
+    "390": {
+      "Plan journey": {
+        "panel": {
+          "left": 20,
+          "top": 235,
+          "width": 350,
+          "height": 2156.078125,
+          "right": 370,
+          "bottom": 2391.078125
+        },
+        "map": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "viewport": 390,
+        "document": 390
+      },
+      "Report": {
+        "panel": {
+          "left": 20,
+          "top": 157,
+          "width": 350,
+          "height": 890,
+          "right": 370,
+          "bottom": 1047
+        },
+        "map": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "viewport": 390,
+        "document": 390
+      },
+      "Agent": {
+        "panel": {
+          "left": 20,
+          "top": 157,
+          "width": 350,
+          "height": 1146,
+          "right": 370,
+          "bottom": 1303
+        },
+        "map": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "viewport": 390,
+        "document": 390
+      },
+      "Updates": {
+        "panel": {
+          "left": 20,
+          "top": 181,
+          "width": 350,
+          "height": 1082.09375,
+          "right": 370,
+          "bottom": 1263.09375
+        },
+        "map": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "viewport": 390,
+        "document": 390
+      },
+      "How it works": {
+        "panel": {
+          "left": 20,
+          "top": 181,
+          "width": 350,
+          "height": 4488.84375,
+          "right": 370,
+          "bottom": 4669.84375
+        },
+        "map": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "viewport": 390,
+        "document": 390
+      }
+    }
+  },
+  "defaultStationCount": 22,
+  "defaultStationContrast": [
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204,
+    1.3577967377764204
+  ],
+  "routeIds": [
+    "r_d242fe3d797400df",
+    "r_da67c274e39e0c00",
+    "r_2b6cd3e3109e43b3",
+    "r_8d0ba92684b1d1e2",
+    "r_a3da1ce3aa06f995",
+    "r_b59174a6ed64d8cf",
+    "r_a3bb2d93a795746f",
+    "r_4aa619ab514066d7",
+    "r_007c4e09879d19cc",
+    "r_c95cc2c94b730206"
+  ],
+  "approvedEvent": {
+    "id": "layout-browser-disruption",
+    "version": 4,
+    "title": "待核实：【模拟布局浏览器测试】东铁线红磡至会展信号故障，暂停服务。"
+  },
+  "motions": [
+    {
+      "from": "Plan journey",
+      "to": "Updates",
+      "mode": "panel-motion",
+      "early": [
+        {
+          "opacity": 0.1836,
+          "transform": "matrix(1, 0, 0, 1, 0, 4.8984)"
+        }
+      ],
+      "next": [
+        {
+          "opacity": 0.8721,
+          "transform": "matrix(1, 0, 0, 1, 0, 0.7674)"
+        }
+      ]
+    },
+    {
+      "from": "Plan journey",
+      "to": "How it works",
+      "mode": "panel-motion",
+      "early": [
+        {
+          "opacity": 0.2987,
+          "transform": "matrix(1, 0, 0, 1, 0, 4.2079)"
+        }
+      ],
+      "next": [
+        {
+          "opacity": 0.6036,
+          "transform": "matrix(1, 0, 0, 1, 0, 2.3787)"
+        }
+      ]
+    },
+    {
+      "from": "Report",
+      "to": "Updates",
+      "mode": "panel-motion",
+      "early": [
+        {
+          "opacity": 0.0786,
+          "transform": "matrix(1, 0, 0, 1, 0, 5.5283)"
+        }
+      ],
+      "next": [
+        {
+          "opacity": 0.8371,
+          "transform": "matrix(1, 0, 0, 1, 0, 0.9775)"
+        }
+      ]
+    },
+    {
+      "from": "Report",
+      "to": "How it works",
+      "mode": "panel-motion",
+      "early": [
+        {
+          "opacity": 0.1836,
+          "transform": "matrix(1, 0, 0, 1, 0, 4.8984)"
+        }
+      ],
+      "next": [
+        {
+          "opacity": 0.488,
+          "transform": "matrix(1, 0, 0, 1, 0, 3.072)"
+        }
+      ]
+    },
+    {
+      "from": "Agent",
+      "to": "Updates",
+      "mode": "panel-motion",
+      "early": [
+        {
+          "opacity": 0,
+          "transform": "matrix(1, 0, 0, 1, 0, 6)"
+        }
+      ],
+      "next": [
+        {
+          "opacity": 0.7713,
+          "transform": "matrix(1, 0, 0, 1, 0, 1.3722)"
+        }
+      ]
+    },
+    {
+      "from": "Agent",
+      "to": "How it works",
+      "mode": "panel-motion",
+      "early": [
+        {
+          "opacity": 0,
+          "transform": "matrix(1, 0, 0, 1, 0, 6)"
+        }
+      ],
+      "next": [
+        {
+          "opacity": 0.3859,
+          "transform": "matrix(1, 0, 0, 1, 0, 3.6848)"
+        }
+      ]
+    }
+  ],
+  "rapidTrace": {
+    "screen": "agent",
+    "events": [
+      {
+        "kind": "pointerdown",
+        "button": "Plan journey",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "sources",
+        "time": 28623.10000000056
+      },
+      {
+        "kind": "pointerup",
+        "button": "Plan journey",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "sources",
+        "time": 28623.400000000373
+      },
+      {
+        "kind": "click",
+        "button": "Plan journey",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "sources",
+        "time": 28623.5
+      },
+      {
+        "kind": "pointerdown",
+        "button": "Updates",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "journey",
+        "time": 28635.800000000745
+      },
+      {
+        "kind": "pointerup",
+        "button": "Updates",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "journey",
+        "time": 28636
+      },
+      {
+        "kind": "click",
+        "button": "Updates",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "journey",
+        "time": 28636
+      },
+      {
+        "kind": "pointerdown",
+        "button": "How it works",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "updates",
+        "time": 28646
+      },
+      {
+        "kind": "pointerup",
+        "button": "How it works",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "updates",
+        "time": 28646.200000000186
+      },
+      {
+        "kind": "click",
+        "button": "How it works",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "updates",
+        "time": 28646.300000000745
+      },
+      {
+        "kind": "pointerdown",
+        "button": "Report",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "sources",
+        "time": 28664.5
+      },
+      {
+        "kind": "pointerup",
+        "button": "Report",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "sources",
+        "time": 28664.800000000745
+      },
+      {
+        "kind": "click",
+        "button": "Report",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "sources",
+        "time": 28664.800000000745
+      },
+      {
+        "kind": "pointerdown",
+        "button": "Agent",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "report",
+        "time": 28674.200000000186
+      },
+      {
+        "kind": "pointerup",
+        "button": "Agent",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "report",
+        "time": 28674.400000000373
+      },
+      {
+        "kind": "click",
+        "button": "Agent",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "report",
+        "time": 28674.400000000373
+      }
+    ]
+  },
+  "fallbackRapid": {
+    "screen": "agent",
+    "events": [
+      {
+        "kind": "pointerdown",
+        "button": "Plan journey",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "report",
+        "time": 36003.60000000056
+      },
+      {
+        "kind": "pointerup",
+        "button": "Plan journey",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "report",
+        "time": 36004.200000000186
+      },
+      {
+        "kind": "click",
+        "button": "Plan journey",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "report",
+        "time": 36004.200000000186
+      },
+      {
+        "kind": "pointerdown",
+        "button": "Updates",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "journey",
+        "time": 36019.40000000037
+      },
+      {
+        "kind": "pointerup",
+        "button": "Updates",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "journey",
+        "time": 36019.800000000745
+      },
+      {
+        "kind": "click",
+        "button": "Updates",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "journey",
+        "time": 36019.90000000037
+      },
+      {
+        "kind": "pointerdown",
+        "button": "How it works",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "updates",
+        "time": 36038.800000000745
+      },
+      {
+        "kind": "pointerup",
+        "button": "How it works",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "updates",
+        "time": 36039.200000000186
+      },
+      {
+        "kind": "click",
+        "button": "How it works",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "updates",
+        "time": 36039.200000000186
+      },
+      {
+        "kind": "pointerdown",
+        "button": "Report",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "sources",
+        "time": 36060.300000000745
+      },
+      {
+        "kind": "pointerup",
+        "button": "Report",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "sources",
+        "time": 36060.60000000056
+      },
+      {
+        "kind": "click",
+        "button": "Report",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "sources",
+        "time": 36060.60000000056
+      },
+      {
+        "kind": "pointerdown",
+        "button": "Agent",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "report",
+        "time": 36071.60000000056
+      },
+      {
+        "kind": "pointerup",
+        "button": "Agent",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "report",
+        "time": 36071.800000000745
+      },
+      {
+        "kind": "click",
+        "button": "Agent",
+        "target": "BUTTON",
+        "trusted": true,
+        "screen": "report",
+        "time": 36071.800000000745
+      }
+    ]
+  },
+  "browserErrors": [],
+  "applicationWrites": [
+    "/api/routes/query",
+    "/api/routes/query",
+    "/api/routes/query"
+  ]
+}

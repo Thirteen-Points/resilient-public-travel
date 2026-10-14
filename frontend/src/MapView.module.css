@@ -18,10 +18,16 @@
 .legend details { border-top: 1px solid var(--rr-border-default, #D9DFD5); margin-top: 16px; }
 .legend details summary { padding: 12px 0; }
 .routeBadge { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; color: #FFFFFF; flex: none; font-size: var(--rr-font-small); }
-.stationLabel { padding: 4px 8px; border: 1px solid var(--rr-border-default, #D9DFD5); border-radius: 8px; background: rgb(255 255 255 / 96%); box-shadow: none; color: var(--rr-text-primary, #18221D); font-family: inherit; font-size: var(--rr-font-small); line-height: 1.4; }
+.stationLabel { padding: 4px 8px; border: 1px solid var(--rr-border-default, #D9DFD5); border-radius: 8px; background: var(--rr-bg-surface, #FFFFFF); box-shadow: none; color: var(--rr-text-secondary, #5E6961); font-family: inherit; font-size: var(--rr-font-small); line-height: 1.4; }
+.activeStationLabel { color: var(--rr-text-primary, #18221D); border-color: var(--rr-border-control, #5E6961); }
+.stationMarker { transition: stroke 120ms ease; }
+.picking .stationMarker, .map:focus-visible .stationMarker { stroke: var(--rr-border-control, #5E6961); }
+.stationTarget { cursor: inherit; }
+.routePath, .impactPath { stroke-linecap: round; }
 .affectedMarker { background: var(--rr-status-degraded) !important; color: var(--rr-text-primary) !important; }
 .impactMarker { display: grid; place-items: center; border-radius: 999px; color: #FFFFFF; background: #C62828; border: 2px solid white; font-size: var(--rr-font-body); font-weight: 700; }
 .pickHint { position: absolute; top: 80px; right: 16px; z-index: 450; margin: 0; max-width: min(320px, calc(100% - 32px)); padding: 12px 16px; border-radius: 16px; color: var(--rr-text-primary, #18221D); background: var(--rr-bg-surface, #FFFFFF); box-shadow: var(--rr-shadow-card); font-size: var(--rr-font-small); line-height: 1.45; }
 .stationEnglish { display: inline; }
-@media (max-width: 1023px) { .wrap { border-radius: 16px; } .docked { display: none; } .legend { right: 64px; bottom: 64px; width: min(160px, calc(100% - 80px)); } .legend[open] { width: min(288px, calc(100% - 80px)); } .stationLabel { width: max-content; max-width: 160px; white-space: normal; } .stationEnglish { display: none; } }
-@media (prefers-reduced-motion: reduce) { .wrap { transition: none; } }
+@media (max-width: 1023px) { .wrap { border-radius: 16px; } .docked { display: none; } .legend { right: 64px; bottom: 64px; width: min(160px, calc(100% - 80px)); } .legend[open] { width: min(288px, calc(100% - 80px)); } .stationLabel { width: max-content; max-width: 160px; white-space: normal; } }
+.activeStationLabel .stationEnglish { display: inline; }
+@media (prefers-reduced-motion: reduce) { .wrap, .stationMarker { transition: none; } }

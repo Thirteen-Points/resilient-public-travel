@@ -1,0 +1,1476 @@
+[
+  {
+    "source": "rapid-probe-scoped-evidence.json",
+    "passed": true,
+    "browser": "151.0.7922.34",
+    "forcedFallback": false,
+    "nativeAnimations": [
+      {
+        "pseudo": "::view-transition-group(page-content)",
+        "duration": 260,
+        "target": "MAIN"
+      },
+      {
+        "pseudo": "::view-transition-new(page-content)",
+        "duration": 260,
+        "target": "MAIN"
+      },
+      {
+        "pseudo": "::view-transition-old(page-content)",
+        "duration": 260,
+        "target": "MAIN"
+      }
+    ],
+    "rounds": [
+      {
+        "round": 1,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 3244.399999999907
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 3245.899999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 3247.399999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 3248.600000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 3250.100000000093
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4067.7999999998137
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4069.2999999998137
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4070.1999999997206
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4071.2999999998137
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4072.1999999997206
+          }
+        ]
+      },
+      {
+        "round": 3,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4877.199999999721
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4878.5
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4879.699999999721
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4881
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4882.199999999721
+          }
+        ]
+      },
+      {
+        "round": 4,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 5686.799999999814
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 5687.899999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 5689
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 5689.899999999907
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 5690.899999999907
+          }
+        ]
+      },
+      {
+        "round": 5,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 6488.100000000093
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 6491
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 6492.100000000093
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 6493.100000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 6494.299999999814
+          }
+        ]
+      },
+      {
+        "round": 6,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 7294.899999999907
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 7296.299999999814
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 7297.100000000093
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 7298.299999999814
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 7299.199999999721
+          }
+        ]
+      },
+      {
+        "round": 7,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8092.100000000093
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8093.399999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8094.399999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8095.600000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8096.699999999721
+          }
+        ]
+      },
+      {
+        "round": 8,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8907.299999999814
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8908.69999999972
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8909.899999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8910.799999999814
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8912.399999999907
+          }
+        ]
+      },
+      {
+        "round": 9,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 9742.19999999972
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 9743.399999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 9763.299999999814
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 9764.69999999972
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 9766.100000000093
+          }
+        ]
+      },
+      {
+        "round": 10,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 10630
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 10631.100000000093
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 10632.100000000093
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 10633.299999999814
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 10634.5
+          }
+        ]
+      },
+      {
+        "round": 11,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 11611
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 11612.299999999814
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 11614.100000000093
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 11615.5
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 11616.69999999972
+          }
+        ]
+      },
+      {
+        "round": 12,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 12624.19999999972
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 12627.100000000093
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 12628.69999999972
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 12630.100000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 12631.399999999907
+          }
+        ]
+      },
+      {
+        "round": 13,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 13805.899999999907
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 13806.899999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 13807.799999999814
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 13808.899999999907
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 13809.899999999907
+          }
+        ]
+      },
+      {
+        "round": 14,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 14994.899999999907
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 14995.899999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 14996.899999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 14997.799999999814
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 14998.69999999972
+          }
+        ]
+      },
+      {
+        "round": 15,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 16193.399999999907
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 16194.399999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 16195.399999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 16196.399999999907
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 16197.69999999972
+          }
+        ]
+      },
+      {
+        "round": 16,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 17408.19999999972
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 17409.600000000093
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 17410.69999999972
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 17412.100000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 17413.19999999972
+          }
+        ]
+      },
+      {
+        "round": 17,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 18577.600000000093
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 18592.69999999972
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 18597.5
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 18599
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 18600.19999999972
+          }
+        ]
+      },
+      {
+        "round": 18,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 19732.600000000093
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 19733.899999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 19734.69999999972
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 19735.600000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 19736.899999999907
+          }
+        ]
+      },
+      {
+        "round": 19,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 20919.399999999907
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 20920.600000000093
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 20921.600000000093
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 20922.600000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 20923.5
+          }
+        ]
+      },
+      {
+        "round": 20,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 22106.100000000093
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 22107.69999999972
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 22108.600000000093
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 22109.600000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 22110.5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "source": "rapid-probe-scoped-fallback-evidence.json",
+    "passed": true,
+    "browser": "151.0.7922.34",
+    "forcedFallback": true,
+    "nativeAnimations": [],
+    "rounds": [
+      {
+        "round": 1,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 2907.100000000093
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 2923.399999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 2955.399999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 2969.600000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 2983.5
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 3806.6999999997206
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 3820.899999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 3829.899999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 3845.1999999997206
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 3856.399999999907
+          }
+        ]
+      },
+      {
+        "round": 3,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4863.100000000093
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4880.799999999814
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4904.699999999721
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4918
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 4931.299999999814
+          }
+        ]
+      },
+      {
+        "round": 4,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 5767.699999999721
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 5781.399999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 5791
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 5804.799999999814
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 5813.100000000093
+          }
+        ]
+      },
+      {
+        "round": 5,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 6670.399999999907
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 6685.899999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 6696.199999999721
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 6711.600000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 6722.299999999814
+          }
+        ]
+      },
+      {
+        "round": 6,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 7669.399999999907
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 7681.699999999721
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 7691.399999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 7705
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 7714.199999999721
+          }
+        ]
+      },
+      {
+        "round": 7,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8929
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 8943.19999999972
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 9169.600000000093
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 9181.69999999972
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 9229.799999999814
+          }
+        ]
+      },
+      {
+        "round": 8,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 10080
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 10094.600000000093
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 10230.399999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 10245.899999999907
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 10257.299999999814
+          }
+        ]
+      },
+      {
+        "round": 9,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 11325.19999999972
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 11340
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 11349.100000000093
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 11365.899999999907
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 11376.5
+          }
+        ]
+      },
+      {
+        "round": 10,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 12506
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 12523.69999999972
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 12532.799999999814
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 12547.100000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 12559.5
+          }
+        ]
+      },
+      {
+        "round": 11,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 13646.19999999972
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 13660.69999999972
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 13851.69999999972
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 13864.299999999814
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 13914.69999999972
+          }
+        ]
+      },
+      {
+        "round": 12,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 14821.600000000093
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 14835.399999999907
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 14843.899999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 14857.600000000093
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 14866.399999999907
+          }
+        ]
+      },
+      {
+        "round": 13,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 15979.19999999972
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 15994.299999999814
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 16187.799999999814
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 16203.5
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 16213
+          }
+        ]
+      },
+      {
+        "round": 14,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 17427.299999999814
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 17441.299999999814
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 17641
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 17655.69999999972
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 17664.600000000093
+          }
+        ]
+      },
+      {
+        "round": 15,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 18776.19999999972
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 18789.799999999814
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 18798.5
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 18812.299999999814
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 18823.399999999907
+          }
+        ]
+      },
+      {
+        "round": 16,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 19931.600000000093
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 19945.69999999972
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 20136.799999999814
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 20148.19999999972
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 20196.799999999814
+          }
+        ]
+      },
+      {
+        "round": 17,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 21097.899999999907
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 21111.299999999814
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 21306
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 21319.799999999814
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 21332.19999999972
+          }
+        ]
+      },
+      {
+        "round": 18,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 22297.69999999972
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 22311.5
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 22507
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 22520.299999999814
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 22529.5
+          }
+        ]
+      },
+      {
+        "round": 19,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 23695.799999999814
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 23709
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 23892.600000000093
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 23906.69999999972
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 23915.5
+          }
+        ]
+      },
+      {
+        "round": 20,
+        "finalScreen": "agent",
+        "clicks": [
+          {
+            "name": "Plan journey",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 25035.899999999907
+          },
+          {
+            "name": "Updates",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 25049
+          },
+          {
+            "name": "How it works",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 25057.899999999907
+          },
+          {
+            "name": "Report",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 25071.899999999907
+          },
+          {
+            "name": "Agent",
+            "target": "BUTTON",
+            "trusted": true,
+            "time": 25080.899999999907
+          }
+        ]
+      }
+    ]
+  }
+]
