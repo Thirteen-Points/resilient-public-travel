@@ -6,7 +6,7 @@ import type { Event, Network, RouteCandidate } from './api/types'
 import { CORRIDOR_IDS } from './data'
 import { eastRailStations } from './lib/eastRailAccess'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
-import { resolveNetworkLineGeometry, resolveRouteLegGeometry, resolveImpactGeometry } from './map/geometry'
+import { resolveRouteLegGeometry, resolveImpactGeometry } from './map/geometry'
 import css from './MapView.module.css'
 
 /** Map occupies the journey grid cell, docks beside Updates, or hides on text pages. */
@@ -20,9 +20,10 @@ type Props = {
   picking: boolean
   onMapPick: (point: { lat: number; lng: number }) => void
   mode?: MapMode
+  showImpacts?: boolean
 }
 
-export function MapView({ network, published, routes, selectedRouteId, picking, onMapPick, mode = 'full' }: Props) {
+export function MapView({ network, published, routes, selectedRouteId, picking, onMapPick, mode = 'full', showImpacts = false }: Props) {
   const element = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const overlaysRef = useRef<L.LayerGroup | null>(null)
@@ -158,10 +159,10 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
     const routeColours = ['#1565C0', '#6A1B9A', '#00838F']
     const draw = (points: L.LatLngExpression[], colors: string[], weight: number, opacity: number, dashed = false, selected = false, label?: string) => {
       if (points.length < 2) return
-      if (selected) L.polyline(points, { color: '#FFFFFF', weight: weight + 4, opacity: 1, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(group)
+      if (selected) L.polyline(points, { color: '#FFFFFF', weight: weight + 4, opacity: 1, lineCap: 'round', lineJoin: 'round', interactive: false, className: css.routePath }).addTo(group)
       colors.forEach((color, index) => {
         const line = L.polyline(points, { color, weight: index ? weight * .48 : weight, opacity,
-          dashArray: dashed ? '4 6' : undefined, lineCap: 'round', lineJoin: 'round', interactive: Boolean(label) }).addTo(group)
+          dashArray: dashed ? '4 6' : undefined, lineCap: 'round', lineJoin: 'round', interactive: Boolean(label), className: css.routePath }).addTo(group)
         if (label) line.bindTooltip(label)
       })
     }
@@ -172,16 +173,8 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
         color: '#1565C0', weight: 1, opacity: .3, fillColor: '#1565C0', fillOpacity: .05, interactive: false,
       }).addTo(group)
     }
-    const drawnPatterns = new Set<string>()
-    for (const line of network.lines) {
-      const pattern = `${line.mode}:${line.stops.join(',')}`
-      if (drawnPatterns.has(pattern)) continue
-      drawnPatterns.add(pattern)
-      for (const geometry of resolveNetworkLineGeometry(line, network)) {
-        schematic ||= geometry.quality === 'schematic' || geometry.quality === 'mixed'
-        geometry.parts.forEach((part, index) => draw(part, lineStyle(line).colors, 2, routes.length ? .2 : .4, geometry.partQualities[index] === 'schematic'))
-      }
-    }
+    // The default map is a quiet station context. Only requested journey paths
+    // and explicitly enabled disruption overlays add lines to the basemap.
     routes.map((route, index) => ({ route, index })).filter(({ route, index }) => index < 3 || route.route_id === selectedRouteId).sort((a, b) => Number(a.route.route_id === selectedRouteId) - Number(b.route.route_id === selectedRouteId)).forEach(({ route, index }) => {
       for (const leg of route.legs) {
         const geometry = resolveRouteLegGeometry(leg, network)
@@ -191,13 +184,13 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
         geometry.parts.forEach((part, partIndex) => draw(part, [routeColours[index % routeColours.length]], selected ? 6 : 4, selected ? 1 : .65, leg.mode === 'WALK' || geometry.partQualities[partIndex] === 'schematic', selected, `Option ${String.fromCharCode(65 + index)} · ${leg.mode === 'WALK' ? 'Walk' : style.label}${geometry.partQualities[partIndex] === 'schematic' ? ' · schematic connection' : ''}`))
       }
     })
-    for (const event of published) for (const segment of event.affected_segments) {
+    for (const event of showImpacts ? published : []) for (const segment of event.affected_segments) {
       const geometry = resolveImpactGeometry(segment, event.line, network)
       schematic ||= geometry.quality === 'schematic' || geometry.quality === 'mixed'
       for (const part of geometry.parts) L.polyline(part, {
         color: segment.impact === 'closed' ? '#C62828' : '#F9A825',
         weight: segment.impact === 'closed' ? 6 : 4,
-        lineCap: 'round', lineJoin: 'round', dashArray: segment.impact === 'closed' ? '8 6' : '2 6', interactive: false,
+        lineCap: 'round', lineJoin: 'round', dashArray: segment.impact === 'closed' ? '8 6' : '2 6', interactive: false, className: css.impactPath,
       }).addTo(group)
       const middle = geometry.parts[0]?.[Math.floor(geometry.parts[0].length / 2)]
       if (middle) L.marker(middle, { keyboard: false, interactive: false, icon: L.divIcon({ className: `${css.impactMarker} ${segment.impact === 'closed' ? '' : css.affectedMarker}`, html: segment.impact === 'closed' ? '×' : '!', iconSize: [24, 24], iconAnchor: [12, 12] }) }).addTo(group)
@@ -211,18 +204,26 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
       english.className = css.stationEnglish
       english.textContent = node.name_en
       label.append(english)
-      L.circleMarker([node.lat, node.lng], {
-        radius: corridor ? node.lines.length > 1 ? 7 : 5 : 4, color: node.kind === 'bus_stop' ? '#B14336' : node.kind === 'pier' ? '#287857' : '#18221D', weight: 2,
-        fillColor: '#fff', fillOpacity: 1,
+      const station = L.circleMarker([node.lat, node.lng], {
+        radius: corridor ? node.lines.length > 1 ? 7 : 5 : 4, color: 'var(--rr-border-default, #D9DFD5)', weight: 2,
+        fillColor: 'var(--rr-bg-surface, #FFFFFF)', fillOpacity: 1, className: css.stationMarker,
       }).bindTooltip(label, { permanent: corridor, direction: id === 'ADM' || id === 'MKK' ? 'left' : 'right', offset: [id === 'ADM' || id === 'MKK' ? -9 : 9, 0], className: css.stationLabel }).addTo(group)
-      L.circleMarker([node.lat, node.lng], { radius: 22, opacity: 0, fillOpacity: 0 }).bindTooltip(node.name_en, { className: css.stationLabel }).addTo(group)
+      const emphasize = (active: boolean) => {
+        station.setStyle({ color: active ? 'var(--rr-text-primary, #18221D)' : 'var(--rr-border-default, #D9DFD5)' })
+        if (active) station.openTooltip()
+        station.getTooltip()?.getElement()?.classList.toggle(css.activeStationLabel, active)
+        if (!active && !corridor) station.closeTooltip()
+      }
+      // Retain the 44 px pointer target while the visible marker stays subtle.
+      L.circleMarker([node.lat, node.lng], { radius: 22, opacity: 0, fillOpacity: 0, className: css.stationTarget })
+        .on('mouseover', () => emphasize(true)).on('mouseout', () => emphasize(false)).addTo(group)
     }
     const points = routes.flatMap(route => route.legs.flatMap(leg => resolveRouteLegGeometry(leg, network).parts.flat()))
     if (points.length) boundsRef.current = L.latLngBounds(points)
     else boundsRef.current = L.latLngBounds(network.nodes.filter(node => CORRIDOR_IDS.some(id => id === node.id) && Number.isFinite(node.lat) && Number.isFinite(node.lng)).map(node => [node.lat, node.lng] as L.LatLngTuple))
     setHasSchematic(schematic)
     setRenderedRevision(published.map(event => `${event.event_id}@${event.version}`).join(','))
-  }, [network, published, routes, selectedRouteId, picking])
+  }, [network, published, routes, selectedRouteId, picking, showImpacts])
 
   const routeKey = routes.map(route => route.route_id).join(',')
   useEffect(() => { resetRef.current(false) }, [routeKey, picking])
@@ -238,15 +239,16 @@ export function MapView({ network, published, routes, selectedRouteId, picking, 
   }, [mode])
 
   return <div className={`${css.wrap} ${picking ? css.picking : ''} ${mode === 'docked' ? css.docked : ''} ${mode === 'hidden' ? css.hidden : ''}`}>
-    <div ref={element} className={css.map} data-event-revisions={renderedRevision} tabIndex={0} aria-label="Hong Kong journey map. Arrow keys pan; plus and minus zoom. Stations can also be selected from the journey form." />
+    <div ref={element} className={css.map} data-event-revisions={renderedRevision} data-map-layer-mode={routes.length ? 'journey' : showImpacts ? 'updates' : 'stations'} data-impact-paths={showImpacts ? 'shown' : 'hidden'} tabIndex={0} aria-label="Hong Kong journey map. Arrow keys pan; plus and minus zoom. Stations can also be selected from the journey form." />
     <div className={css.tools}><button type="button" onClick={() => resetRef.current(true)} aria-label="Fit corridor on map">◎ Fit journey</button></div>
     <details className={css.legend}><summary>Map legend <span aria-hidden="true">↗</span></summary><div>
       {routes.map((route, index) => <p key={route.route_id}><b className={css.routeBadge} style={{ background: ['#1565C0', '#6A1B9A', '#00838F'][index % 3] }}>{String.fromCharCode(65 + index)}</b><span>Option {String.fromCharCode(65 + index)}{route.route_id === selectedRouteId ? ' · selected' : ''}</span></p>)}
-      <p>White outline: selected route</p><p>× Red dashes: closed · ! Amber dots: affected</p><p>Dotted paths: walking or schematic connections</p>
-      <details><summary>Transport lines</summary>{network.lines.map(line => { const style = lineStyle(line); return <p key={line.id}><i style={{ background: lineGradient(style.colors) }} /><span>{style.label}</span></p> })}</details>
-      <p>Verified paths use CSDI geographic snapshots. Connections without a verified path are schematic.</p>
+      {routes.length > 0 && <><p>White outline: selected route</p><p>Dotted paths: walking or schematic connections</p></>}
+      {showImpacts && <p>× Red dashes: closed · ! Amber dots: affected</p>}
+      <p>Stations remain visible. Journey paths appear after a route search.</p>
+      {routes.length > 0 && <><details><summary>Transport lines</summary>{network.lines.map(line => { const style = lineStyle(line); return <p key={line.id}><i style={{ background: lineGradient(style.colors) }} /><span>{style.label}</span></p> })}</details><p>Verified paths use CSDI geographic snapshots. Connections without a verified path are schematic.</p></>}
     </div></details>
-    <p className={css.caption}>{provider}{hasSchematic ? ' · includes schematic connections' : ' · sourced path geometry'}</p>
+    <p className={css.caption}>{provider}{hasSchematic ? ' · includes schematic connections' : routes.length || showImpacts && published.length ? ' · sourced path geometry' : ''}</p>
     {picking && <p className={css.pickHint}>Tap within an 800 m circle around one of the six East Rail stations. Distance is measured straight-line from the station point.</p>}
   </div>
 }

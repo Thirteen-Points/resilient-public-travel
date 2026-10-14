@@ -15,7 +15,7 @@ import { LatestRequest, resolveProfile, profileLabel, routeSelectionKey } from '
 import { HowItWorksPage } from './components/HowItWorksPage'
 import { UpdatesPage } from './components/UpdatesPage'
 import { ProvenanceBadge } from './components/ProvenanceBadge'
-import { gsap, useGSAP, usePageMotion, useSuccessMotion } from './lib/motion'
+import { gsap, useGSAP, usePageMotion, usePageTransition, useSuccessMotion } from './lib/motion'
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
 import { TRANSPORT_OPTIONS, transportLabel } from './lib/transport'
 import { eastRailStations, findEastRailAccess, type StraightLineAccess } from './lib/eastRailAccess'
@@ -164,6 +164,7 @@ export function App() {
   const [submitted, setSubmitted] = useState<{ key: string; persona: Persona; preset: Preset; profile: TravelProfile; transport: 'all' | TransitMode } | null>(null)
   const [success, setSuccess] = useState({ text: '', revision: 0 })
   const root = useRef<HTMLDivElement>(null)
+  const transitionPage = usePageTransition(root)
   const toast = useRef<HTMLDivElement>(null)
   const searchingRef = useRef(false)
   const routeRequests = useRef(new LatestRequest()), requestedJourney = useRef('')
@@ -231,8 +232,14 @@ export function App() {
   const nodes = nodeIndex(network)
   const celebrate = (text: string) => setSuccess(previous => ({ text, revision: previous.revision + 1 }))
   const navigate = (next: Screen) => {
-    if (next === 'journey') window.scrollTo({ top: 0, behavior: 'instant' })
-    setScreen(next); setMenuOpen(false); setMobileView('content'); setActiveField(null); setPicking(null)
+    const commit = () => {
+      if (next === 'journey') window.scrollTo({ top: 0, behavior: 'instant' })
+      setScreen(next); setMenuOpen(false); setMobileView('content'); setActiveField(null); setPicking(null)
+    }
+    // Cancel immediately, before a transition captures the outgoing page.
+    if (next !== screen) { routeRequests.current.cancel(); searchingRef.current = false; setSearching(false) }
+    // Even a click on the current page supersedes an older pending navigation.
+    transitionPage(commit, next !== screen)
   }
   const pickOnMap = (field: Field) => {
     setActiveField(null); setPicking(field); setError(''); setMobileView('map')
@@ -306,6 +313,7 @@ export function App() {
   }
   const activeRoutes = resultCurrent && (screen === 'results' || screen === 'detail') ? routes : []
   const journeyScreen = screen === 'journey' || screen === 'results' || screen === 'detail'
+  const splitScreen = journeyScreen || screen === 'report' || screen === 'agent'
   const showViewTabs = compactViewport && journeyScreen
   const mapVisible = screen !== 'sources' && (!compactViewport || (journeyScreen && mobileView === 'map'))
   const contentVisible = !showViewTabs || mobileView === 'content'
@@ -329,7 +337,7 @@ export function App() {
       </nav>
       <button type="button" className={css.demo} onClick={switchDataMode}>{SEED_MODE ? 'FIXED SEED · USE API' : 'API MODE · USE SEED'}</button>
     </header>
-    <main className={`${css.stage} ${journeyScreen ? css.journeyLayout : ''} ${screen === 'detail' ? css.detailLayout : ''} ${showViewTabs ? mobileView === 'map' ? css.mapOnly : css.contentOnly : ''}`}>
+    <main data-screen={screen} className={`${css.stage} ${splitScreen ? css.journeyLayout : ''} ${screen === 'detail' ? css.detailLayout : ''} ${showViewTabs ? mobileView === 'map' ? css.mapOnly : css.contentOnly : ''}`}>
       <div className={css.accessControls} aria-label="Display accessibility"><button type="button" aria-pressed={largeText} onClick={() => setLargeText(value => !value)}>Large text</button><button type="button" aria-pressed={highContrast} onClick={() => setHighContrast(value => !value)}>High contrast</button></div>
       {!SEED_MODE && (live.warning || live.routeWarning) && <div className={css.refreshNotice} role="alert"><p>{live.warning} {live.routeWarning}</p><button type="button" disabled={refreshing} aria-busy={refreshing} onClick={async () => { setRefreshing(true); try { await live.refresh() } finally { setRefreshing(false) } }}>{refreshing ? 'Refreshing…' : 'Refresh'}</button></div>}
       {showViewTabs && <div className={css.viewTabs} role="tablist" aria-label="Journey view" onKeyDown={event => {
@@ -342,15 +350,15 @@ export function App() {
         <button id="map-view-tab" type="button" role="tab" aria-selected={mobileView === 'map'} aria-controls="journey-map" tabIndex={mobileView === 'map' ? 0 : -1} onClick={() => chooseView('map')}>Map</button>
       </div>}
       <div id="journey-map" className={css.mapFrame} hidden={!mapVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'map-view-tab' : undefined}>
-        <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} mode={mapMode} />
+        <MapView network={network} published={published} routes={activeRoutes} selectedRouteId={selectedId} showImpacts={screen === 'updates' || activeRoutes.length > 0} picking={Boolean(picking) && screen === 'journey'} onMapPick={point => { if (screen === 'journey') mapPick(point) }} mode={mapMode} />
         {showViewTabs && mobileView === 'map' && error && <p className={css.mapPickNotice} role="alert">{error}</p>}
       </div>
       {(mapMode === 'docked' || screen === 'sources') && <div className={`${css.pagePane} ${screen === 'sources' ? css.full : ''}`}>
         {screen === 'sources' && <HowItWorksPage seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} networkVersion={network.meta.version} disclaimer={meta.disclaimer} apiSources={live.bundle?.meta?.sources} sourceWarning={live.sourceWarning} collectorStatus={live.sources} replanningStatus={live.replanning} collectorWarning={live.sourcesWarning || live.warning} replanningWarning={live.replanningWarning} sourcesReadAt={live.sourcesReadAt} onRefresh={live.refresh} onClose={() => navigate('journey')} />}
         {screen === 'updates' && <UpdatesPage events={events} signals={signals} network={network} seedMode={SEED_MODE} snapshotAt={meta.snapshotAt} onBack={() => navigate('journey')} />}
       </div>}
-      <div hidden={screen !== 'agent'}><AgentPanel active={screen === 'agent'} seedMode={SEED_MODE} published={published} context={context} onRoutes={preference => void showRoutes(SEED_MODE ? meta.od.origin : origin, SEED_MODE ? meta.od.destination : destination, preference)} onBack={() => navigate('journey')} /></div>
-      {screen === 'report' && (SEED_MODE ? <section className={css.panel}><h1>Reports use the API.</h1><p>Switch to API mode to submit an unverified report.</p><button type="button" onClick={switchDataMode}>Use API mode</button></section> : <SignalReportForm onAccepted={() => void live.refresh()} />)}
+      <div className={css.contentFrame} hidden={screen !== 'agent'}><AgentPanel active={screen === 'agent'} seedMode={SEED_MODE} published={published} context={context} onRoutes={preference => void showRoutes(SEED_MODE ? meta.od.origin : origin, SEED_MODE ? meta.od.destination : destination, preference)} onBack={() => navigate('journey')} /></div>
+      {screen === 'report' && <div className={css.contentFrame}>{SEED_MODE ? <section data-panel className={css.panel}><h1>Reports use the API.</h1><p>Switch to API mode to submit an unverified report.</p><button type="button" onClick={switchDataMode}>Use API mode</button></section> : <SignalReportForm onAccepted={() => void live.refresh()} />}</div>}
       {screen === 'journey' && <div id="journey-content" data-panel hidden={!contentVisible} role={showViewTabs ? 'tabpanel' : undefined} aria-labelledby={showViewTabs ? 'content-view-tab' : undefined} className={`${css.panel} ${css.mobilePanel}`}>
           <h1>Where are you<br />heading?</h1>
           <p className={css.subhead}>Choose transport, then select one of six East Rail stations or a map point within 800 m straight-line distance of one.</p>

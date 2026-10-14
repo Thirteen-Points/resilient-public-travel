@@ -83,6 +83,11 @@ jobs:
         run: |
           node tests/browser/p4.offline.cjs
           node tests/browser/p4.media.cjs
+      - name: Default map, shared layout and page transitions
+        env:
+          M2_PYTHON: python
+          M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
+        run: node tests/browser/frontend-layout-motion.cjs
       - name: Preserve regression evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -96,6 +101,7 @@ jobs:
             .cache/p4-ci/
             .cache/p4-browser/
             .cache/p4-media/
+            .cache/frontend-layout-motion/
             .cache/offline-demo/backend.log
           if-no-files-found: warn
           retention-days: 14

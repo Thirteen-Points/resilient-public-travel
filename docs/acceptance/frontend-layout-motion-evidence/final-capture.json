@@ -1,0 +1,95 @@
+{
+  "capturedAt": "2026-10-14T06:00:20.285Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "reducedMotion": true,
+  "layouts": [
+    {
+      "name": "Plan journey",
+      "left": 64,
+      "top": 148,
+      "width": 400,
+      "height": 828
+    },
+    {
+      "name": "Report",
+      "left": 64,
+      "top": 148,
+      "width": 400,
+      "height": 828
+    },
+    {
+      "name": "Agent",
+      "left": 64,
+      "top": 148,
+      "width": 400,
+      "height": 828
+    }
+  ],
+  "successfulMapTiles": 9,
+  "basemapNetworkAvailable": true,
+  "mapResponses": [
+    {
+      "url": "https://tiles.openfreemap.org/styles/positron",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm.json",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/sprites/ofm_f384/ofm.png",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/12/3348/1788.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/12/3346/1786.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/12/3347/1786.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/12/3347/1787.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/12/3346/1787.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/12/3346/1788.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/12/3348/1787.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/12/3348/1786.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/planet/20261011_080001_pt/12/3347/1788.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/fonts/Noto%20Sans%20Italic/0-255.pbf",
+      "status": 200
+    },
+    {
+      "url": "https://tiles.openfreemap.org/fonts/Noto%20Sans%20Regular/0-255.pbf",
+      "status": 200
+    }
+  ]
+}

@@ -11,7 +11,7 @@
 .demo, .menuToggle { min-height: 48px; padding: 12px 16px; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-pill); background: var(--rr-bg-surface); color: var(--rr-text-secondary); font-size: var(--rr-font-label); font-weight: 500; }
 .demo { margin-left: auto; white-space: nowrap; }
 .menuToggle { display: none; }
-.stage { position: relative; height: calc(100dvh - 80px); min-height: 560px; overflow: hidden; isolation: isolate; }
+.stage { position: relative; height: calc(100dvh - 80px); min-height: 560px; overflow: hidden; isolation: isolate; view-transition-name: page-content; }
 .accessControls { position: relative; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; padding: 12px 32px; z-index: 700; }
 .accessControls button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-pill); background: var(--rr-bg-surface); color: var(--rr-text-secondary); font-size: var(--rr-font-label); }
 .accessControls button[aria-pressed=true] { background: var(--rr-bg-hero); color: var(--rr-text-inverse); }
@@ -20,9 +20,12 @@
 .journeyLayout .accessControls { grid-column: 1 / -1; grid-row: 1; padding: 12px 0; }
 .journeyLayout .mapFrame { position: relative; inset: auto; grid-column: 2; grid-row: 2; }
 .journeyLayout .mobilePanel { grid-column: 1; grid-row: 2; margin: 0; width: auto; max-width: none; max-height: none; min-height: 0; overflow-y: auto; }
+.journeyLayout .contentFrame { grid-column: 1; grid-row: 2; min-width: 0; min-height: 0; }
+.contentFrame > [data-panel] { width: 100%; height: 100%; max-width: none; max-height: none; min-height: 0; margin: 0; overflow-y: auto; padding: 24px; }
+.contentFrame > [data-panel] h1 { margin: 0 0 8px; font-size: calc(var(--rr-font-body) * 3); line-height: 1.125; letter-spacing: -1.5px; font-weight: 500; }
 .detailLayout { grid-template-columns: 480px minmax(0, 1fr); }
 .journeyLayout:has(> .refreshNotice) { grid-template-rows: auto auto minmax(0, 1fr); }
-.journeyLayout:has(> .refreshNotice) .mobilePanel, .journeyLayout:has(> .refreshNotice) .mapFrame { grid-row: 3; }
+.journeyLayout:has(> .refreshNotice) .mobilePanel, .journeyLayout:has(> .refreshNotice) .contentFrame, .journeyLayout:has(> .refreshNotice) .mapFrame { grid-row: 3; }
 .refreshNotice { position: relative; z-index: 600; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 32px 16px; padding: 12px 16px; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-input); background: var(--rr-bg-warning); font-size: var(--rr-font-small); }
 .refreshNotice p { margin: 0; }
 .refreshNotice button { flex: none; min-height: 44px; padding: 8px 16px; border: 1px solid var(--rr-border-control); border-radius: var(--rr-radius-pill); background: var(--rr-bg-surface); color: var(--rr-text-primary); font-size: var(--rr-font-label); }
@@ -182,6 +185,7 @@
 .highContrast :is(button, input, select, textarea) { border: 2px solid #000; }
 .highContrast :is(button[aria-pressed=true], button[aria-current=page], [role=tab][aria-selected=true]) { background: #000; color: #fff; }
 .highContrast :is(.panel, .eventCard, .routeCard, .connectionStatus) { border: 2px solid #000; }
+.highContrast .contentFrame > [data-panel] { border: 2px solid #000; }
 .highContrast :focus-visible { outline: 3px solid #000; outline-offset: 3px; box-shadow: 0 0 0 6px #ffeb00; }
 .highContrast button:disabled { opacity: 1; border-style: dashed; color: #555; }
 .highContrast a { text-decoration: underline; }
@@ -202,6 +206,8 @@
   .viewTabs button { flex: 1; min-height: 44px; padding: 8px 16px; border: 0; border-radius: var(--rr-radius-pill); background: transparent; color: var(--rr-text-secondary); font-size: var(--rr-font-label); font-weight: 500; }
   .viewTabs button[aria-selected=true] { background: var(--rr-bg-hero); color: var(--rr-text-inverse); }
   .panel h1 { font-size: calc(var(--rr-font-body) * 2); line-height: 1.25; letter-spacing: -.6px; }
+  .contentFrame > [data-panel] h1 { font-size: calc(var(--rr-font-body) * 2); line-height: 1.25; letter-spacing: -.6px; }
+  .contentFrame > [data-panel] { height: auto; max-height: none; margin: 0 0 24px; overflow: visible; }
   .panel, .journeyLayout .mobilePanel { width: 100%; max-width: none; max-height: none; overflow: visible; margin: 0 0 24px; padding: 24px; }
   .mapFrame, .journeyLayout .mapFrame { position: relative; inset: auto; width: 100%; height: max(420px, calc(100dvh - 264px)); min-height: 420px; border-radius: var(--rr-radius-card); overflow: hidden; }
   .pagePane, .pagePane.full { position: relative; inset: auto; overflow: visible; padding: 24px 0; }
@@ -210,5 +216,18 @@
   .timeline { grid-template-columns: 1fr; }
   .timeline li + li { padding-top: 16px; border-top: 1px solid var(--rr-border-control); }
 }
-@media (max-width: 767px) { .header { padding: 16px 20px; } .stage, .journeyLayout { padding: 0 20px 32px; } .panel, .journeyLayout .mobilePanel { padding: 24px 16px; } .refreshNotice { flex-wrap: wrap; } .transportChoices button { padding-right: 8px; padding-left: 8px; } }
+@media (max-width: 767px) { .header { padding: 16px 20px; } .stage, .journeyLayout { padding: 0 20px 32px; } .panel, .journeyLayout .mobilePanel, .contentFrame > [data-panel] { padding: 24px 16px; } .refreshNotice { flex-wrap: wrap; } .transportChoices button { padding-right: 8px; padding-left: 8px; } }
 @media (max-width: 359px) { .header { padding: 16px; } .stage, .journeyLayout { padding: 0 16px 32px; } .accessControls button { padding: 8px 12px; } }
+
+/* Capture the workspace as one scene, keeping navigation interactive. */
+:global(:root) { view-transition-name: none; }
+:global(::view-transition) { pointer-events: none; }
+:global(::view-transition-group(page-content)) { animation-duration: 260ms; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
+:global(::view-transition-old(page-content)) { animation: pageExit 260ms cubic-bezier(.22, 1, .36, 1) both; }
+:global(::view-transition-new(page-content)) { animation: pageEnter 260ms cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes pageExit { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-6px); } }
+@keyframes pageEnter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .stage { view-transition-name: none; }
+  :global(::view-transition-group(page-content)), :global(::view-transition-old(page-content)), :global(::view-transition-new(page-content)) { animation: none; }
+}
