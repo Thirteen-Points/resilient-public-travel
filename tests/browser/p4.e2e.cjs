@@ -122,7 +122,7 @@ let browser, publicPage
     if (request.url() === api + '/api/ai/chat') chatBodies.push(request.postDataJSON())
     if (request.url() === api + '/api/persona/parse') preferenceBodies.push(request.postDataJSON())
   })
-  await page.goto(web); await page.getByRole('button', { name: 'Find resilient routes' }).waitFor()
+  await page.goto(web + '?view=planner'); await page.getByRole('button', { name: 'Find resilient routes' }).waitFor()
   await assertRemovedPages(page)
   await verifyStationPicker(page)
   pass('desktop station picker reopens after selection, closes outside and supports closed ArrowDown')
@@ -366,7 +366,7 @@ let browser, publicPage
   mobile.on('request', request => {
     if (request.url().startsWith(api) && (request.headers()['x-review-token'] || request.headers()['x-csrf-token'] || request.headers().authorization)) forbiddenHeaders.push(new URL(request.url()).pathname)
   })
-  await mobile.goto(web); await mobile.getByRole('button', { name: 'Find resilient routes' }).waitFor()
+  await mobile.goto(web + '?view=planner'); await mobile.getByRole('button', { name: 'Find resilient routes' }).waitFor()
   await verifyStationPicker(mobile)
   pass('390 px station picker keeps first-click, reopen and outside-close behavior')
   await verifyHighContrast(mobile)
@@ -458,7 +458,7 @@ let browser, publicPage
   const seed = await context.newPage(), seedChats = []
   seed.on('pageerror', error => errors.push(error.message))
   seed.on('request', request => { if (request.url().endsWith('/api/ai/chat')) seedChats.push(request.url()) })
-  await seed.goto(web + '?data=seed'); await seed.getByRole('button', { name: 'Find resilient routes' }).waitFor(); await chooseTomorrow(seed); await navigate(seed, 'Agent'); await seed.getByText('Seed conversation · template replies · no live AI.', { exact: false }).waitFor()
+  await seed.goto(web + '?data=seed&view=planner'); await seed.getByRole('button', { name: 'Find resilient routes' }).waitFor(); await chooseTomorrow(seed); await navigate(seed, 'Agent'); await seed.getByText('Seed conversation · template replies · no live AI.', { exact: false }).waitFor()
   await seed.getByRole('button', { name: /^Tai Wai to Admiralty, less walking/ }).click(); await seed.getByRole('button', { name: 'Inspect these seed routes →', exact: true }).click(); await seed.getByRole('heading', { name: 'Tai Wai → Admiralty' }).waitFor()
   assert.deepEqual(seedChats, []); assert.deepEqual(errors, [])
   assert.deepEqual(forbiddenHeaders, [])

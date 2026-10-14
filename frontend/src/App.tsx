@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { MapView } from './MapView'
+import { loadPlannerProfile } from './onboarding/plannerProfile'
 import { seedDataSource } from './api/seedDataSource'
 import { useLiveSession } from './api/useLiveSession'
 import { SignalReportForm } from './components/SignalReportForm'
@@ -153,7 +154,7 @@ export function App() {
   const [preset, setPreset] = useState<Preset>('fastest')
   const [persona, setPersona] = useState<Persona>('commuter')
   const [transport, setTransport] = useState<'all' | TransitMode>('all')
-  const [customProfile, setCustomProfile] = useState<TravelProfile | undefined>()
+  const [customProfile, setCustomProfile] = useState<TravelProfile | undefined>(loadPlannerProfile)
   const effectiveProfile = useMemo(() => resolveProfile({ persona, preset, profile: customProfile }), [persona, preset, customProfile])
   const [largeText, setLargeText] = useState(false), [highContrast, setHighContrast] = useState(false)
   const [departure, setDeparture] = useState(INITIAL_DEPARTURE.slice(11, 16))
