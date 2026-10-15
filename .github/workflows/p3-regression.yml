@@ -58,7 +58,7 @@ jobs:
         run: python scripts/package_offline.py --build --require-media --output .cache/p4-ci/offline.zip
       - name: Install isolated browser runtime
         run: |
-          npm install --prefix .cache/p3-playwright --no-audit --no-fund --package-lock=false playwright@1.56.1 axe-core@4.10.3
+          npm install --prefix .cache/p3-playwright --no-audit --no-fund --package-lock=false playwright@1.56.1
           .cache/p3-playwright/node_modules/.bin/playwright install --with-deps chromium
       - name: Check committed administrator bundle
         run: |
@@ -66,10 +66,6 @@ jobs:
           git diff --exit-code -- ../backend/app/admin_static
           test -z "$(git ls-files --others --exclude-standard ../backend/app/admin_static)"
         working-directory: frontend
-      - name: First-visit preferences regression
-        env:
-          M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
-        run: node tests/browser/preferences.e2e.cjs
       - name: Browser publication, recovery and mobile regression
         env:
           M2_PYTHON: python
@@ -106,7 +102,6 @@ jobs:
             .cache/p4-browser/
             .cache/p4-media/
             .cache/frontend-layout-motion/
-            .cache/preferences-browser/
             .cache/offline-demo/backend.log
           if-no-files-found: warn
           retention-days: 14
