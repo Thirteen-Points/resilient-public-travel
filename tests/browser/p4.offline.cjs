@@ -46,7 +46,7 @@ async function ready(url) {
   video = page.video(); const errors = [], started = Date.now()
   page.on('pageerror', error => errors.push(error.message))
   const holdUntil = async seconds => { if (tour) await pause(Math.max(0, seconds * 1000 - (Date.now() - started))) }
-  await page.goto(web)
+  await page.goto(web + '?view=planner')
   await page.getByRole('combobox', { name: 'TO', exact: true }).click()
   await page.getByRole('option', { name: /^Admiralty East Rail/ }).click()
   await page.locator('[aria-controls="departure-calendar"]').click()

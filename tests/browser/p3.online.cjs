@@ -34,7 +34,8 @@ async function probe(endpoint, body) {
   visitor.on('request', request => {
     if (request.url().startsWith(api) && (request.headers()['x-review-token'] || request.headers()['x-csrf-token'] || request.headers().authorization)) forbiddenHeaders.push(new URL(request.url()).pathname)
   })
-  await visitor.goto(web, { timeout: 60000 })
+  const plannerUrl = new URL(web); plannerUrl.searchParams.set('view', 'planner')
+  await visitor.goto(plannerUrl.href, { timeout: 60000 })
   await visitor.getByRole('button', { name: 'Find resilient routes' }).waitFor({ timeout: 60000 })
   await visitor.getByRole('combobox', { name: 'TO', exact: true }).click(); await visitor.getByRole('option', { name: /Admiralty/ }).click()
   evidence.departure_hkt = await futureJourney(visitor)

@@ -126,7 +126,7 @@ let browser, page
   page.on('pageerror', error => browserErrors.push(error.message))
   const applicationWrites = []
   page.on('request', request => { if (request.method() === 'POST') { assert.ok(request.url().startsWith(api), 'Application write escaped isolated API'); applicationWrites.push(new URL(request.url()).pathname) } })
-  await page.goto(web); await page.getByRole('button', { name: 'Find resilient routes', exact: false }).waitFor()
+  await page.goto(web + '?view=planner'); await page.getByRole('button', { name: 'Find resilient routes', exact: false }).waitFor()
   await assertRemovedPages(page); await settled(page)
   // Let the remote basemap finish its first paint for review screenshots. The
   // assertions below still work if that optional geographic background fails.
