@@ -39,7 +39,7 @@ export function EntryApp() {
   return <>
     <div inert={open} aria-hidden={open || undefined}>
       {plannerReady ? <Suspense fallback={<PlannerPreview />}><Planner /></Suspense> : <PlannerPreview />}
-      <button type="button" id="preferences-trigger" className={css.reopen} onClick={() => setOpen(true)}><Icon name="route" size={18} />我的出行偏好</button>
+      <button type="button" id="preferences-trigger" lang="zh-CN" className={css.reopen} onClick={() => setOpen(true)}><Icon name="route" size={18} />我的出行偏好</button>
     </div>
     {open && <Onboarding onClose={close} />}
   </>
