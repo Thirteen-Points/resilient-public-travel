@@ -25,8 +25,8 @@ export function EntryApp() {
   })
   const [plannerReady, setPlannerReady] = useState(!open)
   useEffect(() => {
-    document.documentElement.lang = open ? 'zh-CN' : 'en'
-    document.title = open ? '你的出行偏好 · ResilientRoute' : 'ResilientRoute'
+    document.documentElement.lang = 'en'
+    document.title = open ? 'Your travel preferences · ResilientRoute' : 'ResilientRoute'
   }, [open])
   function close() {
     if (readState().phase === 'complete') window.dispatchEvent(new Event('rr:preferences-applied'))
@@ -39,7 +39,7 @@ export function EntryApp() {
   return <>
     <div inert={open} aria-hidden={open || undefined}>
       {plannerReady ? <Suspense fallback={<PlannerPreview />}><Planner /></Suspense> : <PlannerPreview />}
-      <button type="button" id="preferences-trigger" lang="zh-CN" className={css.reopen} onClick={() => setOpen(true)}><Icon name="route" size={18} />我的出行偏好</button>
+      <button type="button" id="preferences-trigger" className={css.reopen} onClick={() => setOpen(true)}><Icon name="route" size={18} />Travel preferences</button>
     </div>
     {open && <Onboarding onClose={close} />}
   </>

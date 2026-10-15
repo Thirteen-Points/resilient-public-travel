@@ -1,14 +1,14 @@
 /** The nine UI dimensions share one neutral prior and one normalization pass. */
 export const DIMENSIONS = [
-  { id: 'time', label: '出行时间', short: '时间', description: '优先选择更快到达的路线', prior: .5, color: '#56806a' },
-  { id: 'transfers', label: '换乘次数', short: '换乘', description: '优先选择换乘更少的路线', prior: .5, color: '#89966d' },
-  { id: 'walking', label: '步行距离', short: '步行', description: '优先选择步行更短的路线', prior: .5, color: '#7c9b91' },
-  { id: 'fare', label: '出行票价', short: '票价', description: '优先选择花费更低的路线', prior: .5, color: '#ae8d64' },
-  { id: 'comfort', label: '乘坐舒适', short: '舒适', description: '优先选择更舒适的路线', prior: .5, color: '#9b8ba1' },
-  { id: 'reliability', label: '到达可靠性', short: '可靠', description: '优先选择延误更少的路线', prior: .5, color: '#6f919d' },
-  { id: 'carbon', label: '碳排放', short: '低碳', description: '优先选择排放更低的路线', prior: .5, color: '#608b64' },
-  { id: 'freshness', label: '信息新鲜度', short: '实时', description: '优先选择信息更新更及时的路线', prior: .5, color: '#719ba8' },
-  { id: 'accessibility', label: '无障碍友好', short: '无障碍', description: '更重视电梯、坡道与连续无障碍通道', prior: .5, color: '#a2866b' },
+  { id: 'time', label: 'Travel time', short: 'Time', description: 'Prefer routes that get you there sooner', prior: .5, color: '#56806a' },
+  { id: 'transfers', label: 'Transfers', short: 'Transfers', description: 'Prefer routes with fewer transfers', prior: .5, color: '#89966d' },
+  { id: 'walking', label: 'Walking distance', short: 'Walking', description: 'Prefer routes with less walking', prior: .5, color: '#7c9b91' },
+  { id: 'fare', label: 'Fare', short: 'Fare', description: 'Prefer routes that cost less', prior: .5, color: '#ae8d64' },
+  { id: 'comfort', label: 'Comfort', short: 'Comfort', description: 'Prefer a calmer, more comfortable ride', prior: .5, color: '#9b8ba1' },
+  { id: 'reliability', label: 'Reliability', short: 'Reliability', description: 'Prefer routes with fewer delays', prior: .5, color: '#6f919d' },
+  { id: 'carbon', label: 'Carbon emissions', short: 'Low carbon', description: 'Prefer routes with lower carbon emissions', prior: .5, color: '#608b64' },
+  { id: 'freshness', label: 'Live information', short: 'Live info', description: 'Prefer routes with recently updated information', prior: .5, color: '#719ba8' },
+  { id: 'accessibility', label: 'Accessibility', short: 'Access', description: 'Prioritize lifts, ramps and continuous step-free access', prior: .5, color: '#a2866b' },
 ] as const
 
 export type Dimension = typeof DIMENSIONS[number]['id']
@@ -20,15 +20,15 @@ const options = (dimension: Dimension, labels: [string, string, string]): Option
 }))
 
 export const QUESTIONS: Record<Dimension, Question> = {
-  time: { id: 'time', title: '快一点，还是从容一点？', options: options('time', ['尽快到达，多换乘也可以', '时间与体验，同样重要', '慢一点也没关系']) },
-  transfers: { id: 'transfers', title: '关于换乘，你怎么想？', options: options('transfers', ['尽量直达，稍慢也值得', '一两次换乘，可以接受', '只要更快，多换几次也可以']) },
-  walking: { id: 'walking', title: '走多远，你觉得刚刚好？', options: options('walking', ['尽量少走路', '步行 5–10 分钟可以', '愿意多走一段']) },
-  fare: { id: 'fare', title: '票价会影响你的选择吗？', options: options('fare', ['更经济，慢一点也值得', '预算与体验平衡', '体验更好，价差可以接受']) },
-  comfort: { id: 'comfort', title: '舒适一点，值得多花时间吗？', options: options('comfort', ['值得，尽量避开拥挤', '适度舒适就好', '更在意尽快到达']) },
-  reliability: { id: 'reliability', title: '准时抵达，对你有多重要？', options: options('reliability', ['稳定最重要，稍慢也可以', '速度与稳定兼顾', '更在意预计时间']) },
-  carbon: { id: 'carbon', title: '你愿意为低碳多花一点时间吗？', options: options('carbon', ['愿意，低碳很重要', '条件相近时，优先低碳', '优先满足当下需要']) },
-  freshness: { id: 'freshness', title: '你多在意信息的及时性？', options: options('freshness', ['实时更新很重要', '近期更新就可以', '愿意自行确认信息']) },
-  accessibility: { id: 'accessibility', title: '无障碍通道，对你重要吗？', options: options('accessibility', ['非常重要，优先无障碍通道', '有时需要', '目前没有特别偏好']) },
+  time: { id: 'time', title: 'A faster route, or an easier ride?', options: options('time', ['Get there fast, even with more transfers', 'Balance time and comfort', "Take it slow, I'm not in a rush"]) },
+  transfers: { id: 'transfers', title: 'How do you feel about transfers?', options: options('transfers', ['Stay direct, even if it takes longer', 'One or two transfers are fine', 'More transfers are fine if the trip is faster']) },
+  walking: { id: 'walking', title: 'How much walking feels right?', options: options('walking', ['Keep walking to a minimum', 'A 5-10 minute walk is fine', "I'm happy to walk a little further"]) },
+  fare: { id: 'fare', title: 'How much does the fare matter?', options: options('fare', ['Spend less, even if it takes longer', 'Balance cost and experience', 'Pay a little more for a better trip']) },
+  comfort: { id: 'comfort', title: 'Is a calmer ride worth a little longer?', options: options('comfort', ['Yes, give me room to breathe', 'A little comfort is enough', 'Getting there quickly matters more']) },
+  reliability: { id: 'reliability', title: 'How important is arriving on time?', options: options('reliability', ['Choose a steady route, even if slower', 'Balance speed and reliability', 'Choose the shortest estimated time']) },
+  carbon: { id: 'carbon', title: 'Would you take longer for lower emissions?', options: options('carbon', ['Yes, lower emissions matter to me', 'Choose low carbon when the trip is similar', 'Focus on what I need right now']) },
+  freshness: { id: 'freshness', title: 'How fresh should your travel updates be?', options: options('freshness', ['Live updates are essential', 'Recent updates are enough', 'I can check the details along the way']) },
+  accessibility: { id: 'accessibility', title: 'How important is step-free access?', options: options('accessibility', ['Prioritize step-free routes', 'Helpful on some trips', 'No particular preference right now']) },
 }
 
 export const CORE: Dimension[] = ['time', 'transfers', 'walking']
@@ -116,7 +116,7 @@ export function calculateProfile(state: State): PreferenceProfile {
     const option = QUESTIONS[id].options.find(item => item.id === answers[id])
     const status: Evidence['status'] = observations[id]?.length ? 'collected' : answers[id] === null ? 'skipped' : 'prior'
     return [id, { status, raw: raw[id], option: option?.label ?? null,
-      source: option?.label ?? (status === 'skipped' ? '已跳过 · 中性权重' : '未采集 · 中性权重') }]
+      source: option?.label ?? (status === 'skipped' ? 'Skipped · neutral weight' : 'Not collected · neutral weight') }]
   })) as Record<Dimension, Evidence>
   return { version: 2, weights, evidence, collected: DIMENSIONS.filter(({ id }) => evidence[id].status === 'collected').length, total: DIMENSIONS.length, answers }
 }

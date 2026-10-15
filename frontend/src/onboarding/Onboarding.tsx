@@ -9,12 +9,12 @@ function Profile({ state }: { state: State }) {
   const profile = calculateProfile(state)
   const rounded = percentages(profile.weights)
   const maximum = Math.max(...Object.values(profile.weights))
-  return <div className={css.profile} aria-label="推荐权重画像">
+  return <div className={css.profile} aria-label="Recommendation weight profile">
     {DIMENSIONS.map(dimension => <div className={css.weightRow} key={dimension.id} data-weight-dimension={dimension.id}>
       <Icon name={dimension.id} size={16} /><span>{dimension.short}</span>
       <div className={css.weightTrack}><i data-weight style={{ transform: `scaleX(${profile.weights[dimension.id] / maximum})`, backgroundColor: dimension.color }} /></div>
       <strong data-weight-percent={rounded[dimension.id]}>{rounded[dimension.id]}<span>%</span></strong>
-      <span className={css.evidence} aria-label={`${dimension.label}来源`}>{profile.evidence[dimension.id].status === 'collected' ? profile.evidence[dimension.id].option : profile.evidence[dimension.id].status === 'skipped' ? '已跳过 · 中性' : '未采集 · 中性'}</span>
+      <span className={css.evidence} aria-label={`${dimension.label} source`}>{profile.evidence[dimension.id].status === 'collected' ? profile.evidence[dimension.id].option : profile.evidence[dimension.id].status === 'skipped' ? 'Skipped · Neutral' : 'Not answered · Neutral'}</span>
     </div>)}
   </div>
 }
@@ -129,16 +129,16 @@ export function Onboarding({ onClose }: { onClose: () => void }) {
     track('export')
   }
   const liveText = state.phase === 'question'
-    ? `${state.cursor + 1} / ${steps}。${question.title}。${state.pending ? `已选择${question.options[selectedIndex]?.label}，即将自动进入下一题。` : ''}已采集${profile.collected}个维度。当前${DIMENSIONS.find(d => d.id === question.id)?.label}权重${percentages(profile.weights)[question.id]}%。`
-    : state.phase === 'summary' ? `你的出行偏好已生成。已采集${profile.collected}个维度。全部权重合计100%。`
-    : state.phase === 'complete' ? `你的偏好，已就绪。${storageAvailable ? '已保存至当前浏览器。' : '浏览器无法保存，可导出画像。'}` : '欢迎。你的旅程，你来定义。'
+    ? `Question ${state.cursor + 1} of ${steps}. ${question.title} ${state.pending ? `Selected: ${question.options[selectedIndex]?.label}. Moving to the next question. ` : ''}${profile.collected} dimensions collected. ${DIMENSIONS.find(d => d.id === question.id)?.label} weight: ${percentages(profile.weights)[question.id]} percent.`
+    : state.phase === 'summary' ? `Your travel preferences are ready. ${profile.collected} dimensions collected. All weights total 100 percent.`
+    : state.phase === 'complete' ? `Your preferences are ready. ${storageAvailable ? 'Saved in this browser.' : 'Browser storage is unavailable. You can export your profile.'}` : 'Welcome. Your journey. Your way.'
 
-  return <dialog ref={dialog} className={css.dialog} aria-modal="true" aria-labelledby="onboarding-title" lang="zh-CN" onKeyDown={keepFocus} onCancel={event => { event.preventDefault(); if (state.phase === 'question') send({ type: 'BACK' }); else close() }}>
+  return <dialog ref={dialog} className={css.dialog} aria-modal="true" aria-labelledby="onboarding-title" lang="en" onKeyDown={keepFocus} onCancel={event => { event.preventDefault(); if (state.phase === 'question') send({ type: 'BACK' }); else close() }}>
     <div className={css.dialogGrid}>
       <section className={css.left}>
         <header className={`${css.topbar} flex items-center justify-between`}>
-          <span className={css.mark}><Icon name="route" size={24} /></span>
-          <div className="flex items-center gap-3" aria-label={`问卷进度 ${progress} / ${steps}`}>
+          <span className={css.mark} data-brand="rr." aria-label="ResilientRoute">rr<span>.</span></span>
+          <div className="flex items-center gap-3" aria-label={`Questionnaire progress: ${progress} of ${steps}`}>
             <div className={css.progressDots} aria-hidden="true">{Array.from({ length: steps }).map((_, index) => <i key={index} className={index < progress ? css.dotComplete : index === progress ? css.dotCurrent : ''} />)}</div>
             <span className={css.counter}>{String(progress).padStart(2, '0')}<i>/</i>{String(steps).padStart(2, '0')}</span>
           </div>
@@ -146,10 +146,10 @@ export function Onboarding({ onClose }: { onClose: () => void }) {
         <div ref={content} className={css.content}>
           {state.phase === 'welcome' && <div className={css.welcome}>
             <div className={css.welcomeSymbol} aria-hidden="true"><span /><span /><i /><i /></div>
-            <h1 ref={title} tabIndex={-1} id="onboarding-title">你的旅程，<br /><em>你来定义。</em></h1>
+            <h1 ref={title} tabIndex={-1} id="onboarding-title">Your journey.<br /><em>Your way.</em></h1>
             <div className={css.dimensionIcons} aria-hidden="true">{DIMENSIONS.slice(0,6).map(dimension => <span key={dimension.id}><Icon name={dimension.id} size={19} /></span>)}</div>
-            <button type="button" className={css.primary} onClick={() => send({ type: 'START' })}>开始探索<Icon name="arrow" /></button>
-            <button type="button" className={css.welcomeLater} onClick={close}>稍后再说</button>
+            <button type="button" className={css.primary} onClick={() => send({ type: 'START' })}>Let's begin<Icon name="arrow" /></button>
+            <button type="button" className={css.welcomeLater} onClick={close}>Maybe later</button>
           </div>}
           {state.phase === 'question' && <div className={css.question}>
             <span className={css.questionIcon} aria-hidden="true"><Icon name={question.id} size={27} /></span>
@@ -160,32 +160,32 @@ export function Onboarding({ onClose }: { onClose: () => void }) {
               </button>)}
             </div>
             <div className={`${css.questionActions} flex items-center justify-between`}>
-              <button type="button" onClick={() => send({ type: 'BACK' })}><Icon name="back" size={16} />上一题</button>
-              {answer !== undefined && !state.pending && <button type="button" onClick={() => send({ type: 'NEXT' })}>保留并继续<Icon name="arrow" size={16} /></button>}
-              <button type="button" onClick={() => send({ type: 'SKIP' })}>跳过<Icon name="arrow" size={16} /></button>
+              <button type="button" onClick={() => send({ type: 'BACK' })}><Icon name="back" size={16} />Back</button>
+              {answer !== undefined && !state.pending && <button type="button" onClick={() => send({ type: 'NEXT' })}>Keep &amp; continue<Icon name="arrow" size={16} /></button>}
+              <button type="button" onClick={() => send({ type: 'SKIP' })}>Skip<Icon name="arrow" size={16} /></button>
             </div>
           </div>}
           {(state.phase === 'summary' || state.phase === 'complete') && <div className={css.summary}>
-            <h1 ref={title} tabIndex={-1} id="onboarding-title">{state.phase === 'complete' ? <>你的偏好，<em>已就绪。</em></> : <>你的<span>出行偏好</span></>}</h1>
+            <h1 ref={title} tabIndex={-1} id="onboarding-title">{state.phase === 'complete' ? <>Your preferences, <em>ready.</em></> : <>Your travel <span>preferences</span></>}</h1>
             <Profile state={state} />
             <div className={css.summaryActions}>
               {state.phase === 'summary' ? <>
-                <button type="button" className={css.primary} onClick={() => send({ type: 'FINISH' })}>完成<Icon name="check" size={19} /></button>
-                {state.queue.length === CORE.length && <button type="button" className={css.secondary} onClick={() => send({ type: 'CONTINUE' })}>继续完善<Icon name="arrow" size={18} /></button>}
-              </> : <button type="button" className={css.primary} onClick={close}>开始规划<Icon name="arrow" size={19} /></button>}
+                <button type="button" className={css.primary} onClick={() => send({ type: 'FINISH' })}>Finish<Icon name="check" size={19} /></button>
+                {state.queue.length === CORE.length && <button type="button" className={css.secondary} onClick={() => send({ type: 'CONTINUE' })}>Explore more<Icon name="arrow" size={18} /></button>}
+              </> : <button type="button" className={css.primary} onClick={close}>Plan my journey<Icon name="arrow" size={19} /></button>}
             </div>
             <div className={`${css.summaryLinks} flex items-center justify-between`}>
-              <button type="button" onClick={() => send({ type: 'BACK' })}><Icon name="back" size={15} />回看答案</button>
-              <button type="button" onClick={download}><Icon name="download" size={15} />导出画像</button>
+              <button type="button" onClick={() => send({ type: 'BACK' })}><Icon name="back" size={15} />Review answers</button>
+              <button type="button" onClick={download}><Icon name="download" size={15} />Export profile</button>
             </div>
-            {!storageAvailable && <button type="button" className={css.storageRetry} onClick={() => setStorageAvailable(persistState(state))}>保存失败，重试保存</button>}
+            {!storageAvailable && <button type="button" className={css.storageRetry} onClick={() => setStorageAvailable(persistState(state))}>Couldn't save. Try again</button>}
           </div>}
         </div>
-        <div className={css.bottomTrack} role="progressbar" aria-label="偏好采集进度" aria-valuemin={0} aria-valuemax={steps} aria-valuenow={progress}><span style={{ transform: `scaleX(${progress / steps})` }} /></div>
+        <div className={css.bottomTrack} role="progressbar" aria-label="Preference collection progress" aria-valuemin={0} aria-valuemax={steps} aria-valuenow={progress}><span style={{ transform: `scaleX(${progress / steps})` }} /></div>
       </section>
       <div className={css.mapPanel}><PreferenceMap dimension={question.id} strength={selectedIndex === -1 ? .5 : [1,.5,.16][selectedIndex]} revision={state.revision} direction={state.direction} stage={state.phase} /></div>
     </div>
-    <button type="button" className={css.close} aria-label="暂时关闭引导" onClick={close}><Icon name="close" size={19} /></button>
+    <button type="button" className={css.close} aria-label="Close onboarding" onClick={close}><Icon name="close" size={19} /></button>
     <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{liveText}</div>
   </dialog>
 }
