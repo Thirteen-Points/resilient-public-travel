@@ -131,7 +131,7 @@ function RouteCard({ route, letter, network, selected, onSelect, onDetail }: {
   </article>
 }
 
-export function App() {
+export function App({ onOpenPreferences }: { onOpenPreferences?: () => void } = {}) {
   const [seedBundle, setBundle] = useState<Bundle | null>(null)
   const live = useLiveSession(!SEED_MODE)
   const bundle: Bundle | null = SEED_MODE ? seedBundle : live.bundle ? {
@@ -350,6 +350,7 @@ export function App() {
         <button type="button" aria-current={journeyScreen ? 'page' : undefined} onClick={() => navigate('journey')}>Plan journey</button>
         <button type="button" aria-current={screen === 'updates' ? 'page' : undefined} onClick={() => navigate('updates')}>Updates</button>
         <button type="button" aria-current={screen === 'sources' ? 'page' : undefined} onClick={() => navigate('sources')}>How it works</button>
+        {onOpenPreferences && <button type="button" id="preferences-trigger" aria-haspopup="dialog" onClick={() => { setMenuOpen(false); onOpenPreferences() }}>Travel preferences</button>}
       </nav>
       <button type="button" className={css.demo} onClick={switchDataMode}>{SEED_MODE ? 'FIXED SEED · USE API' : 'API MODE · USE SEED'}</button>
     </header>

@@ -34,12 +34,15 @@ export function EntryApp() {
     setOpen(false)
     const url = new URL(window.location.href)
     if (url.searchParams.get('view') === 'preferences') { url.searchParams.delete('view'); window.history.replaceState(null, '', url) }
-    window.requestAnimationFrame(() => document.getElementById('preferences-trigger')?.focus({ preventScroll: true }))
+    window.requestAnimationFrame(() => {
+      const trigger = document.getElementById('preferences-trigger')
+      const target = trigger?.getClientRects().length ? trigger : document.getElementById('navigation-toggle')
+      target?.focus({ preventScroll: true })
+    })
   }
   return <>
     <div inert={open} aria-hidden={open || undefined}>
-      {plannerReady ? <Suspense fallback={<PlannerPreview />}><Planner /></Suspense> : <PlannerPreview />}
-      <button type="button" id="preferences-trigger" className={css.reopen} onClick={() => setOpen(true)}><Icon name="route" size={18} />Travel preferences</button>
+      {plannerReady ? <Suspense fallback={<PlannerPreview />}><Planner onOpenPreferences={() => setOpen(true)} /></Suspense> : <PlannerPreview />}
     </div>
     {open && <Onboarding onClose={close} />}
   </>

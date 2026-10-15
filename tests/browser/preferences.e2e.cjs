@@ -171,6 +171,14 @@ async function focusInside(page) {
   await audit(page, 'complete'); await page.screenshot({ path: path.join(out, '04-complete.png') })
   pass('all six additional dimensions, reload, cancellation, normalized explainable profile, event history and JSON export')
   await page.getByRole('button', { name: 'Plan my journey', exact: true }).click(); await page.locator('dialog[open]').waitFor({ state: 'hidden' })
+  const preferencesEntry = page.getByRole('navigation', { name: 'Main navigation', exact: true }).getByRole('button', { name: 'Travel preferences', exact: true })
+  await preferencesEntry.waitFor({ state: 'visible' })
+  assert.equal(await preferencesEntry.locator('svg, img, i').count(), 0, 'The navigation entry has no icon')
+  assert.equal(await preferencesEntry.evaluate(button => button.previousElementSibling?.textContent), 'How it works', 'Preferences follow How it works')
+  await page.screenshot({ path: path.join(out, '07-planner-preferences-navigation.png') })
+  await preferencesEntry.click(); await page.locator('dialog[open]').waitFor()
+  await page.getByRole('button', { name: 'Close onboarding', exact: true }).click(); await page.locator('dialog[open]').waitFor({ state: 'hidden' })
+  await page.waitForFunction(() => document.activeElement?.id === 'preferences-trigger')
   await page.reload(); assert.equal(await page.locator('dialog[open]').count(), 0, 'Completed visitors return to the planner')
   await page.goto(url('preferences')); await page.locator('dialog[open]').waitFor()
   await page.getByRole('button', { name: 'Close onboarding', exact: true }).click(); await page.locator('dialog[open]').waitFor({ state: 'hidden' })
@@ -179,7 +187,37 @@ async function focusInside(page) {
   await bypass.page.getByRole('button', { name: /^Find resilient routes/ }).waitFor()
   assert.equal(await bypass.page.locator('dialog[open]').count(), 0)
   assert.equal(await bypass.page.evaluate(() => Object.keys(localStorage).length + Object.keys(sessionStorage).length), 0, 'Explicit planner entry does not write onboarding storage')
-  await bypass.context.close(); pass('completion, explicit reopen/close and clean planner bypass')
+  for (const width of [1440, 1024, 390, 320]) {
+    await bypass.page.setViewportSize({ width, height: 844 })
+    await bypass.page.waitForFunction(() => {
+      const compact = matchMedia('(max-width: 1023px)').matches
+      const toggle = document.getElementById('navigation-toggle'), nav = document.getElementById('main-navigation')
+      return compact ? toggle.getBoundingClientRect().width > 0 && nav.hidden : toggle.getBoundingClientRect().width === 0 && !nav.hidden
+    })
+    if (width < 1024) await bypass.page.getByRole('button', { name: 'Open navigation', exact: true }).click()
+    await bypass.page.mouse.move(1, 1)
+    const entry = bypass.page.getByRole('navigation', { name: 'Main navigation', exact: true }).getByRole('button', { name: 'Travel preferences', exact: true })
+    await entry.waitFor({ state: 'visible' })
+    const navigation = await entry.evaluate(button => {
+      const previous = button.previousElementSibling, r = button.getBoundingClientRect(), prior = previous.getBoundingClientRect()
+      const properties = ['fontFamily', 'fontSize', 'fontWeight', 'color', 'backgroundColor', 'borderRadius', 'padding']
+      return { previous: previous.textContent, left: r.left, right: r.right, priorRight: prior.right, centerY: r.top + r.height / 2, priorCenterY: prior.top + prior.height / 2,
+        width: innerWidth, documentWidth: document.documentElement.scrollWidth,
+        styles: properties.map(key => getComputedStyle(button)[key]), previousStyles: properties.map(key => getComputedStyle(previous)[key]),
+        iconCount: button.querySelectorAll('svg, img, i').length, fixed: getComputedStyle(button).position === 'fixed' }
+    })
+    assert.equal(navigation.previous, 'How it works')
+    assert.ok(navigation.left >= navigation.priorRight - 1 && Math.abs(navigation.centerY - navigation.priorCenterY) < 1, `${width}: Preferences sit to the right of How it works`)
+    assert.ok(navigation.right <= width + 1 && navigation.documentWidth <= width + 1, `${width}: Navigation fits the viewport`)
+    assert.deepEqual(navigation.styles, navigation.previousStyles, `${width}: The entry uses the same navigation styling`)
+    assert.equal(navigation.iconCount, 0); assert.equal(navigation.fixed, false)
+    if (width === 390) await bypass.page.screenshot({ path: path.join(out, '08-mobile-preferences-navigation.png') })
+    await entry.click(); await bypass.page.locator('dialog[open]').waitFor()
+    if (width < 1024) assert.equal(await bypass.page.locator('#main-navigation').getAttribute('hidden'), '', 'Opening preferences folds the mobile menu')
+    await bypass.page.getByRole('button', { name: 'Close onboarding', exact: true }).click(); await bypass.page.locator('dialog[open]').waitFor({ state: 'hidden' })
+    await bypass.page.waitForFunction(id => document.activeElement?.id === id, width < 1024 ? 'navigation-toggle' : 'preferences-trigger')
+  }
+  await bypass.context.close(); pass('completion, navigation placement and styling, desktop/mobile reopen and focus restoration, and clean planner bypass')
   for (const width of [320, 390, 768]) {
     const mobile = await setup({ viewport: { width, height: 844 }, reducedMotion: 'reduce' })
     await mobile.page.goto(url()); await mobile.page.getByRole('button', { name: "Let's begin", exact: true }).waitFor(); await pause(120)
