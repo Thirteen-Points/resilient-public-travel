@@ -19,6 +19,7 @@ import { gsap, useGSAP, usePageMotion, usePageTransition, useSuccessMotion } fro
 import { lineGradient, lineStyle, resolveLine } from './lib/lineColors'
 import { TRANSPORT_OPTIONS, transportLabel } from './lib/transport'
 import { eastRailStations, findEastRailAccess, type StraightLineAccess } from './lib/eastRailAccess'
+import { loadPlannerProfile } from './onboarding/plannerProfile'
 import type { DemoMeta, Event, JourneyContext, Network, Persona, Preset, RouteCandidate, Signal, TravelProfile, TransitMode } from './api/types'
 import { formatHkt, formatRange, legDuration, modeSummary, nodeIndex } from './data'
 import css from './App.module.css'
@@ -150,10 +151,10 @@ export function App() {
   const [picked, setPicked] = useState('')
   const [access, setAccess] = useState<{ origin: StraightLineAccess | null; destination: StraightLineAccess | null }>({ origin: null, destination: null })
   const [error, setError] = useState('')
-  const [preset, setPreset] = useState<Preset>('fastest')
+  const [preset, setPreset] = useState<Preset>(() => loadPlannerProfile()?.preset ?? 'fastest')
   const [persona, setPersona] = useState<Persona>('commuter')
   const [transport, setTransport] = useState<'all' | TransitMode>('all')
-  const [customProfile, setCustomProfile] = useState<TravelProfile | undefined>()
+  const [customProfile, setCustomProfile] = useState<TravelProfile | undefined>(loadPlannerProfile)
   const effectiveProfile = useMemo(() => resolveProfile({ persona, preset, profile: customProfile }), [persona, preset, customProfile])
   const [largeText, setLargeText] = useState(false), [highContrast, setHighContrast] = useState(false)
   const [departure, setDeparture] = useState(INITIAL_DEPARTURE.slice(11, 16))
@@ -177,6 +178,21 @@ export function App() {
   const context = useMemo<JourneyContext>(() => ({ origin, destination, departAt: hktDeparture(departureDate, departure), preset, persona, profile: effectiveProfile, requiredModes: transport === 'all' ? undefined : [transport], eventRevisions, eventIds: eventRevisions ? eventRevisions.split(',').map(value => value.slice(0, value.lastIndexOf('@'))) : [] }), [origin, destination, departureDate, departure, preset, persona, effectiveProfile, transport, eventRevisions])
   const plannerKey = routeSelectionKey(context)
   const resultCurrent = submitted?.key === plannerKey
+  useEffect(() => {
+    const applySavedPreferences = () => {
+      const profile = loadPlannerProfile()
+      if (!profile) return
+      routeRequests.current.cancel()
+      searchingRef.current = false
+      setSearching(false)
+      setCustomProfile(previous => ({ ...(previous ?? profile), preset: profile.preset, weights: profile.weights }))
+      setPreset(profile.preset)
+      setSubmitted(null)
+      setScreen('journey')
+    }
+    window.addEventListener('rr:preferences-applied', applySavedPreferences)
+    return () => window.removeEventListener('rr:preferences-applied', applySavedPreferences)
+  }, [])
   useEffect(() => {
     if (searchingRef.current && (requestedJourney.current !== plannerKey || requestedScreen.current !== screen)) { routeRequests.current.cancel(); searchingRef.current = false; setSearching(false) }
   }, [plannerKey, screen])

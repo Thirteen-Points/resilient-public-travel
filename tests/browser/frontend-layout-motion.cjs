@@ -60,20 +60,66 @@ async function chooseTomorrow(page) {
 async function transitionAnimations(page) {
   return page.evaluate(() => document.getAnimations().filter(animation => animation.effect?.pseudoElement?.startsWith('::view-transition')).map(animation => ({ name: animation.animationName, pseudo: animation.effect.pseudoElement, target: animation.effect.target?.tagName, currentTime: animation.currentTime, duration: animation.effect.getTiming().duration, playState: animation.playState })))
 }
-async function panelPaint(page) {
-  return page.locator('[data-panel]').evaluateAll(panels => panels.filter(panel => panel.getBoundingClientRect().width > 0).map(panel => ({ opacity: Number(getComputedStyle(panel).opacity), transform: getComputedStyle(panel).transform })))
+async function armPageMotion(page, from, to) {
+  // Start inside the browser before the real click. A slow automation response
+  // must not erase a short animation that the browser has already painted.
+  await page.evaluate(({ from, to }) => {
+    window.layoutMotionSampler?.cancel()
+    const main = document.querySelector('main'), initialScreen = main?.getAttribute('data-screen')
+    const sample = { from, to, initialScreen, changedAt: null, frames: [], done: false }
+    const armedAt = performance.now()
+    let raf, observer
+    const stop = () => { cancelAnimationFrame(raf); observer.disconnect(); sample.done = true }
+    window.layoutMotionSampler = { sample, cancel: stop }
+    observer = new MutationObserver(() => {
+      if (sample.changedAt === null && main?.getAttribute('data-screen') !== initialScreen) sample.changedAt = performance.now()
+    })
+    observer.observe(main, { attributes: true, attributeFilter: ['data-screen'] })
+    const tick = now => {
+      const screen = main.getAttribute('data-screen')
+      if (sample.changedAt === null && screen !== initialScreen) sample.changedAt = now
+      if (sample.changedAt !== null) {
+        const panels = Array.from(main.querySelectorAll('[data-panel]')).filter(panel => {
+          const rect = panel.getBoundingClientRect(), style = getComputedStyle(panel)
+          return rect.width > 0 && rect.height > 0 && !panel.closest('[hidden]') && style.visibility !== 'hidden' && style.display !== 'none'
+        }).map(panel => { const style = getComputedStyle(panel); return { opacity: Number(style.opacity), transform: style.transform } })
+        const animations = document.getAnimations().filter(animation => animation.effect?.pseudoElement?.startsWith('::view-transition') && animation.playState === 'running')
+          .map(animation => ({ name: animation.animationName, pseudo: animation.effect.pseudoElement, target: animation.effect.target?.tagName,
+            currentTime: animation.currentTime, duration: animation.effect.getTiming().duration, playState: animation.playState }))
+        sample.frames.push({ elapsed: now - sample.changedAt, screen, panels, animations })
+        if (now - sample.changedAt >= 600) { stop(); return }
+      }
+      // Bound a missing navigation as well as the post-commit capture window.
+      if (now - armedAt >= 3500) { stop(); return }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+  }, { from, to })
 }
-async function observePageMotion(page, scoped) {
+async function observePageMotion(page, scoped, duringTransition = false) {
+  await page.waitForFunction(({ scoped, duringTransition }) => {
+    const sample = window.layoutMotionSampler?.sample
+    if (!sample) return false
+    return sample.done || duringTransition && sample.frames.some(frame => scoped ? frame.animations.length > 0
+      : frame.panels.some(panel => panel.opacity < .999 || panel.transform !== 'none'))
+  }, { scoped, duringTransition }, { timeout: 4500 })
+  const sample = await page.evaluate(() => window.layoutMotionSampler.sample)
+  const diagnostic = `${sample.from} → ${sample.to}: ${JSON.stringify(sample)}`
+  // Save each transition immediately, so a later assertion failure still keeps
+  // all actual frame samples in the CI evidence artifact.
+  const name = `${sample.from}-to-${sample.to}${duringTransition ? '-interrupted' : ''}`.toLowerCase().replaceAll(' ', '-')
+  fs.writeFileSync(path.join(folder, `motion-${name}.json`), JSON.stringify(sample, null, 2) + '\n')
+  assert.ok(sample.changedAt !== null && sample.frames.length > 0, `Navigation was not painted: ${diagnostic}`)
   if (scoped) {
-    await page.waitForFunction(() => document.getAnimations().some(animation => animation.effect?.pseudoElement?.startsWith('::view-transition') && animation.playState === 'running'), undefined, { timeout: 1200 })
-    const animations = await transitionAnimations(page)
-    assert.ok(animations.some(animation => Number(animation.duration) >= 200 && Number(animation.duration) <= 500), `Native scope motion timing ${JSON.stringify(animations)}`)
-    assert.ok(animations.every(animation => animation.target === 'MAIN'), 'Native animations must stay inside the main element scope')
-    return { mode: 'element-scoped', animations }
+    const animations = sample.frames.flatMap(frame => frame.animations)
+    assert.ok(animations.some(animation => Number(animation.duration) >= 200 && Number(animation.duration) <= 500), `Native scope motion timing ${diagnostic}`)
+    assert.ok(animations.every(animation => animation.target === 'MAIN'), `Native animations must stay inside the main element scope: ${diagnostic}`)
+    return { mode: 'element-scoped', ...sample }
   }
-  const early = await panelPaint(page); await frames(page); const next = await panelPaint(page)
-  assert.ok([...early, ...next].some(panel => panel.opacity < .999 || panel.transform !== 'none'), `Compatible panel motion was not painted: ${JSON.stringify({ early, next })}`)
-  return { mode: 'panel-motion', early, next }
+  const moving = sample.frames.filter(frame => frame.panels.some(panel => panel.opacity < .999 || panel.transform !== 'none'))
+  assert.ok(moving.length > 0, `Compatible panel motion was not painted: ${diagnostic}`)
+  const settledFrame = sample.frames.find(frame => frame.elapsed > moving.at(-1).elapsed && frame.panels.length && frame.panels.every(panel => panel.opacity >= .999 && panel.transform === 'none'))
+  return { mode: 'panel-motion', paintedUntil: moving.at(-1).elapsed, settledAt: settledFrame?.elapsed ?? null, ...sample }
 }
 async function paintDiagnostics(page) {
   return page.evaluate(() => {
@@ -126,7 +172,7 @@ let browser, page
   page.on('pageerror', error => browserErrors.push(error.message))
   const applicationWrites = []
   page.on('request', request => { if (request.method() === 'POST') { assert.ok(request.url().startsWith(api), 'Application write escaped isolated API'); applicationWrites.push(new URL(request.url()).pathname) } })
-  await page.goto(web); await page.getByRole('button', { name: 'Find resilient routes', exact: false }).waitFor()
+  await page.goto(web + '?view=planner'); await page.getByRole('button', { name: 'Find resilient routes', exact: false }).waitFor()
   await assertRemovedPages(page); await settled(page)
   // Let the remote basemap finish its first paint for review screenshots. The
   // assertions below still work if that optional geographic background fails.
@@ -237,6 +283,7 @@ let browser, page
   const motions = []
   for (const from of ['Plan journey', 'Report', 'Agent']) for (const to of ['Updates', 'How it works']) {
     await navigate(page, from); await settled(page)
+    await armPageMotion(page, from, to)
     await navigate(page, to)
     const observed = await observePageMotion(page, scopedCapability)
     motions.push({ from, to, ...observed })
@@ -270,8 +317,9 @@ let browser, page
   assert.equal((await transitionAnimations(page)).length, 0, 'Interrupted navigation left a transition overlay')
   assert.equal(await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: 'Agent', exact: true }).getAttribute('aria-current'), 'page')
   pass('rapid navigation settles on the last page, with interactive controls and no orphan transition overlay')
-  await navigate(page, 'Plan journey'); await settled(page); await navigate(page, 'Report')
-  await observePageMotion(page, scopedCapability)
+  await navigate(page, 'Plan journey'); await settled(page)
+  await armPageMotion(page, 'Plan journey', 'Report'); await navigate(page, 'Report')
+  await observePageMotion(page, scopedCapability, true)
   await page.emulateMedia({ reducedMotion: 'reduce' }); await frames(page)
   await page.getByLabel('What did you see?', { exact: true }).fill('Reduced motion enabled during the page transition.')
   await settled(page); assert.equal((await transitionAnimations(page)).length, 0)
@@ -310,7 +358,7 @@ let browser, page
   await navigate(page, 'Plan journey'); await settled(page); await navigate(page, 'How it works'); await settled(page)
   await page.getByRole('heading', { name: 'Clarity before certainty.' }).waitFor()
   assert.equal((await transitionAnimations(page)).length, 0)
-  await navigate(page, 'Report'); await observePageMotion(page, false); await settled(page)
+  await armPageMotion(page, 'How it works', 'Report'); await navigate(page, 'Report'); await observePageMotion(page, false); await settled(page)
   await page.getByLabel('What did you see?', { exact: true }).fill('Older browsers retain usable navigation.')
   assert.equal(await page.getByLabel('What did you see?', { exact: true }).inputValue(), 'Older browsers retain usable navigation.')
   const fallbackPanels = await page.locator('[data-panel]').evaluateAll(panels => panels.filter(panel => panel.getBoundingClientRect().width > 0).map(panel => ({ opacity: getComputedStyle(panel).opacity, transform: getComputedStyle(panel).transform })))

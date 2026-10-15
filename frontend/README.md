@@ -19,6 +19,12 @@ and reviewer credentials must never be embedded in frontend environment variable
 
 ## Passenger and administrator flows
 
+First-time visitors open a centered travel-preference dialog over a blurred,
+inert planner preview. Three core questions produce an initial nine-dimensional
+profile; six optional questions refine it. Completed preferences feed the route
+engine's supported scoring criteria. See [questionnaire and scoring details](../docs/PREFERENCES.md).
+Use `?view=preferences` to reopen, or `?view=planner` for a direct planner entry.
+
 The public application retains Journey, route results/details, Report, Agent,
 Updates and How it works, including the preference preview/editor. Public
 Compare, Simulation and Review pages have been removed. The simulation APIs and
