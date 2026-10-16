@@ -15,10 +15,12 @@ services:
       sizeGB: 1
     envVars:
       - key: OFFLINE_MODE
-        value: "true"
+        value: "false"
       - key: BUS_NETWORK_ENABLED
         value: "true"
       - key: AI_ENABLED
+        value: "true"
+      - key: AI_DISABLE_EXTERNAL
         value: "false"
       - key: CORS_ALLOWED_ORIGINS
         value: https://resilient-public-travel.pages.dev
