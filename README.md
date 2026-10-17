@@ -149,7 +149,7 @@ A browser regression suite (`tests/browser/`) exercises real backend requests, p
 
 `sim_cpp/` is a standalone C++20 event simulation that replays the same 10,000-person synthetic population on the Kowloon Tong → Exhibition Centre corridor under a one-hour East Rail (Hung Hom–Exhibition Centre) closure, comparing three strategies: **A** (no-fault baseline), **B** (protected-first bucket allocation with a known planned closure window) and **C** (immediate fastest route, re-planning only when forced off the train). The headline finding: the 95% per-train physical cap never binds — the 3,400/460 planning cap does — and bucket allocation buys tail protection for protected groups (zero forced alights versus 633, max delay 30 versus 60 min) at a small cost to standard commuters. All reports, charts and the verification record can be read directly on GitHub:
 
-- **[Simulation report](sim_cpp/report/SIMULATION_REPORT.md)** (Chinese, charts inline) · **[Conclusions](sim_cpp/report/CONCLUSIONS.md)** · **[Bucket comparison](sim_cpp/report/BUCKET_COMPARISON.md)** · **[Verification record](sim_cpp/report/VERIFICATION.md)** · **[One-slide summary](sim_cpp/report/SIMULATION_ONE_SLIDE.pptx)** (PPTX)
+- **[Simulation report](sim_cpp/report/SIMULATION_REPORT.md)** (Chinese, charts inline) · **[Verification record](sim_cpp/report/VERIFICATION.md)**
 
 ## Deployment
 
