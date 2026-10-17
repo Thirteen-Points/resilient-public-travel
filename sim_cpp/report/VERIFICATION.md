@@ -1,59 +1,40 @@
-# C++ sandbox verification record
+# VERIFICATION — 东铁 10,000 人沙盒
 
-**Scenario**: `sim_cpp/config/scenario.json` (2026-10-15; off-peak 13:00–15:00 + evening 17:00–18:00; 5 groups; 95% per-train cap; seed 20260922)
+- 运行目录：`sim_cpp/out/run1`
+- 重复运行：`sim_cpp/out/run1_repeat`
+- 输入：`D:/Competition/Hackathon2026SepOct/sim_cpp/data/sim_input.json`
+- 输入 SHA256：`c6aaef9cb197173b264f6eed2e99708ad7e798ec13b85ea951fb6f01636cb4f1`
+- 人口哈希：`5d713f3e1575661a`
 
-**Population**: 10,000; commuter / student / tourist / elderly / wheelchair = 2,000 each; `population_hash = 9cc88d73b34c0acc`.
+## 检查结果
 
-**Input SHA256** (`sim_cpp/data/sim_input.json`): `6fe6a5d6c1535ac1d67454fb63cd5fdc2c9905182cb5f3eb181c720afe117664`
-**C++ input hash**: `97bd81139bf358cf`
-**Config hash**: `876d85a111146b6d`
-
-## Self-test
-
-`sim.exe --self-test` → `SELF-TEST PASS`
-
-- 10,000 passengers; five personas × 2,000.
-- Off-peak arrivals `[13:00:00, 14:59:58]`; evening arrivals `[17:00:00, 17:59:59]`.
-- W1 first-draw mean `20.15 min` (target 20).
-- Six route-timing validation cases pass against the Python engine's exported `query_details` ETAs (±1 s):
-  - closure/standard/HUH @14:05 → 1,305 s
-  - closure/standard/HUH @17:05 → 1,125 s
-  - normal/standard/KOT @13:05 → 1,005 s
-  - normal/standard/KOT @17:05 → 825 s
-  - closure/standard/KOT @14:05 → 1,665 s
-  - closure/standard/KOT @17:05 → 1,305 s
-
-## Output verification
-
-`python scripts/verify_cpp_sim.py --out sim_cpp/out/run1` → `VERIFY PASS`
-
-- Five groups, each 10,000; served + censored = 10,000.
-- B0/B2 fully served; no capacity denial; no train onboard above its 95% cap.
-- Station queues non-negative; line load factors ≤ 1.0.
-- Cross-period rates 5,000/h (off-peak) and 10,000/h (evening).
-- F1/W1 forced-alight cohort exists (HUH turnaround), as required by the scenario.
-
-## Determinism
-
-Two independent runs (`run1` and `run2`) produced identical SHA256 for:
-
-| file | SHA256 (prefix) |
+| 检查 | 结果 |
 |---|---|
-| comparison.json | `232ec077d745b615` |
-| B0/passengers.csv | `b7c9e79271916040` |
-| F1/passengers.csv | `7ec9b6b511e69cba` |
-| W1/passengers.csv | `14242826ff130157` |
-| B2/passengers.csv | `1cfe9efc5a2b1c8e` |
-| F2/passengers.csv | `1d3bfb8becec9429` |
-| F1/station_waiting.csv | `06e6c4bcf8563144` |
-| W1/station_waiting.csv | `cc464c534447cd83` |
+| 输入哈希（sidecar） | PASS |
+| 人口 10,000 / 五类各 2,000 | PASS |
+| served + censored = 10,000 | PASS |
+| 物理 95% 上限 / 无超载 | PASS |
+| 站台事件复算（峰值 / 人·分） | PASS |
+| 到达延误按 passenger id 配对复算 | PASS |
+| Bucket 容量账本 | PASS |
+| 确定性（两次运行哈希一致） | PASS |
 
-Result: **DETERMINISM PASS**.
+## 关键复算值
 
-## Key sanity numbers
+| 组 | served | censored | 平均延误 min | P95 min | 最大 min | denied | forced | 站台人·分 | 峰值列车 LF | 峰值车辆 LF |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A | 10000 | 0 | 0.00 | 0.00 | 0.00 | 0 | 0 | 29759.8 | 23.8% | 23.8% |
+| B | 10000 | 0 | 9.37 | 18.00 | 30.00 | 0 | 0 | 58252.7 | 36.2% | 54.6% |
+| C | 10000 | 0 | 9.50 | 17.00 | 60.00 | 0 | 633 | 65375.3 | 34.8% | 34.8% |
 
-- B0 average journey 14.23 min; B2 12.82 min.
-- F1: 5,701 affected, average delay 9.50 min; 633 HUH forced alights.
-- W1: 6,091 affected, average delay 19.23 min; KOT peak 2,057 (1,743 policy wait), HUH peak 633.
-- F2: 9,029 affected, average delay 12.57 min.
-- Maximum per-train load factor 0.348; zero denied boardings.
+## 断言
+
+**PASS** — 所有断言通过。
+
+## 复算口径
+
+- 站台峰值/人·分：由 `station_waiting_events.csv` 的 delta 逐事件积分；初始 13:00 为空，17:00 清空。
+- 到达延误：B/C 的 `arrival_exc_s` 减去 A 中同一 `passenger_id` 的到达时间，除以 60。
+- 物理容量：每车 `floor(0.95 × capacity_per_vehicle)`；`line_loads.csv` 的 `max_onboard` 不得超过该值。
+- Bucket：`bucket_allocations.csv` 中 `assigned` 行才消耗 route/segment bucket；`fallback` 不计入 bucket 容量。
+- 确定性：两次运行的 `manifest.json` 文件 SHA256 映射完全一致。

@@ -147,9 +147,9 @@ npm run build:admin
 
 ## C++ 沙盒模拟报告
 
-`sim_cpp/` 是一个独立的 C++20 事件仿真沙盒：把同一批 1 万人合成人群在平峰与晚高峰场景中重放到九龙塘 → 会展走廊上，包含东铁线一小时封闭、单车容量上限、强制落车与"原地等待 vs 立即重规划"策略。生成的报告（含站点候车图表、公平性与无障碍发现，以及自检/确定性验证记录）可直接在 GitHub 上查看：
+`sim_cpp/` 是一个独立的 C++20 事件仿真沙盒：把同一批 1 万人合成人群放在东铁线（红磡–会展）一小时封闭场景下，对比三种策略——**A**（无故障基准）、**B**（预知计划封闭窗口的 protected-first bucket 预分配）与 **C**（只看即时信息的最快路线，被强制下车后才重规划）。核心发现：95% 每车物理上限全程未绑定，真正起作用的是 3,400/460 的规划 cap；bucket 用普通乘客的小幅绕行，换来 protected 群体的尾部保障（强制落车 0 对 633 人，最大延误 30 对 60 分钟）。全部报告、图表与验证记录可直接在 GitHub 上查看：
 
-- **[模拟测试报告](sim_cpp/report/SIMULATION_REPORT.md)**（中文，图表内嵌） · **[验证记录](sim_cpp/report/VERIFICATION.md)**
+- **[模拟测试报告](sim_cpp/report/SIMULATION_REPORT.md)**（中文，图表内嵌） · **[分析结论](sim_cpp/report/CONCLUSIONS.md)** · **[Bucket 对比](sim_cpp/report/BUCKET_COMPARISON.md)** · **[验证记录](sim_cpp/report/VERIFICATION.md)** · **[单页摘要](sim_cpp/report/SIMULATION_ONE_SLIDE.pptx)**（PPTX）
 
 ## 部署
 

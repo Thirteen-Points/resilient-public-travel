@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="420" viewBox="0 0 920 420">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<text x="70" y="24" font-family="Calibri" font-size="16" font-weight="bold" fill="#1A1A1A">Route share: B diversifies, C funnels</text>
+<text x="70" y="62" font-family="Calibri" font-size="13" fill="#1A1A1A">KTL+TWL+ERL</text>
+<rect x="330" y="59" width="336.6" height="11" fill="#1F4E79"/>
+<text x="672.6" y="70" font-family="Calibri" font-size="12" fill="#666666">48.1%</text>
+<rect x="330" y="79" width="342.2" height="11" fill="#C00000"/>
+<text x="678.2" y="90" font-family="Calibri" font-size="12" fill="#666666">48.9%</text>
+<text x="70" y="114" font-family="Calibri" font-size="13" fill="#1A1A1A">ERL direct</text>
+<rect x="330" y="111" width="288.7" height="11" fill="#1F4E79"/>
+<text x="624.7" y="122" font-family="Calibri" font-size="12" fill="#666666">41.2%</text>
+<rect x="330" y="131" width="357.8" height="11" fill="#C00000"/>
+<text x="693.8" y="142" font-family="Calibri" font-size="12" fill="#666666">51.1%</text>
+<text x="70" y="166" font-family="Calibri" font-size="13" fill="#1A1A1A">KTL+TML+ERL (DIH)</text>
+<rect x="330" y="163" width="36.8" height="11" fill="#1F4E79"/>
+<text x="372.8" y="174" font-family="Calibri" font-size="12" fill="#666666">5.3%</text>
+<rect x="330" y="183" width="0.0" height="11" fill="#C00000"/>
+<text x="336.0" y="194" font-family="Calibri" font-size="12" fill="#666666">0.0%</text>
+<text x="70" y="218" font-family="Calibri" font-size="13" fill="#1A1A1A">ERL+TML+ERL (TAW)</text>
+<rect x="330" y="215" width="33.0" height="11" fill="#1F4E79"/>
+<text x="369.0" y="226" font-family="Calibri" font-size="12" fill="#666666">4.7%</text>
+<rect x="330" y="235" width="0.0" height="11" fill="#C00000"/>
+<text x="336.0" y="246" font-family="Calibri" font-size="12" fill="#666666">0.0%</text>
+<text x="70" y="270" font-family="Calibri" font-size="13" fill="#1A1A1A">ERL+bus182+ERL</text>
+<rect x="330" y="267" width="5.0" height="11" fill="#1F4E79"/>
+<text x="341.0" y="278" font-family="Calibri" font-size="12" fill="#666666">0.7%</text>
+<rect x="330" y="287" width="0.0" height="11" fill="#C00000"/>
+<text x="336.0" y="298" font-family="Calibri" font-size="12" fill="#666666">0.0%</text>
+<text x="70" y="412" font-family="Calibri" font-size="12" fill="#666666">Top bars: B; lower bars: C. Shares of 10,000 initial route choices.</text>
+</svg>

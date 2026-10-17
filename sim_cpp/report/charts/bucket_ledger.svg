@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="300" viewBox="0 0 920 300">
+<rect width="100%" height="100%" fill="#FFFFFF"/>
+<text x="70" y="24" font-family="Calibri" font-size="16" font-weight="bold" fill="#1A1A1A">B bucket ledger: assigned vs fallback</text>
+<text x="70" y="78" font-family="Calibri" font-size="14" fill="#1A1A1A">assigned</text>
+<rect x="250" y="62" width="596.1" height="22" fill="#1F4E79"/>
+<text x="854.1" y="78" font-family="Calibri" font-size="14" fill="#666666">9314</text>
+<text x="70" y="134" font-family="Calibri" font-size="14" fill="#1A1A1A">fallback</text>
+<rect x="250" y="118" width="43.9" height="22" fill="#C00000"/>
+<text x="301.9" y="134" font-family="Calibri" font-size="14" fill="#666666">686</text>
+<text x="70" y="190" font-family="Calibri" font-size="14" fill="#1A1A1A">protected assigned</text>
+<rect x="250" y="174" width="256.0" height="22" fill="#2E6B2E"/>
+<text x="514.0" y="190" font-family="Calibri" font-size="14" fill="#666666">4000</text>
+<text x="70" y="288" font-family="Calibri" font-size="12" fill="#666666">Protected = elderly + wheelchair. Fallback = fastest feasible, not a bucket assignment.</text>
+</svg>
