@@ -145,6 +145,12 @@ A browser regression suite (`tests/browser/`) exercises real backend requests, p
 
 `deploy/offline/` ships a prepared bundle that starts the API and the built frontend with no installation and no network: a five-minute scripted tour of the corridor, frozen simulation evidence, and recorded media as the failure fallback. Build it with `scripts/package_offline.py`, verify with `python scripts/preflight.py --demo --require-media`, and launch with `deploy/offline/start.ps1` / `start.sh`. See the [offline package guide](deploy/offline/README.md).
 
+## C++ sandbox simulation report
+
+`sim_cpp/` is a standalone C++20 event simulation that replays the same 10,000-person synthetic population through off-peak and evening-peak scenarios on the Kowloon Tong → Exhibition Centre corridor, including a one-hour East Rail closure with per-train capacity caps, forced alighting and wait-versus-reroute policies. The generated report — station-queue charts, fairness and accessibility findings, plus a self-test/determinism verification record — can be read directly on GitHub:
+
+- **[Simulation report](sim_cpp/report/SIMULATION_REPORT.md)** (Chinese, charts inline) · **[Verification record](sim_cpp/report/VERIFICATION.md)**
+
 ## Deployment
 
 The repository contains a Render Blueprint (`render.yaml`) for the API — with a persistent disk for `events.sqlite3`, admin and AI-usage databases — and deploys the frontend to Cloudflare Pages. The backend permits only the exact production Pages origin via `CORS_ALLOWED_ORIGINS`; reviewer APIs are protected by `REVIEW_API_TOKEN`. Before relying on a deployed instance, verify `/api/health/deep`, `/api/meta` and the deployed build SHA. Full runbook: [deployment guide](deploy/DEPLOYMENT.md).

@@ -145,6 +145,12 @@ npm run build:admin
 
 `deploy/offline/` 提供预置离线包：无需安装、无需网络即可启动 API 与构建好的前端，包含走廊五分钟演示脚本、冻结的仿真证据，以及作为故障兜底的录屏媒体。用 `scripts/package_offline.py` 构建，用 `python scripts/preflight.py --demo --require-media` 校验，用 `deploy/offline/start.ps1` / `start.sh` 启动。详见[离线包指南](deploy/offline/README.md)。
 
+## C++ 沙盒模拟报告
+
+`sim_cpp/` 是一个独立的 C++20 事件仿真沙盒：把同一批 1 万人合成人群在平峰与晚高峰场景中重放到九龙塘 → 会展走廊上，包含东铁线一小时封闭、单车容量上限、强制落车与"原地等待 vs 立即重规划"策略。生成的报告（含站点候车图表、公平性与无障碍发现，以及自检/确定性验证记录）可直接在 GitHub 上查看：
+
+- **[模拟测试报告](sim_cpp/report/SIMULATION_REPORT.md)**（中文，图表内嵌） · **[验证记录](sim_cpp/report/VERIFICATION.md)**
+
 ## 部署
 
 仓库内置 Render Blueprint（`render.yaml`）部署 API——为 `events.sqlite3`、管理员与 AI 用量数据库挂载持久磁盘——前端部署在 Cloudflare Pages。后端通过 `CORS_ALLOWED_ORIGINS` 只放行确切的线上 Pages 域名；审核 API 由 `REVIEW_API_TOKEN` 保护。依赖任何已部署实例之前，先核验 `/api/health/deep`、`/api/meta` 与已部署构建 SHA。完整手册见[部署指南](deploy/DEPLOYMENT.md)。

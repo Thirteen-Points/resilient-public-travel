@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="360" viewBox="0 0 980 360" font-family="Segoe UI, Microsoft YaHei, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="490.0" y="26" text-anchor="middle" font-size="18" font-weight="600" fill="#1f2937">offpeak 到达分布（10,000 人）</text>
+<rect x="82" y="58" width="870" height="240" fill="#fbfcfe" stroke="#d7dee8"/>
+<line x1="82" y1="58.00" x2="952" y2="58.00" stroke="#e8edf4"/>
+<text x="72" y="62.00" text-anchor="end" font-size="11" fill="#5b6576">660</text>
+<line x1="82" y1="118.00" x2="952" y2="118.00" stroke="#e8edf4"/>
+<text x="72" y="122.00" text-anchor="end" font-size="11" fill="#5b6576">495</text>
+<line x1="82" y1="178.00" x2="952" y2="178.00" stroke="#e8edf4"/>
+<text x="72" y="182.00" text-anchor="end" font-size="11" fill="#5b6576">330</text>
+<line x1="82" y1="238.00" x2="952" y2="238.00" stroke="#e8edf4"/>
+<text x="72" y="242.00" text-anchor="end" font-size="11" fill="#5b6576">165</text>
+<line x1="82" y1="298.00" x2="952" y2="298.00" stroke="#e8edf4"/>
+<text x="72" y="302.00" text-anchor="end" font-size="11" fill="#5b6576">0</text>
+<rect x="68.95" y="192.18" width="26.10" height="105.82" fill="#4E79A7" opacity="0.82"/>
+<text x="82.00" y="318" text-anchor="middle" font-size="10" fill="#5b6576">13:00</text>
+<rect x="105.20" y="184.91" width="26.10" height="113.09" fill="#4E79A7" opacity="0.82"/>
+<rect x="141.45" y="188.55" width="26.10" height="109.45" fill="#4E79A7" opacity="0.82"/>
+<text x="154.50" y="318" text-anchor="middle" font-size="10" fill="#5b6576">13:10</text>
+<rect x="177.70" y="168.91" width="26.10" height="129.09" fill="#4E79A7" opacity="0.82"/>
+<rect x="213.95" y="172.55" width="26.10" height="125.45" fill="#4E79A7" opacity="0.82"/>
+<text x="227.00" y="318" text-anchor="middle" font-size="10" fill="#5b6576">13:20</text>
+<rect x="250.20" y="174.36" width="26.10" height="123.64" fill="#4E79A7" opacity="0.82"/>
+<rect x="286.45" y="156.55" width="26.10" height="141.45" fill="#4E79A7" opacity="0.82"/>
+<text x="299.50" y="318" text-anchor="middle" font-size="10" fill="#5b6576">13:30</text>
+<rect x="322.70" y="146.36" width="26.10" height="151.64" fill="#4E79A7" opacity="0.82"/>
+<rect x="358.95" y="147.45" width="26.10" height="150.55" fill="#4E79A7" opacity="0.82"/>
+<text x="372.00" y="318" text-anchor="middle" font-size="10" fill="#5b6576">13:40</text>
+<rect x="395.20" y="132.55" width="26.10" height="165.45" fill="#4E79A7" opacity="0.82"/>
+<rect x="431.45" y="133.27" width="26.10" height="164.73" fill="#4E79A7" opacity="0.82"/>
+<text x="444.50" y="318" text-anchor="middle" font-size="10" fill="#5b6576">13:50</text>
+<rect x="467.70" y="86.00" width="26.10" height="212.00" fill="#4E79A7" opacity="0.82"/>
+<rect x="503.95" y="115.09" width="26.10" height="182.91" fill="#4E79A7" opacity="0.82"/>
+<text x="517.00" y="318" text-anchor="middle" font-size="10" fill="#5b6576">14:00</text>
+<rect x="540.20" y="115.82" width="26.10" height="182.18" fill="#4E79A7" opacity="0.82"/>
+<rect x="576.45" y="102.73" width="26.10" height="195.27" fill="#4E79A7" opacity="0.82"/>
+<text x="589.50" y="318" text-anchor="middle" font-size="10" fill="#5b6576">14:10</text>
+<rect x="612.70" y="129.27" width="26.10" height="168.73" fill="#4E79A7" opacity="0.82"/>
+<rect x="648.95" y="102.36" width="26.10" height="195.64" fill="#4E79A7" opacity="0.82"/>
+<text x="662.00" y="318" text-anchor="middle" font-size="10" fill="#5b6576">14:20</text>
+<rect x="685.20" y="110.36" width="26.10" height="187.64" fill="#4E79A7" opacity="0.82"/>
+<rect x="721.45" y="122.00" width="26.10" height="176.00" fill="#4E79A7" opacity="0.82"/>
+<text x="734.50" y="318" text-anchor="middle" font-size="10" fill="#5b6576">14:30</text>
+<rect x="757.70" y="143.45" width="26.10" height="154.55" fill="#4E79A7" opacity="0.82"/>
+<rect x="793.95" y="150.00" width="26.10" height="148.00" fill="#4E79A7" opacity="0.82"/>
+<text x="807.00" y="318" text-anchor="middle" font-size="10" fill="#5b6576">14:40</text>
+<rect x="830.20" y="168.55" width="26.10" height="129.45" fill="#4E79A7" opacity="0.82"/>
+<rect x="866.45" y="183.82" width="26.10" height="114.18" fill="#4E79A7" opacity="0.82"/>
+<text x="879.50" y="318" text-anchor="middle" font-size="10" fill="#5b6576">14:50</text>
+<rect x="902.70" y="188.55" width="26.10" height="109.45" fill="#4E79A7" opacity="0.82"/>
+<text x="517.0" y="342" text-anchor="middle" font-size="12" fill="#374151">时间</text>
+<text x="18" y="178.0" text-anchor="middle" font-size="12" fill="#374151" transform="rotate(-90 18 178.0)">到达人数 / 5min</text>
+</svg>
