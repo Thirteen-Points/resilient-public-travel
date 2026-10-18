@@ -197,6 +197,10 @@ let browser, page
   if (baseline) { console.log(JSON.stringify({ baseline: true, layouts, folder })); return }
   pass('1440 and 1024: Journey, Report and Agent share the same sidebar and adjacent map geometry')
   await page.setViewportSize({ width: 1440, height: 1000 }); await navigate(page, 'Plan journey'); await settled(page)
+  // ResizeObserver refits Leaflet after the panel settles; wait for the
+  // station geometry itself instead of assuming the 300 ms UI delay paints it.
+  await page.waitForFunction(() => Array.from(document.querySelectorAll('#journey-map .leaflet-overlay-pane svg path'))
+    .filter(path => /a/i.test(path.getAttribute('d') ?? '') && Number(getComputedStyle(path).strokeOpacity) > 0).length >= 6)
   const defaultPaths = await mapPaths(page), stations = defaultPaths.filter(path => /a/i.test(path.d))
   assert.equal(defaultPaths.filter(path => !/a/i.test(path.d)).length, 0, 'Default map unexpectedly draws route/network lines')
   assert.ok(stations.length >= 6, 'Default map should retain station markers')
