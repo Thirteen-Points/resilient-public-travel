@@ -36,6 +36,11 @@ class FixtureLoadProvider:
 
 
 def attach_load(details, provider):
+    """Add bottleneck queueing above the zero-demand half-headway baseline.
+
+    Scheduled boarding waits are already in the path ETA. Only the increase
+    above normal waiting is added, once per route rather than per stop.
+    """
     result = deepcopy(details)
     if result['routes'] and provider is None:
         raise DataUnavailable('C-Sim load provider required; no implicit demand assumption')
@@ -48,7 +53,20 @@ def attach_load(details, provider):
         if not isinstance(age, (float, int)) or not math.isfinite(age) or age < 0:
             raise DataUnavailable('Load provider requires finite nonnegative freshness_s')
     for route in result['routes']:
-        route['load_estimate'] = validate_load(provider(route, result['route_parameters'][route['route_id']]))
+        parameters = result['route_parameters'][route['route_id']]
+        route['load_estimate'] = validate_load(provider(route, parameters))
+        headway_s = parameters['headway_s']
+        wait_s = route['load_estimate']['expected_wait_s']
+        delay_s = max(0.0, wait_s - headway_s / 2) if headway_s > 0 else 0.0
+        total = route['total']
+        total['queue_delay_s'] = delay_s
+        total['time_s'] += delay_s
+        total['time_range_s'] = [bound + delay_s for bound in total['time_range_s']]
+        if headway_s > 0 and wait_s >= 2 * headway_s:
+            route['warnings'].append('Queue estimate has reached the two-headway cap; actual waiting may be longer in severe crowding.')
+        refusal = route['load_estimate']['board_refusal_prob']
+        if refusal > 0:
+            route['warnings'].append(f'Boarding may be refused (model probability {refusal:.0%}); allow extra time.')
         route['evidence'].append({'source': provider.source, 'freshness_s': provider.freshness_s})
         if provider.provenance == 'simulated':
             route['provenance'] = 'simulated'

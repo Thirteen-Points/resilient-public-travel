@@ -186,6 +186,7 @@ Hackathon2026SepOct/
   "total": {
     "time_s": 1900,
     "time_range_s": [1700, 2100],
+    "queue_delay_s": 0,
     "transfers": 1,
     "walk_m": 420,
     "fare_hkd": 12.5,
@@ -208,6 +209,14 @@ Hackathon2026SepOct/
   "provenance": "real-derived"
 }
 ```
+
+`total.queue_delay_s` 是已计入 `time_s` 和 `time_range_s` 两端的额外排队等待秒数。
+计算为 `max(0, load_estimate.expected_wait_s - route_parameters.headway_s / 2)`：
+路径时间已有按班次计算的常规候车，排队模型的零需求基线（半班距）不重复累加。
+路线级模型使用瓶颈班距，不按途经站点或换乘次数重复累加；纯步行为 0。
+评分及解释在排队接入后计算，缓存仅保存未加排队的路径，每次命中仍重新读取负载并评分。
+区间沿用行程模型的方差并整体平移，不表示已校准的排队等待置信区间。
+缺少此字段的旧版本 seed 不得标成已计入排队；模拟需求仍标注 simulated。
 
 ### 3.5 `LoadEstimate` / `DiversionPlan` / `SimResult`
 

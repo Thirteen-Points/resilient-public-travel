@@ -88,6 +88,7 @@
 .routeCard:nth-child(3n+3) { --candidate: var(--rr-route-c); }
 .selectedRoute { border-color: var(--candidate); box-shadow: inset 0 0 0 1px var(--candidate); }
 .routeSelect { display: block; width: 100%; min-height: 48px; padding: 16px; border: 0; background: transparent; color: var(--rr-text-primary); text-align: left; }
+.routeQueue { display: block; margin: 8px 0 0 35px; color: var(--rr-text-secondary); font-size: 12px; line-height: 1.5; }
 .routeSelect:focus-visible { outline-offset: -4px; }
 .routeTop { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .routeLetter { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: var(--rr-radius-small); background: var(--candidate); color: var(--rr-text-inverse); font-size: var(--rr-font-label); font-weight: 600; }

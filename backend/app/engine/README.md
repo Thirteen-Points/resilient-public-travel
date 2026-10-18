@@ -208,3 +208,14 @@ routes.seed 采用当前引擎生成的新稳定 route_id，不将旧 r_seed_006
 ## Transport selection
 
 The route query accepts `modes` (allowed transit modes) and `required_modes` (each must occur in the journey). Required modes filter feasible paths before diversity and scoring and form part of cache identity. Walking and other transit modes can provide connections. Supported transit values are MTR, BUS, MINIBUS and FERRY; the curated network currently has no verified minibus service.
+
+## Queue-inclusive journey estimates
+
+`total.queue_delay_s = max(0, load_estimate.expected_wait_s - headway_s / 2)`
+is included in `time_s` and both `time_range_s` bounds before ranking and
+explanations are generated. Scheduled waiting is already in the path ETA;
+the bottleneck queue model is applied once per route. Cache hits refresh load
+and scores without accumulating delay. The interval retains the existing
+travel variance; it is not a calibrated queue confidence interval. Capped
+queue estimates and boarding refusal risk are disclosed. Default seed demand
+is explicitly simulated and zero; no measured prediction accuracy is claimed.

@@ -82,6 +82,11 @@ jobs:
           M2_PYTHON: python
           M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
         run: node tests/browser/p4.e2e.cjs
+      - name: Queue-inclusive journey estimates
+        env:
+          M2_PYTHON: python
+          M2_PLAYWRIGHT: ${{ github.workspace }}/.cache/p3-playwright/node_modules/playwright
+        run: node tests/browser/queue.e2e.cjs
       - name: Offline production browser regression
         env:
           M2_PYTHON: python
@@ -109,6 +114,7 @@ jobs:
             .cache/p4-media/
             .cache/frontend-layout-motion/
             .cache/preferences-browser/
+            .cache/queue-browser/
             .cache/offline-demo/backend.log
           if-no-files-found: warn
           retention-days: 14

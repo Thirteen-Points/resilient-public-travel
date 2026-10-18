@@ -1,12 +1,14 @@
 import type { RouteCandidate } from '../api/types'
 import { formatRange } from '../data'
 import { ProvenanceBadge } from './ProvenanceBadge'
+import { QueueWait } from './QueueWait'
 import css from './P3.module.css'
 
 export function BackendRoute({ route }: { route: RouteCandidate }) {
   return <section className={css.summary} data-backend-route={route.route_id}>
     <strong>{route.label}</strong>
     <p className={css.routeTime}>{formatRange(route.total.time_range_s)}</p>
+    <p><QueueWait route={route} /></p>
     <dl className={css.metrics}><div><dt>Walking</dt><dd>{route.total.walk_m} <small>m</small></dd></div><div><dt>Transfers</dt><dd>{route.total.transfers}</dd></div><div><dt>Fare estimate</dt><dd>HK${route.total.fare_hkd.toFixed(2)}</dd></div><div><dt>Engine score</dt><dd>{Math.round(route.score * 100)}<small> /100</small></dd></div></dl>
     <p>Adult Octopus ordinary class · bus section fares · ferry upper deck (lower deck for wheelchair routes). Personal concessions excluded.</p>
     <ProvenanceBadge value={route.provenance} />

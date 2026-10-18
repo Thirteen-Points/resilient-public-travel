@@ -118,6 +118,8 @@ export interface RouteCandidate {
   total: {
     time_s: number
     time_range_s: [number, number]
+    /** Extra bottleneck queueing above normal waiting, already in the ETA. */
+    queue_delay_s?: number
     transfers: number
     walk_m: number
     fare_hkd: number

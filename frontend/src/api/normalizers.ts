@@ -200,6 +200,7 @@ function validateRoute(raw: unknown, path: string, issues: Issues): void {
   }
   if (isRecord(raw.total)) {
     expectFiniteNumber(raw.total, 'time_s', `${path}.total`, issues, value => value >= 0, 'a non-negative total time in seconds')
+    if (raw.total.queue_delay_s !== undefined) expectFiniteNumber(raw.total, 'queue_delay_s', `${path}.total`, issues, value => value >= 0, 'a non-negative queue delay in seconds')
     const range = raw.total.time_range_s
     if (Array.isArray(range) && range.length === 2 && range.every(isFiniteNumber)) {
       if (range[0] > (range[1] as number)) {
