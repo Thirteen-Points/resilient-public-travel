@@ -65,7 +65,9 @@ def score_routes(routes, profile, *, baseline_fare):
             route["notes"].append("Estimated comfort is low; prolonged standing may be required.")
         if any(leg["accessible"] is not True for leg in route["legs"]):
             route["notes"].append("Step-free access has not been confirmed for the entire journey.")
+        queue_note = (f"Includes {total['queue_delay_s'] / 60:.1f} min extra queueing (demand/capacity model estimate). "
+                      if 'queue_delay_s' in total else '')
         route["explain"] = (f"{route['label']}: about {total['time_range_s'][0] / 60:.0f}–"
                             f"{total['time_range_s'][1] / 60:.0f} min, {total['transfers']} transfers, "
-                            f"{total['walk_m']:g} m walking. Ranked with {preset} weights; carbon emissions and comfort are simulated estimates.")
+                            f"{total['walk_m']:g} m walking. {queue_note}Ranked with {preset} weights; carbon emissions and comfort are simulated estimates.")
     return sorted(output, key=lambda r: (-r["score"], r["total"]["time_s"], r["route_id"]))

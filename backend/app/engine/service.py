@@ -68,7 +68,7 @@ class RouteEngine:
                           sorted(event_ids or ()), sorted(modes or ()), sorted(required_modes or ()), limit, self.baseline_fare, fare_revision], sort_keys=True)
         cached = self.cache.get(key)
         if cached is not None:
-            return attach_load(cached, self.load_provider)
+            return self._load_and_score(cached, profile)
         found = search_paths(snapshot, origin, destination, at, profile, modes=modes, required_modes=required_modes,
                              max_expansions=self.max_expansions)
         paths = select_diverse(found.paths, limit)
@@ -106,7 +106,7 @@ class RouteEngine:
                                          + ('; high overlap, so this is not an independent alternative corridor' if overlap >= .7 else '')
                                          + '; only the diversity preference is relaxed; accessibility, walking and transfer hard limits remain enforced.')
             raw.append(route)
-        routes = score_routes(raw, profile, baseline_fare=self.baseline_fare)
+        routes = raw
         diagnostics = list(snapshot.network.diagnostics)
         if len(routes) < limit:
             diagnostics.append(f"Only {len(routes)} feasible diverse routes; target {limit} cannot be guaranteed by this network/profile")
@@ -116,7 +116,7 @@ class RouteEngine:
         if found.truncated:
             diagnostics.append("Search bounded by path/expansion budget; result is not exhaustive")
         # Keep simulation parameters outside the public RouteCandidate contract.
-        parameters = {r["route_id"]: r.pop("_metrics") for r in routes}
+        parameters = {r["route_id"]: dict(r["_metrics"]) for r in routes}
         for route in routes:
             parameters[route['route_id']].update(route_id=route['route_id'],
                                                  freshness_s=route['total']['freshness_s'])
@@ -130,4 +130,13 @@ class RouteEngine:
                                         "diversity_filtered": len(found.paths) > len(paths),
                                         "bounded": found.truncated}}
         self.cache.put(key, result)
-        return attach_load(result, self.load_provider)
+        return self._load_and_score(result, profile)
+
+    def _load_and_score(self, details, profile):
+        # Cache only demand-independent paths; refresh queue delay and ranking
+        # together, including when the same journey is requested again.
+        result = attach_load(details, self.load_provider)
+        result['routes'] = score_routes(result['routes'], profile, baseline_fare=self.baseline_fare)
+        for route in result['routes']:
+            route.pop('_metrics', None)
+        return result

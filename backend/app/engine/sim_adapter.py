@@ -66,4 +66,8 @@ class SimLoadProvider:
         return self.demand.freshness_s
 
     def __call__(self, route, parameters):
+        if parameters['headway_s'] == 0:
+            # No boarding or transit supply on a walking-only path.
+            return {'users_on_route': 0, 'capacity_per_hour': 0, 'load_factor': 0,
+                    'expected_wait_s': 0, 'board_refusal_prob': 0}
         return self.simulation.estimate_load(parameters, self.demand.read(route['route_id'], 60), 60)

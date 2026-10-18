@@ -72,6 +72,7 @@
             "required": ["time_s", "time_range_s", "transfers", "walk_m", "fare_hkd", "co2_g", "reliability", "freshness_s"],
             "properties": {
               "time_s": {"type": "number", "minimum": 0},
+              "queue_delay_s": {"type": "number", "minimum": 0, "description": "Extra demand-dependent bottleneck queue delay, already included in time_s and both time_range_s bounds."},
               "time_range_s": {"type": "array", "prefixItems": [{"type": "number", "minimum": 0}, {"type": "number", "minimum": 0}], "minItems": 2, "maxItems": 2},
               "transfers": {"type": "integer", "minimum": 0},
               "walk_m": {"type": "number", "minimum": 0},

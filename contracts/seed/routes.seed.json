@@ -149,7 +149,8 @@
         "fare_hkd": 17.1,
         "co2_g": 377.6459250773652,
         "reliability": 0.9527124634696297,
-        "freshness_s": 117540.0
+        "freshness_s": 117540.0,
+        "queue_delay_s": 0.0
       },
       "score": 0.7253817690399843,
       "score_breakdown": [
@@ -460,7 +461,8 @@
         "fare_hkd": 17.1,
         "co2_g": 487.45646140970234,
         "reliability": 0.956032247438536,
-        "freshness_s": 117780.0
+        "freshness_s": 117780.0,
+        "queue_delay_s": 0.0
       },
       "score": 0.6686625019812564,
       "score_breakdown": [
@@ -739,7 +741,8 @@
         "fare_hkd": 17.1,
         "co2_g": 470.0858589846166,
         "reliability": 0.9510283528741148,
-        "freshness_s": 117900.0
+        "freshness_s": 117900.0,
+        "queue_delay_s": 0.0
       },
       "score": 0.6560291958919676,
       "score_breakdown": [
@@ -1042,7 +1045,8 @@
         "fare_hkd": 17.1,
         "co2_g": 395.42328086188735,
         "reliability": 0.9553285805655818,
-        "freshness_s": 117780.0
+        "freshness_s": 117780.0,
+        "queue_delay_s": 0.0
       },
       "score": 0.6492465982885218,
       "score_breakdown": [
@@ -1314,7 +1318,8 @@
         "fare_hkd": 17.1,
         "co2_g": 484.5578101793136,
         "reliability": 0.9535645609474832,
-        "freshness_s": 118020.0
+        "freshness_s": 118020.0,
+        "queue_delay_s": 0.0
       },
       "score": 0.6342336023212333,
       "score_breakdown": [
@@ -1586,7 +1591,8 @@
         "fare_hkd": 17.1,
         "co2_g": 429.5423181381969,
         "reliability": 0.9425144820403738,
-        "freshness_s": 118140.0
+        "freshness_s": 118140.0,
+        "queue_delay_s": 0.0
       },
       "score": 0.5962547986742324,
       "score_breakdown": [
@@ -1887,7 +1893,8 @@
         "fare_hkd": 18.9,
         "co2_g": 558.7913669970235,
         "reliability": 0.8373718799090476,
-        "freshness_s": 118740.0
+        "freshness_s": 118740.0,
+        "queue_delay_s": 0.0
       },
       "score": 0.5022674807234957,
       "score_breakdown": [
@@ -2151,7 +2158,8 @@
         "fare_hkd": 20.8,
         "co2_g": 989.9687801359372,
         "reliability": 0.7267433642141494,
-        "freshness_s": 119640.0
+        "freshness_s": 119640.0,
+        "queue_delay_s": 0.0
       },
       "score": 0.36560724485489904,
       "score_breakdown": [
@@ -2517,7 +2525,8 @@
         "fare_hkd": 20.0,
         "co2_g": 555.668976301476,
         "reliability": 0.9421612074982437,
-        "freshness_s": 119280.0
+        "freshness_s": 119280.0,
+        "queue_delay_s": 0.0
       },
       "score": 0.34986000810954426,
       "score_breakdown": [
@@ -2909,7 +2918,8 @@
         "fare_hkd": 18.9,
         "co2_g": 955.7760054228138,
         "reliability": 0.8114640876902408,
-        "freshness_s": 120240.0
+        "freshness_s": 120240.0,
+        "queue_delay_s": 0.0
       },
       "score": 0.17028511739204183,
       "score_breakdown": [
