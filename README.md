@@ -8,17 +8,13 @@ It was built for the Hack4SDG 2026 hackathon by Team Thirteen-Points. This proje
 
 > **This is an academic prototype, not an official transport service.** The network, capacities, simulations and some fares are modelled or derived. Nothing here is a live timetable, an accessibility guarantee, or operational advice. Check operator announcements for real travel decisions.
 
-## Slides
+## Demo Video
 
+[Watch the demo video](https://www.youtube.com/watch?v=RAm9hZ5Hwoc)
 
+## Project status
 
-## Live demo
-
-| Component | URL |
-| --- | --- |
-| Public web app | <https://resilient-public-travel.pages.dev> |
-| REST API (Render) | <https://resilient-public-travel-api.onrender.com> |
-| Interactive API docs | <https://resilient-public-travel-api.onrender.com/docs> |
+The Hack4SDG project has ended and is no longer maintained. The public frontend remains online as a historical demo: <https://resilient-public-travel.pages.dev>. The Render backend (REST API and interactive docs) is pending manual suspension and remains active until then.
 
 ## What it does
 
@@ -155,9 +151,9 @@ A browser regression suite (`tests/browser/`) exercises real backend requests, p
 
 - **[Simulation report](sim_cpp/report/SIMULATION_REPORT.md)** (Chinese, charts inline) · **[Verification record](sim_cpp/report/VERIFICATION.md)**
 
-## Deployment
+## Deployment (historical)
 
-The repository contains a Render Blueprint (`render.yaml`) for the API — with a persistent disk for `events.sqlite3`, admin and AI-usage databases — and deploys the frontend to Cloudflare Pages. The backend permits only the exact production Pages origin via `CORS_ALLOWED_ORIGINS`; reviewer APIs are protected by `REVIEW_API_TOKEN`. Before relying on a deployed instance, verify `/api/health/deep`, `/api/meta` and the deployed build SHA. Full runbook: [deployment guide](deploy/DEPLOYMENT.md).
+The public frontend remains deployed on Cloudflare Pages. The Render API service and its interactive docs are pending manual shutdown; the Render Blueprint (`render.yaml`) and [deployment guide](deploy/DEPLOYMENT.md) are retained for historical reference.
 
 ## Trust and data limits
 
