@@ -14,7 +14,7 @@ It was built for the Hack4SDG 2026 hackathon by Team Thirteen-Points. This proje
 
 ## Project status
 
-The Hack4SDG project has ended and is no longer maintained. The public frontend remains online as a historical demo: <https://resilient-public-travel.pages.dev>. The Render backend (REST API and interactive docs) is pending manual suspension and remains active until then.
+The Hack4SDG project has ended and is no longer maintained. The public frontend remains online as a historical demo: <https://resilient-public-travel.pages.dev>. 
 
 ## What it does
 
