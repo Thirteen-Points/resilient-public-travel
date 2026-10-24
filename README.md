@@ -4,9 +4,13 @@
 
 ResilientRoute is a disruption-aware journey guidance prototype for a modelled Hong Kong East Rail corridor from **Tai Wai to Admiralty**. When a rail segment is disrupted, it turns multi-source signals into human-approved events, applies those events to a deterministic multimodal route engine, and gives every traveller — from a commuter in a hurry to a wheelchair user — personalised, honestly-labelled alternatives across MTR, bus, ferry and walking, with modelled fares and official bus arrival times.
 
-It was built for the Hack4SDG 2026 hackathon by Team Thirteen-Points.
+It was built for the Hack4SDG 2026 hackathon by Team Thirteen-Points. This project made it to the pitch round but did not win an award.
 
 > **This is an academic prototype, not an official transport service.** The network, capacities, simulations and some fares are modelled or derived. Nothing here is a live timetable, an accessibility guarantee, or operational advice. Check operator announcements for real travel decisions.
+
+## Slides
+
+
 
 ## Live demo
 
