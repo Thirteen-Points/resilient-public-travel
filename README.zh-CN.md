@@ -14,7 +14,7 @@ ResilientRoute 是一个面向香港东铁线**大围 → 金钟走廊**的中�
 
 ## 项目状态
 
-Hack4SDG 比赛已结束，项目停止维护。公众前端作为历史演示保留：<https://resilient-public-travel.pages.dev>。Render 后端（REST API 与交互式文档）仍待手动暂停；暂停前服务仍在运行。
+Hack4SDG 比赛已结束，项目停止维护。公众前端作为历史演示保留：<https://resilient-public-travel.pages.dev>。
 
 ## 它做什么
 
