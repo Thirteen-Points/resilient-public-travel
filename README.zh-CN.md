@@ -8,17 +8,13 @@ ResilientRoute 是一个面向香港东铁线**大围 → 金钟走廊**的中�
 
 > **这是一个学术原型，不是官方交通服务。** 网络、运力、仿真与部分票价为建模或推导数据。本项目不提供实时时刻表，不构成无障碍保证，也不是出行建议。真实出行请以运营方公告为准。
 
-## 提交的 PPT
+## 演示视频
 
-[HackathonSlide]()
+[观看演示视频](https://www.youtube.com/watch?v=RAm9hZ5Hwoc)
 
-## 线上演示
+## 项目状态
 
-| 组件 | 地址 |
-| --- | --- |
-| 公众网页 | <https://resilient-public-travel.pages.dev> |
-| REST API（Render） | <https://resilient-public-travel-api.onrender.com> |
-| 交互式 API 文档 | <https://resilient-public-travel-api.onrender.com/docs> |
+Hack4SDG 比赛已结束，项目停止维护。公众前端作为历史演示保留：<https://resilient-public-travel.pages.dev>。Render 后端（REST API 与交互式文档）仍待手动暂停；暂停前服务仍在运行。
 
 ## 它做什么
 
@@ -155,9 +151,9 @@ npm run build:admin
 
 - **[模拟测试报告](sim_cpp/report/SIMULATION_REPORT.md)**（中文，图表内嵌） · **[验证记录](sim_cpp/report/VERIFICATION.md)**
 
-## 部署
+## 部署（历史记录）
 
-仓库内置 Render Blueprint（`render.yaml`）部署 API——为 `events.sqlite3`、管理员与 AI 用量数据库挂载持久磁盘——前端部署在 Cloudflare Pages。后端通过 `CORS_ALLOWED_ORIGINS` 只放行确切的线上 Pages 域名；审核 API 由 `REVIEW_API_TOKEN` 保护。依赖任何已部署实例之前，先核验 `/api/health/deep`、`/api/meta` 与已部署构建 SHA。完整手册见[部署指南](deploy/DEPLOYMENT.md)。
+公众前端仍部署在 Cloudflare Pages。Render API 服务及其交互式文档仍待手动关闭；Render Blueprint（`render.yaml`）和[部署指南](deploy/DEPLOYMENT.md)保留作历史参考。
 
 ## 信任与数据边界
 
